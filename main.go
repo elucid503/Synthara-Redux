@@ -1,7 +1,9 @@
 package main
 
 import (
+	"Synthara-Redux/Handlers"
 	"Synthara-Redux/Utils"
+	"os"
 
 	"github.com/joho/godotenv"
 )
@@ -10,14 +12,38 @@ func main() {
 
 	godotenv.Load(".env")
 
-	Utils.InitDiscordClient()
+	InitErr := Utils.InitDiscordClient()
 
-	Utils.ConnectDiscordClient()
+	if InitErr != nil {
 
-	Utils.WaitUntilDiscordClientReady()
+		os.Exit(1)
 
-	// Connect events, eventually
+	}
+
+	ConnectErr := Utils.ConnectDiscordClient()
+
+	if ConnectErr != nil {
+
+		os.Exit(1)
+
+	}
+
+	WaitingErr := Utils.WaitUntilDiscordClientReady()
+
+	if WaitingErr != nil {
+
+		os.Exit(1)
+
+	}
+
+	if (os.Getenv("REFRESH_COMMANDS") == "true") {
+
+		Handlers.InitializeCommands()
+
+	}
 	
+	Handlers.InitializeHandlers()
+
 	Utils.Hang()
 
 }

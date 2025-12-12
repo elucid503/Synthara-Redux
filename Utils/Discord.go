@@ -16,7 +16,7 @@ var DiscordClient bot.Client
 
 func InitDiscordClient() error {
 
-	InitializedClient, ErrorInitializing := disgo.New(os.Getenv("DISCORD_BOT_TOKEN"), bot.WithGatewayConfigOpts(gateway.WithIntents(gateway.IntentGuildVoiceStates)))
+	InitializedClient, ErrorInitializing := disgo.New(os.Getenv("DISCORD_TOKEN"), bot.WithGatewayConfigOpts(gateway.WithIntents(gateway.IntentGuildVoiceStates)))
 
 	if ErrorInitializing != nil {
 
@@ -77,10 +77,12 @@ func WaitUntilDiscordClientReady() error {
 
 		case <-WaitChannel:
 
+			Logger.Info("Discord client is ready.")
 			return nil // Successfully received Ready event
 
 		case <-ContextToUse.Done():
 
+			Logger.Error("Timeout waiting for Discord client to be ready.")
 			return ContextToUse.Err() // Timeout or cancellation
 
 		}
