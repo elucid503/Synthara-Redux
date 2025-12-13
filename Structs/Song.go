@@ -1,12 +1,12 @@
-package Structs;
+package Structs
 
 type Song struct {
 
 	YouTubeID string `json:"youtube_id"`
 
-	Title string `json:"title"`
+	Title   string   `json:"title"`
 	Artists []string `json:"artists"`
-	Album string `json:"album"`
+	Album   string   `json:"album"`
 
 	Duration Duration `json:"duration"`
 
@@ -16,7 +16,7 @@ type Song struct {
 
 type Duration struct {
 
-	Seconds int `json:"seconds"`
+	Seconds   int    `json:"seconds"`
 	Formatted string `json:"formatted"`
-
+	
 }

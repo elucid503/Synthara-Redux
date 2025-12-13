@@ -44,6 +44,14 @@ func main() {
 	
 	Handlers.InitializeHandlers()
 
+	InnerTubeError := Utils.InitInnerTubeClient();
+
+	if InnerTubeError != nil {
+
+		os.Exit(1);
+
+	}
+	
 	Utils.Hang()
 
 }
