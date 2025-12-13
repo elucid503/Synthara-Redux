@@ -124,7 +124,7 @@ func (Processor *AudioProcessor) ExtractAACFrames(SegmentBytes []byte) ([][]byte
 
 		if Data.PES != nil && AudioPIDFound && Data.PID == AudioPID {
 
-			if Data.PES.Data != nil && len(Data.PES.Data) > 0 {
+			if len(Data.PES.Data) > 0 {
 
 				// Extract ADTS AAC frames from PES data
 				Frames := Processor.ParseADTSFrames(Data.PES.Data)
