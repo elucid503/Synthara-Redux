@@ -1,7 +1,9 @@
+//go:build linux || darwin || windows
+// +build linux darwin windows
+
 package Utils
 
 import (
-	
 	"bytes"
 	"context"
 	"errors"
@@ -9,8 +11,7 @@ import (
 
 	"github.com/asticode/go-astits"
 	"github.com/nareix/joy4/codec/aacparser"
-	"github.com/pion/opus"
-
+	opus "gopkg.in/hraban/opus.v2"
 )
 
 const (
@@ -23,14 +24,14 @@ const (
 
 )
 
-type AudioProcessors struct {
+type AudioProcessor struct {
 
 	AACDecoder  *FDKAACDecoder
 	OpusEncoder *opus.Encoder
 
 }
 
-func NewAudioProcessor() (*AudioProcessors, error) {
+func NewAudioProcessor() (*AudioProcessor, error) {
 
 	AACDecoder, ErrorCreatingDecoder := NewFDKAACDecoder()
 
@@ -49,7 +50,7 @@ func NewAudioProcessor() (*AudioProcessors, error) {
 
 	}
 
-	return &AudioProcessors{
+	return &AudioProcessor{
 
 		AACDecoder:  AACDecoder,
 		OpusEncoder: OpusEncoder,
@@ -58,7 +59,7 @@ func NewAudioProcessor() (*AudioProcessors, error) {
 
 }
 
-func (Processor *AudioProcessors) ProcessSegment(SegmentBytes []byte) ([][]byte, error) {
+func (Processor *AudioProcessor) ProcessSegment(SegmentBytes []byte) ([][]byte, error) {
 
 	AACFrames, ErrorExtractingAAC := Processor.ExtractAACFrames(SegmentBytes)
 
@@ -80,7 +81,7 @@ func (Processor *AudioProcessors) ProcessSegment(SegmentBytes []byte) ([][]byte,
 
 }
 
-func (Processor *AudioProcessors) ExtractAACFrames(SegmentBytes []byte) ([][]byte, error) {
+func (Processor *AudioProcessor) ExtractAACFrames(SegmentBytes []byte) ([][]byte, error) {
 
 	Reader := bytes.NewReader(SegmentBytes)
 	Demuxer := astits.NewDemuxer(context.Background(), Reader)
@@ -145,7 +146,7 @@ func (Processor *AudioProcessors) ExtractAACFrames(SegmentBytes []byte) ([][]byt
 
 }
 
-func (Processor *AudioProcessors) ParseADTSFrames(ADTSData []byte) [][]byte {
+func (Processor *AudioProcessor) ParseADTSFrames(ADTSData []byte) [][]byte {
 
 	var Frames [][]byte
 	Offset := 0
@@ -186,7 +187,7 @@ func (Processor *AudioProcessors) ParseADTSFrames(ADTSData []byte) [][]byte {
 
 }
 
-func (Processor *AudioProcessors) EncodeAACToOpus(AACFrames [][]byte) ([][]byte, error) {
+func (Processor *AudioProcessor) EncodeAACToOpus(AACFrames [][]byte) ([][]byte, error) {
 
 	var AllPCMData []int16
 
@@ -234,7 +235,8 @@ func (Processor *AudioProcessors) EncodeAACToOpus(AACFrames [][]byte) ([][]byte,
 		PCMFrame := AllPCMData[Offset:End]
 
 		// Encode to Opus
-		OpusData, ErrorEncoding := Processor.OpusEncoder.Encode(PCMFrame)
+		OpusData := make([]byte, MaxPacketSize)
+		N, ErrorEncoding := Processor.OpusEncoder.Encode(PCMFrame, OpusData)
 
 		if ErrorEncoding != nil {
 
@@ -242,7 +244,7 @@ func (Processor *AudioProcessors) EncodeAACToOpus(AACFrames [][]byte) ([][]byte,
 
 		}
 
-		OpusFrames = append(OpusFrames, OpusData)
+		OpusFrames = append(OpusFrames, OpusData[:N])
 
 	}
 
@@ -250,7 +252,7 @@ func (Processor *AudioProcessors) EncodeAACToOpus(AACFrames [][]byte) ([][]byte,
 
 }
 
-func (Processor *AudioProcessors) Close() {
+func (Processor *AudioProcessor) Close() {
 
 	if Processor.AACDecoder != nil {
 
@@ -262,7 +264,7 @@ func (Processor *AudioProcessors) Close() {
 
 type SegmentStreamer struct {
 
-	Processor       *AudioProcessors
+	Processor       *AudioProcessor
 
 	CurrentIndex    int
 	TotalSegments   int
