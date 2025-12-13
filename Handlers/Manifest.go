@@ -13,14 +13,35 @@ func InitializeCommands() {
 
 	// Ping Command
 
-	Command := discord.SlashCommandCreate{
+	PingCommand := discord.SlashCommandCreate{
 
 		Name:        "ping",
 		Description: "Replies with Pong!",
 
 	}
 
-	Utils.DiscordClient.Rest().SetGlobalCommands(Utils.DiscordClient.ApplicationID(), []discord.ApplicationCommandCreate{Command})
+	// Play Command
+
+	PlayCommand := discord.SlashCommandCreate{
+
+		Name:        "play",
+		Description: "Search and play a song",
+
+		Options: []discord.ApplicationCommandOption{
+
+			discord.ApplicationCommandOptionString{
+
+				Name:        "query",
+				Description: "The song to search for",
+				Required:    true,
+
+			},
+
+		},
+
+	}
+
+	Utils.DiscordClient.Rest().SetGlobalCommands(Utils.DiscordClient.ApplicationID(), []discord.ApplicationCommandCreate{PingCommand, PlayCommand})
 
 	Utils.Logger.Info("Slash commands initialized.")
 
@@ -39,6 +60,10 @@ func InitializeHandlers() {
 				case "ping":
 
 					Commands.PingCommand(E)
+
+				case "play":
+
+					Commands.PlayCommand(E)
 
 			}
 

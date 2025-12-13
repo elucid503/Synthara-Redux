@@ -11,7 +11,7 @@ import (
 
 	"github.com/asticode/go-astits"
 	"github.com/nareix/joy4/codec/aacparser"
-	opus "gopkg.in/hraban/opus.v2"
+	"layeh.com/gopus"
 )
 
 const (
@@ -27,7 +27,7 @@ const (
 type AudioProcessor struct {
 
 	AACDecoder  *FDKAACDecoder
-	OpusEncoder *opus.Encoder
+	OpusEncoder *gopus.Encoder
 
 }
 
@@ -41,7 +41,7 @@ func NewAudioProcessor() (*AudioProcessor, error) {
 
 	}
 
-	OpusEncoder, ErrorCreatingEncoder := opus.NewEncoder(SampleRate, Channels, opus.AppVoIP)
+	OpusEncoder, ErrorCreatingEncoder := gopus.NewEncoder(SampleRate, Channels, gopus.Audio)
 
 	if ErrorCreatingEncoder != nil {
 
@@ -235,8 +235,7 @@ func (Processor *AudioProcessor) EncodeAACToOpus(AACFrames [][]byte) ([][]byte, 
 		PCMFrame := AllPCMData[Offset:End]
 
 		// Encode to Opus
-		OpusData := make([]byte, MaxPacketSize)
-		N, ErrorEncoding := Processor.OpusEncoder.Encode(PCMFrame, OpusData)
+		OpusData, ErrorEncoding := Processor.OpusEncoder.Encode(PCMFrame, FrameSize, MaxPacketSize)
 
 		if ErrorEncoding != nil {
 
@@ -244,7 +243,7 @@ func (Processor *AudioProcessor) EncodeAACToOpus(AACFrames [][]byte) ([][]byte, 
 
 		}
 
-		OpusFrames = append(OpusFrames, OpusData[:N])
+		OpusFrames = append(OpusFrames, OpusData)
 
 	}
 

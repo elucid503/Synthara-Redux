@@ -10,7 +10,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/nareix/joy4 v0.0.0-20200507095837-05a4ffbb5369
 	github.com/nezbut/innertube-go v0.0.0-20250322163246-7e42a6884c2b
-	gopkg.in/hraban/opus.v2 v2.0.0-20230925203106-0188a62cb302
+	layeh.com/gopus v0.0.0-20210501142526-1ee02d434e32
 )
 
 require (
