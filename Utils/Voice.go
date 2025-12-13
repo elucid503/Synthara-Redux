@@ -21,7 +21,7 @@ var (
 )
 
 // GetOrCreateGuild Retrieves or creates a guild instance
-func GetOrCreateGuild(GuildID snowflake.ID, GuildName string) *Structs.Guild {
+func GetOrCreateGuild(GuildID snowflake.ID) *Structs.Guild {
 
 	GuildsMutex.Lock()
 	defer GuildsMutex.Unlock()
@@ -32,7 +32,7 @@ func GetOrCreateGuild(GuildID snowflake.ID, GuildName string) *Structs.Guild {
 
 	}
 
-	Guild := Structs.NewGuild(GuildID, GuildName)
+	Guild := Structs.NewGuild(GuildID)
 	Guilds[GuildID] = Guild
 
 	return Guild

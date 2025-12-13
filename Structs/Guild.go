@@ -12,7 +12,6 @@ import (
 type Guild struct {
 
 	ID snowflake.ID `json:"id"`
-	Name string `json:"name"`
 
 	Queue Queue `json:"queue"`
 
@@ -57,12 +56,11 @@ type Features struct {
 }
 
 // NewGuild Creates a new Guild instance
-func NewGuild(ID snowflake.ID, Name string) *Guild {
+func NewGuild(ID snowflake.ID) *Guild {
 
 	return &Guild{
 
 		ID:   ID,
-		Name: Name,
 
 		Queue: Queue{
 

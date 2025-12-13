@@ -51,25 +51,29 @@ func InitializeHandlers() {
 
 	Utils.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event bot.Event) {
 
-		switch E := Event.(type) {
+		go func ()  {
+			
+			switch E := Event.(type) {
 
-		case *events.ApplicationCommandInteractionCreate:
+				case *events.ApplicationCommandInteractionCreate:
 
-			switch E.Data.CommandName() {
+					switch E.Data.CommandName() {
 
-				case "ping":
+						case "ping":
 
-					Commands.PingCommand(E)
+							Commands.PingCommand(E)
 
-				case "play":
+						case "play":
 
-					Commands.PlayCommand(E)
+							Commands.PlayCommand(E)
 
-			}
+					}
 
-			Utils.Logger.Info("Received and handled command: " + E.Data.CommandName());
+					Utils.Logger.Info("Received and handled command: " + E.Data.CommandName());
 
-		}
+				}
+
+		}()
 					
 	}))
 

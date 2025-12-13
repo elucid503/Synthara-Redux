@@ -58,9 +58,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	GuildID := *Event.GuildID()
 
-	VoiceState, VoiceStateExists := Utils.DiscordClient.Caches().VoiceState(*Event.GuildID(), Event.User().ID)
+	VoiceState, VoiceStateError := Event.Client().Rest().GetUserVoiceState(GuildID, Event.User().ID);
 
-	if !VoiceStateExists || VoiceState.ChannelID == nil {
+	if VoiceStateError != nil || VoiceState.ChannelID == nil {
 
 		Msg := "You must be in a voice channel to use this command!"
 
@@ -98,25 +98,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	Song := SearchResults[0]
 
-	// Get or create guild instance
-
-	GuildData, ErrorFetchingGuild := Utils.DiscordClient.Rest().GetGuild(GuildID, false)
-
-	if ErrorFetchingGuild != nil {
-
-		Msg := "Error fetching guild information!"
-
-		Event.Client().Rest().UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
-
-			Content: &Msg,
-
-		})
-
-		return
-
-	}
-
-	Guild := Utils.GetOrCreateGuild(GuildID, GuildData.Name)
+	Guild := Utils.GetOrCreateGuild(GuildID)
 
 	Guild.SetTextChannel(Event.Channel().ID())
 
@@ -150,7 +132,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	if !Guild.HasCurrentSong() {
 
-		Msg := fmt.Sprintf("Now playing: **%s**", Song.Title)
+		Msg := fmt.Sprintf("Now playing: %s", Song.Title)
 
 		Event.Client().Rest().UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
