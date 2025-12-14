@@ -4,7 +4,7 @@ A Go rewrite of the Synthara music bot, aiming to provide efficient and convenie
 
 ## Overview
 
-Unlike many other bots which use FFMPEG or a similar executable for audio processing, Synthara-Redux provides music streaming capabilities with real-time and native audio transcoding. The bot searches YouTube for music, downloads and processes audio streams, and plays them directly in Discord voice channels with minimal latency and high audio quality.
+Unlike many other bots which use FFMPEG or a similar executable for audio processing, Synthara-Redux provides music streaming capabilities with real-time and native audio transcoding. The bot searches YouTube for music, downloads and processes audio streams, and plays them directly in Discord voice channels with minimal latency and high (enough) audio quality.
 
 ## Audio Processing Pipeline
 
