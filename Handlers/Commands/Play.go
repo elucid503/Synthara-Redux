@@ -1,8 +1,7 @@
 package Commands
 
 import (
-	"Synthara-Redux/Utils"
-	"fmt"
+	"Synthara-Redux/APIs/Innertube"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -57,11 +56,11 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	ChannelID := *VoiceState.ChannelID
+	// ChannelID := *VoiceState.ChannelID
 
 	// Search for songs
 
-	SearchResults := Utils.SearchInnerTubeSongs(Query)
+	SearchResults := Innertube.SearchForSongs(Query)
 
 	if len(SearchResults) == 0 {
 
@@ -75,86 +74,6 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	// Get the first result
 
-	Song := SearchResults[0]
-
-	Guild := Utils.GetOrCreateGuild(GuildID)
-
-	Guild.SetTextChannel(Event.Channel().ID())
-
-	// Connect to voice channel if not already connected
-
-	if Guild.VoiceConnection == nil || Guild.Channels.Voice != ChannelID {
-
-		ErrorConnecting := Utils.ConnectToVoiceChannel(GuildID, ChannelID)
-
-		if ErrorConnecting != nil {
-
-			Event.CreateMessage(discord.MessageCreate{
-
-				Content: "Failed to connect to voice channel: " + ErrorConnecting.Error(),
-
-			})
-
-			return
-
-		}
-
-	}
-
-	// Add song to queue
-
-	Guild.AddToQueue(Song)
-
-	// If nothing is currently playing, start playback
-
-	if !Guild.HasCurrentSong() {
-
-		Event.CreateMessage(discord.MessageCreate{
-
-			Content: fmt.Sprintf("Now playing: %s", Song.Title),
-
-		})
-
-		go func() {
-
-			for Guild.AdvanceQueue() {
-
-				CurrentSong := Guild.Queue.Current
-
-				if CurrentSong == nil {
-
-					break
-
-				}
-
-				ErrorPlaying := Utils.PlaySongInGuild(Guild, *CurrentSong)
-
-				if ErrorPlaying != nil {
-
-					Utils.Logger.Error("Error playing song: " + ErrorPlaying.Error())
-					break
-
-				}
-
-			}
-
-			// Disconnects after queue is empty
-
-			Guild.Queue.Current = nil
-			Guild.DisconnectVoice()
-
-		}()
-
-	} else {
-
-		Event.CreateMessage(discord.MessageCreate{
-
-			Content: fmt.Sprintf("Added to Queue: %s (Position: %d)", Song.Title, len(Guild.Queue.Next)),
-
-		})
-
-	}
-
+	
 }

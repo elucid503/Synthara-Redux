@@ -1,8 +1,7 @@
-package Utils
+package Globals
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -19,14 +18,12 @@ func InitDiscordClient() error {
 
 	if ErrorInitializing != nil {
 
-		Logger.Error(fmt.Sprintf("Error initializing Discord client: %s", ErrorInitializing.Error()))
 		return ErrorInitializing
 
 	}
 
 	DiscordClient = InitializedClient
 	
-	Logger.Info("Discord client initialized successfully")
 	return nil
 
 }
@@ -40,11 +37,10 @@ func ConnectDiscordClient() error {
 
 	if ErrorConnecting != nil {
 
-		Logger.Error(fmt.Sprintf("Error connecting Discord client: %s", ErrorConnecting.Error()))
-
+		return ErrorConnecting
+		
 	}
 
-	Logger.Info("Discord client connected successfully")
 	return nil
 
 }

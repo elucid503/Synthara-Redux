@@ -1,7 +1,7 @@
-package Utils
+package Innertube
 
 import (
-	"Synthara-Redux/Structs"
+	"Synthara-Redux/Utils"
 	"context"
 	"errors"
 	"os"
@@ -13,29 +13,56 @@ import (
 	innertubego "github.com/nezbut/innertube-go"
 )
 
+// Types
+
+type Song struct {
+
+	YouTubeID string `json:"youtube_id"`
+
+	Title   string   `json:"title"`
+	Artists []string `json:"artists"`
+	Album   string   `json:"album"`
+
+	Duration Duration `json:"duration"`
+
+	Cover string `json:"cover"`
+
+}
+
+type Duration struct {
+
+	Seconds   int    `json:"seconds"`
+	Formatted string `json:"formatted"`
+	
+}
+
+// Variables 
+
 var InnerTubeClient *innertubego.InnerTube;
 
-func InitInnerTubeClient() error {
+// Functions
+
+func InitClient() error {
 
 	InitializedClient, ErrorInitializing := innertubego.NewInnerTube(nil, "WEB_REMIX", "1.20240715.01.00", "", "", "", nil, true);
 
 	if ErrorInitializing != nil {
 
-		Logger.Error("Error initializing InnerTube client: " + ErrorInitializing.Error())
+		Utils.Logger.Error("Error initializing InnerTube client: " + ErrorInitializing.Error())
 		return ErrorInitializing;
 
 	}
 
 	InnerTubeClient = InitializedClient;
 
-	Logger.Info("InnerTube client initialized successfully")
+	Utils.Logger.Info("InnerTube client initialized successfully")
 	return nil;
 
 }
 
-func SearchInnerTubeSongs(Query string) []Structs.Song {
+func SearchForSongs(Query string) []Song {
 
-	Results := []Structs.Song{}
+	Results := []Song{}
 	Params := "EgWKAQIIAWoQEAMQCRAFEBAQBBAVEAoQEQ%3D%3D"; // Songs
 
 	RequestContext, RequestCancel := context.WithTimeout(context.Background(), 5 * time.Second) // 5s timeout
@@ -45,12 +72,12 @@ func SearchInnerTubeSongs(Query string) []Structs.Song {
 
 	if SearchRequestError != nil {
 
-		Logger.Error("Error performing search request: " + SearchRequestError.Error())
+		Utils.Logger.Error("Error performing search request: " + SearchRequestError.Error())
 		return Results
 
 	}
 
-	ShelfContentsVal, ShelfContentsExists := GetNestedValue(SearchRequestResults, "contents", "tabbedSearchResultsRenderer", "tabs", ) 
+	ShelfContentsVal, ShelfContentsExists := Utils.GetNestedValue(SearchRequestResults, "contents", "tabbedSearchResultsRenderer", "tabs", ) 
 
 	if !ShelfContentsExists {
 
@@ -66,7 +93,7 @@ func SearchInnerTubeSongs(Query string) []Structs.Song {
 
 	}
 
-	ContentsVal, ContentsExists := GetNestedValue(Tabs[0], "tabRenderer", "content", "sectionListRenderer", "contents")
+	ContentsVal, ContentsExists := Utils.GetNestedValue(Tabs[0], "tabRenderer", "content", "sectionListRenderer", "contents")
 	
 	if !ContentsExists {
 
@@ -82,7 +109,7 @@ func SearchInnerTubeSongs(Query string) []Structs.Song {
 
 	}
 
-	ShelfContentsVal, ShelfContentsExists = GetNestedValue(SectionContentsVal[0], "musicShelfRenderer", "contents")
+	ShelfContentsVal, ShelfContentsExists = Utils.GetNestedValue(SectionContentsVal[0], "musicShelfRenderer", "contents")
 
 	if !ShelfContentsExists {
 
@@ -185,5 +212,11 @@ func GetSongAudioSegments(YouTubeID string) ([]OverturePlayStructs.HLSSegment, e
 	}
 
 	return Playlist.Segments, nil
+	
+}
+
+func GetAudioSegmentBytes(Segment OverturePlayStructs.HLSSegment) ([]byte, error) {
+
+	return OverturePlay.GetHLSSegment(Segment.URI, &OverturePlay.HLSOptions{ })
 	
 }

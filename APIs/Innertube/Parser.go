@@ -1,18 +1,20 @@
-package Utils
+package Innertube
 
 import (
-	"Synthara-Redux/Structs"
+	"Synthara-Redux/Utils"
 	"errors"
 	"strings"
 )
 
-func ParseSong(Renderer map[string]interface{}) (Structs.Song, error) {
+// Parser Functons
 
-    VideoIDVal, VideoIDExists := GetNestedValue(Renderer, "playlistItemData", "videoId")
+func ParseSong(Renderer map[string]interface{}) (Song, error) {
+
+    VideoIDVal, VideoIDExists := Utils.GetNestedValue(Renderer, "playlistItemData", "videoId")
 
     if !VideoIDExists {
 
-        return Structs.Song{}, errors.New("video ID not found in renderer")
+        return Song{}, errors.New("video ID not found in renderer")
 
     }
 
@@ -20,7 +22,7 @@ func ParseSong(Renderer map[string]interface{}) (Structs.Song, error) {
 
     if !VideoIDValid || VideoID == "" {
 
-        return Structs.Song{}, errors.New("invalid video ID in renderer")
+        return Song{}, errors.New("invalid video ID in renderer")
 
     }
 
@@ -29,12 +31,12 @@ func ParseSong(Renderer map[string]interface{}) (Structs.Song, error) {
 
     if !FlexColumnsExists || len(FlexColumns) < 2 {
 
-        return Structs.Song{}, errors.New("insufficient flex columns in renderer")
+        return Song{}, errors.New("insufficient flex columns in renderer")
 
     }
 
     Title := ""
-    TitleRuns, TitleRunsValid := GetNestedValue(FlexColumns[0], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
+    TitleRuns, TitleRunsValid := Utils.GetNestedValue(FlexColumns[0], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
 
     if TitleRunsValid {
 
@@ -59,7 +61,7 @@ func ParseSong(Renderer map[string]interface{}) (Structs.Song, error) {
     Album := ""
     DurationFormatted := ""
 
-    RunsVal, RunsValueOK := GetNestedValue(FlexColumns[1], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
+    RunsVal, RunsValueOK := Utils.GetNestedValue(FlexColumns[1], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
 
     if RunsValueOK {
 
@@ -111,10 +113,10 @@ func ParseSong(Renderer map[string]interface{}) (Structs.Song, error) {
 
 	}
 
-	Cover := ExtractSongThumbnail(Renderer)
-	DurationSeconds := ParseFormattedDuration(DurationFormatted)
+	Cover := Utils.ExtractSongThumbnail(Renderer)
+	DurationSeconds := Utils.ParseFormattedDuration(DurationFormatted)
 
-	return Structs.Song{
+	return Song{
 
 		YouTubeID: VideoID,
 
@@ -122,7 +124,7 @@ func ParseSong(Renderer map[string]interface{}) (Structs.Song, error) {
 		Artists:   Artists,
 		Album:     Album,
 
-		Duration: Structs.Duration{
+		Duration: Duration{
 
 			Seconds:   DurationSeconds,
 			Formatted: DurationFormatted,

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/Globals"
 	"Synthara-Redux/Handlers"
 	"Synthara-Redux/Utils"
 	"os"
@@ -12,7 +14,7 @@ func main() {
 
 	godotenv.Load(".env")
 
-	InitErr := Utils.InitDiscordClient()
+	InitErr := Globals.InitDiscordClient()
 
 	if InitErr != nil {
 
@@ -20,7 +22,7 @@ func main() {
 
 	}
 
-	ConnectErr := Utils.ConnectDiscordClient()
+	ConnectErr := Globals.ConnectDiscordClient()
 
 	if ConnectErr != nil {
 
@@ -36,7 +38,7 @@ func main() {
 	
 	Handlers.InitializeHandlers()
 
-	InnerTubeError := Utils.InitInnerTubeClient();
+	InnerTubeError := Innertube.InitClient();
 
 	if InnerTubeError != nil {
 

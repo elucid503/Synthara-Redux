@@ -1,6 +1,7 @@
 package Utils
 
 import (
+	"Synthara-Redux/Globals"
 	"context"
 	"fmt"
 	"os"
@@ -18,7 +19,7 @@ func Hang() {
 
 	Logger.Info("Shutting down and disconnecting Discord client...")
 
-	DiscordClient.Close(context.TODO())
+	Globals.DiscordClient.Close(context.TODO())
 	
 }
 

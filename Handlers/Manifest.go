@@ -1,6 +1,7 @@
 package Handlers
 
 import (
+	"Synthara-Redux/Globals"
 	"Synthara-Redux/Handlers/Commands"
 	"Synthara-Redux/Utils"
 
@@ -41,7 +42,7 @@ func InitializeCommands() {
 
 	}
 
-	Utils.DiscordClient.Rest.SetGlobalCommands(Utils.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand})
+	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand})
 
 	Utils.Logger.Info("Slash commands initialized.")
 
@@ -51,7 +52,7 @@ func InitializeHandlers() {
 	
 	// Ready
 
-	Utils.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.Ready) {
+	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.Ready) {
 
 		Utils.Logger.Info("Discord Client is ready!")
 
@@ -59,7 +60,7 @@ func InitializeHandlers() {
 
 	// Command Interactions
 
-	Utils.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.ApplicationCommandInteractionCreate) {
+	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.ApplicationCommandInteractionCreate) {
 
 		go func ()  {
 			
