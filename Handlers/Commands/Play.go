@@ -2,6 +2,9 @@ package Commands
 
 import (
 	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/Globals"
+	"Synthara-Redux/Structs"
+	"fmt"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -42,9 +45,25 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	GuildID := *Event.GuildID()
 
-	VoiceState, VoiceStateError := Event.Client().Rest.GetUserVoiceState(GuildID, Event.User().ID);
+	VoiceState, VoiceStateExists := Globals.DiscordClient.Caches.VoiceState(GuildID, Event.User().ID)
 
-	if VoiceStateError != nil || VoiceState.ChannelID == nil {
+	if !VoiceStateExists || VoiceState.ChannelID == nil {
+
+		VoiceState, VoiceStateError := Event.Client().Rest.GetUserVoiceState(GuildID, Event.User().ID);
+		
+		if VoiceStateError != nil || VoiceState.ChannelID == nil {
+
+			VoiceStateExists = false
+
+		} else {
+
+			VoiceStateExists = true
+
+		}
+		
+	}
+
+	if !VoiceStateExists || VoiceState.ChannelID == nil {
 
 		Event.CreateMessage(discord.MessageCreate{
 
@@ -56,7 +75,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	// ChannelID := *VoiceState.ChannelID
+	ChannelID := *VoiceState.ChannelID
 
 	// Search for songs
 
@@ -66,7 +85,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "No results found for your query!",
+			Content: "No results were found for your query!",
 
 		})
 
@@ -74,6 +93,38 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
+	Guild := Structs.GetOrCreateGuild(GuildID);
 
+	// Connect to voice channel
+
+	ErrorConnecting := Guild.Connect(ChannelID)
+
+	if ErrorConnecting != nil {
+
+		Event.CreateMessage(discord.MessageCreate{
+
+			Content: "Failed to connect to voice channel: " + ErrorConnecting.Error(),
+
+		})
+
+		return
+
+	}
 	
+	// Play/Add result 
+
+	IsCurrent := Guild.Queue.Add(SearchResults[0])
+
+	if IsCurrent {
+		
+		Event.CreateMessage(discord.MessageCreate{
+
+			Content: fmt.Sprintf("Now playing %s by %s", SearchResults[0].Title, SearchResults[0].Artists[0]),
+
+		})
+
+	}
+	
+	
+
 }

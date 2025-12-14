@@ -7,12 +7,16 @@ import (
 	"Synthara-Redux/Utils"
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/disgoorg/disgo/voice"
 	"github.com/disgoorg/snowflake/v2"
 )
+
+var GuildStore = make(map[snowflake.ID]*Guild)
+var GuildStoreMutex sync.Mutex
 
 type Guild struct {
 
@@ -29,11 +33,25 @@ type Guild struct {
 
 }
 
+const (
+
+	StateIdle = iota
+	StatePlaing = iota
+	StatePaused = iota
+
+)
+
 type Queue struct {
+
+	ParentID snowflake.ID `json:"parent_id"`
+
+	State int `json:"state"`
 
 	Previous []Innertube.Song `json:"previous"`
 	Current *Innertube.Song `json:"current"`
 	Next []Innertube.Song `json:"next"`
+
+	Functions QueueFunctions `json:"-"`
 
 }
 
@@ -41,6 +59,13 @@ type Channels struct {
 
 	Voice snowflake.ID `json:"voice"`
 	Text snowflake.ID `json:"text"`
+
+}
+
+type QueueFunctions struct {
+
+	Added func(Queue *Queue, Song Innertube.Song) `json:"-"`
+	State func(Queue *Queue, State int) `json:"-"`
 
 }
 
@@ -63,15 +88,26 @@ type Features struct {
 // NewGuild Creates a new Guild instance
 func NewGuild(ID snowflake.ID) *Guild {
 
-	return &Guild{
+	Created := &Guild{
 
 		ID:   ID,
 
 		Queue: Queue{
 
+			ParentID: ID,
+
+			State:   StateIdle,
+
 			Previous: []Innertube.Song{},
 			Current:  nil,
 			Next:     []Innertube.Song{},
+
+			Functions: QueueFunctions{
+
+				Added: nil,
+				State: nil,
+
+			},
 
 		},
 
@@ -91,8 +127,52 @@ func NewGuild(ID snowflake.ID) *Guild {
 		},
 
 		VoiceConnection: nil,
+		
+	}
+
+	// Store the guild
+
+	GuildStoreMutex.Lock()
+	GuildStore[ID] = Created
+	GuildStoreMutex.Unlock()
+
+	return Created
+
+}
+
+func GetOrCreateGuild(ID snowflake.ID) *Guild {
+
+	GuildStoreMutex.Lock()
+	GuildInstance, Exists := GuildStore[ID]
+	GuildStoreMutex.Unlock()
+
+	if Exists {
+
+		return GuildInstance
+		
+	} else {
+
+		return NewGuild(ID)
 
 	}
+
+}
+
+// Event-Like Handlers
+
+func QueueAddedHandler(Queue *Queue, Song Innertube.Song) {
+
+	Utils.Logger.Info(fmt.Sprintf("Song %s was enqueued for Queue %s", Song.Title, Queue.ParentID.String()))
+
+	// TODO: More logic here...
+
+}
+
+func QueueStateHandler(Queue *Queue, State int) {
+
+	Utils.Logger.Info(fmt.Sprintf("Queue %s state changed to %d", Queue.ParentID.String(), State))
+
+	// TODO: More logic here...
 
 }
 
@@ -164,18 +244,9 @@ func (G *Guild) Disconnect() error {
 
 }
 
-// PlayOrAdd sets and plays the current song if no current... otherwise adds; if play, DOES NOT return until the song is finished!
-func (G *Guild) PlayOrAdd(Song Innertube.Song) error {
+// Play sets and plays the current song; DOES NOT return until the song is finished!
+func (G *Guild) Play(Song Innertube.Song) (error) {
 	
-	if (G.Queue.HasCurrent()) {
-
-		G.Queue.Add(Song)
-		return nil
-
-	}
-
-	G.Queue.Current = &Song
-
 	// Fetch HLS segments for the song
 
 	Segments, ErrorFetchingSegments := Innertube.GetSongAudioSegments(Song.YouTubeID)
@@ -237,6 +308,8 @@ func (G *Guild) PlayOrAdd(Song Innertube.Song) error {
 
 	}
 
+	G.Queue.ChangeState(StatePlaing) // Now is playing
+
 	// Start fetching and processing segments in background
 
 	go func() {
@@ -283,11 +356,12 @@ func (G *Guild) PlayOrAdd(Song Innertube.Song) error {
 
 		if CurrentIndex >= TotalSegments && len(Streamer.OpusFrameChan) == 0 {
 
+			G.Queue.ChangeState(StateIdle) // No longer playing
 			break
 
 		}
 
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(250 * time.Millisecond) // Checks every 250ms
 
 	}
 
@@ -295,7 +369,12 @@ func (G *Guild) PlayOrAdd(Song Innertube.Song) error {
 	
 }
 
-// Queue Functions
+func (Q *Queue) ChangeState(NewState int) {	
+
+	Q.State = NewState
+	Q.Functions.State(Q, NewState)
+
+}
 
 // HasCurrent Checks if there is a current song playing
 func (Q *Queue) HasCurrent() bool {
@@ -304,10 +383,32 @@ func (Q *Queue) HasCurrent() bool {
 
 }
 
-// Add appends a song to the end of the queue
-func (Q *Queue) Add(Song Innertube.Song) {
+// IsEmpty Checks if the queue is empty (no current song and no next songs)
+func (Q *Queue) IsEmpty() bool {
 
-	Q.Next = append(Q.Next, Song)
+	return Q.Current == nil && len(Q.Next) == 0
+
+}
+
+// Add appends a song to the end of the queue OR current
+func (Q *Queue) Add(Song Innertube.Song) bool {
+
+	WasAdded := false;
+
+	if Q.Current == nil {
+
+		Q.Current = &Song
+		WasAdded = true;
+
+	} else {
+
+		Q.Next = append(Q.Next, Song)
+
+	}
+
+	Q.Functions.Added(Q, Song)
+
+	return WasAdded
 
 }
 
