@@ -41,37 +41,41 @@ func InitializeCommands() {
 
 	}
 
-	Utils.DiscordClient.Rest().SetGlobalCommands(Utils.DiscordClient.ApplicationID(), []discord.ApplicationCommandCreate{PingCommand, PlayCommand})
+	Utils.DiscordClient.Rest.SetGlobalCommands(Utils.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand})
 
 	Utils.Logger.Info("Slash commands initialized.")
 
 }
 
 func InitializeHandlers() {
+	
+	// Ready
 
-	Utils.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event bot.Event) {
+	Utils.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.Ready) {
+
+		Utils.Logger.Info("Discord Client is ready!")
+
+	}))
+
+	// Command Interactions
+
+	Utils.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.ApplicationCommandInteractionCreate) {
 
 		go func ()  {
 			
-			switch E := Event.(type) {
+			switch Event.Data.CommandName() {
 
-				case *events.ApplicationCommandInteractionCreate:
+				case "ping":
 
-					switch E.Data.CommandName() {
+					Commands.PingCommand(Event)
 
-						case "ping":
+				case "play":
 
-							Commands.PingCommand(E)
+					Commands.PlayCommand(Event)
 
-						case "play":
+			}
 
-							Commands.PlayCommand(E)
-
-					}
-
-					Utils.Logger.Info("Received and handled command: " + E.Data.CommandName());
-
-				}
+			Utils.Logger.Info("Received and handled command: " + Event.Data.CommandName());
 
 		}()
 					

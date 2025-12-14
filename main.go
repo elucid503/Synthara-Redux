@@ -28,14 +28,6 @@ func main() {
 
 	}
 
-	WaitingErr := Utils.WaitUntilDiscordClientReady()
-
-	if WaitingErr != nil {
-
-		os.Exit(1)
-
-	}
-
 	if (os.Getenv("REFRESH_COMMANDS") == "true") {
 
 		Handlers.InitializeCommands()

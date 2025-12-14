@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Build script for Synthara-Redux with optimized opus compilation
+# Build script for Synthara-Redux
 # This script enables C compiler optimizations and suppresses false-positive warnings
 
-echo "Building Synthara-Redux with optimized opus..."
+echo "Building Synthara-Redux with optimizations..."
 echo ""
 
 # Set CGO flags for optimization and warning suppression
@@ -16,9 +16,6 @@ export CGO_LDFLAGS=""
 export CGO_ENABLED=1
 
 # Build the project
-
-echo "CGO_CFLAGS: $CGO_CFLAGS"
-echo ""
 
 go build -v -o synthara-redux
 

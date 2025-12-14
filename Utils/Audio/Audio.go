@@ -50,6 +50,8 @@ func NewAudioProcessor() (*AudioProcessor, error) {
 
 	}
 
+	OpusEncoder.SetBitrate(128000) // 128 kbps
+
 	return &AudioProcessor{
 
 		AACDecoder:  AACDecoder,
@@ -353,7 +355,7 @@ func (Streamer *SegmentStreamer) GetNextFrame() ([]byte, bool) {
 
 func (Streamer *SegmentStreamer) ShouldFetchNext() bool {
 
-	return Streamer.CurrentIndex < Streamer.TotalSegments && len(Streamer.OpusFrameChan) < 50
+	return Streamer.CurrentIndex < Streamer.TotalSegments && len(Streamer.OpusFrameChan) < 50 // fetches next if less than 50 frames are buffered
 
 }
 

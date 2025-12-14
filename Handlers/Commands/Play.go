@@ -30,7 +30,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Msg := "Please provide a search query!"
 
-		Event.Client().Rest().UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
 			Content: &Msg,
 
@@ -46,7 +46,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Msg := "You must be in a guild to use this command!"
 
-		Event.Client().Rest().UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
 			Content: &Msg,
 
@@ -58,13 +58,13 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	GuildID := *Event.GuildID()
 
-	VoiceState, VoiceStateError := Event.Client().Rest().GetUserVoiceState(GuildID, Event.User().ID);
+	VoiceState, VoiceStateError := Event.Client().Rest.GetUserVoiceState(GuildID, Event.User().ID);
 
 	if VoiceStateError != nil || VoiceState.ChannelID == nil {
 
 		Msg := "You must be in a voice channel to use this command!"
 
-		Event.Client().Rest().UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
 			Content: &Msg,
 
@@ -84,7 +84,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Msg := "No results found for your query!"
 
-		Event.Client().Rest().UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
 			Content: &Msg,
 
@@ -112,7 +112,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 			Msg := "Failed to connect to voice channel: " + ErrorConnecting.Error()
 
-			Event.Client().Rest().UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
+			Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
 				Content: &Msg,
 
@@ -134,7 +134,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Msg := fmt.Sprintf("Now playing: %s", Song.Title)
 
-		Event.Client().Rest().UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
 			Content: &Msg,
 
@@ -173,7 +173,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Msg := fmt.Sprintf("Added to Queue: **%s** (Position: %d)", Song.Title, len(Guild.Queue.Next))
 
-		Event.Client().Rest().UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
 			Content: &Msg,
 

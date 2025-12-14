@@ -87,6 +87,7 @@ func (Decoder *FDKAACDecoder) Decode(ADTSFrame []byte) ([]int16, error) {
 
 	NumChannels := int(StreamInfo.numChannels)
 	FrameSize := int(StreamInfo.frameSize)
+	SampleRate := int(StreamInfo.sampleRate)
 	OutputSize := NumChannels * FrameSize
 
 	// Convert C.short to int16
@@ -97,6 +98,11 @@ func (Decoder *FDKAACDecoder) Decode(ADTSFrame []byte) ([]int16, error) {
 
 		PCMData[Index] = int16(OutputBuffer[Index])
 
+	}
+
+	// Resample if needed (YouTube audio is often 44.1kHz, Discord needs 48kHz)
+	if SampleRate != 48000 {
+		PCMData = ResamplePCM(PCMData, SampleRate, 48000, NumChannels)
 	}
 
 	return PCMData, nil
@@ -111,5 +117,43 @@ func (Decoder *FDKAACDecoder) Close() {
 		Decoder.Decoder = nil
 
 	}
+
+}
+
+// ResamplePCM resamples PCM audio from one sample rate to another using linear interpolation
+func ResamplePCM(Input []int16, InputRate, OutputRate, Channels int) []int16 {
+
+	if InputRate == OutputRate {
+		return Input
+	}
+
+	Ratio := float64(InputRate) / float64(OutputRate)
+	InputFrames := len(Input) / Channels
+	OutputFrames := int(float64(InputFrames) / Ratio)
+	Output := make([]int16, OutputFrames*Channels)
+
+	for OutFrame := 0; OutFrame < OutputFrames; OutFrame++ {
+
+		InPos := float64(OutFrame) * Ratio
+		InFrame := int(InPos)
+		Fraction := InPos - float64(InFrame)
+
+		if InFrame >= InputFrames-1 {
+			InFrame = InputFrames - 2
+			Fraction = 1.0
+		}
+
+		for Ch := 0; Ch < Channels; Ch++ {
+
+			Sample1 := float64(Input[InFrame*Channels+Ch])
+			Sample2 := float64(Input[(InFrame+1)*Channels+Ch])
+			Interpolated := Sample1 + (Sample2-Sample1)*Fraction
+			Output[OutFrame*Channels+Ch] = int16(Interpolated)
+
+		}
+
+	}
+
+	return Output
 
 }

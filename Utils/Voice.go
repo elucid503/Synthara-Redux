@@ -73,12 +73,12 @@ func ConnectToVoiceChannel(GuildID snowflake.ID, ChannelID snowflake.ID) error {
 
 	}
 
-	ContextToUse, CancelFunc := context.WithTimeout(context.Background(), 10 * time.Second)
+	OpenContext, CancelFunc := context.WithTimeout(context.Background(), 10 * time.Second)
 	defer CancelFunc()
 
-	VoiceConnection := DiscordClient.VoiceManager().CreateConn(GuildID)
+	VoiceConnection := DiscordClient.VoiceManager.CreateConn(GuildID)
 
-	ErrorOpening := VoiceConnection.Open(ContextToUse, ChannelID, false, false)
+	ErrorOpening := VoiceConnection.Open(OpenContext, ChannelID, false, false)
 
 	if ErrorOpening != nil {
 
@@ -110,9 +110,7 @@ func (P *OpusProvider) ProvideOpusFrame() ([]byte, error) {
 	Frame, Available := P.Streamer.GetNextFrame()
 
 	if Frame != nil && Available {
-
 		return Frame, nil
-
 	}
 
 	return nil, nil
