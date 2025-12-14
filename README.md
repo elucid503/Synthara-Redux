@@ -81,27 +81,6 @@ YOUTUBE_COOKIE=your_youtube_cookie_here
 REFRESH_COMMANDS=false
 ```
 
-### Obtaining Configuration Values
-
-**Discord Token:**
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application or select an existing one
-3. Navigate to the "Bot" section
-4. Click "Reset Token" or "Copy" to get your bot token
-5. Enable the following Privileged Gateway Intents:
-   - Server Members Intent (optional, for member info)
-   - Message Content Intent (if processing messages)
-
-**YouTube Cookie (Optional):**
-- Required only for age-restricted content or member-only videos
-- Export cookies from your browser while logged into YouTube
-- Use a browser extension like "EditThisCookie" or "Cookie-Editor"
-- Copy the entire cookie string and paste it in the `.env` file
-
-**Command Registration:**
-- Set `REFRESH_COMMANDS=true` on first run or when commands are modified
-- Set to `false` for normal operation to avoid unnecessary API calls
-
 ## Building the Project
 
 ### Prerequisites
