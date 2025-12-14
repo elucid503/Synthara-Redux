@@ -10,17 +10,6 @@ import (
 
 func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
-	// Defer initial response
-	
-	ErrorDeferring := Event.DeferCreateMessage(false)
-
-	if ErrorDeferring != nil {
-
-		Utils.Logger.Error("Error deferring message: " + ErrorDeferring.Error())
-		return
-
-	}
-
 	// Get the search query from command options
 
 	Data := Event.SlashCommandInteractionData()
@@ -28,11 +17,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Query == "" {
 
-		Msg := "Please provide a search query!"
+		Event.CreateMessage(discord.MessageCreate{
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
-
-			Content: &Msg,
+			Content:"Please provide a search query!",
 
 		})
 
@@ -44,11 +31,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Event.Member() == nil {
 
-		Msg := "You must be in a guild to use this command!"
+		Event.CreateMessage(discord.MessageCreate{
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
-
-			Content: &Msg,
+			Content: "You must be in a guild to use this command!",
 
 		})
 
@@ -62,11 +47,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	if VoiceStateError != nil || VoiceState.ChannelID == nil {
 
-		Msg := "You must be in a voice channel to use this command!"
+		Event.CreateMessage(discord.MessageCreate{
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
-
-			Content: &Msg,
+			Content: "You must be in a voice channel to use this command!",
 
 		})
 
@@ -82,11 +65,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	if len(SearchResults) == 0 {
 
-		Msg := "No results found for your query!"
+		Event.CreateMessage(discord.MessageCreate{
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
-
-			Content: &Msg,
+			Content: "No results found for your query!",
 
 		})
 
@@ -110,11 +91,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		if ErrorConnecting != nil {
 
-			Msg := "Failed to connect to voice channel: " + ErrorConnecting.Error()
+			Event.CreateMessage(discord.MessageCreate{
 
-			Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
-
-				Content: &Msg,
+				Content: "Failed to connect to voice channel: " + ErrorConnecting.Error(),
 
 			})
 
@@ -132,11 +111,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	if !Guild.HasCurrentSong() {
 
-		Msg := fmt.Sprintf("Now playing: %s", Song.Title)
+		Event.CreateMessage(discord.MessageCreate{
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
-
-			Content: &Msg,
+			Content: fmt.Sprintf("Now playing: %s", Song.Title),
 
 		})
 
@@ -172,11 +149,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	} else {
 
-		Msg := fmt.Sprintf("Added to Queue: **%s** (Position: %d)", Song.Title, len(Guild.Queue.Next))
+		Event.CreateMessage(discord.MessageCreate{
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
-
-			Content: &Msg,
+			Content: fmt.Sprintf("Added to Queue: %s (Position: %d)", Song.Title, len(Guild.Queue.Next)),
 
 		})
 

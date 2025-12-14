@@ -11,7 +11,7 @@ echo ""
 export CGO_CFLAGS="-O3 -Wno-stringop-overread -Wno-unused-result"
 export CGO_LDFLAGS=""
 
-# Optional: Enable CGO for explicit confirmation
+# CGO for explicit confirmation
 
 export CGO_ENABLED=1
 

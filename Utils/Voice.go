@@ -245,7 +245,7 @@ func PlaySongInGuild(Guild *Structs.Guild, Song Structs.Song) error {
 
 	Logger.Info("Now playing: " + Song.Title)
 
-	// Monitor playback
+	// Monitor playback; returns when done
 
 	for {
 
