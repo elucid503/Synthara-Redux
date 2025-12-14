@@ -8,7 +8,7 @@ Unlike many other bots which use FFMPEG or a similar executable for audio proces
 
 ## Audio Processing Pipeline
 
-The bot implements a sophisticated multi-stage audio processing pipeline:
+The bot implements a multi-stage audio processing pipeline:
 
 ### 1. Stream Acquisition
 - Uses InnerTube (YouTube's internal API) and a custom scraper to search for songs and retrieve HLS manifests
