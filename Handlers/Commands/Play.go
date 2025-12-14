@@ -163,8 +163,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 			}
 
-			// Disconnect after queue is empty
+			// Disconnects after queue is empty
 
+			Guild.Queue.Current = nil
 			Guild.DisconnectVoice()
 
 		}()
