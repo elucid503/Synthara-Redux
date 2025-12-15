@@ -45,9 +45,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	GuildID := *Event.GuildID()
 
-	VoiceState, VoiceStateExists := Globals.DiscordClient.Caches.VoiceState(GuildID, Event.User().ID)
+	OriginalVoiceState, VoiceStateExists := Globals.DiscordClient.Caches.VoiceState(GuildID, Event.User().ID)
 
-	if !VoiceStateExists || VoiceState.ChannelID == nil {
+	if !VoiceStateExists || OriginalVoiceState.ChannelID == nil {
 
 		VoiceState, VoiceStateError := Event.Client().Rest.GetUserVoiceState(GuildID, Event.User().ID);
 		
@@ -60,10 +60,12 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 			VoiceStateExists = true
 
 		}
+
+		OriginalVoiceState = *VoiceState;
 		
 	}
 
-	if !VoiceStateExists || VoiceState.ChannelID == nil {
+	if !VoiceStateExists || OriginalVoiceState.ChannelID == nil {
 
 		Event.CreateMessage(discord.MessageCreate{
 
@@ -75,7 +77,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	ChannelID := *VoiceState.ChannelID
+	ChannelID := OriginalVoiceState.ChannelID
 
 	// Search for songs
 
@@ -97,7 +99,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	// Connect to voice channel
 
-	ErrorConnecting := Guild.Connect(ChannelID)
+	ErrorConnecting := Guild.Connect(*ChannelID)
 
 	if ErrorConnecting != nil {
 
@@ -123,8 +125,16 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		})
 
+		Guild.Play(*Guild.Queue.Current)
+
+	} else {
+
+		Event.CreateMessage(discord.MessageCreate{
+
+			Content: fmt.Sprintf("Added %s by %s to the queue", SearchResults[0].Title, SearchResults[0].Artists[0]),
+
+		})
+
 	}
-	
-	
 
 }

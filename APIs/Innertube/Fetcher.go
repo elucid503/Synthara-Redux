@@ -55,7 +55,7 @@ func InitClient() error {
 
 	InnerTubeClient = InitializedClient;
 
-	Utils.Logger.Info("InnerTube client initialized successfully")
+	Utils.Logger.Info("InnerTube client initialized successfully.")
 	return nil;
 
 }

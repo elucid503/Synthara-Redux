@@ -104,8 +104,8 @@ func NewGuild(ID snowflake.ID) *Guild {
 
 			Functions: QueueFunctions{
 
-				Added: nil,
-				State: nil,
+				Added: QueueAddedHandler,
+				State: QueueStateHandler,
 
 			},
 
@@ -172,8 +172,40 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 	Utils.Logger.Info(fmt.Sprintf("Queue %s state changed to %d", Queue.ParentID.String(), State))
 
-	// TODO: More logic here...
+	// Check Queue state and perform actions
 
+	if State == StateIdle {
+
+		// Idle state; move to next song if available
+		// TODO: Repeat/Shuffle and autoplay logic
+
+		Utils.Logger.Info(fmt.Sprintf("Queue %s is now idle; moving on...", Queue.ParentID.String()))
+
+		Advanced := Queue.Advance()
+
+		if Advanced {
+
+			Utils.Logger.Info(fmt.Sprintf("Queue %s advanced to next song: %s", Queue.ParentID.String(), Queue.Current.Title))
+
+			Guild := GetOrCreateGuild(Queue.ParentID)
+
+			ErrorPlaying := Guild.Play(*Queue.Current)
+
+			if ErrorPlaying != nil {
+
+				Utils.Logger.Error(fmt.Sprintf("Error playing song %s for Queue %s: %s", Queue.Current.Title, Queue.ParentID.String(), ErrorPlaying.Error()))
+
+			}
+
+		} else {
+
+			Utils.Logger.Info(fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
+
+		}
+
+	}
+
+	
 }
 
 // Guild Functions
@@ -194,11 +226,8 @@ func (G *Guild) Connect(ToChannelID snowflake.ID) error {
 
 	if G.VoiceConnection != nil {
 
-		CloseContext, CloseCancel := context.WithTimeout(context.Background(), 5 * time.Second)
-		defer CloseCancel()
-
-		G.VoiceConnection.Close(CloseContext) // Close existing connection
-
+		return nil; // Already connected, so we're done
+		
 	}
 
 	OpenContext, CancelFunc := context.WithTimeout(context.Background(), 10 * time.Second)
@@ -372,7 +401,7 @@ func (G *Guild) Play(Song Innertube.Song) (error) {
 func (Q *Queue) ChangeState(NewState int) {	
 
 	Q.State = NewState
-	Q.Functions.State(Q, NewState)
+	go Q.Functions.State(Q, NewState) // done parallel since it may block, and we don't need to wait in this case...
 
 }
 

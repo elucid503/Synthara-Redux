@@ -14,6 +14,8 @@ func main() {
 
 	godotenv.Load(".env")
 
+	Utils.Logger.Info("Starting Synthara-Redux...")
+
 	InitErr := Globals.InitDiscordClient()
 
 	if InitErr != nil {
@@ -22,6 +24,8 @@ func main() {
 
 	}
 
+	Utils.Logger.Info("Connecting to Discord...")
+
 	ConnectErr := Globals.ConnectDiscordClient()
 
 	if ConnectErr != nil {
@@ -29,6 +33,8 @@ func main() {
 		os.Exit(1)
 
 	}
+
+	Utils.Logger.Info("Connected to Discord!")
 
 	if (os.Getenv("REFRESH_COMMANDS") == "true") {
 
