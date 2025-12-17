@@ -4,9 +4,11 @@
 package Audio
 
 import (
+	"Synthara-Redux/Utils"
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/asticode/go-astits"
@@ -263,6 +265,21 @@ func (Processor *AudioProcessor) Close() {
 
 }
 
+type Streamer interface {
+	
+	Pause()
+	Resume()
+
+	IsPaused() bool
+
+	ProcessNextSegment(SegmentBytes []byte) error
+
+	GetProgress() (int, int)
+
+	ShouldFetchNext() bool
+
+}
+
 type SegmentStreamer struct {
 
 	Processor       *AudioProcessor
@@ -276,6 +293,7 @@ type SegmentStreamer struct {
 
 	ErrorChan       chan error
 	StopChan        chan struct{}
+	Paused          bool
 
 }
 
@@ -303,11 +321,31 @@ func NewSegmentStreamer(SegmentDuration float64, TotalSegments int) (*SegmentStr
 
 }
 
+func (Streamer *SegmentStreamer) Pause() {
+
+	Streamer.Paused = true
+
+}
+
+func (Streamer *SegmentStreamer) Resume() {
+
+	Streamer.Paused = false
+
+}
+
+func (Streamer *SegmentStreamer) IsPaused() bool {
+
+	return Streamer.Paused
+
+}
+
 func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) error {
 
 	OpusFrames, ErrorProcessing := Streamer.Processor.ProcessSegment(SegmentBytes)
 
 	if ErrorProcessing != nil {
+
+		Utils.Logger.Error(fmt.Sprintf("Error processing segment %d/%d: %s", Streamer.CurrentIndex, Streamer.TotalSegments, ErrorProcessing.Error()))
 
 		return ErrorProcessing
 
@@ -317,11 +355,11 @@ func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) error {
 
 		select {
 
-		case Streamer.OpusFrameChan <- Frame:
+			case Streamer.OpusFrameChan <- Frame:
 
-		case <-Streamer.StopChan:
+			case <-Streamer.StopChan:
 
-			return errors.New("stream stopped")
+				return errors.New("stream stopped")
 
 		}
 
@@ -335,21 +373,27 @@ func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) error {
 
 func (Streamer *SegmentStreamer) GetNextFrame() ([]byte, bool) {
 
-	select {
-
-	case Frame := <-Streamer.OpusFrameChan:
-
-		return Frame, true
-
-	case <-Streamer.StopChan:
-
-		return nil, false
-
-	default:
+	if Streamer.Paused {
 
 		return nil, true
 
 	}
+
+	select {
+
+		case Frame := <-Streamer.OpusFrameChan:
+
+			return Frame, true
+
+		case <-Streamer.StopChan:
+
+			return nil, false
+
+		default:
+
+			return nil, true
+
+		}
 
 }
 

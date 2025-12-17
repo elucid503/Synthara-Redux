@@ -36,7 +36,7 @@ type Guild struct {
 const (
 
 	StateIdle = iota
-	StatePlaing = iota
+	StatePlaying = iota
 	StatePaused = iota
 
 )
@@ -52,6 +52,7 @@ type Queue struct {
 	Next []Innertube.Song `json:"next"`
 
 	Functions QueueFunctions `json:"-"`
+	CurrentStreamer Audio.Streamer `json:"-"`
 
 }
 
@@ -174,38 +175,77 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 	// Check Queue state and perform actions
 
-	if State == StateIdle {
+	switch State {
 
-		// Idle state; move to next song if available
-		// TODO: Repeat/Shuffle and autoplay logic
+		case StateIdle:
 
-		Utils.Logger.Info(fmt.Sprintf("Queue %s is now idle; moving on...", Queue.ParentID.String()))
+			// Idle state; move to next song if available
+			// TODO: Repeat/Shuffle and autoplay logic
 
-		Advanced := Queue.Advance()
+			Utils.Logger.Info(fmt.Sprintf("Queue %s is now idle; moving on...", Queue.ParentID.String()))
 
-		if Advanced {
+			Advanced := Queue.Advance()
 
-			Utils.Logger.Info(fmt.Sprintf("Queue %s advanced to next song: %s", Queue.ParentID.String(), Queue.Current.Title))
+			if Advanced {
 
-			Guild := GetOrCreateGuild(Queue.ParentID)
+				Utils.Logger.Info(fmt.Sprintf("Queue %s advanced to next song: %s", Queue.ParentID.String(), Queue.Current.Title))
 
-			ErrorPlaying := Guild.Play(*Queue.Current)
+				Guild := GetOrCreateGuild(Queue.ParentID)
 
-			if ErrorPlaying != nil {
+				ErrorPlaying := Guild.Play(*Queue.Current)
 
-				Utils.Logger.Error(fmt.Sprintf("Error playing song %s for Queue %s: %s", Queue.Current.Title, Queue.ParentID.String(), ErrorPlaying.Error()))
+				if ErrorPlaying != nil {
+
+					Utils.Logger.Error(fmt.Sprintf("Error playing song %s for Queue %s: %s", Queue.Current.Title, Queue.ParentID.String(), ErrorPlaying.Error()))
+
+				}
+
+			} else {
+
+				Utils.Logger.Info(fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
+
+				Queue.Current = nil;
 
 			}
 
-		} else {
+		case StatePaused:
 
-			Utils.Logger.Info(fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
+			if Queue.CurrentStreamer != nil {
 
-		}
+				Queue.CurrentStreamer.Pause()
+
+			}
+
+		case StatePlaying:
+
+			if Queue.CurrentStreamer != nil {
+
+				Queue.CurrentStreamer.Resume()
+
+			}
+
+	}
+	
+}
+
+func QueuePauseStateHandler(Queue *Queue, IsPaused bool) {
+
+	if Queue.CurrentStreamer == nil {
+		return
+	}
+
+	if IsPaused {
+
+		Utils.Logger.Info(fmt.Sprintf("Queue %s paused", Queue.ParentID.String()))
+		Queue.CurrentStreamer.Pause()
+
+	} else {
+
+		Utils.Logger.Info(fmt.Sprintf("Queue %s resumed", Queue.ParentID.String()))
+		Queue.CurrentStreamer.Resume()
 
 	}
 
-	
 }
 
 // Guild Functions
@@ -337,7 +377,11 @@ func (G *Guild) Play(Song Innertube.Song) (error) {
 
 	}
 
-	G.Queue.ChangeState(StatePlaing) // Now is playing
+	G.Queue.ChangeState(StatePlaying) // Now is playing
+
+	// Store streamer in queue for event handlers
+
+	G.Queue.CurrentStreamer = Streamer
 
 	// Start fetching and processing segments in background
 

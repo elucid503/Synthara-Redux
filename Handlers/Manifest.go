@@ -42,7 +42,25 @@ func InitializeCommands() {
 
 	}
 
-	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand})
+	// Pause Command
+
+	PauseCommand := discord.SlashCommandCreate{
+
+		Name:        "pause",
+		Description: "Pauses the currently playing song",
+
+	}
+
+	// Resume Command 
+
+	ResumeCommand := discord.SlashCommandCreate{
+
+		Name:        "resume",
+		Description: "Resumes the currently paused song",
+
+	}
+
+	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand, PauseCommand, ResumeCommand})
 
 	Utils.Logger.Info("Slash commands initialized.")
 
@@ -73,6 +91,14 @@ func InitializeHandlers() {
 				case "play":
 
 					Commands.PlayCommand(Event)
+
+				case "pause":
+
+					Commands.PauseCommand(Event)
+
+				case "resume": 
+
+					Commands.ResumeCommand(Event)
 
 			}
 

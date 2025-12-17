@@ -5,6 +5,7 @@ import (
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Handlers"
 	"Synthara-Redux/Utils"
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -20,6 +21,7 @@ func main() {
 
 	if InitErr != nil {
 
+		Utils.Logger.Error(fmt.Sprintf("Failed to initialize Discord client: %s", InitErr.Error()))
 		os.Exit(1)
 
 	}
@@ -30,6 +32,7 @@ func main() {
 
 	if ConnectErr != nil {
 
+		Utils.Logger.Error(fmt.Sprintf("Failed to connect to Discord: %s", ConnectErr.Error()))
 		os.Exit(1)
 
 	}
@@ -48,6 +51,7 @@ func main() {
 
 	if InnerTubeError != nil {
 
+		Utils.Logger.Error(fmt.Sprintf("Failed to initialize Innertube client: %s", InnerTubeError.Error()))
 		os.Exit(1);
 
 	}
