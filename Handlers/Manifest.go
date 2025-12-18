@@ -2,6 +2,7 @@ package Handlers
 
 import (
 	"Synthara-Redux/Globals"
+	"Synthara-Redux/Handlers/Autocomplete"
 	"Synthara-Redux/Handlers/Commands"
 	"Synthara-Redux/Utils"
 
@@ -35,6 +36,7 @@ func InitializeCommands() {
 				Name:        "query",
 				Description: "The song to search for",
 				Required:    true,
+				Autocomplete: true,
 
 			},
 
@@ -106,6 +108,22 @@ func InitializeHandlers() {
 
 		}()
 					
+	}))
+
+	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.AutocompleteInteractionCreate) {
+
+		go func() {
+
+			switch Event.Data.CommandName {
+
+				case "play":
+
+					Autocomplete.PlayAutocomplete(Event)
+
+			}
+
+		}()
+
 	}))
 
 	Utils.Logger.Info("Event handlers initialized.")
