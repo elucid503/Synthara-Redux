@@ -36,6 +36,24 @@ type Duration struct {
 	
 }
 
+type SearchSuggestionMetadata struct {
+
+	ID       string `json:"id"`
+	Type     string `json:"type"`
+
+	Title    string `json:"title"`
+	Subtitle string `json:"subtitle"`
+
+}
+
+type SearchSuggestion struct {
+
+	Text string `json:"text"`
+
+	Metadata SearchSuggestionMetadata `json:"metadata"`
+
+}
+
 // Variables 
 
 var InnerTubeClient *innertubego.InnerTube;
@@ -219,4 +237,97 @@ func GetAudioSegmentBytes(Segment OverturePlayStructs.HLSSegment) ([]byte, error
 
 	return OverturePlay.GetHLSSegment(Segment.URI, &OverturePlay.HLSOptions{ })
 	
+}
+
+func GetSearchSuggestions(Query string) []SearchSuggestion {
+
+	Results := []SearchSuggestion{}
+
+	RequestContext, RequestCancel := context.WithTimeout(context.Background(), 5 * time.Second) // 5s timeout
+	defer RequestCancel()
+
+	SearchSuggestions, SearchError := InnerTubeClient.MusicGetSearchSuggestions(RequestContext, &Query)
+	
+	if SearchError != nil {
+
+		Utils.Logger.Error("Error fetching search suggestions: " + SearchError.Error())
+		return Results
+
+	}
+
+	// Get root contents array
+
+	ContentsVal, ContentsExists := Utils.GetNestedValue(SearchSuggestions, "contents")
+
+	if !ContentsExists {
+
+		return Results
+
+	}
+
+	Contents, ContentsValid := ContentsVal.([]interface{})
+
+	if !ContentsValid || len(Contents) == 0 {
+
+		return Results
+
+	}
+
+	// Iterate through each suggestion section
+
+	for _, SectionItem := range Contents {
+
+		SectionMap, SectionMapValid := SectionItem.(map[string]interface{})
+
+		if !SectionMapValid {
+
+			continue
+
+		}
+
+		// Get the suggestion section renderer
+		SectionRendererVal, SectionRendererExists := Utils.GetNestedValue(SectionMap, "searchSuggestionsSectionRenderer", "contents")
+
+		if !SectionRendererExists {
+
+			continue
+
+		}
+
+		SuggestionContents, SuggestionContentsValid := SectionRendererVal.([]interface{})
+
+		if !SuggestionContentsValid {
+
+			continue
+
+		}
+
+		// Parse each suggestion renderer
+
+		for _, SuggestionItem := range SuggestionContents {
+
+			SuggestionMap, SuggestionMapValid := SuggestionItem.(map[string]interface{})
+
+			if !SuggestionMapValid {
+
+				continue
+
+			}
+
+			// Use the parser to convert renderer to SearchSuggestion
+			
+			Suggestion, ParseError := ParseSuggestion(SuggestionMap)
+
+			if ParseError == nil {
+
+				Results = append(Results, Suggestion)
+
+			}
+
+		}
+
+	}
+
+	return Results
+
 }

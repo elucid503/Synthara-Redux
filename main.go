@@ -56,6 +56,8 @@ func main() {
 
 	}
 	
+	Innertube.GetSearchSuggestions("Twenty one Pilots");
+
 	Utils.Hang()
 
 }

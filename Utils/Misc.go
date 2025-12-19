@@ -7,6 +7,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/snowflake/v2"
 )
 
 func Hang() {
@@ -51,52 +54,30 @@ func GetNestedValue(Data interface{}, Keys ...string) (interface{}, bool) {
 
 }
 
-func ExtractSongThumbnail(Renderer map[string]interface{}) string {
+func GetVoiceState(GuildID snowflake.ID, UserID snowflake.ID) (*discord.VoiceState, bool) {
 
-	ThumbnailsVal, ThumbnailsValExists := GetNestedValue(Renderer, "thumbnail", "musicThumbnailRenderer", "thumbnail", "thumbnails")
+	VoiceState, VoiceStateExists := Globals.DiscordClient.Caches.VoiceState(GuildID, UserID)
 
-	if !ThumbnailsValExists || len(ThumbnailsVal.([]interface{})) == 0 {
+	if !VoiceStateExists || VoiceState.ChannelID == nil {
 
-		return "https://cdn.discordapp.com/embed/avatars/1.png" // Default 'thumbnail'
+		RestVoiceState, RestError := Globals.DiscordClient.Rest.GetUserVoiceState(GuildID, UserID)
 
-	}
+		if RestError != nil || RestVoiceState == nil || RestVoiceState.ChannelID == nil {
 
-	LastThumbnail, LastThumbnailExists := ThumbnailsVal.([]interface{})[len(ThumbnailsVal.([]interface{}))-1].(map[string]interface{})
+			return nil, false
 
-	if !LastThumbnailExists {
+		}
 
-		return "https://cdn.discordapp.com/embed/avatars/1.png"
-
-	}
-
-	URL, LastThumbnailURLExists := LastThumbnail["url"].(string)
-
-	if !LastThumbnailURLExists {
-
-		return "https://cdn.discordapp.com/embed/avatars/1.png"
+		return RestVoiceState, true
 
 	}
 
-	return URL
+	return &VoiceState, true
 
 }
 
-func ParseFormattedDuration(FormattedDuration string) int {
+func GetURI(Type string, ID string) string {
 
-	if FormattedDuration == "" {
-
-		return 0
-		
-	}
-
-	var Minutes, Seconds int
-
-	if _, ParseError := fmt.Sscanf(FormattedDuration, "%d:%d", &Minutes, &Seconds); ParseError == nil {
-
-		return Minutes*60 + Seconds
-
-	}
-
-	return 0
-
+	return fmt.Sprintf("Synthara-Redux:%s:%s", Type, ID)
+ 
 }

@@ -275,7 +275,7 @@ func (G *Guild) Connect(ToChannelID snowflake.ID) error {
 
 	VoiceConnection := Globals.DiscordClient.VoiceManager.CreateConn(G.ID)
 
-	ErrorOpening := VoiceConnection.Open(OpenContext, G.Channels.Voice, false, false)
+	ErrorOpening := VoiceConnection.Open(OpenContext, G.Channels.Voice, false, true)
 
 	if ErrorOpening != nil {
 

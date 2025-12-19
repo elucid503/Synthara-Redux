@@ -2,8 +2,8 @@ package Commands
 
 import (
 	"Synthara-Redux/APIs/Innertube"
-	"Synthara-Redux/Globals"
 	"Synthara-Redux/Structs"
+	"Synthara-Redux/Utils"
 	"fmt"
 
 	"github.com/disgoorg/disgo/discord"
@@ -45,27 +45,9 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	GuildID := *Event.GuildID()
 
-	OriginalVoiceState, VoiceStateExists := Globals.DiscordClient.Caches.VoiceState(GuildID, Event.User().ID)
+	VoiceState, VoiceStateExists := Utils.GetVoiceState(GuildID, Event.User().ID)
 
-	if !VoiceStateExists || OriginalVoiceState.ChannelID == nil {
-
-		VoiceState, VoiceStateError := Event.Client().Rest.GetUserVoiceState(GuildID, Event.User().ID);
-		
-		if VoiceStateError != nil || VoiceState.ChannelID == nil {
-
-			VoiceStateExists = false
-
-		} else {
-
-			VoiceStateExists = true
-
-		}
-
-		OriginalVoiceState = *VoiceState;
-		
-	}
-
-	if !VoiceStateExists || OriginalVoiceState.ChannelID == nil {
+	if !VoiceStateExists {
 
 		Event.CreateMessage(discord.MessageCreate{
 
@@ -77,7 +59,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	ChannelID := OriginalVoiceState.ChannelID
+	ChannelID := VoiceState.ChannelID
 
 	// Search for songs
 
