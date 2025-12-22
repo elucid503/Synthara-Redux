@@ -81,3 +81,15 @@ func GetURI(Type string, ID string) string {
 	return fmt.Sprintf("Synthara-Redux:%s:%s", Type, ID)
  
 }
+
+func Pluralize(Word string, Count int) string {
+
+	if Count == 1 {
+
+		return Word
+
+	}
+
+	return Word + "s"
+
+}

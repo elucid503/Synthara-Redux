@@ -15,6 +15,7 @@ require (
 
 require (
 	github.com/asticode/go-astikit v0.57.1 // indirect
+	github.com/cenkalti/dominantcolor v1.0.3 // direct
 	github.com/disgoorg/json/v2 v2.0.0 // indirect
 	github.com/disgoorg/omit v1.0.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
@@ -22,5 +23,6 @@ require (
 	github.com/sasha-s/go-csync v0.0.0-20240107134140-fcbab37b09ad // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
 	golang.org/x/crypto v0.46.0 // indirect
+	golang.org/x/image v0.18.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 )

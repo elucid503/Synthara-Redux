@@ -464,25 +464,25 @@ func (Q *Queue) IsEmpty() bool {
 }
 
 // Add appends a song to the end of the queue OR current
-func (Q *Queue) Add(Song Innertube.Song) bool {
+func (Q *Queue) Add(Song Innertube.Song) int {
 
-	WasAdded := false;
+	Pos := len(Q.Next)
 
 	if Q.Current == nil {
 
 		Q.Current = &Song
-		WasAdded = true;
 
 	} else {
 
 		Q.Next = append(Q.Next, Song)
+		Pos++ // Position in UPCOMING queue is 1-based
 
 	}
 
 	Q.Functions.Added(Q, Song)
 
-	return WasAdded
-
+	return Pos
+	
 }
 
 // Advance moves to the next song in the queue; returns false if there are no more songs

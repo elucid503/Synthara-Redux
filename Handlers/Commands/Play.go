@@ -4,7 +4,6 @@ import (
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
-	"fmt"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -97,25 +96,17 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 	
 	// Play/Add result 
 
-	IsCurrent := Guild.Queue.Add(SearchResults[0])
+	Pos := Guild.Queue.Add(SearchResults[0])
 
-	if IsCurrent {
+	Event.CreateMessage(discord.MessageCreate{
+
+		Embeds: []discord.Embed{SearchResults[0].Embed(&Event.Member().User, Pos)},
 		
-		Event.CreateMessage(discord.MessageCreate{
+	})
 
-			Content: fmt.Sprintf("Now playing %s by %s", SearchResults[0].Title, SearchResults[0].Artists[0]),
-
-		})
-
+	if Pos == 0 {
+	
 		Guild.Play(*Guild.Queue.Current)
-
-	} else {
-
-		Event.CreateMessage(discord.MessageCreate{
-
-			Content: fmt.Sprintf("Added %s by %s to the queue", SearchResults[0].Title, SearchResults[0].Artists[0]),
-
-		})
 
 	}
 
