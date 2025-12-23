@@ -62,7 +62,25 @@ func InitializeCommands() {
 
 	}
 
-	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand, PauseCommand, ResumeCommand})
+	// Next Command
+
+	NextCommand := discord.SlashCommandCreate{
+
+		Name:        "next",
+		Description: "Skips to the next song in the queue",
+
+	}
+
+	// Last Command
+
+	LastCommand := discord.SlashCommandCreate{
+
+		Name:        "last",
+		Description: "Plays the previously played song",
+
+	}
+
+	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand, PauseCommand, ResumeCommand, NextCommand, LastCommand})
 
 	Utils.Logger.Info("Slash commands initialized.")
 
@@ -101,6 +119,14 @@ func InitializeHandlers() {
 				case "resume": 
 
 					Commands.ResumeCommand(Event)
+
+				case "next":
+
+					Commands.NextCommand(Event)
+
+				case "last":
+
+					Commands.LastCommand(Event)
 
 			}
 

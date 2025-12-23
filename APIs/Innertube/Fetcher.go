@@ -1,6 +1,7 @@
 package Innertube
 
 import (
+	"Synthara-Redux/Globals"
 	"Synthara-Redux/Utils"
 	"context"
 	"errors"
@@ -156,37 +157,69 @@ func SearchForSongs(Query string) []Song {
 
 }
 
-func GetSongAudioSegments(YouTubeID string) ([]OverturePlayStructs.HLSSegment, error) {
-
+func GetSongManifestURL(YouTubeID string) (string, error) {
+	
 	Cookie := os.Getenv("YOUTUBE_COOKIE")
 
-	Video, ErrorFetchingVideo := OverturePlay.Info(YouTubeID, &OverturePlay.InfoOptions{
+	var HLSManifestURL string
 
-		GetHLSFormats: true,
+	ManifestCache := Globals.GetOrCreateCache("Manifests")
 
-	}, nil, &Cookie)
+	FoundManifest, FoundManifestExists := ManifestCache.Get(YouTubeID)
 
-	if ErrorFetchingVideo != nil {
+	if FoundManifestExists {
 
-		return nil, ErrorFetchingVideo
+		HLSManifestURL = FoundManifest.(string)
+
+	} else {
+
+		Video, ErrorFetchingVideo := OverturePlay.Info(YouTubeID, &OverturePlay.InfoOptions{
+
+			GetHLSFormats: true,
+
+		}, nil, &Cookie)
+
+		if ErrorFetchingVideo != nil {
+
+			return "", ErrorFetchingVideo
+
+		}
+
+		if (len(Video.HLSFormats) == 0) {	
+
+			return "", errors.New("no HLS formats available for this video")
+
+		}
+
+		// Ideal HLS format is lowest res, so we sort ascending by width
+
+		slices.SortFunc(Video.HLSFormats, func(a, b OverturePlayStructs.Format) int {
+
+			return *a.Width - *b.Width
+
+		})
+
+		HLSManifestURL = Video.HLSFormats[0].URL // 0 being lowest res
+
+		ManifestCache.Set(YouTubeID, HLSManifestURL, 1 * time.Hour) // 1 Hour TTL
 
 	}
 
-	if (len(Video.HLSFormats) == 0) {	
+	return HLSManifestURL, nil
 
-		return nil, errors.New("no HLS formats available for this video")
+}
+
+func GetSongAudioSegments(YouTubeID string) ([]OverturePlayStructs.HLSSegment, error) {
+
+	HLSManifestURL, ErrorGettingManifestURL := GetSongManifestURL(YouTubeID)
+
+	if ErrorGettingManifestURL != nil {
+
+		return nil, ErrorGettingManifestURL
 
 	}
 
-	// Ideal HLS format is lowest res, so we sort ascending by width
-
-	slices.SortFunc(Video.HLSFormats, func(a, b OverturePlayStructs.Format) int {
-
-		return *a.Width - *b.Width
-
-	})
-
-	Manifest, ErrorFetchingManifest := OverturePlay.GetHLSManifest(Video.HLSFormats[0].URL, nil) // 0 being lowest res
+	Manifest, ErrorFetchingManifest := OverturePlay.GetHLSManifest(HLSManifestURL, nil) // 0 being lowest res
 
 	if ErrorFetchingManifest != nil {
 

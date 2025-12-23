@@ -265,21 +265,6 @@ func (Processor *AudioProcessor) Close() {
 
 }
 
-type Streamer interface {
-	
-	Pause()
-	Resume()
-
-	IsPaused() bool
-
-	ProcessNextSegment(SegmentBytes []byte) error
-
-	GetProgress() (int, int)
-
-	ShouldFetchNext() bool
-
-}
-
 type SegmentStreamer struct {
 
 	Processor       *AudioProcessor
@@ -313,6 +298,7 @@ func NewSegmentStreamer(SegmentDuration float64, TotalSegments int) (*SegmentStr
 		CurrentIndex:    0,
 		TotalSegments:   TotalSegments,
 		SegmentDuration: SegmentDuration,
+		
 		OpusFrameChan:   make(chan []byte, 100),
 		ErrorChan:       make(chan error, 10),
 		StopChan:        make(chan struct{}),

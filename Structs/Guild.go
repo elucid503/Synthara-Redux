@@ -49,10 +49,10 @@ type Queue struct {
 
 	Previous []Innertube.Song `json:"previous"`
 	Current *Innertube.Song `json:"current"`
-	Next []Innertube.Song `json:"next"`
+	Upcoming []Innertube.Song `json:"next"`
 
 	Functions QueueFunctions `json:"-"`
-	CurrentStreamer Audio.Streamer `json:"-"`
+	CurrentStreamer *Audio.SegmentStreamer `json:"-"`
 
 }
 
@@ -67,6 +67,7 @@ type QueueFunctions struct {
 
 	Added func(Queue *Queue, Song Innertube.Song) `json:"-"`
 	State func(Queue *Queue, State int) `json:"-"`
+	Updated func(Queue *Queue) `json:"-"`
 
 }
 
@@ -101,12 +102,13 @@ func NewGuild(ID snowflake.ID) *Guild {
 
 			Previous: []Innertube.Song{},
 			Current:  nil,
-			Next:     []Innertube.Song{},
+			Upcoming: []Innertube.Song{},
 
 			Functions: QueueFunctions{
 
 				Added: QueueAddedHandler,
 				State: QueueStateHandler,
+				Updated: QueueUpdatedHandler,
 
 			},
 
@@ -164,9 +166,7 @@ func GetOrCreateGuild(ID snowflake.ID) *Guild {
 func QueueAddedHandler(Queue *Queue, Song Innertube.Song) {
 
 	Utils.Logger.Info(fmt.Sprintf("Song %s was enqueued for Queue %s", Song.Title, Queue.ParentID.String()))
-
-	// TODO: More logic here...
-
+	
 }
 
 func QueueStateHandler(Queue *Queue, State int) {
@@ -189,6 +189,8 @@ func QueueStateHandler(Queue *Queue, State int) {
 			if Advanced {
 
 				Utils.Logger.Info(fmt.Sprintf("Queue %s advanced to next song: %s", Queue.ParentID.String(), Queue.Current.Title))
+
+				Queue.Functions.Updated(Queue)
 
 				Guild := GetOrCreateGuild(Queue.ParentID)
 
@@ -246,6 +248,30 @@ func QueuePauseStateHandler(Queue *Queue, IsPaused bool) {
 
 	}
 
+}
+
+func QueueUpdatedHandler(Queue *Queue) {
+
+	if len(Queue.Upcoming) == 0 {
+
+		return
+
+	}
+
+	NextSong := Queue.Upcoming[0]
+
+	// Pre-caches HLS manifest for next song
+	
+	Utils.Logger.Info(fmt.Sprintf("Queue %s updated; caching HLS manifest for song: %s", Queue.ParentID.String(), NextSong.Title))
+
+	_, ErrorGettingManifest := Innertube.GetSongManifestURL(NextSong.YouTubeID)
+
+	if ErrorGettingManifest != nil {
+
+		Utils.Logger.Error(fmt.Sprintf("Error caching HLS manifest for song %s: %s", NextSong.Title, ErrorGettingManifest.Error()))
+
+	}
+	
 }
 
 // Guild Functions
@@ -449,6 +475,37 @@ func (Q *Queue) ChangeState(NewState int) {
 
 }
 
+// playCurrent starts playback of the current song; returns false on failure.
+func (Q *Queue) playCurrent() bool {
+
+	if Q.Current == nil {
+
+		return false
+
+	}
+
+	if Q.CurrentStreamer != nil {
+
+		Q.CurrentStreamer.Stop() // ensures previous stream halts and stopChan is closed
+		Q.CurrentStreamer = nil
+
+	}
+
+	Guild := GetOrCreateGuild(Q.ParentID)
+
+	ErrorPlaying := Guild.Play(*Q.Current)
+
+	if ErrorPlaying != nil {
+
+		Utils.Logger.Error(fmt.Sprintf("Error playing song %s for Queue %s: %s", Q.Current.Title, Q.ParentID.String(), ErrorPlaying.Error()))
+		return false
+
+	}
+
+	return true
+
+}
+
 // HasCurrent Checks if there is a current song playing
 func (Q *Queue) HasCurrent() bool {
 
@@ -459,14 +516,14 @@ func (Q *Queue) HasCurrent() bool {
 // IsEmpty Checks if the queue is empty (no current song and no next songs)
 func (Q *Queue) IsEmpty() bool {
 
-	return Q.Current == nil && len(Q.Next) == 0
+	return Q.Current == nil && len(Q.Upcoming) == 0
 
 }
 
 // Add appends a song to the end of the queue OR current
 func (Q *Queue) Add(Song Innertube.Song) int {
 
-	Pos := len(Q.Next)
+	Pos := len(Q.Upcoming)
 
 	if Q.Current == nil {
 
@@ -474,7 +531,7 @@ func (Q *Queue) Add(Song Innertube.Song) int {
 
 	} else {
 
-		Q.Next = append(Q.Next, Song)
+		Q.Upcoming = append(Q.Upcoming, Song)
 		Pos++ // Position in UPCOMING queue is 1-based
 
 	}
@@ -488,7 +545,55 @@ func (Q *Queue) Add(Song Innertube.Song) int {
 // Advance moves to the next song in the queue; returns false if there are no more songs
 func (Q *Queue) Advance() bool {
 
-	if len(Q.Next) == 0 {
+	return Q.jump(1, false)
+
+}
+
+// Next moves forward by one song in the upcoming queue; returns false when none exist.
+func (Q *Queue) Next() bool {
+
+	return Q.jump(1, true)
+
+}
+
+// Previous moves to the most recently played song; returns false when there is no history.
+func (Q *Queue) Last() bool {
+
+	if len(Q.Previous) == 0 {
+
+		return false
+
+	}
+
+	if Q.Current != nil {
+
+		Q.Upcoming = append([]Innertube.Song{*Q.Current}, Q.Upcoming...)
+
+	}
+
+	PrevIndex := len(Q.Previous) - 1
+	PrevSong := Q.Previous[PrevIndex]
+	Q.Previous = Q.Previous[:PrevIndex]
+	Q.Current = &PrevSong
+
+
+	Q.Functions.Updated(Q)
+
+	return Q.playCurrent()
+
+}
+
+// Jump moves to the 1-indexed position within the upcoming queue; returns false for invalid positions.
+func (Q *Queue) Jump(Index int) bool {
+
+	return Q.jump(Index, true)
+
+}
+
+// jump performs the queue movement; optionally starts playback when shouldPlay is true.
+func (Q *Queue) jump(Index int, shouldPlay bool) bool {
+
+	if Index < 1 || Index > len(Q.Upcoming) {
 
 		return false
 
@@ -500,10 +605,30 @@ func (Q *Queue) Advance() bool {
 
 	}
 
-	Q.Current = &Q.Next[0]
-	Q.Next = Q.Next[1:]
+	if Index > 1 {
 
-	return true
+		Skipped := make([]Innertube.Song, Index-1)
+		copy(Skipped, Q.Upcoming[:Index-1])
+		Q.Previous = append(Q.Previous, Skipped...)
+
+	}
+
+	Target := Q.Upcoming[Index-1]
+	Remaining := make([]Innertube.Song, len(Q.Upcoming[Index:]))
+	copy(Remaining, Q.Upcoming[Index:])
+
+	Q.Current = &Target
+	Q.Upcoming = Remaining
+
+	if !shouldPlay {
+
+		return true
+
+	}
+
+	Q.Functions.Updated(Q)
+
+	return Q.playCurrent()
 
 }
 
@@ -512,6 +637,6 @@ func (Q *Queue) Clear() {
 
 	Q.Previous = []Innertube.Song{}
 	Q.Current = nil
-	Q.Next = []Innertube.Song{}
+	Q.Upcoming = []Innertube.Song{}
 
 }
