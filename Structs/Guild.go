@@ -182,13 +182,22 @@ func (G *Guild) Disconnect() error {
 		}
 
 		ContextToUse, CancelFunc := context.WithTimeout(context.Background(), 5 * time.Second)
+
 		defer CancelFunc()
+
 		// Stop speaking and detach provider before closing connection
+
 		_ = G.VoiceConnection.SetSpeaking(ContextToUse, 0)
 		G.VoiceConnection.SetOpusFrameProvider(nil)
 
 		G.VoiceConnection.Close(ContextToUse)
 		G.VoiceConnection = nil
+
+		// Removes guild from store to free up memory
+
+		GuildStoreMutex.Lock()
+		delete(GuildStore, G.ID)
+		GuildStoreMutex.Unlock()
 
 		return nil;
 

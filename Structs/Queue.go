@@ -119,6 +119,37 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				Utils.Logger.Info(fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
 
+				// Sends a message indicating the queue has ended
+
+				go func() { 
+
+					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(GetGuild(Queue.ParentID).Channels.Text, discord.MessageCreate{
+
+						Embeds: []discord.Embed{{
+
+							Title: "Queue Ended",
+							Description: "The playback Queue has finished.\nNew songs may be added at any time.",
+							Color: 0xFFFFFF, // White
+							
+							Author: &discord.EmbedAuthor{
+
+								Name: "Notifications",
+
+							},
+
+						}},
+
+					})
+
+					if ErrorSending != nil {
+
+						Utils.Logger.Error(fmt.Sprintf("Error sending queue ended message to channel %s for Queue %s: %s", GetGuild(Queue.ParentID).Channels.Text, Queue.ParentID.String(), ErrorSending.Error()))
+
+					}
+
+				}()
+
+
 				Queue.Current = nil;
 
 			}
