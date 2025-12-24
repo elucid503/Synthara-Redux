@@ -3,9 +3,7 @@ package Audio
 // OpusProvider Implements OpusFrameProvider interface for SegmentStreamer
 type OpusProvider struct {
 
-	Streamer   *SegmentStreamer
-	Segments   []interface{}
-	Index      int
+	Streamer *SegmentStreamer
 
 }
 
@@ -25,6 +23,6 @@ func (P *OpusProvider) ProvideOpusFrame() ([]byte, error) {
 
 func (P *OpusProvider) Close() {
 
-	P.Streamer.Close()
+	P.Streamer.Stop()
 
 }

@@ -11,7 +11,7 @@ func LastCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	GuildID := *Event.GuildID()
 
-	Guild := Structs.GetOrCreateGuild(GuildID);
+	Guild := Structs.GetGuild(GuildID);
 
 	Success := Guild.Queue.Last()
 

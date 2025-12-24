@@ -11,9 +11,9 @@ func ResumeCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	GuildID := *Event.GuildID()
 
-	Guild := Structs.GetOrCreateGuild(GuildID);
+	Guild := Structs.GetGuild(GuildID);
 
-	Guild.Queue.ChangeState(Structs.StatePlaying)
+	Guild.Queue.SetState(Structs.StatePlaying)
 
 	Event.CreateMessage(discord.MessageCreate{
 		

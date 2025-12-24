@@ -18,6 +18,8 @@ type Song struct {
 	Duration Duration `json:"duration"`
 
 	Cover string `json:"cover"`
+
+	Internal SongInternal `json:"internal"`
 		
 }
 
@@ -34,11 +36,15 @@ type QueueInfo struct {
 	TotalUpcoming  int `json:"total_upcoming"`
 	TotalPrevious int `json:"total_previous"`
 	
-	TimePlaying int `json:"time_previous"`
+}
+
+type SongInternal struct {
+
+	Requestor string `json:"requestor"`
 
 }
 
-func (S *Song) Embed(Requestor *discord.User, State QueueInfo) discord.Embed {
+func (S *Song) Embed(State QueueInfo) discord.Embed {
 
 	Embed := discord.NewEmbedBuilder()
 
@@ -74,24 +80,19 @@ func (S *Song) Embed(Requestor *discord.User, State QueueInfo) discord.Embed {
 
 	Embed.SetThumbnail(S.Cover)
 
-	Embed.SetDescription(fmt.Sprintf("By **%s**", ArtistNames))
+	Description := fmt.Sprintf("On **%s**", S.Album)
 
+	Embed.SetDescription(Description)
+
+	Embed.AddField("Artists", ArtistNames, true)
 	Embed.AddField("Duration", fmt.Sprintf("%s Min", S.Duration.Formatted), true)
-	Embed.AddField(fmt.Sprintf("%s By", AddedState), Requestor.Username, true)
+	Embed.AddField(fmt.Sprintf("%s By", AddedState), S.Internal.Requestor, true)
 
 	TotalSongs := State.TotalPrevious + State.TotalUpcoming + 1
 	CurrentPosition := State.SongPosition + 1
 	
-	if State.TimePlaying > 0 { // only shows time playing if greater than 0
-
-		Embed.SetFooter(fmt.Sprintf("Song %d of %d • Playing for %s Min", CurrentPosition, TotalSongs, FormatDuration(State.TimePlaying)), "")
-
-	} else {
-
-		Embed.SetFooter(fmt.Sprintf("Song %d of %d • Connected", CurrentPosition, TotalSongs), "")
+	Embed.SetFooter(fmt.Sprintf("Song %d of %d in Queue", CurrentPosition, TotalSongs), "")
 		
-	}
-
 	// Color 
 
 	DominantColor, ColorFetchError := Utils.GetDominantColorHex(S.Cover)

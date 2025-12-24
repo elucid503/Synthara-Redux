@@ -11,9 +11,9 @@ func PauseCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	GuildID := *Event.GuildID()
 
-	Guild := Structs.GetOrCreateGuild(GuildID);
+	Guild := Structs.GetGuild(GuildID);
 
-	Guild.Queue.ChangeState(Structs.StatePaused)
+	Guild.Queue.SetState(Structs.StatePaused)
 
 	Event.CreateMessage(discord.MessageCreate{
 		

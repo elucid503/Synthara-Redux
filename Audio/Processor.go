@@ -4,12 +4,11 @@
 package Audio
 
 import (
-	"Synthara-Redux/Utils"
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"io"
+	"sync/atomic"
 
 	"github.com/asticode/go-astits"
 	"github.com/nareix/joy4/codec/aacparser"
@@ -26,6 +25,49 @@ const (
 
 )
 
+type Playback struct {
+
+	Streamer *SegmentStreamer
+
+	Stopped  atomic.Bool
+
+}
+
+func (P *Playback) Pause() {
+
+	if P.Streamer != nil {
+
+		P.Streamer.Pause()
+
+	}
+
+}
+
+func (P *Playback) Resume() {
+
+	if P.Streamer != nil {
+
+		P.Streamer.Resume()
+
+	}
+
+}
+
+func (P *Playback) Stop() {
+
+	if P.Stopped.Swap(true) {
+
+		return
+
+	}
+
+	if P.Streamer != nil {
+
+		P.Streamer.Stop()
+
+	}
+
+}
 type AudioProcessor struct {
 
 	AACDecoder  *FDKAACDecoder
@@ -92,6 +134,7 @@ func (Processor *AudioProcessor) ExtractAACFrames(SegmentBytes []byte) ([][]byte
 
 	var AACFrames [][]byte
 	var AudioPID uint16
+	
 	AudioPIDFound := false
 
 	for {
@@ -130,7 +173,8 @@ func (Processor *AudioProcessor) ExtractAACFrames(SegmentBytes []byte) ([][]byte
 
 			if len(Data.PES.Data) > 0 {
 
-				// Extract ADTS AAC frames from PES data
+				// Extracts ADTS AAC frames from PES data
+
 				Frames := Processor.ParseADTSFrames(Data.PES.Data)
 				AACFrames = append(AACFrames, Frames...)
 
@@ -163,7 +207,8 @@ func (Processor *AudioProcessor) ParseADTSFrames(ADTSData []byte) [][]byte {
 
 		}
 
-		// Parse ADTS header to get frame length
+		// Parses ADTS header to get frame length
+
 		_, _, FrameLen, _, ErrorParsing := aacparser.ParseADTSHeader(ADTSData[Offset:])
 
 		if ErrorParsing != nil {
@@ -193,53 +238,59 @@ func (Processor *AudioProcessor) ParseADTSFrames(ADTSData []byte) [][]byte {
 
 func (Processor *AudioProcessor) EncodeAACToOpus(AACFrames [][]byte) ([][]byte, error) {
 
-	var AllPCMData []int16
+	var OpusFrames [][]byte
+	SamplesPerFrame := FrameSize * Channels
+	
+	PCMBuffer := make([]int16, 0, SamplesPerFrame*4) // Preallocate reasonable buffer
 
-	// Decode all AAC frames to PCM
 	for _, Frame := range AACFrames {
 
 		PCMData, ErrorDecoding := Processor.AACDecoder.Decode(Frame)
 
-		if ErrorDecoding != nil {
+		if ErrorDecoding != nil { 
 
 			continue // Skip bad frames
 
 		}
 
-		if PCMData != nil {
+		if PCMData == nil {
+			
+			continue // No data decoded
 
-			AllPCMData = append(AllPCMData, PCMData...)
+		}
+
+		PCMBuffer = append(PCMBuffer, PCMData...)
+
+		// Encodes complete frames immediately
+
+		for len(PCMBuffer) >= SamplesPerFrame {
+
+			PCMFrame := PCMBuffer[:SamplesPerFrame]
+
+			OpusData, ErrorEncoding := Processor.OpusEncoder.Encode(PCMFrame, FrameSize, MaxPacketSize)
+
+			if ErrorEncoding != nil {
+
+				return nil, ErrorEncoding
+
+			}
+
+			OpusFrames = append(OpusFrames, OpusData)
+			
+			PCMBuffer = PCMBuffer[SamplesPerFrame:] // Removes already-processed samples
 
 		}
 
 	}
 
-	if len(AllPCMData) == 0 {
+	// Handles remaining samples with padding if needed
 
-		return nil, errors.New("no PCM data decoded")
+	if len(PCMBuffer) > 0 {
 
-	}
+		Padding := make([]int16, SamplesPerFrame-len(PCMBuffer))
+		PCMBuffer = append(PCMBuffer, Padding...)
 
-	// Encode PCM to Opus in chunks
-	var OpusFrames [][]byte
-	SamplesPerFrame := FrameSize * Channels
-
-	for Offset := 0; Offset < len(AllPCMData); Offset += SamplesPerFrame {
-
-		End := Offset + SamplesPerFrame
-
-		if End > len(AllPCMData) {
-
-			// Pad last frame with silence
-			Padding := make([]int16, End-len(AllPCMData))
-			AllPCMData = append(AllPCMData, Padding...)
-
-		}
-
-		PCMFrame := AllPCMData[Offset:End]
-
-		// Encode to Opus
-		OpusData, ErrorEncoding := Processor.OpusEncoder.Encode(PCMFrame, FrameSize, MaxPacketSize)
+		OpusData, ErrorEncoding := Processor.OpusEncoder.Encode(PCMBuffer, FrameSize, MaxPacketSize)
 
 		if ErrorEncoding != nil {
 
@@ -262,168 +313,5 @@ func (Processor *AudioProcessor) Close() {
 		Processor.AACDecoder.Close()
 
 	}
-
-}
-
-type SegmentStreamer struct {
-
-	Processor       *AudioProcessor
-
-	CurrentIndex    int
-	TotalSegments   int
-
-	SegmentDuration float64
-
-	OpusFrameChan   chan []byte
-
-	ErrorChan       chan error
-	StopChan        chan struct{}
-	Paused          bool
-
-}
-
-func NewSegmentStreamer(SegmentDuration float64, TotalSegments int) (*SegmentStreamer, error) {
-
-	Processor, ErrorCreatingProcessor := NewAudioProcessor()
-
-	if ErrorCreatingProcessor != nil {
-
-		return nil, ErrorCreatingProcessor
-
-	}
-
-	return &SegmentStreamer{
-
-		Processor:       Processor,
-		CurrentIndex:    0,
-		TotalSegments:   TotalSegments,
-		SegmentDuration: SegmentDuration,
-		
-		OpusFrameChan:   make(chan []byte, 100),
-		ErrorChan:       make(chan error, 10),
-		StopChan:        make(chan struct{}),
-
-	}, nil
-
-}
-
-func (Streamer *SegmentStreamer) Pause() {
-
-	Streamer.Paused = true
-
-}
-
-func (Streamer *SegmentStreamer) Resume() {
-
-	Streamer.Paused = false
-
-}
-
-func (Streamer *SegmentStreamer) IsPaused() bool {
-
-	return Streamer.Paused
-
-}
-
-func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) error {
-
-	OpusFrames, ErrorProcessing := Streamer.Processor.ProcessSegment(SegmentBytes)
-
-	if ErrorProcessing != nil {
-
-		Utils.Logger.Error(fmt.Sprintf("Error processing segment %d/%d: %s", Streamer.CurrentIndex, Streamer.TotalSegments, ErrorProcessing.Error()))
-
-		return ErrorProcessing
-
-	}
-
-	for _, Frame := range OpusFrames {
-
-		select {
-
-			case Streamer.OpusFrameChan <- Frame:
-
-			case <-Streamer.StopChan:
-
-				return errors.New("stream stopped")
-
-		}
-
-	}
-
-	Streamer.CurrentIndex++
-
-	return nil
-
-}
-
-func (Streamer *SegmentStreamer) GetNextFrame() ([]byte, bool) {
-
-	if Streamer.Paused {
-
-		return nil, true
-
-	}
-
-	select {
-
-		case Frame := <-Streamer.OpusFrameChan:
-
-			return Frame, true
-
-		case <-Streamer.StopChan:
-
-			return nil, false
-
-		default:
-
-			return nil, true
-
-		}
-
-}
-
-func (Streamer *SegmentStreamer) ShouldFetchNext() bool {
-
-	return Streamer.CurrentIndex < Streamer.TotalSegments && len(Streamer.OpusFrameChan) < 50 // fetches next if less than 50 frames are buffered; 20ms/frame = 1s buffer
-
-}
-
-func (Streamer *SegmentStreamer) GetProgress() (int, int) {
-
-	return Streamer.CurrentIndex, Streamer.TotalSegments
-
-}
-
-func (Streamer *SegmentStreamer) GetSegmentDuration() float64 {
-
-	return Streamer.SegmentDuration
-
-}
-
-func (Streamer *SegmentStreamer) GetCurrentTime() float64 {
-
-	if Streamer == nil {
-
-		return 0.0 // streamer does not exist, yet
-
-	}
-
-	return float64(Streamer.CurrentIndex) * Streamer.SegmentDuration
-
-}
-
-func (Streamer *SegmentStreamer) Stop() {
-
-	close(Streamer.StopChan)
-	Streamer.Processor.Close()
-
-}
-
-func (Streamer *SegmentStreamer) Close() {
-
-	Streamer.Stop()
-	close(Streamer.OpusFrameChan)
-	close(Streamer.ErrorChan)
 
 }

@@ -76,11 +76,11 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	Guild := Structs.GetOrCreateGuild(GuildID);
+	Guild := Structs.GetGuild(GuildID);
 
 	// Connect to voice channel
 
-	ErrorConnecting := Guild.Connect(*ChannelID)
+	ErrorConnecting := Guild.Connect(*ChannelID, Event.Channel().ID())
 
 	if ErrorConnecting != nil {
 
@@ -96,7 +96,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 	
 	// Play/Add result 
 
-	Pos := Guild.Queue.Add(SearchResults[0])
+	Pos := Guild.Queue.Add(&SearchResults[0], Event.User().Mention())
 
 	State := Innertube.QueueInfo{
 
@@ -105,19 +105,17 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 		TotalPrevious: len(Guild.Queue.Previous),
 		TotalUpcoming: len(Guild.Queue.Upcoming),
 
-		TimePlaying: Guild.Queue.GetTimePlaying(),
-
 	}
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Embeds: []discord.Embed{SearchResults[0].Embed(&Event.Member().User, State)},
+		Embeds: []discord.Embed{SearchResults[0].Embed(State)},
 		
 	})
 
 	if Pos == 0 {
 	
-		Guild.Play(*Guild.Queue.Current)
+		Guild.Play(Guild.Queue.Current)
 
 	}
 
