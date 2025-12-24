@@ -157,6 +157,43 @@ func SearchForSongs(Query string) []Song {
 
 }
 
+func GetSongByYouTubeID(YouTubeID string) (*Song, error) {
+
+	Cookie := os.Getenv("YOUTUBE_COOKIE")
+
+	FetchedVideo, ErrorFetching := OverturePlay.Info(YouTubeID, nil, nil, &Cookie)
+
+	if ErrorFetching != nil {
+
+		return nil, ErrorFetching
+
+	}
+
+	FetchedVideoDetails := FetchedVideo.Details()
+
+	Song := &Song{
+
+		Title: FetchedVideoDetails.Title,
+		YouTubeID: FetchedVideoDetails.ID,
+
+		Artists: []string{ FetchedVideoDetails.Author },
+		Album: FetchedVideoDetails.Title, // YouTube videos don't have albums, so we use title as placeholder
+
+		Duration: Duration{
+
+			Seconds: int(FetchedVideoDetails.Duration) / 1000,
+			Formatted: FormatDuration(int(FetchedVideoDetails.Duration) / 1000),
+
+		},
+		
+		Cover: FetchedVideoDetails.Thumbnails[0].URL, // Uses first thumbnail as cover
+
+	}
+
+	return Song, nil
+
+}
+
 func GetSongManifestURL(YouTubeID string) (string, error) {
 	
 	Cookie := os.Getenv("YOUTUBE_COOKIE")
@@ -209,13 +246,13 @@ func GetSongManifestURL(YouTubeID string) (string, error) {
 
 }
 
-func GetSongAudioSegments(YouTubeID string) ([]OverturePlayStructs.HLSSegment, error) {
+func GetSongAudioSegments(YouTubeID string) ([]OverturePlayStructs.HLSSegment, int, error) {
 
 	HLSManifestURL, ErrorGettingManifestURL := GetSongManifestURL(YouTubeID)
 
 	if ErrorGettingManifestURL != nil {
 
-		return nil, ErrorGettingManifestURL
+		return nil, 0, ErrorGettingManifestURL
 
 	}
 
@@ -223,13 +260,13 @@ func GetSongAudioSegments(YouTubeID string) ([]OverturePlayStructs.HLSSegment, e
 
 	if ErrorFetchingManifest != nil {
 
-		return nil, ErrorFetchingManifest
+		return nil, 0, ErrorFetchingManifest
 
 	}
 
 	if len(Manifest.Playlists) == 0 {
 
-		return nil, errors.New("no playlists found in HLS manifest")
+		return nil, 0, errors.New("no playlists found in HLS manifest")
 
 	}
 
@@ -237,11 +274,11 @@ func GetSongAudioSegments(YouTubeID string) ([]OverturePlayStructs.HLSSegment, e
 
 	if ErrorFetchingPlaylist != nil {
 
-		return nil, ErrorFetchingPlaylist
+		return nil, 0, ErrorFetchingPlaylist
 
 	}
 
-	return Playlist.Segments, nil
+	return Playlist.Segments, Playlist.TargetDuration, nil
 	
 }
 

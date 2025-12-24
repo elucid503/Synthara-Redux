@@ -395,6 +395,24 @@ func (Streamer *SegmentStreamer) GetProgress() (int, int) {
 
 }
 
+func (Streamer *SegmentStreamer) GetSegmentDuration() float64 {
+
+	return Streamer.SegmentDuration
+
+}
+
+func (Streamer *SegmentStreamer) GetCurrentTime() float64 {
+
+	if Streamer == nil {
+
+		return 0.0 // streamer does not exist, yet
+
+	}
+
+	return float64(Streamer.CurrentIndex) * Streamer.SegmentDuration
+
+}
+
 func (Streamer *SegmentStreamer) Stop() {
 
 	close(Streamer.StopChan)

@@ -3,7 +3,6 @@ package Innertube
 import (
 	"Synthara-Redux/Utils"
 	"fmt"
-	"os"
 
 	"github.com/disgoorg/disgo/discord"
 )
@@ -19,9 +18,7 @@ type Song struct {
 	Duration Duration `json:"duration"`
 
 	Cover string `json:"cover"`
-	
-	HLSManifest string `json:"-"`
-	
+		
 }
 
 type Duration struct {
@@ -31,7 +28,17 @@ type Duration struct {
 
 }
 
-func (S *Song) Embed(Requestor *discord.User, PosInQueue int) discord.Embed {
+type QueueInfo struct {
+
+	SongPosition int `json:"song_position"`
+	TotalUpcoming  int `json:"total_upcoming"`
+	TotalPrevious int `json:"total_previous"`
+	
+	TimePlaying int `json:"time_previous"`
+
+}
+
+func (S *Song) Embed(Requestor *discord.User, State QueueInfo) discord.Embed {
 
 	Embed := discord.NewEmbedBuilder()
 
@@ -40,9 +47,9 @@ func (S *Song) Embed(Requestor *discord.User, PosInQueue int) discord.Embed {
 	AuthorName := "Now Playing"
 	AddedState := "Played"
 
-	if PosInQueue > 0 { 
+	if State.SongPosition > 0 { 
 
-		AuthorName = fmt.Sprintf("%d %s Away", PosInQueue, Utils.Pluralize("Song", PosInQueue))
+		AuthorName = fmt.Sprintf("%d %s Away", State.SongPosition, Utils.Pluralize("Song", State.SongPosition))
 		AddedState = "Enqueued"
 
 	}
@@ -67,12 +74,23 @@ func (S *Song) Embed(Requestor *discord.User, PosInQueue int) discord.Embed {
 
 	Embed.SetThumbnail(S.Cover)
 
-	Embed.SetDescription(fmt.Sprintf("By **%s&&", ArtistNames))
+	Embed.SetDescription(fmt.Sprintf("By **%s**", ArtistNames))
 
 	Embed.AddField("Duration", fmt.Sprintf("%s Min", S.Duration.Formatted), true)
 	Embed.AddField(fmt.Sprintf("%s By", AddedState), Requestor.Username, true)
 
-	Embed.SetFooter(os.Getenv("EMBED_FOOTER_TEXT"), "")
+	TotalSongs := State.TotalPrevious + State.TotalUpcoming + 1
+	CurrentPosition := State.SongPosition + 1
+	
+	if State.TimePlaying > 0 { // only shows time playing if greater than 0
+
+		Embed.SetFooter(fmt.Sprintf("Song %d of %d • Playing for %s Min", CurrentPosition, TotalSongs, FormatDuration(State.TimePlaying)), "")
+
+	} else {
+
+		Embed.SetFooter(fmt.Sprintf("Song %d of %d • Connected", CurrentPosition, TotalSongs), "")
+		
+	}
 
 	// Color 
 

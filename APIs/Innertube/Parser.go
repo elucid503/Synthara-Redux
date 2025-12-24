@@ -467,3 +467,19 @@ func ParseFormattedDuration(FormattedDuration string) int {
 	return 0
 
 }
+
+func FormatDuration(Seconds int) string {
+
+	Hours := Seconds / 3600
+	Minutes := (Seconds % 3600) / 60
+	RemainingSeconds := Seconds % 60
+
+	if Hours > 0 {
+
+		return fmt.Sprintf("%d:%02d:%02d", Hours, Minutes, RemainingSeconds)
+		
+	}
+
+	return fmt.Sprintf("%d:%02d", Minutes, RemainingSeconds)
+
+}

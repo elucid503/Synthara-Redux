@@ -190,8 +190,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				Utils.Logger.Info(fmt.Sprintf("Queue %s advanced to next song: %s", Queue.ParentID.String(), Queue.Current.Title))
 
-				Queue.Functions.Updated(Queue)
-
 				Guild := GetOrCreateGuild(Queue.ParentID)
 
 				ErrorPlaying := Guild.Play(*Queue.Current)
@@ -344,7 +342,7 @@ func (G *Guild) Play(Song Innertube.Song) (error) {
 	
 	// Fetch HLS segments for the song
 
-	Segments, ErrorFetchingSegments := Innertube.GetSongAudioSegments(Song.YouTubeID)
+	Segments, SegmentDur, ErrorFetchingSegments := Innertube.GetSongAudioSegments(Song.YouTubeID)
 
 	if ErrorFetchingSegments != nil {
 
@@ -360,7 +358,7 @@ func (G *Guild) Play(Song Innertube.Song) (error) {
 
 	// Create segment streamer
 
-	Streamer, ErrorCreatingStreamer := Audio.NewSegmentStreamer(0.0, len(Segments))
+	Streamer, ErrorCreatingStreamer := Audio.NewSegmentStreamer(float64(SegmentDur), len(Segments))
 
 	if ErrorCreatingStreamer != nil {
 
@@ -437,7 +435,7 @@ func (G *Guild) Play(Song Innertube.Song) (error) {
 
 			ErrorProcessing := Streamer.ProcessNextSegment(SegmentBytes)
 
-			if ErrorProcessing != nil {
+			if ErrorProcessing != nil && ErrorProcessing.Error() != "stream stopped" { // ignores stream stopped errors
 
 				Utils.Logger.Error("Error processing segment: " + ErrorProcessing.Error())
 
@@ -537,6 +535,7 @@ func (Q *Queue) Add(Song Innertube.Song) int {
 	}
 
 	Q.Functions.Added(Q, Song)
+	Q.Functions.Updated(Q)
 
 	return Pos
 	
@@ -576,10 +575,10 @@ func (Q *Queue) Last() bool {
 	Q.Previous = Q.Previous[:PrevIndex]
 	Q.Current = &PrevSong
 
-
 	Q.Functions.Updated(Q)
 
-	return Q.playCurrent()
+	go Q.playCurrent() // done in goroutine to avoid blocking
+	return true
 
 }
 
@@ -628,7 +627,8 @@ func (Q *Queue) jump(Index int, shouldPlay bool) bool {
 
 	Q.Functions.Updated(Q)
 
-	return Q.playCurrent()
+	go Q.playCurrent() // same reason for goroutine as above
+	return true
 
 }
 
@@ -638,5 +638,29 @@ func (Q *Queue) Clear() {
 	Q.Previous = []Innertube.Song{}
 	Q.Current = nil
 	Q.Upcoming = []Innertube.Song{}
+
+	Q.Functions.Updated(Q)
+
+}
+
+func (Q *Queue) GetTimePlaying() int {
+
+	// Returns current duration + all previous durations in seconds
+
+	TotalSeconds := 0
+
+	if Q.Current != nil {
+
+		TotalSeconds += int(Q.CurrentStreamer.GetCurrentTime()) // converts float64 to int
+
+	}
+
+	for _, PreviousSong := range Q.Previous {
+
+		TotalSeconds += PreviousSong.Duration.Seconds
+
+	}
+
+	return TotalSeconds
 
 }

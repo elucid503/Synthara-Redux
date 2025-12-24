@@ -98,9 +98,20 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	Pos := Guild.Queue.Add(SearchResults[0])
 
+	State := Innertube.QueueInfo{
+
+		SongPosition: Pos,
+
+		TotalPrevious: len(Guild.Queue.Previous),
+		TotalUpcoming: len(Guild.Queue.Upcoming),
+
+		TimePlaying: Guild.Queue.GetTimePlaying(),
+
+	}
+
 	Event.CreateMessage(discord.MessageCreate{
 
-		Embeds: []discord.Embed{SearchResults[0].Embed(&Event.Member().User, Pos)},
+		Embeds: []discord.Embed{SearchResults[0].Embed(&Event.Member().User, State)},
 		
 	})
 
