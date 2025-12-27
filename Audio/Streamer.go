@@ -23,8 +23,10 @@ type SegmentStreamer struct {
 	Stopped atomic.Bool
 
 	SegmentDuration int
+	Progress int64
 
 	OpusFrameChan chan []byte
+	SeekChan      chan int
 
 	Mutex sync.Mutex
 
@@ -49,7 +51,10 @@ func NewSegmentStreamer(SegmentDuration int, TotalSegments int) (*SegmentStreame
 		TotalSegments:   TotalSegments,
 		SegmentDuration: SegmentDuration,
 
+		Progress: 0,
+
 		OpusFrameChan: make(chan []byte, 50),
+		SeekChan:      make(chan int, 1),
 
 	}
 
@@ -84,11 +89,11 @@ func (Streamer *SegmentStreamer) IsStopped() bool {
 
 }
 
-func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) {
+func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) (int, bool) {
 
 	if Streamer.IsStopped() {
 
-		return
+		return 0, false
 
 	}
 
@@ -97,7 +102,7 @@ func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) {
 	if ErrorProcessing != nil {
 
 		Utils.Logger.Error(fmt.Sprintf("Error processing segment %d/%d: %s", Streamer.CurrentIndex, Streamer.TotalSegments, ErrorProcessing.Error()))
-		return
+		return 0, false
 
 	}
 
@@ -105,17 +110,37 @@ func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) {
 
 		if Streamer.IsStopped() {
 
-			return
+			return 0, false
 
 		}
 
-		Streamer.OpusFrameChan <- Frame // Blocking send
+		select {
+
+			case Index := <-Streamer.SeekChan:
+
+				return Index, true
+
+			default:
+
+			}
+
+			select {
+
+				case Index := <-Streamer.SeekChan:
+
+					return Index, true
+
+				case Streamer.OpusFrameChan <- Frame: // Blocking send
+				
+		}
 
 	}
 
 	Streamer.Mutex.Lock()
 	Streamer.CurrentIndex++
 	Streamer.Mutex.Unlock()
+
+	return 0, false
 
 }
 
@@ -134,6 +159,12 @@ func (Streamer *SegmentStreamer) GetNextFrame() ([]byte, bool) {
 		return nil, false // channel closed
 
 	}
+
+	// Each frame is 20ms, so we increment progress by 20
+
+	Streamer.Mutex.Lock()
+	Streamer.Progress += 20
+	Streamer.Mutex.Unlock()
 
 	return Frame, true
 
@@ -156,7 +187,7 @@ func (Streamer *SegmentStreamer) Stop() {
 
 		if r := recover(); r != nil {
 
-			// Channel already closed, ignore panic
+			// Channel already closed, nop
 
 		}
 
@@ -193,8 +224,10 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 
 	Playback := &Playback{
 
-		Streamer: Streamer,
-		Stopped: atomic.Bool{},
+		Streamer:        Streamer,
+		Segments:        Segments,
+		SegmentDuration: SegmentDuration,
+		Stopped:         atomic.Bool{},
 
 	}
 
@@ -204,11 +237,28 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 
 	go func() {
 
-		for Index := 0; Index < len(Segments); Index++ {
+		for Index := 0; Index < len(Segments); {
+
+			select {
+
+				case NewIndex := <-Streamer.SeekChan:
+
+					Index = NewIndex
+					continue
+
+				default:
+					
+			}
 
 			if Playback.Stopped.Load() {
 
 				break // Stopped
+
+			}
+
+			if Index >= len(Segments) {
+
+				break // All segments processed
 
 			}
 
@@ -219,12 +269,23 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 			if ErrorFetching != nil {
 
 				Utils.Logger.Error("Error fetching segment: " + ErrorFetching.Error())
+
+				Index++
 				continue
 
 			}
 
-			Streamer.ProcessNextSegment(SegmentBytes)
+			NewIndex, Seeked := Streamer.ProcessNextSegment(SegmentBytes)
 			SegmentBytes = nil
+
+			if Seeked { // go to new index
+
+				Index = NewIndex
+				continue
+
+			}
+
+			Index++
 
 		}
 

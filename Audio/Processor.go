@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 
 	"github.com/asticode/go-astits"
+	InnertubeStructs "github.com/elucid503/Overture-Play/Structs"
 	"github.com/nareix/joy4/codec/aacparser"
 	"layeh.com/gopus"
 )
@@ -28,6 +29,9 @@ const (
 type Playback struct {
 
 	Streamer *SegmentStreamer
+
+	Segments []InnertubeStructs.HLSSegment
+	SegmentDuration int
 
 	Stopped  atomic.Bool
 
@@ -68,6 +72,96 @@ func (P *Playback) Stop() {
 	}
 
 }
+
+func (P *Playback) Seek(Offset int) error {
+
+	if P.Streamer == nil {
+
+		return errors.New("no active streamer")
+
+	}
+
+	P.Streamer.Mutex.Lock()
+	defer P.Streamer.Mutex.Unlock()
+
+	// Calculate new time
+
+	CurrentTime := P.Streamer.Progress
+	TargetTime := CurrentTime + (int64(Offset) * 1000)
+
+	if TargetTime < 0 {
+
+		TargetTime = 0
+
+	}
+
+	TotalDuration := int64(len(P.Segments) * P.SegmentDuration * 1000)
+
+	if TargetTime >= TotalDuration {
+
+		TargetTime = TotalDuration - 1000
+
+		if TargetTime < 0 {
+
+			TargetTime = 0
+
+		}
+
+	}
+
+	// Calculate segment index
+
+	TargetIndex := int(TargetTime / int64(P.SegmentDuration*1000))
+
+	// Update Progress and Index
+
+	P.Streamer.Progress = TargetTime
+	P.Streamer.CurrentIndex = TargetIndex
+
+	// Send to SeekChan
+
+	select {
+
+		case P.Streamer.SeekChan <- TargetIndex:
+
+		default:
+
+			// Channel full, drain and push
+
+			select {
+
+				case <-P.Streamer.SeekChan:
+
+				default:
+
+				}
+
+				P.Streamer.SeekChan <- TargetIndex
+
+	}
+
+	// Drain OpusFrameChan to stop old audio
+
+	Loop:
+
+	for {
+
+		select {
+
+		case <-P.Streamer.OpusFrameChan:
+
+		default:
+
+			break Loop
+
+		}
+
+	}
+
+	return nil
+
+}
+
 type AudioProcessor struct {
 
 	AACDecoder  *FDKAACDecoder

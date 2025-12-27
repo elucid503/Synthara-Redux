@@ -80,7 +80,28 @@ func InitializeCommands() {
 
 	}
 
-	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand, PauseCommand, ResumeCommand, NextCommand, LastCommand})
+	// Seek Command
+
+	SeekCommand := discord.SlashCommandCreate{
+
+		Name:        "seek",
+		Description: "Seek forward or backward in the current song",
+
+		Options: []discord.ApplicationCommandOption{
+
+			discord.ApplicationCommandOptionInt{
+
+				Name:        "offset",
+				Description: "Seconds to seek (positive = forward, negative = backward)",
+				Required:    true,
+
+			},
+
+		},
+
+	}
+
+	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand, PauseCommand, ResumeCommand, NextCommand, LastCommand, SeekCommand})
 
 	Utils.Logger.Info("Slash commands initialized.")
 
@@ -127,6 +148,10 @@ func InitializeHandlers() {
 				case "last":
 
 					Commands.LastCommand(Event)
+
+				case "seek":
+
+					Commands.SeekCommand(Event)
 
 			}
 
