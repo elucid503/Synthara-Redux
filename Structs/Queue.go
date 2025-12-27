@@ -121,9 +121,12 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				// Sends a message indicating the queue has ended
 
+				Guild := GetGuild(Queue.ParentID)
+				TextChannelID := Guild.Channels.Text
+
 				go func() { 
 
-					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(GetGuild(Queue.ParentID).Channels.Text, discord.MessageCreate{
+					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(TextChannelID, discord.MessageCreate{
 
 						Embeds: []discord.Embed{{
 
@@ -143,12 +146,13 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 					if ErrorSending != nil {
 
-						Utils.Logger.Error(fmt.Sprintf("Error sending queue ended message to channel %s for Queue %s: %s", GetGuild(Queue.ParentID).Channels.Text, Queue.ParentID.String(), ErrorSending.Error()))
+						Utils.Logger.Error(fmt.Sprintf("Error sending queue ended message to channel %s for Queue %s: %s", TextChannelID, Queue.ParentID.String(), ErrorSending.Error()))
 
 					}
 
 				}()
 
+				Guild.Disconnect(true)
 
 				Queue.Current = nil;
 

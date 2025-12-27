@@ -31,6 +31,8 @@ type Guild struct {
 	VoiceConnection voice.Conn `json:"-"`
 	StreamerMutex sync.Mutex `json:"-"`
 
+	Internal GuildInternal `json:"-"`
+
 }
 
 type Channels struct {
@@ -45,6 +47,12 @@ type Features struct {
 	Repeat int `json:"repeat"`
 	Shuffle bool `json:"shuffle"`
 	Autoplay bool `json:"autoplay"`
+
+}
+
+type GuildInternal struct {
+
+	Disconnecting bool `json:"disconnecting"`
 
 }
 
@@ -91,6 +99,12 @@ func NewGuild(ID snowflake.ID) *Guild {
 		},
 
 		VoiceConnection: nil,
+
+		Internal: GuildInternal{
+
+			Disconnecting: false,
+
+		},
 		
 	}
 
@@ -121,8 +135,6 @@ func GetGuild(ID snowflake.ID) *Guild {
 	}
 
 }
-
-// Guild Functions
 
 // Connect Establishes a voice connection to the specified channel. Gateway events are handled.
 func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID) error {
@@ -165,7 +177,9 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 }
  
 // Disconnect Closes the existing voice connection; if none exists, returns an error
-func (G *Guild) Disconnect() error {
+func (G *Guild) Disconnect(CloseConn bool) error {
+
+	G.Internal.Disconnecting = true // for other handlers to know
 
 	G.StreamerMutex.Lock()
 	defer G.StreamerMutex.Unlock()
@@ -181,17 +195,20 @@ func (G *Guild) Disconnect() error {
 
 		}
 
-		ContextToUse, CancelFunc := context.WithTimeout(context.Background(), 5 * time.Second)
+		if CloseConn {
 
-		defer CancelFunc()
+			ContextToUse, CancelFunc := context.WithTimeout(context.Background(), 5 * time.Second)
+			defer CancelFunc()
 
-		// Stop speaking and detach provider before closing connection
+			// Stop speaking and detach provider before closing connection
 
-		_ = G.VoiceConnection.SetSpeaking(ContextToUse, 0)
-		G.VoiceConnection.SetOpusFrameProvider(nil)
+			_ = G.VoiceConnection.SetSpeaking(ContextToUse, 0)
+			G.VoiceConnection.SetOpusFrameProvider(nil)
 
-		G.VoiceConnection.Close(ContextToUse)
-		G.VoiceConnection = nil
+			G.VoiceConnection.Close(ContextToUse)
+			G.VoiceConnection = nil
+
+		}
 
 		// Removes guild from store to free up memory
 

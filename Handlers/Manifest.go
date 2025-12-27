@@ -4,7 +4,9 @@ import (
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Handlers/Autocomplete"
 	"Synthara-Redux/Handlers/Commands"
+	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
+	"fmt"
 
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/discord"
@@ -175,6 +177,56 @@ func InitializeHandlers() {
 
 		}()
 
+	}))
+
+	// Voice State Updates
+
+	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.GuildVoiceStateUpdate) {
+
+		if (Event.VoiceState.UserID != Globals.DiscordClient.ApplicationID) {
+
+			return; // Not our bot
+
+		}
+
+		Guild := Structs.GetGuild(Event.VoiceState.GuildID)
+
+		if (Event.VoiceState.ChannelID == nil && !Guild.Internal.Disconnecting) { // we do not want to call this if Disconnect() was already called...
+
+			// Disconnected from voice channel, we should clean up the voice connection
+
+			Guild.Disconnect(false)
+
+			go func() { 
+
+				_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.MessageCreate{
+
+					Embeds: []discord.Embed{{
+
+						Title: "Manually Disconnected",
+						Description: "The Queue has been reset.",
+						Color: 0xFFFFFF, // White
+						
+						Author: &discord.EmbedAuthor{
+
+							Name: "Notifications",
+
+						},
+
+					}},
+
+				})
+
+				if ErrorSending != nil {
+
+					Utils.Logger.Error(fmt.Sprintf("Error sending manual disconnect message to guild %s: %s", Guild.ID, ErrorSending.Error()))
+				
+				}
+
+			}()
+
+		}
+		
 	}))
 
 	Utils.Logger.Info("Event handlers initialized.")

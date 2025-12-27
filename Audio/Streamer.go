@@ -27,6 +27,7 @@ type SegmentStreamer struct {
 
 	OpusFrameChan chan []byte
 	SeekChan      chan int
+	DoneChan      chan struct{}
 
 	Mutex sync.Mutex
 
@@ -55,6 +56,7 @@ func NewSegmentStreamer(SegmentDuration int, TotalSegments int) (*SegmentStreame
 
 		OpusFrameChan: make(chan []byte, 50),
 		SeekChan:      make(chan int, 1),
+		DoneChan:      make(chan struct{}),
 
 	}
 
@@ -116,21 +118,27 @@ func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) (int, b
 
 		select {
 
+			case <-Streamer.DoneChan:
+				return 0, false
+
 			case Index := <-Streamer.SeekChan:
 
 				return Index, true
 
 			default:
 
-			}
+		}
 
-			select {
+		select {
 
-				case Index := <-Streamer.SeekChan:
+			case <-Streamer.DoneChan:
+				return 0, false
 
-					return Index, true
+			case Index := <-Streamer.SeekChan:
 
-				case Streamer.OpusFrameChan <- Frame: // Blocking send
+				return Index, true
+
+			case Streamer.OpusFrameChan <- Frame: // Blocking send
 				
 		}
 
@@ -152,21 +160,24 @@ func (Streamer *SegmentStreamer) GetNextFrame() ([]byte, bool) {
 
 	}
 
-	Frame, OK := <-Streamer.OpusFrameChan
+	select {
+	case <-Streamer.DoneChan:
+		return nil, false
+	case Frame, OK := <-Streamer.OpusFrameChan:
+		if !OK {
 
-	if !OK {
-
-		return nil, false // channel closed
-
+			return nil, false // channel closed
+	
+		}
+	
+		// Each frame is 20ms, so we increment progress by 20
+	
+		Streamer.Mutex.Lock()
+		Streamer.Progress += 20
+		Streamer.Mutex.Unlock()
+	
+		return Frame, true
 	}
-
-	// Each frame is 20ms, so we increment progress by 20
-
-	Streamer.Mutex.Lock()
-	Streamer.Progress += 20
-	Streamer.Mutex.Unlock()
-
-	return Frame, true
 
 }
 
@@ -193,7 +204,7 @@ func (Streamer *SegmentStreamer) Stop() {
 
 	}()
 
-	close(Streamer.OpusFrameChan)
+	close(Streamer.DoneChan)
 
 	if Streamer.Processor != nil {
 
@@ -293,9 +304,9 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 
 		Streamer.Mutex.Lock()
 
-		if !Playback.Stopped.Load() {
+		close(Streamer.OpusFrameChan)
 
-			close(Streamer.OpusFrameChan)
+		if !Playback.Stopped.Load() {
 
 			if OnFinished != nil {
 
