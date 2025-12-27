@@ -6,6 +6,6 @@ import (
 
 func InitializeRoutes() {
 
-	Globals.WebServer.GET("/Queue", HandleSocket)
+	Globals.WebServer.GET("/Queue", HandleWSConnections)
 
 }
