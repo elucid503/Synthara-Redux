@@ -8,9 +8,11 @@ import (
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/gateway"
+	"github.com/gin-gonic/gin"
 )
 
 var DiscordClient *bot.Client
+var WebServer *gin.Engine
 
 func InitDiscordClient() error {
 
@@ -25,6 +27,14 @@ func InitDiscordClient() error {
 	DiscordClient = InitializedClient
 	
 	return nil
+
+}
+
+func InitWebServer() {
+
+	gin.SetMode(gin.ReleaseMode)
+	
+	WebServer = gin.Default()
 
 }
 

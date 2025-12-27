@@ -13,6 +13,7 @@ import (
 
 	"github.com/disgoorg/disgo/voice"
 	"github.com/disgoorg/snowflake/v2"
+	"github.com/gorilla/websocket"
 )
 
 var GuildStore = make(map[snowflake.ID]*Guild)
@@ -34,6 +35,14 @@ type Guild struct {
 	Internal GuildInternal `json:"-"`
 
 }
+
+const (
+
+	Event_Initial = "INITIAL_STATE"
+	Event_QueueUpdated = "QUEUE_UPDATED"
+	Event_StateChanged = "STATE_CHANGED"
+
+)
 
 type Channels struct {
 
@@ -75,11 +84,12 @@ func NewGuild(ID snowflake.ID) *Guild {
 
 			Functions: QueueFunctions{
 
-				Added: QueueAddedHandler,
 				State: QueueStateHandler,
 				Updated: QueueUpdatedHandler,
 
 			},
+
+			WebSockets: make(map[*websocket.Conn]bool),
 
 		},
 

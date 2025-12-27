@@ -1,0 +1,16 @@
+@import url('https://cdn.sprout.software/Files/Sprout/Hosting/Fonts/Din.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+
+  font-family: "DIN 2014",sans-serif;
+  line-height: 1.5;
+  font-weight: 500;
+
+  color-scheme: dark;
+  background-color: #09090b; 
+
+}

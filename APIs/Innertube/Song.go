@@ -19,7 +19,7 @@ type Song struct {
 
 	Cover string `json:"cover"`
 
-	Internal SongInternal `json:"internal"`
+	Internal SongInternal `json:"-"`
 		
 }
 

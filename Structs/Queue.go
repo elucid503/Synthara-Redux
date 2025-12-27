@@ -6,9 +6,11 @@ import (
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Utils"
 	"fmt"
+	"sync"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -41,27 +43,51 @@ type Queue struct {
 	
 	PlaybackSession *Audio.Playback `json:"-"`
 
+	WebSockets      map[*websocket.Conn]bool `json:"-"`
+	SocketMutex     sync.Mutex               `json:"-"`
+
 }
 
 type QueueFunctions struct {
 
-	Added func(Queue *Queue, Song *Innertube.Song) `json:"-"`
 	State func(Queue *Queue, State int) `json:"-"`
 	Updated func(Queue *Queue) `json:"-"`
 
 }
 
-// Event-Like Handlers
+func (Q *Queue) SendToWebsockets(Event string, Data interface{}) {
 
-func QueueAddedHandler(Queue *Queue, Song *Innertube.Song) {
+	Q.SocketMutex.Lock()
+	defer Q.SocketMutex.Unlock()
 
-	Utils.Logger.Info(fmt.Sprintf("Song %s was enqueued for Queue %s", Song.Title, Queue.ParentID.String()))
-	
+	Payload := map[string]interface{}{
+
+		"Event": Event,
+		"Data":  Data,
+
+	}
+
+	for Connection := range Q.WebSockets {
+
+		ErrorSending := Connection.WriteJSON(Payload)
+
+		if ErrorSending != nil {
+
+			Connection.Close()
+			delete(Q.WebSockets, Connection)
+
+		}
+
+	}
+
 }
+
+// Event-Like Handlers
 
 func QueueStateHandler(Queue *Queue, State int) {
 
 	Utils.Logger.Info(fmt.Sprintf("Queue %s state changed to %d", Queue.ParentID.String(), State))
+	Queue.SendToWebsockets(Event_StateChanged, map[string]interface{}{"State": State})
 
 	// Check Queue state and perform actions
 
@@ -180,6 +206,8 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 func QueueUpdatedHandler(Queue *Queue) {
 
+	Queue.SendToWebsockets(Event_QueueUpdated, map[string]interface{}{ "Current": Queue.Current})
+
 	if len(Queue.Upcoming) == 0 {
 
 		return
@@ -262,7 +290,6 @@ func (Q *Queue) Add(Song *Innertube.Song, Requestor string) int {
 
 	}
 
-	Q.Functions.Added(Q, Song)
 	Q.Functions.Updated(Q)
 
 	return Pos

@@ -4,6 +4,7 @@ import (
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Handlers"
+	"Synthara-Redux/Server"
 	"Synthara-Redux/Utils"
 	"fmt"
 	"os"
@@ -47,6 +48,13 @@ func main() {
 	
 	Handlers.InitializeHandlers()
 
+	Globals.InitWebServer()
+	Server.InitializeRoutes()
+	
+	go Globals.WebServer.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
+
+	Utils.Logger.Info(fmt.Sprintf("Web server running on port %s", os.Getenv("PORT")))
+
 	InnerTubeError := Innertube.InitClient();
 
 	if InnerTubeError != nil {
@@ -56,8 +64,6 @@ func main() {
 
 	}
 	
-	Innertube.GetSearchSuggestions("Twenty one Pilots");
-
 	Utils.Hang()
 
 }
