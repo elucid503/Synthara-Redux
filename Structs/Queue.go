@@ -90,28 +90,44 @@ func (Q *Queue) SendToWebsockets(Event string, Data interface{}) {
 func (Q *Queue) StartProgressTicker() {
 
 	if Q.TickerStopChan != nil {
+
 		Q.StopProgressTicker()
+
 	}
 
 	Q.TickerStopChan = make(chan bool)
 
 	go func() {
-		ticker := time.NewTicker(500 * time.Millisecond)
-		defer ticker.Stop()
+
+		Ticker := time.NewTicker(500 * time.Millisecond)
+		defer Ticker.Stop()
 
 		for {
+
 			select {
-			case <-ticker.C:
+
+			case <-Ticker.C:
+
 				if Q.PlaybackSession != nil && Q.State == StatePlaying {
-					progress := Q.PlaybackSession.Streamer.Progress / 1000 // in seconds
+
+					Progress := Q.PlaybackSession.Streamer.Progress
+
 					Q.SendToWebsockets(Event_ProgressUpdate, map[string]interface{}{
-						"Progress": progress,
+
+						"Progress": Progress,
+
 					})
+
 				}
+
 			case <-Q.TickerStopChan:
+
 				return
+
 			}
+
 		}
+
 	}()
 
 }
@@ -120,8 +136,10 @@ func (Q *Queue) StartProgressTicker() {
 func (Q *Queue) StopProgressTicker() {
 
 	if Q.TickerStopChan != nil {
+
 		close(Q.TickerStopChan)
 		Q.TickerStopChan = nil
+
 	}
 
 }
@@ -139,7 +157,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 		case StateIdle:
 
-			// Stop progress ticker when idle
 			Queue.StopProgressTicker()
 
 			// Idle state; move to next song if available
@@ -233,7 +250,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 		case StatePaused:
 
-			// Stop progress ticker when paused
 			Queue.StopProgressTicker()
 
 			if Queue.PlaybackSession != nil {
@@ -244,7 +260,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 		case StatePlaying:
 
-			// Start progress ticker when playing
 			Queue.StartProgressTicker()
 
 			if Queue.PlaybackSession != nil {

@@ -89,7 +89,7 @@ func HandleWSConnections(Context *gin.Context) {
 
 			"Current": Guild.Queue.Current,
 			"State": Guild.Queue.State,
-			"Progress": (Guild.Queue.PlaybackSession.Streamer.Progress / 1000), // in seconds
+			"Progress": (Guild.Queue.PlaybackSession.Streamer.Progress),
 
 		},
 
@@ -154,6 +154,8 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 			if Guild.Queue.PlaybackSession != nil {
 
 				Guild.Queue.PlaybackSession.Seek(int(Offset))
+
+				Guild.Queue.SendToWebsockets(Structs.Event_ProgressUpdate, map[string]interface{}{ "Progress": Guild.Queue.PlaybackSession.Streamer.Progress })
 
 			}
 

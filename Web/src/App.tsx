@@ -130,20 +130,8 @@ function App() {
                 break;
 
                 case WSEvents.Event_ProgressUpdate:
-
-                    const ServerTime = Message.Data.Progress * 1000;
                     
-                    SetCurrentTime((Prev) => {
-
-                        if (ServerTime < Prev) {
-
-                            return Prev; // ignores backwards update
-
-                        }
-
-                        return ServerTime;
-
-                    });
+                    SetCurrentTime(Message.Data.Progress);
 
                 break;
 
