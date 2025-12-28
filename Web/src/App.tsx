@@ -131,7 +131,7 @@ function App() {
 
                 case WSEvents.Event_ProgressUpdate:
                     
-                    SetCurrentTime(Message.Data.Progress);
+                    SetCurrentTime(Math.max(0, (Message.Data.Progress - 250))); // slight buffer to account for latency
 
                 break;
 
