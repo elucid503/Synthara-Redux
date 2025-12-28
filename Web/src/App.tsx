@@ -1,19 +1,34 @@
-import { useEffect, useRef, useState } from 'react';
-import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
+import { Play, Pause, SkipBack, SkipForward, Music } from 'lucide-react';
 
-import { Song, PlayerState, WSEvents, WSMessage, Operation } from './Types';
+import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse } from './Types';
 
 function App() {
 
     const [Socket, SetSocket] = useState<WebSocket | null>(null);
+   
     const [CurrentSong, SetCurrentSong] = useState<Song | null>(null);
     const [PlayerStateValue, SetPlayerStateValue] = useState<PlayerState>(PlayerState.Idle);
-    const [CurrentTime, SetCurrentTime] = useState(0); // in seconds
-    const [ActiveView, SetActiveView] = useState<'NowPlaying' | 'Queue'>('NowPlaying');
-    const [BackgroundImage, SetBackgroundImage] = useState<string>('');
+    const [CurrentTime, SetCurrentTime] = useState(0);
     
-    const IntervalRef = useRef<number | null>(null);
+    const [ActiveView, SetActiveView] = useState<'Details' | 'Queue' | 'Lyrics'>(() => {
 
+        const Params = new URLSearchParams(window.location.search);
+        const View = Params.get('View');
+
+        if (View === 'Lyrics') return 'Lyrics';
+        if (View === 'Queue') return 'Queue';
+
+        return 'Details';
+
+    });
+
+    const [BackgroundImage, SetBackgroundImage] = useState<string>('');
+
+    const [Lyrics, SetLyrics] = useState<LyricsResponse | null>(null);
+    const [LyricsLoading, SetLyricsLoading] = useState(false);
+    const [LyricsError, SetLyricsError] = useState(false);
+    
     // Normalizes Google cover URLs to ensure 512x512 dimensions
 
     const NormalizeCoverURL = (URL: string): string => {
@@ -22,12 +37,58 @@ function App() {
 
     };
 
+    const FetchLyrics = async (Song: Song) => {
+
+        SetLyricsLoading(true);
+        SetLyricsError(false);
+
+        try {
+
+            const Params = new URLSearchParams({
+
+                title: Song.title.replace(/\s*\(.*?\)/g, '').trim(), // removes info in parentheses
+                artist: Song.artists[0],
+                album: Song.album,
+
+                source: 'apple,lyricsplus,musixmatch,spotify,musixmatch-word'
+
+            });
+            
+            const Response = await fetch(`https://lyricsplus.prjktla.workers.dev/v2/lyrics/get?${Params}`);
+            
+            if (Response.ok) {
+
+                const Data: LyricsResponse = await Response.json();
+                SetLyrics(Data);
+
+            } else {
+
+                SetLyrics(null);
+                SetLyricsError(true);
+
+            }
+
+        } catch (Error) {
+
+            console.error('Error fetching lyrics:', Error);
+            
+            SetLyrics(null);
+            SetLyricsError(true);
+
+        } finally {
+
+            SetLyricsLoading(false);
+
+        }
+
+    };
+
     // WebSocket connection
 
     useEffect(() => {
 
         const Params = window.location.href.split('/');
-        const QueueID = Params[Params.length - 1];
+        const QueueID = Params[Params.length - 1].split('?')[0]; // ignores the query params
 
         const WS = new WebSocket(`ws://localhost:3000/API/Queue?ID=${QueueID}`);
 
@@ -47,7 +108,9 @@ function App() {
 
                     SetCurrentSong(Message.Data.Current);
                     SetPlayerStateValue(Message.Data.State);
-                    SetCurrentTime(Message.Data.Progress); // provides initial progress
+                    
+                    const InitialProgress = Message.Data.Progress * 1000; // convert seconds to ms
+                    SetCurrentTime(InitialProgress);
 
                 break;
                     
@@ -61,6 +124,26 @@ function App() {
 
                     SetCurrentSong(Message.Data.Current);
                     SetCurrentTime(0);
+
+                    SetLyrics(null);
+
+                break;
+
+                case WSEvents.Event_ProgressUpdate:
+
+                    const ServerTime = Message.Data.Progress * 1000;
+                    
+                    SetCurrentTime((Prev) => {
+
+                        if (ServerTime < Prev) {
+
+                            return Prev; // ignores backwards update
+
+                        }
+
+                        return ServerTime;
+
+                    });
 
                 break;
 
@@ -90,13 +173,15 @@ function App() {
 
     }, []);
 
-    // Updates background when song changes
+    // Updates background & lyrics when song changes
 
     useEffect(() => {
 
         if (CurrentSong) {
 
             SetBackgroundImage(NormalizeCoverURL(CurrentSong.cover));
+            
+            ActiveView == 'Lyrics' && FetchLyrics(CurrentSong);
 
         }
 
@@ -106,46 +191,199 @@ function App() {
 
     useEffect(() => {
 
+        let Interval: any;
+
         if (PlayerStateValue == PlayerState.Playing) {
 
-            IntervalRef.current = window.setInterval(() => {
+            Interval = setInterval(() => {
 
-                SetCurrentTime((Prev) => {
+                SetCurrentTime((Prev) => Prev + 50);
 
-                    if (CurrentSong && Prev >= CurrentSong.duration.seconds) {
+            }, 50);
 
-                        return CurrentSong.duration.seconds;
+        }
 
-                    }
+        return () => clearInterval(Interval);
 
-                    return Prev + 1;
+    }, [PlayerStateValue]);
 
-                });
+    // Fetch lyrics when switching to Lyrics view
 
-            }, 1000);
+    useEffect(() => {
 
-        } else {
+        if (ActiveView == 'Lyrics' && CurrentSong && !Lyrics && !LyricsLoading) {
 
-            if (IntervalRef.current) {
+            FetchLyrics(CurrentSong);
 
-                clearInterval(IntervalRef.current);
-                IntervalRef.current = null;
+        }
+        
+    }, [ActiveView, CurrentSong]);
+
+    // Lyrics Logic
+
+    const CurrentLineIndex = useMemo(() => {
+
+        if (!Lyrics || !Lyrics.lyrics) return -1;
+
+        // Finds the last line that has started. This is ideal, since we only display one line at a time
+
+        for (let i = Lyrics.lyrics.length - 1; i >= 0; i--) {
+
+            if (CurrentTime >= Lyrics.lyrics[i].time) {
+
+                return i;
 
             }
 
         }
 
-        return () => {
+        return -1;
 
-            if (IntervalRef.current) {
+    }, [Lyrics, CurrentTime]);
 
-                clearInterval(IntervalRef.current);
+    const RenderLyrics = () => {
+
+        if (LyricsError) {
+
+            return (
+
+                <div className="min-h-[200px] flex items-center justify-center">
+
+                    <div className="text-zinc-500">No Lyrics available.</div>
+
+                </div>
+
+            );
+
+        }
+
+        if (!Lyrics || CurrentLineIndex == -1) {
+
+            if (Lyrics && Lyrics.lyrics.length > 0 && CurrentTime < Lyrics.lyrics[0].time) {
+
+                return (
+
+                    <div className="min-h-[200px] flex flex-col items-center justify-center animate-pulse">
+                        
+                        <Music size={64} className="text-zinc-500" />
+                    
+                    </div>
+
+                );
 
             }
 
-        };
+            return (
 
-    }, [PlayerStateValue, CurrentSong]);
+                <div className="min-h-[200px] flex items-center justify-center">
+
+                    <div className="text-zinc-500 animate-pulse">Loading Lyrics...</div>
+
+                </div>
+
+            );
+
+        }
+
+        const CurrentLine = Lyrics.lyrics[CurrentLineIndex];
+        const NextLine = Lyrics.lyrics[CurrentLineIndex + 1];
+
+        // Check for instrumental
+
+        const LineEnd = CurrentLine.time + CurrentLine.duration;
+        const IsInstrumental = NextLine && (NextLine.time - LineEnd > 10_000) && (CurrentTime > LineEnd);
+
+        if (IsInstrumental) {
+
+            return (
+
+                <div className="min-h-[200px] flex flex-col items-center justify-center animate-pulse">
+                    
+                    <Music size={64} className="text-zinc-500" />
+                
+                </div>
+
+            );
+
+        }
+
+        const HasSyllables = CurrentLine.syllabus && CurrentLine.syllabus.length > 0;
+
+        return (
+
+            <div key={CurrentLineIndex} className="lyric-line-active text-center max-w-4xl mx-auto px-4">
+                
+                <div className="text-3xl md:text-4xl font-semibold leading-relaxed tracking-wide">
+                    
+                    {HasSyllables ? (
+
+                        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
+                            
+                            {(() => {
+
+                                const Words: any[][] = [];
+                                let CurrentWord: any[] = [];
+
+                                CurrentLine.syllabus!.forEach((Syllable) => {
+
+                                    CurrentWord.push(Syllable);
+
+                                    if (Syllable.text.endsWith(' ')) {
+
+                                        Words.push(CurrentWord);
+                                        CurrentWord = [];
+
+                                    }
+
+                                });
+
+                                if (CurrentWord.length > 0) Words.push(CurrentWord);
+
+                                return Words.map((Word, WordIndex) => (
+
+                                    <span key={WordIndex} className="whitespace-nowrap inline-block">
+                                        
+                                        {Word.map((Syllable, SyllableIndex) => {
+
+                                            const IsActive = CurrentTime >= Syllable.time;
+
+                                            return (
+
+                                                <span key={SyllableIndex} className={`transition-colors ease-linear ${IsActive ? 'text-white' : 'text-zinc-600'}`} style={{ transitionDuration: `${IsActive ? Syllable.duration : 200}ms` }} >
+                                                    
+                                                    {Syllable.text}
+
+                                                </span>
+
+                                            );
+
+                                        })}
+
+                                    </span>
+
+                                ));
+
+                            })()}
+
+                        </div>
+
+                    ) : (
+
+                        <span className="text-white transition-colors duration-500">
+                            
+                            {CurrentLine.text}
+                            
+                        </span>
+                        
+                    )}
+
+                </div>
+
+            </div>
+
+        );
+
+    };
 
     const SendOperation = (OperationType: Operation, Params: { [key: string]: any } = {}) => {
 
@@ -165,11 +403,11 @@ function App() {
 
     const HandlePlayPause = () => {
 
-        if (PlayerStateValue === PlayerState.Playing) {
+        if (PlayerStateValue == PlayerState.Playing) {
 
             SendOperation(Operation.Pause);
 
-        } else if (PlayerStateValue === PlayerState.Paused) {
+        } else if (PlayerStateValue == PlayerState.Paused) {
 
             SendOperation(Operation.Resume);
 
@@ -191,7 +429,7 @@ function App() {
 
     const HandleSeek = (Value: number) => {
 
-        const Offset = Value - CurrentTime; // will be positive for seeking forward, negative for backward
+        const Offset = (Value - CurrentTime) / 1000; // convert ms to seconds for offset
 
         SendOperation(Operation.Seek, { Offset });
         SetCurrentTime(Value);
@@ -236,20 +474,42 @@ function App() {
 
             <div className="w-full max-w-2xl relative z-10">
 
-                {/* Cover Art */}
+                {/* Content Area */}
 
-                <div className="relative aspect-square w-full max-w-md mx-auto mb-8 rounded-lg overflow-hidden shadow-2xl">
+                <div className="mb-8">
 
-                    <img src={NormalizeCoverURL(CurrentSong.cover)} alt={CurrentSong.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                    {ActiveView != 'Lyrics' && (<>
+                        
+                        {/* Cover Art */}
 
-                </div>
+                        <div className="relative aspect-square w-full max-w-md mx-auto mb-8 rounded-lg overflow-hidden shadow-2xl">
 
-                {/* Song Info */}
+                            <img src={NormalizeCoverURL(CurrentSong.cover)} alt={CurrentSong.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
 
-                <div className="text-center mb-8">
+                        </div>
 
-                    <h1 className="text-3xl font-bold mb-2 truncate">{CurrentSong.title}</h1>
-                    <p className="text-xl text-zinc-400 truncate"> {CurrentSong.artists.join(', ')} </p>
+                        {/* Song Info */}
+
+                        <div className="text-center">
+
+                            <h1 className="text-3xl font-bold mb-2 truncate">{CurrentSong.title}</h1>
+                            <p className="text-xl text-zinc-400 truncate"> {CurrentSong.artists.join(', ')} </p>
+
+                        </div>
+
+                    </>)}
+
+                    {/* Lyrics View */}
+
+                    {ActiveView == 'Lyrics' && (
+
+                        <div className="min-h-[200px] flex items-center justify-center">
+
+                            {RenderLyrics()}
+                            
+                        </div>
+
+                    )}
 
                 </div>
 
@@ -264,7 +524,7 @@ function App() {
                             const Rect = E.currentTarget.getBoundingClientRect();
                             const X = E.clientX - Rect.left;
                             const Percentage = X / Rect.width;
-                            const NewTime = Math.max(0, Math.min(CurrentSong.duration.seconds, Percentage * CurrentSong.duration.seconds));
+                            const NewTime = Math.max(0, Math.min(CurrentSong.duration.seconds * 1000, Percentage * CurrentSong.duration.seconds * 1000));
                             
                             HandleSeek(Math.floor(NewTime));
 
@@ -277,7 +537,7 @@ function App() {
                                 const Rect = MouseEvent.currentTarget.getBoundingClientRect();
                                 const X = MoveEvent.clientX - Rect.left;
                                 const Percentage = Math.max(0, Math.min(1, X / Rect.width));
-                                const NewTime = Percentage * CurrentSong.duration.seconds;
+                                const NewTime = Percentage * CurrentSong.duration.seconds * 1000;
                                 
                                 SetCurrentTime(Math.floor(NewTime));
 
@@ -288,7 +548,7 @@ function App() {
                                 const Rect = MouseEvent.currentTarget.getBoundingClientRect();
                                 const X = UpEvent.clientX - Rect.left;
                                 const Percentage = Math.max(0, Math.min(1, X / Rect.width));
-                                const NewTime = Percentage * CurrentSong.duration.seconds;
+                                const NewTime = Percentage * CurrentSong.duration.seconds * 1000;
 
                                 HandleSeek(Math.floor(NewTime));
 
@@ -309,7 +569,7 @@ function App() {
                                 const Rect = E.currentTarget.getBoundingClientRect();
                                 const X = MoveEvent.touches[0].clientX - Rect.left;
                                 const Percentage = Math.max(0, Math.min(1, X / Rect.width));
-                                const NewTime = Percentage * CurrentSong.duration.seconds;
+                                const NewTime = Percentage * CurrentSong.duration.seconds * 1000;
 
                                 SetCurrentTime(Math.floor(NewTime));
 
@@ -320,7 +580,7 @@ function App() {
                                 const Rect = E.currentTarget.getBoundingClientRect();
                                 const X = EndEvent.changedTouches[0].clientX - Rect.left;
                                 const Percentage = Math.max(0, Math.min(1, X / Rect.width));
-                                const NewTime = Percentage * CurrentSong.duration.seconds;
+                                const NewTime = Percentage * CurrentSong.duration.seconds * 1000;
 
                                 HandleSeek(Math.floor(NewTime));
 
@@ -335,13 +595,13 @@ function App() {
                         }}
 
                     >
-                        <div className="absolute top-0 left-0 h-full bg-white rounded-full transition-all duration-100" style={{ width: `${(CurrentTime / CurrentSong.duration.seconds) * 100}%` }} />
+                        <div className="absolute top-0 left-0 h-full bg-white rounded-full transition-all duration-100" style={{ width: `${(CurrentTime / (CurrentSong.duration.seconds * 1000)) * 100}%` }} />
                     
                     </div>
 
                     <div className="flex justify-between text-sm text-zinc-500 mt-2">
 
-                        <span>{FormatTime(CurrentTime)}</span>
+                        <span>{FormatTime(CurrentTime / 1000)}</span>
                         <span>{CurrentSong.duration.formatted}</span>
 
                     </div>
@@ -370,8 +630,12 @@ function App() {
 
                 <div className="flex justify-center gap-4">
 
-                    <button onClick={() => SetActiveView('NowPlaying')} className={`px-6 py-2 rounded-md border transition-colors ${ActiveView == 'NowPlaying' ? 'bg-white text-zinc-950 border-white' : 'bg-transparent text-white border-zinc-600 hover:border-white' }`} >
-                        Now Playing
+                    <button onClick={() => SetActiveView('Details')} className={`px-6 py-2 rounded-md border transition-colors ${ActiveView == 'Details' ? 'bg-white text-zinc-950 border-white' : 'bg-transparent text-white border-zinc-600 hover:border-white' }`} >
+                        Details
+                    </button>
+
+                    <button onClick={() => SetActiveView('Lyrics')} className={`px-6 py-2 rounded-md border transition-colors ${ActiveView == 'Lyrics' ? 'bg-white text-zinc-950 border-white' : 'bg-transparent text-white border-zinc-600 hover:border-white' }`} >
+                        Lyrics
                     </button>
 
                     <button onClick={() => SetActiveView('Queue')} className={`px-6 py-2 rounded-md border transition-colors ${ActiveView == 'Queue' ? 'bg-white text-zinc-950 border-white' : 'bg-transparent text-white border-zinc-600 hover:border-white' }`} >

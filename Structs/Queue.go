@@ -7,6 +7,7 @@ import (
 	"Synthara-Redux/Utils"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
@@ -46,6 +47,9 @@ type Queue struct {
 	WebSockets      map[*websocket.Conn]bool `json:"-"`
 	SocketMutex     sync.Mutex               `json:"-"`
 
+	ProgressTicker  *Audio.Playback `json:"-"`
+	TickerStopChan  chan bool       `json:"-"`
+
 }
 
 type QueueFunctions struct {
@@ -82,6 +86,46 @@ func (Q *Queue) SendToWebsockets(Event string, Data interface{}) {
 
 }
 
+// StartProgressTicker starts a ticker that sends progress updates every 500ms
+func (Q *Queue) StartProgressTicker() {
+
+	if Q.TickerStopChan != nil {
+		Q.StopProgressTicker()
+	}
+
+	Q.TickerStopChan = make(chan bool)
+
+	go func() {
+		ticker := time.NewTicker(500 * time.Millisecond)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ticker.C:
+				if Q.PlaybackSession != nil && Q.State == StatePlaying {
+					progress := Q.PlaybackSession.Streamer.Progress / 1000 // in seconds
+					Q.SendToWebsockets(Event_ProgressUpdate, map[string]interface{}{
+						"Progress": progress,
+					})
+				}
+			case <-Q.TickerStopChan:
+				return
+			}
+		}
+	}()
+
+}
+
+// StopProgressTicker stops the progress update ticker
+func (Q *Queue) StopProgressTicker() {
+
+	if Q.TickerStopChan != nil {
+		close(Q.TickerStopChan)
+		Q.TickerStopChan = nil
+	}
+
+}
+
 // Event-Like Handlers
 
 func QueueStateHandler(Queue *Queue, State int) {
@@ -94,6 +138,9 @@ func QueueStateHandler(Queue *Queue, State int) {
 	switch State {
 
 		case StateIdle:
+
+			// Stop progress ticker when idle
+			Queue.StopProgressTicker()
 
 			// Idle state; move to next song if available
 			// TODO: Repeat/Shuffle and autoplay logic
@@ -186,6 +233,9 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 		case StatePaused:
 
+			// Stop progress ticker when paused
+			Queue.StopProgressTicker()
+
 			if Queue.PlaybackSession != nil {
 
 				Queue.PlaybackSession.Pause()
@@ -193,6 +243,9 @@ func QueueStateHandler(Queue *Queue, State int) {
 			}
 
 		case StatePlaying:
+
+			// Start progress ticker when playing
+			Queue.StartProgressTicker()
 
 			if Queue.PlaybackSession != nil {
 

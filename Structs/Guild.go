@@ -41,6 +41,7 @@ const (
 	Event_Initial = "INITIAL_STATE"
 	Event_QueueUpdated = "QUEUE_UPDATED"
 	Event_StateChanged = "STATE_CHANGED"
+	Event_ProgressUpdate = "PROGRESS_UPDATE"
 
 )
 
