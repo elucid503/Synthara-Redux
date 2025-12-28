@@ -36,6 +36,8 @@ func InitWebServer() {
 	
 	WebServer = gin.Default()
 
+	WebServer.Static("/assets", "./Web/dist/assets")
+
 }
 
 func ConnectDiscordClient() error {

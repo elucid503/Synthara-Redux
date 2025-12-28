@@ -35,11 +35,11 @@ var Upgrader = websocket.Upgrader{
 
 func HandleWSConnections(Context *gin.Context) {
 
-	GuildIDStr := Context.Query("QueueID")
+	GuildIDStr := Context.Query("ID")
 
 	if GuildIDStr == "" {
 
-		Context.JSON(http.StatusBadRequest, gin.H{"Error": "QueueID is required"})
+		Context.JSON(http.StatusBadRequest, gin.H{"Error": "Queue ID is required"})
 		return
 
 	}
@@ -48,7 +48,7 @@ func HandleWSConnections(Context *gin.Context) {
 
 	if ErrorParsing != nil {
 
-		Context.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid QueueID"})
+		Context.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid Queue ID"})
 		return
 
 	}
@@ -89,6 +89,7 @@ func HandleWSConnections(Context *gin.Context) {
 
 			"Current": Guild.Queue.Current,
 			"State": Guild.Queue.State,
+			"Progress": (Guild.Queue.PlaybackSession.Streamer.Progress / 1000), // in seconds
 
 		},
 
