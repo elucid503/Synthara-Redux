@@ -111,7 +111,11 @@ func (P *Playback) Seek(Offset int) error {
 
 	// Calculate segment index
 
-	TargetIndex := int(TargetTime / int64(P.SegmentDuration*1000))
+	TargetIndex := int(TargetTime / int64(P.SegmentDuration * 1000))
+
+	// We will be slightly off by the segment duration. We must adjust the time accordingly.
+
+	TargetTime = int64(TargetIndex * P.SegmentDuration * 1000)
 
 	// Update Progress and Index
 
