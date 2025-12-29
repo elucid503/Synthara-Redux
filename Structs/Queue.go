@@ -209,6 +209,9 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				Utils.Logger.Info(fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
 
+				// Send queue update to notify UI that queue has ended
+				Queue.Functions.Updated(Queue)
+
 				// Sends a message indicating the queue has ended
 
 				Guild := GetGuild(Queue.ParentID)

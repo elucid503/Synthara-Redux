@@ -1,7 +1,13 @@
-import { useEffect, useState, useMemo } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Music, MoreHorizontal, Trash2, CornerDownRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Play, Pause, SkipBack, SkipForward, Trash2, CornerDownRight, RefreshCw } from 'lucide-react';
 
 import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse } from './Types';
+import { NormalizeCoverURL, FormatTime, SendOperation, FetchLyrics } from './Utils/MIsc';
+import { HandleProgressBarClick, HandleProgressBarMouseDown, HandleProgressBarTouchStart } from './Utils/Inputs';
+
+import DetailsView from './Views/Details';
+import LyricsView from './Views/Lyrics';
+import QueueView from './Views/Queue';
 
 function App() {
 
@@ -10,8 +16,6 @@ function App() {
     const [CurrentSong, SetCurrentSong] = useState<Song | null>(null);
     const [PreviousSongs, SetPreviousSongs] = useState<Song[]>([]);
     const [UpcomingSongs, SetUpcomingSongs] = useState<Song[]>([]);
-
-    const [ShowPrevious, SetShowPrevious] = useState(false);
 
     const [ActiveContextMenu, SetActiveContextMenu] = useState<{ type: 'Previous' | 'Upcoming', index: number, x: number, y: number } | null>(null);
 
@@ -78,57 +82,16 @@ function App() {
     const [LyricsLoading, SetLyricsLoading] = useState(false);
     const [LyricsError, SetLyricsError] = useState(false);
     
-    // Normalizes Google cover URLs to ensure 512x512 dimensions
-
-    const NormalizeCoverURL = (URL: string): string => {
-
-        return URL.replace(/=w\d+-h\d+(-l\d+)?(-rj)?/g, '=w512-h512-l90-rj');
-
-    };
-
-    const FetchLyrics = async (Song: Song) => {
+    const FetchLyricsAndSetState = async (Song: Song) => {
 
         SetLyricsLoading(true);
         SetLyricsError(false);
 
-        try {
-
-            const Params = new URLSearchParams({
-
-                title: Song.title.replace(/\s*\(.*?\)/g, '').trim(), // removes info in parentheses
-                artist: Song.artists[0],
-                album: Song.album,
-
-                source: 'apple,lyricsplus,musixmatch,spotify,musixmatch-word'
-
-            });
-            
-            const Response = await fetch(`https://lyricsplus.prjktla.workers.dev/v2/lyrics/get?${Params}`);
-            
-            if (Response.ok) {
-
-                const Data: LyricsResponse = await Response.json();
-                SetLyrics(Data);
-
-            } else {
-
-                SetLyrics(null);
-                SetLyricsError(true);
-
-            }
-
-        } catch (Error) {
-
-            console.error('Error fetching lyrics:', Error);
-            
-            SetLyrics(null);
-            SetLyricsError(true);
-
-        } finally {
-
-            SetLyricsLoading(false);
-
-        }
+        const { data, error } = await FetchLyrics(Song);
+        
+        SetLyrics(data);
+        SetLyricsError(error);
+        SetLyricsLoading(false);
 
     };
 
@@ -222,7 +185,7 @@ function App() {
 
             SetBackgroundImage(NormalizeCoverURL(CurrentSong.cover));
             
-            ActiveView == 'Lyrics' && FetchLyrics(CurrentSong);
+            ActiveView == 'Lyrics' && FetchLyricsAndSetState(CurrentSong);
 
         }
 
@@ -254,334 +217,21 @@ function App() {
 
         if (ActiveView == 'Lyrics' && CurrentSong && !Lyrics && !LyricsLoading) {
 
-            FetchLyrics(CurrentSong);
+            FetchLyricsAndSetState(CurrentSong);
 
         }
         
     }, [ActiveView, CurrentSong]);
 
-    // Lyrics Logic
-
-    const CurrentLineIndex = useMemo(() => {
-
-        if (!Lyrics || !Lyrics.lyrics) return -1;
-
-        // Finds the last line that has started. This is ideal, since we only display one line at a time
-
-        for (let i = Lyrics.lyrics.length - 1; i >= 0; i--) {
-
-            if (CurrentTime >= Lyrics.lyrics[i].time) {
-
-                return i;
-
-            }
-
-        }
-
-        return -1;
-
-    }, [Lyrics, CurrentTime]);
-
-    const RenderSong = (Song: Song, Mode: 'Big' | 'Normal' | 'Muted', Index: number = 0, Key?: string) => {
-
-        const IsBig = Mode == 'Big';
-        const IsPrevious = Mode == 'Muted';
-        const ContextType = IsPrevious ? 'Previous' : 'Upcoming';
-
-        if (IsBig) {
-
-            return (
-
-                <div key={Key} className="flex items-center gap-4 p-4 rounded-xl bg-white/10">
-                    
-                    <img src={NormalizeCoverURL(Song.cover)} referrerPolicy='no-referrer' className="w-16 h-16 rounded-lg object-cover shadow-lg" />
-                        
-                    <div className="flex-1 min-w-0">
-
-                        <div className="text-lg font-bold truncate">{Song.title}</div>
-                        <div className="text-zinc-400 truncate">{Song.artists.join(', ')}</div>
-                    
-                    </div>
-
-                    <div className="text-zinc-400 mr-2 font-semibold">{Song.duration.formatted}</div>
-                
-                </div>
-
-            );
-
-        }
-
-        return (
-
-            <div key={Key} className={`flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group relative ${IsPrevious ? 'opacity-60' : ''}`}>
-                
-                {!IsPrevious && (<div className="p-1 text-center text-zinc-500 font-medium text-sm">{Index + 1}</div>)}
-
-                <img src={NormalizeCoverURL(Song.cover)} referrerPolicy='no-referrer' className="w-10 h-10 rounded object-cover" />
-                
-                <div className="flex-1 min-w-0">
-
-                    <div className="font-medium truncate text-sm">{Song.title}</div>
-                    <div className="text-xs text-zinc-400 truncate">{Song.artists.join(', ')}</div>
-                
-                </div>
-                
-                <div className="text-xs font-semibold text-zinc-500 w-12 text-right">{Song.duration.formatted}</div>
-
-                <button onClick={(E) => { 
-                    
-                    E.stopPropagation(); 
-                    const Rect = E.currentTarget.getBoundingClientRect();
-                    
-                    SetActiveContextMenu(ActiveContextMenu?.index === Index && ActiveContextMenu?.type === ContextType ? null : { type: ContextType, index: Index, x: Rect.right, y: Rect.bottom }); 
-                
-                }} className="mr-2 text-zinc-400 hover:text-white transition-colors context-menu-trigger" >
-                    
-                    <MoreHorizontal size={16} />
-
-                </button>
-
-            </div>
-
-        );
-
-    };
-
-    const RenderQueue = () => {
-
-        return (
-
-            <div className="w-full h-fit max-w-3xl mx-auto">
-                
-                {/* Previous Songs Toggle */}
-
-                {PreviousSongs.length > 0 && (
-
-                    <div className="mb-6">
-
-                        <button onClick={() => SetShowPrevious(!ShowPrevious)} className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-wider hover:text-white transition-colors">
-                            
-                            Previous
-                            {ShowPrevious ? <ChevronUp className='mb-0.5' size={16} /> : <ChevronDown className='mb-0.5' size={16} />}
-
-                        </button>
-
-                        {ShowPrevious && (
-
-                            <div className="mt-4 space-y-2">
-
-                                {PreviousSongs.map((Song, Index) => RenderSong(Song, 'Muted', Index, `prev-${Index}`))}
-                            
-                            </div>
-
-                        )}
-
-                    </div>
-
-                )}
-
-                {/* Current Song */}
-
-                <div className="mb-8">
-
-                    <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4">Now Playing</h2>
-                    {CurrentSong && RenderSong(CurrentSong, 'Big')}
-                
-                </div>
-
-                {/* Upcoming Songs */}
-
-                {UpcomingSongs.length > 0 && (
-
-                    <div>
-
-                        <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4">Next Up</h2>
-                        
-                        <div className="space-y-2">
-                            
-                            {UpcomingSongs.map((Song, Index) => RenderSong(Song, 'Normal', Index, `next-${Index}`))}
-                    
-                        </div>
-                            
-                    </div>
-                        
-                )}
-
-            </div>
-
-        );
-
-    };
-
-    const RenderLyrics = () => {
-
-        if (LyricsError) {
-
-            return (
-
-                <div className="min-h-[200px] flex items-center justify-center">
-
-                    <div className="text-zinc-500">No Lyrics available.</div>
-
-                </div>
-
-            );
-
-        }
-
-        if (!Lyrics || CurrentLineIndex == -1) {
-
-            if (Lyrics && Lyrics.lyrics.length > 0 && CurrentTime < Lyrics.lyrics[0].time) {
-
-                return (
-
-                    <div className="min-h-[200px] flex flex-col items-center justify-center animate-pulse">
-                        
-                        <Music size={64} className="text-zinc-500" />
-                    
-                    </div>
-
-                );
-
-            }
-
-            return (
-
-                <div className="min-h-[200px] flex items-center justify-center">
-
-                    <div className="text-zinc-500 animate-pulse">Loading Lyrics...</div>
-
-                </div>
-
-            );
-
-        }
-
-        const CurrentLine = Lyrics.lyrics[CurrentLineIndex];
-        const NextLine = Lyrics.lyrics[CurrentLineIndex + 1];
-
-        // Check for instrumental
-
-        const LineEnd = CurrentLine.time + CurrentLine.duration;
-        const IsInstrumental = NextLine && (NextLine.time - LineEnd > 10_000) && (CurrentTime > LineEnd);
-
-        if (IsInstrumental) {
-
-            return (
-
-                <div className="min-h-[200px] flex flex-col items-center justify-center animate-pulse">
-                    
-                    <Music size={64} className="text-zinc-500" />
-                
-                </div>
-
-            );
-
-        }
-
-        const HasSyllables = CurrentLine.syllabus && CurrentLine.syllabus.length > 0;
-
-        return (
-
-            <div key={CurrentLineIndex} className="lyric-line-active text-center max-w-4xl mx-auto px-4">
-                
-                <div className="text-3xl md:text-4xl font-semibold leading-relaxed tracking-wide">
-                    
-                    {HasSyllables ? (
-
-                        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
-                            
-                            {(() => {
-
-                                const Words: any[][] = [];
-                                let CurrentWord: any[] = [];
-
-                                CurrentLine.syllabus!.forEach((Syllable) => {
-
-                                    CurrentWord.push(Syllable);
-
-                                    if (Syllable.text.endsWith(' ')) {
-
-                                        Words.push(CurrentWord);
-                                        CurrentWord = [];
-
-                                    }
-
-                                });
-
-                                if (CurrentWord.length > 0) Words.push(CurrentWord);
-
-                                return Words.map((Word, WordIndex) => (
-
-                                    <span key={WordIndex} className="whitespace-nowrap inline-block">
-                                        
-                                        {Word.map((Syllable, SyllableIndex) => {
-
-                                            const IsActive = CurrentTime >= Syllable.time;
-
-                                            return (
-
-                                                <span key={SyllableIndex} className={`transition-colors ease-linear ${IsActive ? 'text-white' : 'text-zinc-600'}`} style={{ transitionDuration: `${IsActive && Syllable.duration > 200 ? Syllable.duration : 200}ms` }} >
-                                                    
-                                                    {Syllable.text}
-
-                                                </span>
-
-                                            );
-
-                                        })}
-
-                                    </span>
-
-                                ));
-
-                            })()}
-
-                        </div>
-
-                    ) : (
-
-                        <span className="text-white transition-colors duration-500">
-                            
-                            {CurrentLine.text}
-                            
-                        </span>
-                        
-                    )}
-
-                </div>
-
-            </div>
-
-        );
-
-    };
-
-    const SendOperation = (OperationType: Operation, Params: { [key: string]: any } = {}) => {
-
-        if (!Socket || Socket.readyState != WebSocket.OPEN) return;
-        
-        const Message: any = { Operation: OperationType };
-
-        Object.keys(Params).forEach((Key) => {
-
-            Message[Key] = Params[Key];
-
-        });
-        
-        Socket.send(JSON.stringify(Message));
-
-    };
-
     const HandlePlayPause = () => {
 
         if (PlayerStateValue == PlayerState.Playing) {
 
-            SendOperation(Operation.Pause);
+            SendOperation(Socket, Operation.Pause);
 
         } else if (PlayerStateValue == PlayerState.Paused) {
 
-            SendOperation(Operation.Resume);
+            SendOperation(Socket, Operation.Resume);
 
         }
 
@@ -589,13 +239,13 @@ function App() {
 
     const HandlePrevious = () => {
 
-        SendOperation(Operation.Last);
+        SendOperation(Socket, Operation.Last);
 
     };
 
     const HandleNext = () => {
 
-        SendOperation(Operation.Next);
+        SendOperation(Socket, Operation.Next);
 
     };
 
@@ -603,17 +253,8 @@ function App() {
 
         const Offset = (Value - CurrentTime) / 1000; // convert ms to seconds for offset
 
-        SendOperation(Operation.Seek, { Offset });
+        SendOperation(Socket, Operation.Seek, { Offset });
         SetCurrentTime(Value);
-
-    };
-
-    const FormatTime = (Seconds: number): string => {
-
-        const Mins = Math.floor(Seconds / 60);
-        const Secs = Math.floor(Seconds % 60);
-
-        return `${Mins}:${Secs.toString().padStart(2, '0')}`;
 
     };
 
@@ -650,26 +291,7 @@ function App() {
 
                 <div className="mb-8">
 
-                    {ActiveView == 'Details' && (<>
-                        
-                        {/* Cover Art */}
-
-                        <div className="relative aspect-square w-full max-w-md mx-auto mb-8 rounded-lg overflow-hidden shadow-2xl">
-
-                            <img src={NormalizeCoverURL(CurrentSong.cover)} alt={CurrentSong.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-
-                        </div>
-
-                        {/* Song Info */}
-
-                        <div className="text-center">
-
-                            <h1 className="text-3xl font-bold mb-2 truncate">{CurrentSong.title}</h1>
-                            <p className="text-xl text-zinc-400 truncate"> {CurrentSong.artists.join(', ')} </p>
-
-                        </div>
-
-                    </>)}
+                    {ActiveView == 'Details' && (<DetailsView CurrentSong={CurrentSong} />)}
 
                     {/* Lyrics View */}
 
@@ -677,7 +299,7 @@ function App() {
 
                         <div className="min-h-[200px] flex items-center justify-center">
 
-                            {RenderLyrics()}
+                            <LyricsView Lyrics={Lyrics} LyricsError={LyricsError} CurrentTime={CurrentTime} />
                             
                         </div>
 
@@ -689,7 +311,7 @@ function App() {
 
                         <div className="min-h-[200px] max-h-[500px] overflow-y-scroll">
 
-                            {RenderQueue()}
+                            <QueueView Current={CurrentSong} PreviousSongs={PreviousSongs} UpcomingSongs={UpcomingSongs} ActiveContextMenu={ActiveContextMenu} SetActiveContextMenu={SetActiveContextMenu} />
                             
                         </div>
 
@@ -701,88 +323,24 @@ function App() {
 
                 <div className="mb-8">
 
+                    {/* Bar Track */}
+
                     <div className="relative w-full h-1 bg-zinc-700 rounded-full cursor-pointer overflow-hidden"
                         
-                        onClick={(E) => {
-                            
-                            const Rect = E.currentTarget.getBoundingClientRect();
-                            const X = E.clientX - Rect.left;
-                            const Percentage = X / Rect.width;
-                            const NewTime = Math.max(0, Math.min(CurrentSong.duration.seconds * 1000, Percentage * CurrentSong.duration.seconds * 1000));
-                            
-                            HandleSeek(Math.floor(NewTime));
+                        onClick={(E) => HandleProgressBarClick(E, CurrentSong.duration.seconds, HandleSeek)}
 
-                        }}
+                        onMouseDown={(E) => HandleProgressBarMouseDown(E, CurrentSong.duration.seconds, SetCurrentTime, HandleSeek)}
 
-                        onMouseDown={(MouseEvent) => {
-
-                            const HandleMouseMove = (MoveEvent: MouseEvent) => {
-
-                                const Rect = MouseEvent.currentTarget.getBoundingClientRect();
-                                const X = MoveEvent.clientX - Rect.left;
-                                const Percentage = Math.max(0, Math.min(1, X / Rect.width));
-                                const NewTime = Percentage * CurrentSong.duration.seconds * 1000;
-                                
-                                SetCurrentTime(Math.floor(NewTime));
-
-                            };
-
-                            const HandleMouseUp = (UpEvent: MouseEvent) => {
-
-                                const Rect = MouseEvent.currentTarget.getBoundingClientRect();
-                                const X = UpEvent.clientX - Rect.left;
-                                const Percentage = Math.max(0, Math.min(1, X / Rect.width));
-                                const NewTime = Percentage * CurrentSong.duration.seconds * 1000;
-
-                                HandleSeek(Math.floor(NewTime));
-
-                                document.removeEventListener('mousemove', HandleMouseMove);
-                                document.removeEventListener('mouseup', HandleMouseUp);
-
-                            };
-
-                            document.addEventListener('mousemove', HandleMouseMove);
-                            document.addEventListener('mouseup', HandleMouseUp);
-
-                        }}
-
-                        onTouchStart={(E) => {
-
-                            const HandleTouchMove = (MoveEvent: TouchEvent) => {
-
-                                const Rect = E.currentTarget.getBoundingClientRect();
-                                const X = MoveEvent.touches[0].clientX - Rect.left;
-                                const Percentage = Math.max(0, Math.min(1, X / Rect.width));
-                                const NewTime = Percentage * CurrentSong.duration.seconds * 1000;
-
-                                SetCurrentTime(Math.floor(NewTime));
-
-                            };
-
-                            const HandleTouchEnd = (EndEvent: TouchEvent) => {
-
-                                const Rect = E.currentTarget.getBoundingClientRect();
-                                const X = EndEvent.changedTouches[0].clientX - Rect.left;
-                                const Percentage = Math.max(0, Math.min(1, X / Rect.width));
-                                const NewTime = Percentage * CurrentSong.duration.seconds * 1000;
-
-                                HandleSeek(Math.floor(NewTime));
-
-                                document.removeEventListener('touchmove', HandleTouchMove);
-                                document.removeEventListener('touchend', HandleTouchEnd);
-
-                            };
-
-                            document.addEventListener('touchmove', HandleTouchMove);
-                            document.addEventListener('touchend', HandleTouchEnd);
-
-                        }}
+                        onTouchStart={(E) => HandleProgressBarTouchStart(E, CurrentSong.duration.seconds, SetCurrentTime, HandleSeek)}
 
                     >
-                        <div className="absolute top-0 left-0 h-full bg-white rounded-full transition-all duration-100" style={{ width: `${(CurrentTime / (CurrentSong.duration.seconds * 1000)) * 100}%` }} />
                     
-                    </div>
+                    {/* Bar Fill */}
+                    
+                    <div className="absolute top-0 left-0 h-full bg-white rounded-full transition-all duration-100" style={{ width: `${(CurrentTime / (CurrentSong.duration.seconds * 1000)) * 100}%` }}/></div>
 
+                    {/* Time Labels */}
+                    
                     <div className="flex justify-between text-sm text-zinc-500 mt-2">
 
                         <span>{FormatTime(CurrentTime / 1000)}</span>
@@ -839,6 +397,17 @@ function App() {
                     <div className="fixed w-48 bg-zinc-600/35 backdrop-blur-md border border-white/10 rounded-xl shadow-xl z-50 overflow-hidden context-menu-content" style={{ top: ActiveContextMenu.y + 4, left: ActiveContextMenu.x - 192 }} >
                         
                         <div className="p-1">
+
+                            {IsPrevious && (
+
+                                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg transition-colors" >
+                                   
+                                    <RefreshCw size={14} />
+                                    Replay
+
+                                </button>
+
+                            )}
 
                             <button className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg ${IsPrevious ? 'text-zinc-400 cursor-not-allowed' : 'transition-colors'}`}>
                                 

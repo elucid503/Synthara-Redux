@@ -1,3 +1,5 @@
+// Server-Defined Types
+
 export interface Song {
 
     youtube_id: string;
@@ -57,39 +59,61 @@ export interface WSMessage<T> {
 // Lyrics Types
 
 export interface LyricsSyllabus {
+
     time: number;
     duration: number;
+
     text: string;
+
 }
 
 export interface LyricsLine {
+
     time: number;
     duration: number;
+
     text: string;
     syllabus?: LyricsSyllabus[];
+
     element: {
+
         key?: string;
         songPart?: string;
         singer?: string;
+
     };
+
 }
 
 export interface LyricsMetadata {
+
     source: string;
+
     songWriters?: string[];
     title?: string;
+
     language?: string;
+
     totalDuration?: string;
     leadingSilence?: string;
+
 }
 
 export interface LyricsResponse {
+
     type: "Word" | "Line";
+
     metadata: LyricsMetadata;
+
     lyrics: LyricsLine[];
+
     cached?: string;
+
     processingTime?: {
+
         timeElapsed: number;
         lastProcessed: number;
+
     };
+
 }
