@@ -190,50 +190,82 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 // Disconnect Closes the existing voice connection; if none exists, returns an error
 func (G *Guild) Disconnect(CloseConn bool) error {
 
-	G.Internal.Disconnecting = true // for other handlers to know
+	// Maintain compatibility: delegate to centralized Cleanup implementation.
+	G.Internal.Disconnecting = true
+	return G.Cleanup(CloseConn)
+
+}
+
+// Stops playback, tickers, closes websockets, and the voice connection
+func (G *Guild) Cleanup(CloseConn bool) error {
 
 	G.StreamerMutex.Lock()
 	defer G.StreamerMutex.Unlock()
 
-	if G.VoiceConnection != nil {
+	G.Internal.Disconnecting = true
 
-		// Stops current session before disconnecting to prevent backpressure issues
-		
-		if G.Queue.PlaybackSession != nil {
+	// Stop playback session if present
 
-			G.Queue.PlaybackSession.Stop()
-			G.Queue.PlaybackSession = nil
+	if G.Queue.PlaybackSession != nil {
 
-		}
+		// Stop should be safe to call multiple times
 
-		if CloseConn {
-
-			ContextToUse, CancelFunc := context.WithTimeout(context.Background(), 5 * time.Second)
-			defer CancelFunc()
-
-			// Stop speaking and detach provider before closing connection
-
-			_ = G.VoiceConnection.SetSpeaking(ContextToUse, 0)
-			G.VoiceConnection.SetOpusFrameProvider(nil)
-
-			G.VoiceConnection.Close(ContextToUse)
-			G.VoiceConnection = nil
-
-		}
-
-		// Removes guild from store to free up memory
-
-		GuildStoreMutex.Lock()
-		delete(GuildStore, G.ID)
-		GuildStoreMutex.Unlock()
-
-		return nil;
-
-	} else {
-
-		return errors.New("no active voice connection to disconnect")
+		G.Queue.PlaybackSession.Stop()
+		G.Queue.PlaybackSession = nil
 
 	}
+
+	// Stop the queue progress ticker
+	G.Queue.StopProgressTicker()
+
+	// Clear websockets safely
+	G.Queue.SocketMutex.Lock()
+
+	for conn := range G.Queue.WebSockets {
+
+		func(c *websocket.Conn) {
+
+			defer func() {
+
+				if r := recover(); r != nil {
+					// noop
+				}
+
+			}()
+
+			c.Close()
+
+		}(conn)
+
+		delete(G.Queue.WebSockets, conn)
+
+	}
+
+	G.Queue.SocketMutex.Unlock()
+
+	// Closes voice connection if requested
+
+	if CloseConn && G.VoiceConnection != nil {
+
+		ContextToUse, CancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
+		defer CancelFunc()
+
+		_ = G.VoiceConnection.SetSpeaking(ContextToUse, 0)
+
+		G.VoiceConnection.SetOpusFrameProvider(nil)
+
+		G.VoiceConnection.Close(ContextToUse)
+		G.VoiceConnection = nil
+
+	}
+
+	// Removes from guild store
+
+	GuildStoreMutex.Lock()
+	delete(GuildStore, G.ID)
+	GuildStoreMutex.Unlock()
+
+	return nil
 
 }
 

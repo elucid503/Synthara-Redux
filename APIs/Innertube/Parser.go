@@ -68,45 +68,73 @@ func ParseSong(Renderer map[string]interface{}) (Song, error) {
 
         if Runs, RunsValid := RunsVal.([]interface{}); RunsValid {
 
-            for Index, Run := range Runs {
+			Segments := []string{}
+
+			CurrentSegment := strings.Builder{}
+
+            for _, Run := range Runs {
 
                 if RunMap, RunMapOK := Run.(map[string]interface{}); RunMapOK {
 					
                     if RunText, RunTextOK := RunMap["text"].(string); RunTextOK {
 
-                        if RunText == " • " { continue }
+                        if RunText == " • " {
 
-                        switch Index {
+							if CurrentSegment.Len() > 0 {
 
-							case 0:
+								Segments = append(Segments, strings.TrimSpace(CurrentSegment.String()))
 
-								SplitRunText := strings.SplitN(RunText, ", ", -1);
+								CurrentSegment.Reset()
 
-								for _, Artist := range SplitRunText {
+							}
 
-									TrimmedArtist := strings.TrimSpace(strings.ReplaceAll(Artist, "\u0026", ""))
-
-									if TrimmedArtist != "" {
-
-										Artists = append(Artists, TrimmedArtist)
-
-									}
-
-								}
-
-							case 2:
-
-								Album = RunText // Run 2 -> Album
-
-							case 4:
-
-								DurationFormatted = RunText // Run 4 -> Formatted Duration
+							continue
 
 						}
+
+						CurrentSegment.WriteString(RunText)
 
 					}
 
 				}
+
+			}
+
+			if CurrentSegment.Len() > 0 {
+
+				Segments = append(Segments, strings.TrimSpace(CurrentSegment.String()))
+
+			}
+
+			if len(Segments) > 0 {
+
+				ArtistText := Segments[0]
+
+				SplitArtists := strings.Split(ArtistText, ", ")
+
+				for _, Artist := range SplitArtists {
+
+					TrimmedArtist := strings.TrimSpace(strings.ReplaceAll(Artist, "\u0026", "&"))
+
+					if TrimmedArtist != "" {
+
+						Artists = append(Artists, TrimmedArtist)
+
+					}
+
+				}
+
+			}
+
+			if len(Segments) > 1 {
+
+				Album = Segments[1]
+
+			}
+
+			if len(Segments) > 2 {
+
+				DurationFormatted = Segments[2]
 
 			}
 

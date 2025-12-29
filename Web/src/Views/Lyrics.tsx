@@ -105,7 +105,7 @@ function Lyrics({ Lyrics, LyricsError, CurrentTime }: LyricsProps) {
 
         <div key={CurrentLineIndex} className="lyric-line-active text-center max-w-4xl mx-auto px-4">
             
-            <div className="text-3xl md:text-4xl font-semibold leading-relaxed tracking-wide">
+            <div className="text-4xl font-semibold tracking-wide">
                 
                 {HasSyllables ? (
 

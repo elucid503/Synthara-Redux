@@ -67,7 +67,7 @@ func SearchForSongs(Query string) []Song {
 	defer RequestCancel()
 
 	SearchRequestResults, SearchRequestError := InnerTubeClient.Search(RequestContext, &Query, &Params, nil)
-
+ 
 	if SearchRequestError != nil {
 
 		Utils.Logger.Error("Error performing search request: " + SearchRequestError.Error())

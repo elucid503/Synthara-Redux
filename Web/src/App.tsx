@@ -123,7 +123,7 @@ function App() {
                     SetUpcomingSongs(Message.Data.Upcoming || []);
                     SetPlayerStateValue(Message.Data.State);
                     
-                    const InitialProgress = Message.Data.Progress * 1000; // convert seconds to ms
+                    const InitialProgress = Message.Data.Progress;
                     SetCurrentTime(InitialProgress);
 
                 break;
@@ -147,7 +147,7 @@ function App() {
 
                 case WSEvents.Event_ProgressUpdate:
                     
-                    SetCurrentTime(Math.max(0, (Message.Data.Progress - 250))); // slight buffer to account for latency
+                    SetCurrentTime(Math.max(0, (Message.Data.Progress - 100))); // slight buffer to account for latency
 
                 break;
 

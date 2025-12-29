@@ -34,16 +34,35 @@ export const SendOperation = (Socket: WebSocket | null, OperationType: Operation
 
 };
 
+
 // Fetches lyrics from the API we've decided to use
 export const FetchLyrics = async (Song: Song): Promise<{ data: LyricsResponse | null, error: boolean }> => {
+
+    const CleanedTitle = Song.title.replace(/\s*\(.*?\)/g, '').trim();
+    const OriginalTitle = Song.title;
+
+    const Result = await LyricsFetcher(CleanedTitle, Song.artists[0], Song.album);
+
+    if (Result.error && CleanedTitle != OriginalTitle) {
+
+        return await LyricsFetcher(OriginalTitle, Song.artists[0], Song.album);
+
+    }
+
+    return Result;
+
+};
+
+// Helper function to fetch lyrics with specific title/artist/album strings
+const LyricsFetcher = async (Title: string, Artist: string, Album: string): Promise<{ data: LyricsResponse | null, error: boolean }> => {
 
     try {
 
         const Params = new URLSearchParams({
 
-            title: Song.title.replace(/\s*\(.*?\)/g, '').trim(), // removes info in parentheses
-            artist: Song.artists[0],
-            album: Song.album,
+            title: Title,
+            artist: Artist,
+            album: Album,
 
             source: 'apple,lyricsplus,musixmatch,spotify,musixmatch-word'
 
@@ -65,6 +84,7 @@ export const FetchLyrics = async (Song: Song): Promise<{ data: LyricsResponse | 
     } catch (Error) {
 
         console.error('Error fetching lyrics:', Error);
+
         return { data: null, error: true };
 
     }

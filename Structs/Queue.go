@@ -245,7 +245,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				}()
 
-				Guild.Disconnect(true)
+				Guild.Cleanup(true)
 
 				Queue.Current = nil;
 

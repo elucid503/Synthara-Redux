@@ -191,11 +191,11 @@ func InitializeHandlers() {
 
 		Guild := Structs.GetGuild(Event.VoiceState.GuildID)
 
-		if (Event.VoiceState.ChannelID == nil && !Guild.Internal.Disconnecting) { // we do not want to call this if Disconnect() was already called...
+		if (Event.VoiceState.ChannelID == nil && !Guild.Internal.Disconnecting) { // we do not want to call this if Cleanup() was already called...
 
-			// Disconnected from voice channel, we should clean up the voice connection
+			// Disconnected from voice channel
 
-			Guild.Disconnect(false)
+			Guild.Cleanup(false)
 
 			go func() { 
 

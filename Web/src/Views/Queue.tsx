@@ -62,7 +62,7 @@ function Queue({ Current, PreviousSongs, UpcomingSongs, ActiveContextMenu, SetAc
 
                 <img src={NormalizeCoverURL(Song.cover)} referrerPolicy='no-referrer' className="w-10 h-10 rounded object-cover" />
                 
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 -ml-1">
 
                     <div className="font-medium truncate text-sm">{Song.title}</div>
                     <div className="text-xs text-zinc-400 truncate">{Song.artists.join(', ')}</div>
