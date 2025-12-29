@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Music } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Music, MoreHorizontal, Trash2, CornerDownRight, ChevronDown, ChevronUp } from 'lucide-react';
 
 import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse } from './Types';
 
@@ -8,6 +8,55 @@ function App() {
     const [Socket, SetSocket] = useState<WebSocket | null>(null);
    
     const [CurrentSong, SetCurrentSong] = useState<Song | null>(null);
+    const [PreviousSongs, SetPreviousSongs] = useState<Song[]>([]);
+    const [UpcomingSongs, SetUpcomingSongs] = useState<Song[]>([]);
+
+    const [ShowPrevious, SetShowPrevious] = useState(false);
+
+    const [ActiveContextMenu, SetActiveContextMenu] = useState<{ type: 'Previous' | 'Upcoming', index: number, x: number, y: number } | null>(null);
+
+    // Close context menu on click outside or scroll
+
+    useEffect(() => {
+
+        const HandleClickOutside = (E: MouseEvent) => {
+
+            if (ActiveContextMenu) {
+
+                const Target = E.target as HTMLElement;
+
+                if (!Target.closest('.context-menu-trigger') && !Target.closest('.context-menu-content')) {
+                   
+                    SetActiveContextMenu(null);
+
+                }
+
+            }
+
+        };
+
+        const HandleScroll = () => {
+
+            if (ActiveContextMenu) {
+
+                SetActiveContextMenu(null);
+
+            }
+
+        };
+
+        window.addEventListener('click', HandleClickOutside);
+        window.addEventListener('scroll', HandleScroll, true);
+
+        return () => {
+
+            window.removeEventListener('click', HandleClickOutside);
+            window.removeEventListener('scroll', HandleScroll, true);
+
+        };
+
+    }, [ActiveContextMenu]);
+
     const [PlayerStateValue, SetPlayerStateValue] = useState<PlayerState>(PlayerState.Idle);
     const [CurrentTime, SetCurrentTime] = useState(0);
     
@@ -16,8 +65,8 @@ function App() {
         const Params = new URLSearchParams(window.location.search);
         const View = Params.get('View');
 
-        if (View === 'Lyrics') return 'Lyrics';
-        if (View === 'Queue') return 'Queue';
+        if (View == 'Lyrics') return 'Lyrics';
+        if (View == 'Queue') return 'Queue';
 
         return 'Details';
 
@@ -107,6 +156,8 @@ function App() {
                 case WSEvents.Event_Initial:
 
                     SetCurrentSong(Message.Data.Current);
+                    SetPreviousSongs(Message.Data.Previous || []);
+                    SetUpcomingSongs(Message.Data.Upcoming || []);
                     SetPlayerStateValue(Message.Data.State);
                     
                     const InitialProgress = Message.Data.Progress * 1000; // convert seconds to ms
@@ -123,6 +174,8 @@ function App() {
                 case WSEvents.Event_QueueUpdated:
 
                     SetCurrentSong(Message.Data.Current);
+                    SetPreviousSongs(Message.Data.Previous || []);
+                    SetUpcomingSongs(Message.Data.Upcoming || []);
                     SetCurrentTime(0);
 
                     SetLyrics(null);
@@ -228,6 +281,137 @@ function App() {
         return -1;
 
     }, [Lyrics, CurrentTime]);
+
+    const RenderSong = (Song: Song, Mode: 'Big' | 'Normal' | 'Muted', Index: number = 0, Key?: string) => {
+
+        const IsBig = Mode == 'Big';
+        const IsPrevious = Mode == 'Muted';
+        const ContextType = IsPrevious ? 'Previous' : 'Upcoming';
+
+        if (IsBig) {
+
+            return (
+
+                <div key={Key} className="flex items-center gap-4 p-4 rounded-xl bg-white/10">
+                    
+                    <img src={NormalizeCoverURL(Song.cover)} referrerPolicy='no-referrer' className="w-16 h-16 rounded-lg object-cover shadow-lg" />
+                        
+                    <div className="flex-1 min-w-0">
+
+                        <div className="text-lg font-bold truncate">{Song.title}</div>
+                        <div className="text-zinc-400 truncate">{Song.artists.join(', ')}</div>
+                    
+                    </div>
+
+                    <div className="text-zinc-400 mr-2 font-semibold">{Song.duration.formatted}</div>
+                
+                </div>
+
+            );
+
+        }
+
+        return (
+
+            <div key={Key} className={`flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group relative ${IsPrevious ? 'opacity-60' : ''}`}>
+                
+                {!IsPrevious && (<div className="p-1 text-center text-zinc-500 font-medium text-sm">{Index + 1}</div>)}
+
+                <img src={NormalizeCoverURL(Song.cover)} referrerPolicy='no-referrer' className="w-10 h-10 rounded object-cover" />
+                
+                <div className="flex-1 min-w-0">
+
+                    <div className="font-medium truncate text-sm">{Song.title}</div>
+                    <div className="text-xs text-zinc-400 truncate">{Song.artists.join(', ')}</div>
+                
+                </div>
+                
+                <div className="text-xs font-semibold text-zinc-500 w-12 text-right">{Song.duration.formatted}</div>
+
+                <button onClick={(E) => { 
+                    
+                    E.stopPropagation(); 
+                    const Rect = E.currentTarget.getBoundingClientRect();
+                    
+                    SetActiveContextMenu(ActiveContextMenu?.index === Index && ActiveContextMenu?.type === ContextType ? null : { type: ContextType, index: Index, x: Rect.right, y: Rect.bottom }); 
+                
+                }} className="mr-2 text-zinc-400 hover:text-white transition-colors context-menu-trigger" >
+                    
+                    <MoreHorizontal size={16} />
+
+                </button>
+
+            </div>
+
+        );
+
+    };
+
+    const RenderQueue = () => {
+
+        return (
+
+            <div className="w-full h-fit max-w-3xl mx-auto">
+                
+                {/* Previous Songs Toggle */}
+
+                {PreviousSongs.length > 0 && (
+
+                    <div className="mb-6">
+
+                        <button onClick={() => SetShowPrevious(!ShowPrevious)} className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-wider hover:text-white transition-colors">
+                            
+                            Previous
+                            {ShowPrevious ? <ChevronUp className='mb-0.5' size={16} /> : <ChevronDown className='mb-0.5' size={16} />}
+
+                        </button>
+
+                        {ShowPrevious && (
+
+                            <div className="mt-4 space-y-2">
+
+                                {PreviousSongs.map((Song, Index) => RenderSong(Song, 'Muted', Index, `prev-${Index}`))}
+                            
+                            </div>
+
+                        )}
+
+                    </div>
+
+                )}
+
+                {/* Current Song */}
+
+                <div className="mb-8">
+
+                    <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4">Now Playing</h2>
+                    {CurrentSong && RenderSong(CurrentSong, 'Big')}
+                
+                </div>
+
+                {/* Upcoming Songs */}
+
+                {UpcomingSongs.length > 0 && (
+
+                    <div>
+
+                        <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4">Next Up</h2>
+                        
+                        <div className="space-y-2">
+                            
+                            {UpcomingSongs.map((Song, Index) => RenderSong(Song, 'Normal', Index, `next-${Index}`))}
+                    
+                        </div>
+                            
+                    </div>
+                        
+                )}
+
+            </div>
+
+        );
+
+    };
 
     const RenderLyrics = () => {
 
@@ -337,7 +521,7 @@ function App() {
 
                                             return (
 
-                                                <span key={SyllableIndex} className={`transition-colors ease-linear ${IsActive ? 'text-white' : 'text-zinc-600'}`} style={{ transitionDuration: `${IsActive ? Syllable.duration : 200}ms` }} >
+                                                <span key={SyllableIndex} className={`transition-colors ease-linear ${IsActive ? 'text-white' : 'text-zinc-600'}`} style={{ transitionDuration: `${IsActive && Syllable.duration > 200 ? Syllable.duration : 200}ms` }} >
                                                     
                                                     {Syllable.text}
 
@@ -466,7 +650,7 @@ function App() {
 
                 <div className="mb-8">
 
-                    {ActiveView != 'Lyrics' && (<>
+                    {ActiveView == 'Details' && (<>
                         
                         {/* Cover Art */}
 
@@ -494,6 +678,18 @@ function App() {
                         <div className="min-h-[200px] flex items-center justify-center">
 
                             {RenderLyrics()}
+                            
+                        </div>
+
+                    )}
+
+                    {/* Queue View */}
+
+                    {ActiveView == 'Queue' && (
+
+                        <div className="min-h-[200px] max-h-[500px] overflow-y-scroll">
+
+                            {RenderQueue()}
                             
                         </div>
 
@@ -633,6 +829,42 @@ function App() {
                 </div>
 
             </div>
+
+            {ActiveContextMenu && (() => {
+
+                const IsPrevious = ActiveContextMenu.type == 'Previous';
+
+                return (
+                    
+                    <div className="fixed w-48 bg-zinc-600/35 backdrop-blur-md border border-white/10 rounded-xl shadow-xl z-50 overflow-hidden context-menu-content" style={{ top: ActiveContextMenu.y + 4, left: ActiveContextMenu.x - 192 }} >
+                        
+                        <div className="p-1">
+
+                            <button className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg ${IsPrevious ? 'text-zinc-400 cursor-not-allowed' : 'transition-colors'}`}>
+                                
+                                <CornerDownRight size={14} />
+                                Jump To
+
+                            </button>
+                            
+                            {!IsPrevious && (
+
+                                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg text-red-400 hover:text-red-300 transition-colors">
+                                   
+                                    <Trash2 size={14} />
+                                    Remove
+
+                                </button>
+
+                            )}
+
+                        </div>
+
+                    </div>
+
+                );
+
+            })()}
 
         </div>
 

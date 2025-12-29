@@ -88,6 +88,8 @@ func HandleWSConnections(Context *gin.Context) {
 		"Data": map[string]interface{}{
 
 			"Current": Guild.Queue.Current,
+			"Previous": Guild.Queue.Previous,
+			"Upcoming": Guild.Queue.Upcoming,
 			"State": Guild.Queue.State,
 			"Progress": (Guild.Queue.PlaybackSession.Streamer.Progress),
 
