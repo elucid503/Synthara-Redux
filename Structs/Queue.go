@@ -170,7 +170,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				Utils.Logger.Info(fmt.Sprintf("Queue %s advanced to next song: %s", Queue.ParentID.String(), Queue.Current.Title))
 
-				Guild := GetGuild(Queue.ParentID)
+				Guild := GetGuild(Queue.ParentID, false) // does not create if not found
 
 				State := Innertube.QueueInfo{
 
@@ -214,7 +214,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				// Sends a message indicating the queue has ended
 
-				Guild := GetGuild(Queue.ParentID)
+				Guild := GetGuild(Queue.ParentID, false) // does not create if not found
 				TextChannelID := Guild.Channels.Text
 
 				go func() { 
@@ -380,7 +380,13 @@ func (Q *Queue) Play() bool {
 
 	}
 
-	Guild := GetGuild(Q.ParentID)
+	Guild := GetGuild(Q.ParentID, false) // does not create if not found
+
+	if Guild == nil {
+
+		return false
+
+	}
 
 	ErrorPlaying := Guild.Play(Q.Current)
 

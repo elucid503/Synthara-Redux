@@ -46,7 +46,7 @@ func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	// Get the guild
 
-	Guild := Structs.GetGuild(GuildID)
+	Guild := Structs.GetGuild(GuildID, false) // does not create if not found
 
 	if Guild == nil {
 

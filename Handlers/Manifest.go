@@ -189,7 +189,13 @@ func InitializeHandlers() {
 
 		}
 
-		Guild := Structs.GetGuild(Event.VoiceState.GuildID)
+		Guild := Structs.GetGuild(Event.VoiceState.GuildID, false) // does not create if not found
+
+		if (Guild == nil) {
+
+			return; // No active guild session
+
+		}
 
 		if (Event.VoiceState.ChannelID == nil && !Guild.Internal.Disconnecting) { // we do not want to call this if Cleanup() was already called...
 

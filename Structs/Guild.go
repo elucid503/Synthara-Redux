@@ -129,7 +129,7 @@ func NewGuild(ID snowflake.ID) *Guild {
 
 }
 
-func GetGuild(ID snowflake.ID) *Guild {
+func GetGuild(ID snowflake.ID, Create bool) *Guild {
 
 	GuildStoreMutex.Lock()
 	GuildInstance, Exists := GuildStore[ID]
@@ -139,9 +139,13 @@ func GetGuild(ID snowflake.ID) *Guild {
 
 		return GuildInstance
 		
-	} else {
+	} else if Create {
 
 		return NewGuild(ID)
+
+	} else {
+
+		return nil
 
 	}
 

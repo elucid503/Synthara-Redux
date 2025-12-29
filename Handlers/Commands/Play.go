@@ -76,7 +76,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	Guild := Structs.GetGuild(GuildID);
+	Guild := Structs.GetGuild(GuildID, true) // creates if not found
 
 	// Connect to voice channel
 

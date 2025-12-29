@@ -53,11 +53,11 @@ func HandleWSConnections(Context *gin.Context) {
 
 	}
 
-	Guild := Structs.GetGuild(GuildID)
+	Guild := Structs.GetGuild(GuildID, false) // does not create if not found
 
 	if Guild == nil {
 
-		Context.JSON(http.StatusNotFound, gin.H{"Error": "Queue not found"})
+		Context.JSON(http.StatusNotFound, gin.H{"Error": "Guild not found"})
 		return
 
 	}

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Trash2, CornerDownRight, RefreshCw } from 'lucide-react';
 
 import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse } from './Types';
-import { NormalizeCoverURL, FormatTime, SendOperation, FetchLyrics } from './Utils/MIsc';
+import { NormalizeCoverURL, FormatTime, SendOperation, FetchLyrics } from './Utils/Misc';
 import { HandleProgressBarClick, HandleProgressBarMouseDown, HandleProgressBarTouchStart } from './Utils/Inputs';
 
 import DetailsView from './Views/Details';
@@ -102,7 +102,7 @@ function App() {
         const Params = window.location.href.split('/');
         const QueueID = Params[Params.length - 1].split('?')[0]; // ignores the query params
 
-        const WS = new WebSocket(`ws://localhost:3000/API/Queue?ID=${QueueID}`);
+        const WS = new WebSocket(`${import.meta.env.VITE_SERVER_URL}/API/Queue?ID=${QueueID}`);
 
         WS.onopen = () => {
 
