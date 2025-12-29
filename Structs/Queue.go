@@ -174,6 +174,8 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				State := Innertube.QueueInfo{
 
+					GuildID: Queue.ParentID,
+
 					SongPosition: 0,
 
 					TotalPrevious: len(Guild.Queue.Previous),

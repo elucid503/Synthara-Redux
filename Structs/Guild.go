@@ -194,8 +194,8 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 // Disconnect Closes the existing voice connection; if none exists, returns an error
 func (G *Guild) Disconnect(CloseConn bool) error {
 
-	// Maintain compatibility: delegate to centralized Cleanup implementation.
 	G.Internal.Disconnecting = true
+
 	return G.Cleanup(CloseConn)
 
 }
@@ -205,6 +205,8 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 
 	G.StreamerMutex.Lock()
 	defer G.StreamerMutex.Unlock()
+
+	Utils.Logger.Info(fmt.Sprintf("Cleaning up guild: %s", G.ID.String()))
 
 	G.Internal.Disconnecting = true
 

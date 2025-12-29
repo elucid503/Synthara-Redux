@@ -100,6 +100,8 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	State := Innertube.QueueInfo{
 
+		GuildID: GuildID,
+
 		SongPosition: Pos,
 
 		TotalPrevious: len(Guild.Queue.Previous),

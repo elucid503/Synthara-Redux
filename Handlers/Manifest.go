@@ -103,7 +103,30 @@ func InitializeCommands() {
 
 	}
 
-	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand, PauseCommand, ResumeCommand, NextCommand, LastCommand, SeekCommand})
+	// Lyrics Command 
+
+	LyricsCommand := discord.SlashCommandCreate{
+
+		Name:        "lyrics",
+		Description: "Get the lyrics for the currently playing song",
+
+	}
+
+	ControlsCommand := discord.SlashCommandCreate{
+
+		Name:        "controls",
+		Description: "Get playback controls",
+
+	}
+
+	QueueCommand := discord.SlashCommandCreate{
+
+		Name:        "queue",
+		Description: "View and edit the current song Queue",
+
+	}
+
+	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand, PauseCommand, ResumeCommand, NextCommand, LastCommand, SeekCommand, LyricsCommand, ControlsCommand, QueueCommand})
 
 	Utils.Logger.Info("Slash commands initialized.")
 
@@ -154,6 +177,18 @@ func InitializeHandlers() {
 				case "seek":
 
 					Commands.SeekCommand(Event)
+
+				case "lyrics":
+
+					Commands.LyricsCommand(Event)
+
+				case "controls":
+
+					Commands.ControlsCommand(Event)
+
+				case "queue":
+
+					Commands.QueueCommand(Event)
 
 			}
 

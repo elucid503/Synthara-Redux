@@ -3,8 +3,10 @@ package Innertube
 import (
 	"Synthara-Redux/Utils"
 	"fmt"
+	"os"
 
 	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/snowflake/v2"
 )
 
 type Song struct {
@@ -31,6 +33,8 @@ type Duration struct {
 }
 
 type QueueInfo struct {
+
+	GuildID snowflake.ID `json:"guild_id"`
 
 	SongPosition int `json:"song_position"`
 	TotalUpcoming  int `json:"total_upcoming"`
@@ -78,6 +82,9 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 
 	}
 
+	Page := fmt.Sprintf("%s/Queues/%s", os.Getenv("DOMAIN"), State.GuildID.String()) 
+	Embed.SetURL(Page)
+
 	Embed.SetThumbnail(S.Cover)
 
 	Description := fmt.Sprintf("On **%s**", S.Album)
@@ -87,11 +94,8 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 	Embed.AddField("Artists", ArtistNames, true)
 	Embed.AddField("Duration", fmt.Sprintf("%s Min", S.Duration.Formatted), true)
 	Embed.AddField(fmt.Sprintf("%s By", AddedState), S.Internal.Requestor, true)
-
-	TotalSongs := State.TotalPrevious + State.TotalUpcoming + 1
-	CurrentPosition := State.SongPosition + 1
 	
-	Embed.SetFooter(fmt.Sprintf("Song %d of %d in Queue", CurrentPosition, TotalSongs), "")
+	// Embed.SetFooter(fmt.Sprintf("%d %s in Queue • %d %s Played", State.TotalUpcoming, Utils.Pluralize("Song", State.TotalUpcoming), State.TotalPrevious, Utils.Pluralize("Song", State.TotalPrevious)), "") // no footer IconURL
 		
 	// Color 
 
