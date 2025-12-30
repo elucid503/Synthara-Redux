@@ -9,7 +9,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func LyricsCommand(Event *events.ApplicationCommandInteractionCreate) {
+func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 	GuildID := Event.GuildID()

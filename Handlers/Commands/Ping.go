@@ -7,7 +7,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func PingCommand(Event *events.ApplicationCommandInteractionCreate) {
+func Ping(Event *events.ApplicationCommandInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 

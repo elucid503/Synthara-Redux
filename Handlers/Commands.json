@@ -1,0 +1,371 @@
+[
+	{
+		"name": "ping",
+		"name_localizations": {
+			"en-US": "ping",
+			"en-GB": "ping",
+			"es-ES": "ping",
+			"es-419": "ping",
+			"zh-CN": "ping",
+			"fr": "ping",
+			"it": "ping",
+			"de": "ping",
+			"pl": "ping",
+			"ru": "пинг",
+			"ja": "ping"
+		},
+		"description": "Replies with Pong!",
+		"description_localizations": {
+			"en-US": "Replies with Pong!",
+			"en-GB": "Replies with Pong!",
+			"es-ES": "¡Responde con Pong!",
+			"es-419": "¡Responde con Pong!",
+			"zh-CN": "回复 乓！",
+			"fr": "Répond avec Pong !",
+			"it": "Risponde con Pong!",
+			"de": "Antwortet mit Pong!",
+			"pl": "Odpowiada Pong!",
+			"ru": "Отвечает «Понг!»",
+			"ja": "「ポン！」と返信します"
+		}
+	},
+	{
+		"name": "play",
+		"name_localizations": {
+			"en-US": "play",
+			"en-GB": "play",
+			"es-ES": "reproducir",
+			"es-419": "reproducir",
+			"zh-CN": "播放",
+			"fr": "jouer",
+			"it": "riproduci",
+			"de": "abspielen",
+			"pl": "odtwórz",
+			"ru": "играть",
+			"ja": "再生"
+		},
+		"description": "Search and play a song",
+		"description_localizations": {
+			"en-US": "Search and play a song",
+			"en-GB": "Search and play a song",
+			"es-ES": "Buscar y reproducir una canción",
+			"es-419": "Buscar y reproducir una canción",
+			"zh-CN": "搜索并播放歌曲",
+			"fr": "Rechercher et jouer une chanson",
+			"it": "Cerca e riproduci una canzone",
+			"de": "Suchen und Abspielen eines Liedes",
+			"pl": "Wyszukaj i odtwórz utwór",
+			"ru": "Найти и воспроизвести песню",
+			"ja": "曲を検索して再生する"
+		},
+		"options": [
+			{
+				"type": 3,
+				"name": "query",
+				"name_localizations": {
+					"en-US": "query",
+					"en-GB": "query",
+					"es-ES": "consulta",
+					"es-419": "consulta",
+					"zh-CN": "查询",
+					"fr": "requête",
+					"it": "query",
+					"de": "abfrage",
+					"pl": "zapytanie",
+					"ru": "запрос",
+					"ja": "クエリ"
+				},
+				"description": "The song to search for",
+				"description_localizations": {
+					"en-US": "The song to search for",
+					"en-GB": "The song to search for",
+					"es-ES": "La canción a buscar",
+					"es-419": "La canción a buscar",
+					"zh-CN": "要搜索的歌曲",
+					"fr": "La chanson à rechercher",
+					"it": "La canzone da cercare",
+					"de": "Das zu suchende Lied",
+					"pl": "Utwór do wyszukania",
+					"ru": "Песня для поиска",
+					"ja": "検索する曲"
+				},
+				"required": true,
+				"autocomplete": true
+			}
+		]
+	},
+	{
+		"name": "pause",
+		"name_localizations": {
+			"en-US": "pause",
+			"en-GB": "pause",
+			"es-ES": "pausar",
+			"es-419": "pausar",
+			"zh-CN": "暂停",
+			"fr": "pause",
+			"it": "pausa",
+			"de": "pausieren",
+			"pl": "pauza",
+			"ru": "пауза",
+			"ja": "一時停止"
+		},
+		"description": "Pauses the currently playing song",
+		"description_localizations": {
+			"en-US": "Pauses the currently playing song",
+			"en-GB": "Pauses the currently playing song",
+			"es-ES": "Pausa la canción que se está reproduciendo",
+			"es-419": "Pausa la canción que se está reproduciendo",
+			"zh-CN": "暂停当前播放的歌曲",
+			"fr": "Met en pause la chanson en cours",
+			"it": "Mette in pausa la canzone in riproduzione",
+			"de": "Pausiert das aktuell gespielte Lied",
+			"pl": "Wstrzymuje odtwarzany utwór",
+			"ru": "Приостанавливает воспроизведение текущей песни",
+			"ja": "現在再生中の曲を一時停止します"
+		}
+	},
+	{
+		"name": "resume",
+		"name_localizations": {
+			"en-US": "resume",
+			"en-GB": "resume",
+			"es-ES": "reanudar",
+			"es-419": "reanudar",
+			"zh-CN": "恢复",
+			"fr": "reprendre",
+			"it": "riprendi",
+			"de": "fortsetzen",
+			"pl": "wznów",
+			"ru": "продолжить",
+			"ja": "再開"
+		},
+		"description": "Resumes the currently paused song",
+		"description_localizations": {
+			"en-US": "Resumes the currently paused song",
+			"en-GB": "Resumes the currently paused song",
+			"es-ES": "Reanuda la canción pausada",
+			"es-419": "Reanuda la canción pausada",
+			"zh-CN": "恢复暂停的歌曲",
+			"fr": "Reprend la chanson en pause",
+			"it": "Riprende la canzone in pausa",
+			"de": "Setzt das pausierte Lied fort",
+			"pl": "Wznawia wstrzymany utwór",
+			"ru": "Возобновляет воспроизведение приостановленной песни",
+			"ja": "一時停止中の曲を再開します"
+		}
+	},
+	{
+		"name": "next",
+		"name_localizations": {
+			"en-US": "next",
+			"en-GB": "next",
+			"es-ES": "siguiente",
+			"es-419": "siguiente",
+			"zh-CN": "下一首",
+			"fr": "suivant",
+			"it": "prossimo",
+			"de": "weiter",
+			"pl": "następny",
+			"ru": "следующий",
+			"ja": "次"
+		},
+		"description": "Skips to the next song in the queue",
+		"description_localizations": {
+			"en-US": "Skips to the next song in the queue",
+			"en-GB": "Skips to the next song in the queue",
+			"es-ES": "Salta a la siguiente canción en la cola",
+			"es-419": "Salta a la siguiente canción en la cola",
+			"zh-CN": "跳到队列中的下一首歌曲",
+			"fr": "Passe à la chanson suivante dans la file d'attente",
+			"it": "Passa alla canzone successiva nella coda",
+			"de": "Springt zum nächsten Lied in der Warteschlange",
+			"pl": "Przechodzi do następnego utworu w kolejce",
+			"ru": "Переходит к следующей песне в очереди",
+			"ja": "キューの次の曲にスキップします"
+		}
+	},
+	{
+		"name": "last",
+		"name_localizations": {
+			"en-US": "last",
+			"en-GB": "last",
+			"es-ES": "anterior",
+			"es-419": "anterior",
+			"zh-CN": "上一首",
+			"fr": "précédent",
+			"it": "precedente",
+			"de": "vorherige",
+			"pl": "poprzedni",
+			"ru": "предыдущий",
+			"ja": "前"
+		},
+		"description": "Plays the previously played song",
+		"description_localizations": {
+			"en-US": "Plays the previously played song",
+			"en-GB": "Plays the previously played song",
+			"es-ES": "Reproduce la canción reproducida anteriormente",
+			"es-419": "Reproduce la canción reproducida anteriormente",
+			"zh-CN": "播放上一首歌曲",
+			"fr": "Joue la chanson précédemment jouée",
+			"it": "Riproduce la canzone riprodotta in precedenza",
+			"de": "Spielt das zuvor gespielte Lied",
+			"pl": "Odtwarza poprzednio odtwarzany utwór",
+			"ru": "Воспроизводит предыдущую песню",
+			"ja": "前に再生した曲を再生します"
+		}
+	},
+	{
+		"name": "seek",
+		"name_localizations": {
+			"en-US": "seek",
+			"en-GB": "seek",
+			"es-ES": "buscar",
+			"es-419": "buscar",
+			"zh-CN": "跳转",
+			"fr": "chercher",
+			"it": "cerca",
+			"de": "spulen",
+			"pl": "przewiń",
+			"ru": "перемотать",
+			"ja": "シーク"
+		},
+		"description": "Seek forward or backward in the current song",
+		"description_localizations": {
+			"en-US": "Seek forward or backward in the current song",
+			"en-GB": "Seek forward or backward in the current song",
+			"es-ES": "Avanza o retrocede en la canción actual",
+			"es-419": "Avanza o retrocede en la canción actual",
+			"zh-CN": "在当前歌曲中向前或向后跳转",
+			"fr": "Avancer ou reculer dans la chanson actuelle",
+			"it": "Avanza o torna indietro nella canzone corrente",
+			"de": "Vor- oder Zurückspulen im aktuellen Lied",
+			"pl": "Przewiń do przodu lub do tyłu w bieżącym utworze",
+			"ru": "Перемотать вперёд или назад в текущей песне",
+			"ja": "現在の曲を早送りまたは巻き戻しします"
+		},
+		"options": [
+			{
+				"type": 4,
+				"name": "offset",
+				"name_localizations": {
+					"en-US": "offset",
+					"en-GB": "offset",
+					"es-ES": "desplazamiento",
+					"es-419": "desplazamiento",
+					"zh-CN": "偏移量",
+					"fr": "décalage",
+					"it": "offset",
+					"de": "versatz",
+					"pl": "przesunięcie",
+					"ru": "смещение",
+					"ja": "オフセット"
+				},
+				"description": "Seconds to seek (positive = forward, negative = backward)",
+				"description_localizations": {
+					"en-US": "Seconds to seek (positive = forward, negative = backward)",
+					"en-GB": "Seconds to seek (positive = forward, negative = backward)",
+					"es-ES": "Segundos a buscar (positivo = adelante, negativo = atrás)",
+					"es-419": "Segundos a buscar (positivo = adelante, negativo = atrás)",
+					"zh-CN": "跳转秒数（正数 = 前进，负数 = 后退）",
+					"fr": "Secondes à rechercher (positif = avancer, négatif = reculer)",
+					"it": "Secondi da cercare (positivo = avanti, negativo = indietro)",
+					"de": "Zu suchende Sekunden (positiv = vorwärts, negativ = rückwärts)",
+					"pl": "Sekundy do przewinięcia (dodatnie = do przodu, ujemne = do tyłu)",
+					"ru": "Секунды для перемотки (положительное = вперёд, отрицательное = назад)",
+					"ja": "シークする秒数（正 = 前方、負 = 後方）"
+				},
+				"required": true
+			}
+		]
+	},
+	{
+		"name": "lyrics",
+		"name_localizations": {
+			"en-US": "lyrics",
+			"en-GB": "lyrics",
+			"es-ES": "letra",
+			"es-419": "letra",
+			"zh-CN": "歌词",
+			"fr": "paroles",
+			"it": "testo",
+			"de": "liedtext",
+			"pl": "tekst",
+			"ru": "текст",
+			"ja": "歌詞"
+		},
+		"description": "Get the lyrics for the currently playing song",
+		"description_localizations": {
+			"en-US": "Get the lyrics for the currently playing song",
+			"en-GB": "Get the lyrics for the currently playing song",
+			"es-ES": "Obtener la letra de la canción que se está reproduciendo",
+			"es-419": "Obtener la letra de la canción que se está reproduciendo",
+			"zh-CN": "获取当前播放歌曲的歌词",
+			"fr": "Obtenir les paroles de la chanson en cours",
+			"it": "Ottieni il testo della canzone in riproduzione",
+			"de": "Liedtext des aktuell gespielten Liedes abrufen",
+			"pl": "Uzyskaj tekst odtwarzanego utworu",
+			"ru": "Получить текст текущей песни",
+			"ja": "現在再生中の曲の歌詞を取得します"
+		}
+	},
+	{
+		"name": "controls",
+		"name_localizations": {
+			"en-US": "controls",
+			"en-GB": "controls",
+			"es-ES": "controles",
+			"es-419": "controles",
+			"zh-CN": "控制",
+			"fr": "contrôles",
+			"it": "controlli",
+			"de": "steuerung",
+			"pl": "sterowanie",
+			"ru": "управление",
+			"ja": "コントロール"
+		},
+		"description": "Get playback controls",
+		"description_localizations": {
+			"en-US": "Get playback controls",
+			"en-GB": "Get playback controls",
+			"es-ES": "Obtener controles de reproducción",
+			"es-419": "Obtener controles de reproducción",
+			"zh-CN": "获取播放控制",
+			"fr": "Obtenir les contrôles de lecture",
+			"it": "Ottieni i controlli di riproduzione",
+			"de": "Wiedergabesteuerung abrufen",
+			"pl": "Uzyskaj sterowanie odtwarzaniem",
+			"ru": "Получить элементы управления воспроизведением",
+			"ja": "再生コントロールを取得します"
+		}
+	},
+	{
+		"name": "queue",
+		"name_localizations": {
+			"en-US": "queue",
+			"en-GB": "queue",
+			"es-ES": "cola",
+			"es-419": "cola",
+			"zh-CN": "队列",
+			"fr": "file",
+			"it": "coda",
+			"de": "warteschlange",
+			"pl": "kolejka",
+			"ru": "очередь",
+			"ja": "キュー"
+		},
+		"description": "View and edit the current song Queue",
+		"description_localizations": {
+			"en-US": "View and edit the current song Queue",
+			"en-GB": "View and edit the current song Queue",
+			"es-ES": "Ver y editar la cola de canciones actual",
+			"es-419": "Ver y editar la cola de canciones actual",
+			"zh-CN": "查看和编辑当前歌曲队列",
+			"fr": "Voir et modifier la file d'attente des chansons",
+			"it": "Visualizza e modifica la coda delle canzoni corrente",
+			"de": "Aktuelle Lied-Warteschlange anzeigen und bearbeiten",
+			"pl": "Zobacz i edytuj bieżącą kolejkę utworów",
+			"ru": "Просмотреть и изменить текущую очередь песен",
+			"ja": "現在の曲のキューを表示および編集します"
+		}
+	}
+]

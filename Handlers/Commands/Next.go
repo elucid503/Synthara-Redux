@@ -8,7 +8,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func NextCommand(Event *events.ApplicationCommandInteractionCreate) {
+func Next(Event *events.ApplicationCommandInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()

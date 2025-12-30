@@ -8,7 +8,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func PauseCommand(Event *events.ApplicationCommandInteractionCreate) {
+func Pause(Event *events.ApplicationCommandInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()

@@ -10,7 +10,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
+func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 

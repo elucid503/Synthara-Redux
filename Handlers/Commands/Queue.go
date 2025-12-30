@@ -9,7 +9,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func QueueCommand(Event *events.ApplicationCommandInteractionCreate) {
+func Queue(Event *events.ApplicationCommandInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 	GuildID := Event.GuildID()

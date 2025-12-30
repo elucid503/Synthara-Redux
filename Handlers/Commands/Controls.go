@@ -9,7 +9,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func ControlsCommand(Event *events.ApplicationCommandInteractionCreate) {
+func Conrols(Event *events.ApplicationCommandInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 	GuildID := Event.GuildID()

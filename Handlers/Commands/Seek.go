@@ -10,7 +10,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
+func Seek(Event *events.ApplicationCommandInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 

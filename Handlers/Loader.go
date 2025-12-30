@@ -7,127 +7,74 @@ import (
 	"Synthara-Redux/Handlers/Commands"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
 )
 
+type CommandEntry struct {
+
+	Name                     string                                        `json:"name"`
+	NameLocalizations        map[discord.Locale]string                     `json:"name_localizations,omitempty"`
+	
+	Description              string                                        `json:"description"`
+	DescriptionLocalizations map[discord.Locale]string                     `json:"description_localizations,omitempty"`
+	
+	Options                  []discord.UnmarshalApplicationCommandOption  `json:"options,omitempty"`
+
+}
+
 func InitializeCommands() {
 
-	// Ping Command
+	File, ErrorReading := os.ReadFile("Handlers/Commands.json")
 
-	PingCommand := discord.SlashCommandCreate{
+	if ErrorReading != nil {
 
-		Name:        "ping",
-		Description: "Replies with Pong!",
-
-	}
-
-	// Play Command
-
-	PlayCommand := discord.SlashCommandCreate{
-
-		Name:        "play",
-		Description: "Search and play a song",
-
-		Options: []discord.ApplicationCommandOption{
-
-			discord.ApplicationCommandOptionString{
-
-				Name:        "query",
-				Description: "The song to search for",
-				Required:    true,
-				Autocomplete: true,
-
-			},
-
-		},
+		Utils.Logger.Error("Failed to read Commands.json: " + ErrorReading.Error())
 
 	}
 
-	// Pause Command
+	var Manifest []CommandEntry
 
-	PauseCommand := discord.SlashCommandCreate{
+	ErrorUnmarshaling := json.Unmarshal(File, &Manifest)
 
-		Name:        "pause",
-		Description: "Pauses the currently playing song",
+	if ErrorUnmarshaling != nil {
 
-	}
-
-	// Resume Command 
-
-	ResumeCommand := discord.SlashCommandCreate{
-
-		Name:        "resume",
-		Description: "Resumes the currently paused song",
+		Utils.Logger.Error("Failed to unmarshal Commands.json: " + ErrorUnmarshaling.Error())
 
 	}
 
-	// Next Command
+	CommandsToRegister := make([]discord.ApplicationCommandCreate, len(Manifest))
 
-	NextCommand := discord.SlashCommandCreate{
+	for Index, Command := range Manifest {
 
-		Name:        "next",
-		Description: "Skips to the next song in the queue",
+		// Converts UnmarshalApplicationCommandOption to ApplicationCommandOption
 
-	}
+		Options := make([]discord.ApplicationCommandOption, len(Command.Options))
 
-	// Last Command
+		for i, opt := range Command.Options {
 
-	LastCommand := discord.SlashCommandCreate{
+			Options[i] = opt.ApplicationCommandOption
+			
+		}
 
-		Name:        "last",
-		Description: "Plays the previously played song",
+		CommandsToRegister[Index] = discord.SlashCommandCreate{
 
-	}
+			Name:                     Command.Name,
+			NameLocalizations:        Command.NameLocalizations,
+			Description:              Command.Description,
+			DescriptionLocalizations: Command.DescriptionLocalizations,
+			Options:                  Options,
 
-	// Seek Command
-
-	SeekCommand := discord.SlashCommandCreate{
-
-		Name:        "seek",
-		Description: "Seek forward or backward in the current song",
-
-		Options: []discord.ApplicationCommandOption{
-
-			discord.ApplicationCommandOptionInt{
-
-				Name:        "offset",
-				Description: "Seconds to seek (positive = forward, negative = backward)",
-				Required:    true,
-
-			},
-
-		},
+		}
 
 	}
 
-	// Lyrics Command 
-
-	LyricsCommand := discord.SlashCommandCreate{
-
-		Name:        "lyrics",
-		Description: "Get the lyrics for the currently playing song",
-
-	}
-
-	ControlsCommand := discord.SlashCommandCreate{
-
-		Name:        "controls",
-		Description: "Get playback controls",
-
-	}
-
-	QueueCommand := discord.SlashCommandCreate{
-
-		Name:        "queue",
-		Description: "View and edit the current song Queue",
-
-	}
-
-	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, []discord.ApplicationCommandCreate{PingCommand, PlayCommand, PauseCommand, ResumeCommand, NextCommand, LastCommand, SeekCommand, LyricsCommand, ControlsCommand, QueueCommand})
+	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, CommandsToRegister)
 
 	Utils.Logger.Info("Slash commands initialized.")
 
@@ -148,48 +95,50 @@ func InitializeHandlers() {
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.ApplicationCommandInteractionCreate) {
 
 		go func ()  {
+
+			// Switching for each command; not really a better way to do this
 			
 			switch Event.Data.CommandName() {
 
 				case "ping":
 
-					Commands.PingCommand(Event)
+					Commands.Ping(Event)
 
 				case "play":
 
-					Commands.PlayCommand(Event)
+					Commands.Play(Event)
 
 				case "pause":
 
-					Commands.PauseCommand(Event)
+					Commands.Pause(Event)
 
 				case "resume": 
 
-					Commands.ResumeCommand(Event)
+					Commands.Resume(Event)
 
 				case "next":
 
-					Commands.NextCommand(Event)
+					Commands.Next(Event)
 
 				case "last":
 
-					Commands.LastCommand(Event)
+					Commands.Last(Event)
 
 				case "seek":
 
-					Commands.SeekCommand(Event)
+					Commands.Seek(Event)
 
 				case "lyrics":
 
-					Commands.LyricsCommand(Event)
+					Commands.Lyrics(Event)
 
 				case "controls":
 
-					Commands.ControlsCommand(Event)
+					Commands.Conrols(Event)
 
 				case "queue":
 
-					Commands.QueueCommand(Event)
+					Commands.Queue(Event)
 
 			}
 
