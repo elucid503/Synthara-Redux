@@ -1,6 +1,7 @@
 package Commands
 
 import (
+	"Synthara-Redux/Globals/Localizations"
 	"fmt"
 	"os"
 
@@ -10,13 +11,14 @@ import (
 
 func QueueCommand(Event *events.ApplicationCommandInteractionCreate) {
 
+	Locale := Event.Locale().Code()
 	GuildID := Event.GuildID()
 
 	Page := fmt.Sprintf("%s/Queues/%s?View=Queue", os.Getenv("DOMAIN"), GuildID.String()) 
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Content: fmt.Sprintf("View/Edit the Queue [here](%s)", Page),
+		Content: Localizations.GetFormat("Commands.Queue.Success", Locale, Page),
 
 	})
 

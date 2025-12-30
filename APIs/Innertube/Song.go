@@ -1,6 +1,7 @@
 package Innertube
 
 import (
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Utils"
 	"fmt"
 	"os"
@@ -36,9 +37,11 @@ type QueueInfo struct {
 
 	GuildID snowflake.ID `json:"guild_id"`
 
-	SongPosition int `json:"song_position"`
-	TotalUpcoming  int `json:"total_upcoming"`
+	SongPosition  int `json:"song_position"`
+	TotalUpcoming int `json:"total_upcoming"`
 	TotalPrevious int `json:"total_previous"`
+
+	Locale string `json:"locale"`
 	
 }
 
@@ -50,17 +53,26 @@ type SongInternal struct {
 
 func (S *Song) Embed(State QueueInfo) discord.Embed {
 
+	Locale := State.Locale
+
+	if Locale == "" {
+
+		Locale = Localizations.Default
+
+	}
+
 	Embed := discord.NewEmbedBuilder()
 
 	Embed.SetTitle(S.Title)
 
-	AuthorName := "Now Playing"
-	AddedState := "Played"
+	AuthorName := Localizations.Get("Embeds.NowPlaying.AuthorNowPlaying", Locale)
+	AddedState := Localizations.Get("Embeds.NowPlaying.StatePlayedBy", Locale)
 
 	if State.SongPosition > 0 { 
 
-		AuthorName = fmt.Sprintf("%d %s Away", State.SongPosition, Utils.Pluralize("Song", State.SongPosition))
-		AddedState = "Enqueued"
+		SongWord := Localizations.Pluralize("Song", State.SongPosition, Locale)
+		AuthorName = Localizations.GetFormat("Embeds.NowPlaying.AuthorSongsAway", Locale, State.SongPosition, SongWord)
+		AddedState = Localizations.Get("Embeds.NowPlaying.StateEnqueuedBy", Locale)
 
 	}
 
@@ -87,16 +99,14 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 
 	Embed.SetThumbnail(S.Cover)
 
-	Description := fmt.Sprintf("On **%s**", S.Album)
+	Description := Localizations.GetFormat("Embeds.NowPlaying.DescriptionOnAlbum", Locale, S.Album)
 
 	Embed.SetDescription(Description)
 
-	Embed.AddField("Artists", ArtistNames, true)
-	Embed.AddField("Duration", fmt.Sprintf("%s Min", S.Duration.Formatted), true)
-	Embed.AddField(fmt.Sprintf("%s By", AddedState), S.Internal.Requestor, true)
+	Embed.AddField(Localizations.Get("Embeds.NowPlaying.FieldArtists", Locale), ArtistNames, true)
+	Embed.AddField(Localizations.Get("Embeds.NowPlaying.FieldDuration", Locale), Localizations.GetFormat("Embeds.NowPlaying.DurationFormat", Locale, S.Duration.Formatted), true)
+	Embed.AddField(AddedState, S.Internal.Requestor, true)
 	
-	// Embed.SetFooter(fmt.Sprintf("%d %s in Queue • %d %s Played", State.TotalUpcoming, Utils.Pluralize("Song", State.TotalUpcoming), State.TotalPrevious, Utils.Pluralize("Song", State.TotalPrevious)), "") // no footer IconURL
-		
 	// Color 
 
 	DominantColor, ColorFetchError := Utils.GetDominantColorHex(S.Cover)

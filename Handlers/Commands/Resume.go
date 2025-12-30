@@ -1,6 +1,7 @@
 package Commands
 
 import (
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 
 	"github.com/disgoorg/disgo/discord"
@@ -9,6 +10,7 @@ import (
 
 func ResumeCommand(Event *events.ApplicationCommandInteractionCreate) {
 
+	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
 
 	Guild := Structs.GetGuild(GuildID, false) // does not create if not found
@@ -17,7 +19,7 @@ func ResumeCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "No active playback session found!",
+			Content: Localizations.Get("Commands.Resume.Errors.NoSession", Locale),
 
 		})
 
@@ -29,7 +31,7 @@ func ResumeCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	Event.CreateMessage(discord.MessageCreate{
 		
-		Content: "Resumed the currently paused song",
+		Content: Localizations.Get("Commands.Resume.Success", Locale),
 		
 	})
 	

@@ -1,6 +1,7 @@
 package Commands
 
 import (
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 
 	"github.com/disgoorg/disgo/discord"
@@ -9,6 +10,7 @@ import (
 
 func NextCommand(Event *events.ApplicationCommandInteractionCreate) {
 
+	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
 
 	Guild := Structs.GetGuild(GuildID, false) // does not create if not found
@@ -17,7 +19,7 @@ func NextCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "No active playback session found!",
+			Content: Localizations.Get("Commands.Next.Errors.NoSession", Locale),
 
 		})
 
@@ -31,7 +33,7 @@ func NextCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "There is no next song in the queue",
+			Content: Localizations.Get("Commands.Next.Errors.NoNextSong", Locale),
 
 		})
 
@@ -41,7 +43,7 @@ func NextCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Content: "Skipped to the next song",
+		Content: Localizations.Get("Commands.Next.Success", Locale),
 
 	})
 

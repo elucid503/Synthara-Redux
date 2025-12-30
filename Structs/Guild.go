@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/voice"
 	"github.com/disgoorg/snowflake/v2"
 	"github.com/gorilla/websocket"
@@ -22,6 +23,7 @@ var GuildStoreMutex sync.Mutex
 type Guild struct {
 
 	ID snowflake.ID `json:"id"`
+	Locale discord.Locale `json:"locale"`
 
 	Queue Queue `json:"queue"`
 
@@ -67,11 +69,12 @@ type GuildInternal struct {
 }
 
 // NewGuild Creates a new Guild instance
-func NewGuild(ID snowflake.ID) *Guild {
+func NewGuild(ID snowflake.ID, Locale discord.Locale) *Guild {
 
 	Created := &Guild{
 
 		ID:   ID,
+		Locale: Locale,
 
 		Queue: Queue{
 
@@ -141,7 +144,21 @@ func GetGuild(ID snowflake.ID, Create bool) *Guild {
 		
 	} else if Create {
 
-		return NewGuild(ID)
+		GuildInstance, ExistsInCache := Globals.DiscordClient.Caches.GuildCache().Get(ID)
+
+		if !ExistsInCache {
+
+			FetchedGuild, ErrorFetching := Globals.DiscordClient.Rest.GetGuild(ID, false)
+
+			if ErrorFetching == nil {
+
+				GuildInstance = FetchedGuild.Guild
+
+			}
+
+		}
+
+		return NewGuild(ID, discord.Locale(GuildInstance.PreferredLocale))
 
 	} else {
 

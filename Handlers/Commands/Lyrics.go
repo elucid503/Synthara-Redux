@@ -1,6 +1,7 @@
 package Commands
 
 import (
+	"Synthara-Redux/Globals/Localizations"
 	"fmt"
 	"os"
 
@@ -10,13 +11,14 @@ import (
 
 func LyricsCommand(Event *events.ApplicationCommandInteractionCreate) {
 
+	Locale := Event.Locale().Code()
 	GuildID := Event.GuildID()
 
 	Page := fmt.Sprintf("%s/Queues/%s?View=Lyrics", os.Getenv("DOMAIN"), GuildID.String()) 
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Content: fmt.Sprintf("View the lyrics [here](%s)", Page),
+		Content: Localizations.GetFormat("Commands.Lyrics.Success", Locale, Page),
 
 	})
 

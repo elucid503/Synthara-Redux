@@ -3,6 +3,7 @@ package main
 import (
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/Globals"
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Handlers"
 	"Synthara-Redux/Server"
 	"Synthara-Redux/Utils"
@@ -17,6 +18,17 @@ func main() {
 	godotenv.Load(".env")
 
 	Utils.Logger.Info("Starting Synthara-Redux...")
+
+	LocalizationErr := Localizations.Initialize()
+
+	if LocalizationErr != nil {
+
+		Utils.Logger.Error(fmt.Sprintf("Failed to initialize/read localizations: %s", LocalizationErr.Error()))
+		os.Exit(1)
+
+	}
+
+	Utils.Logger.Info("Localizations loaded.")
 
 	InitErr := Globals.InitDiscordClient()
 

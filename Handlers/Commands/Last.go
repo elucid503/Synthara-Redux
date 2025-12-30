@@ -1,6 +1,7 @@
 package Commands
 
 import (
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 
 	"github.com/disgoorg/disgo/discord"
@@ -9,6 +10,7 @@ import (
 
 func LastCommand(Event *events.ApplicationCommandInteractionCreate) {
 
+	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
 
 	Guild := Structs.GetGuild(GuildID, false) // does not create if not found
@@ -19,7 +21,7 @@ func LastCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "There is no previously played song",
+			Content: Localizations.Get("Commands.Last.Errors.NoPreviousSong", Locale),
 
 		})
 
@@ -29,7 +31,7 @@ func LastCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Content: "Playing the previous song",
+		Content: Localizations.Get("Commands.Last.Success", Locale),
 
 	})
 

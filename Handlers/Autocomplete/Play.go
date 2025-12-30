@@ -2,6 +2,7 @@ package Autocomplete
 
 import (
 	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Utils"
 	"fmt"
 	"strings"
@@ -12,6 +13,7 @@ import (
 
 func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 
+	Locale := Event.Locale().Code()
 	Input := Event.Data.String("query");
 
 	if len(Input) < 3 {
@@ -20,8 +22,8 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 			
 			discord.AutocompleteChoiceString{
 
-				Name:  "Input must be at least 3 characters long",
-				Value: "N/A",
+				Name:  Localizations.Get("Autocomplete.Play.InputTooShort", Locale),
+				Value: Localizations.Get("Autocomplete.Play.Placeholder", Locale),
 			},
 
 		})
@@ -38,8 +40,8 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 			
 			discord.AutocompleteChoiceString{
 
-				Name:  "No suggestions found",
-				Value: "N/A",
+				Name:  Localizations.Get("Autocomplete.Play.NoSuggestions", Locale),
+				Value: Localizations.Get("Autocomplete.Play.Placeholder", Locale),
 
 			},
 

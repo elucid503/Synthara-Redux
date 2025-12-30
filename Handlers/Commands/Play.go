@@ -2,6 +2,7 @@ package Commands
 
 import (
 	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
 
@@ -10,6 +11,8 @@ import (
 )
 
 func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
+
+	Locale := Event.Locale().Code()
 
 	// Get the search query from command options
 
@@ -20,7 +23,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content:"Please provide a search query!",
+			Content: Localizations.Get("Commands.Play.Errors.NoQuery", Locale),
 
 		})
 
@@ -34,7 +37,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "You must be in a guild to use this command!",
+			Content: Localizations.Get("Commands.Play.Errors.NotInGuild", Locale),
 
 		})
 
@@ -50,7 +53,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "You must be in a voice channel to use this command!",
+			Content: Localizations.Get("Commands.Play.Errors.NotInVoiceChannel", Locale),
 
 		})
 
@@ -68,7 +71,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "No results were found for your query!",
+			Content: Localizations.Get("Commands.Play.Errors.NoResults", Locale),
 
 		})
 
@@ -86,7 +89,7 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "Failed to connect to voice channel: " + ErrorConnecting.Error(),
+			Content: Localizations.GetFormat("Commands.Play.Errors.FailedToConnect", Locale, ErrorConnecting.Error()),
 
 		})
 
@@ -106,6 +109,8 @@ func PlayCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		TotalPrevious: len(Guild.Queue.Previous),
 		TotalUpcoming: len(Guild.Queue.Upcoming),
+
+		Locale: Locale,
 
 	}
 

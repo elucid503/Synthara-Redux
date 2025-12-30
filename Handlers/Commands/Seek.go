@@ -1,6 +1,7 @@
 package Commands
 
 import (
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
 	"fmt"
@@ -11,6 +12,8 @@ import (
 
 func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
 
+	Locale := Event.Locale().Code()
+
 	// Get the offset from command options
 
 	Data := Event.SlashCommandInteractionData()
@@ -20,7 +23,7 @@ func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "Please provide a seek offset in seconds (e.g., 10 to skip forward, -10 to go back)!",
+			Content: Localizations.Get("Commands.Seek.Errors.NoOffset", Locale),
 
 		})
 
@@ -34,7 +37,7 @@ func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "You must be in a guild to use this command!",
+			Content: Localizations.Get("Commands.Seek.Errors.NotInGuild", Locale),
 
 		})
 
@@ -52,7 +55,7 @@ func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "No active playback session found!",
+			Content: Localizations.Get("Commands.Seek.Errors.NoSession", Locale),
 
 		})
 
@@ -66,7 +69,7 @@ func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "No song is currently playing!",
+			Content: Localizations.Get("Commands.Seek.Errors.NoSongPlaying", Locale),
 
 		})
 
@@ -82,7 +85,7 @@ func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "You must be in a voice channel to use this command!",
+			Content: Localizations.Get("Commands.Seek.Errors.NotInVoiceChannel", Locale),
 
 		})
 
@@ -94,7 +97,7 @@ func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: "You must be in the same voice channel as the bot!",
+			Content: Localizations.Get("Commands.Seek.Errors.NotInSameChannel", Locale),
 
 		})
 
@@ -112,7 +115,7 @@ func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: fmt.Sprintf("Failed to seek: %s", ErrorSeeking.Error()),
+			Content: Localizations.GetFormat("Commands.Seek.Errors.SeekFailed", Locale, ErrorSeeking.Error()),
 
 		})
 
@@ -122,19 +125,19 @@ func SeekCommand(Event *events.ApplicationCommandInteractionCreate) {
 
 	// Send success message
 
-	Direction := "forward"
+	Direction := Localizations.Get("Commands.Seek.Directions.Forward", Locale)
 	AbsOffset := Offset
 
 	if Offset < 0 {
 
-		Direction = "backward"
+		Direction = Localizations.Get("Commands.Seek.Directions.Backward", Locale)
 		AbsOffset = -Offset
 
 	}
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Content: fmt.Sprintf("Seeked %s by %d seconds!", Direction, AbsOffset),
+		Content: Localizations.GetFormat("Commands.Seek.Success", Locale, Direction, AbsOffset),
 
 	})
 

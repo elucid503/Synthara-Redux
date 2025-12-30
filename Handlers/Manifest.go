@@ -2,6 +2,7 @@ package Handlers
 
 import (
 	"Synthara-Redux/Globals"
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Handlers/Autocomplete"
 	"Synthara-Redux/Handlers/Commands"
 	"Synthara-Redux/Structs"
@@ -244,13 +245,13 @@ func InitializeHandlers() {
 
 					Embeds: []discord.Embed{{
 
-						Title: "Manually Disconnected",
-						Description: "The Queue has been reset.",
-						Color: 0xFFFFFF, // White
+						Title:       Localizations.Get("Embeds.Notifications.ManualDisconnect.Title", Guild.Locale.Code()),
+						Description: Localizations.Get("Embeds.Notifications.ManualDisconnect.Description", Guild.Locale.Code()),
+						Color:       0xFFFFFF, // White
 						
 						Author: &discord.EmbedAuthor{
 
-							Name: "Notifications",
+							Name: Localizations.Get("Embeds.Notifications.Author", Guild.Locale.Code()),
 
 						},
 

@@ -4,6 +4,7 @@ import (
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/Audio"
 	"Synthara-Redux/Globals"
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Utils"
 	"fmt"
 	"sync"
@@ -181,6 +182,8 @@ func QueueStateHandler(Queue *Queue, State int) {
 					TotalPrevious: len(Guild.Queue.Previous),
 					TotalUpcoming: len(Guild.Queue.Upcoming),
 
+					Locale: Guild.Locale.Code(),
+
 				}
 
 				go func() { // we don't need to wait for this...
@@ -225,13 +228,13 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 						Embeds: []discord.Embed{{
 
-							Title: "Queue Ended",
-							Description: "The playback Queue has finished.\nNew songs may be added at any time.",
-							Color: 0xFFFFFF, // White
+							Title:       Localizations.Get("Embeds.Notifications.QueueEnded.Title", Guild.Locale.Code()),
+							Description: Localizations.Get("Embeds.Notifications.QueueEnded.Description", Guild.Locale.Code()),
+							Color:       0xFFFFFF, // White
 							
 							Author: &discord.EmbedAuthor{
 
-								Name: "Notifications",
+								Name: Localizations.Get("Embeds.Notifications.Author", Guild.Locale.Code()),
 
 							},
 
