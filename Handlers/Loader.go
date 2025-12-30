@@ -18,19 +18,19 @@ import (
 
 type CommandEntry struct {
 
-	Name                     string                                        `json:"name"`
-	NameLocalizations        map[discord.Locale]string                     `json:"name_localizations,omitempty"`
+	Name string `json:"name"`
+	NameLocalizations map[discord.Locale]string `json:"name_localizations,omitempty"`
 	
-	Description              string                                        `json:"description"`
-	DescriptionLocalizations map[discord.Locale]string                     `json:"description_localizations,omitempty"`
+	Description string `json:"description"`
+	DescriptionLocalizations map[discord.Locale]string `json:"description_localizations,omitempty"`
 	
-	Options                  []discord.UnmarshalApplicationCommandOption  `json:"options,omitempty"`
+	Options []discord.UnmarshalApplicationCommandOption `json:"options,omitempty"`
 
 }
 
 func InitializeCommands() {
 
-	File, ErrorReading := os.ReadFile("Handlers/Commands.json")
+	File, ErrorReading := os.ReadFile("./Handlers/Commands.json")
 
 	if ErrorReading != nil {
 
