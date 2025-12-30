@@ -40,53 +40,53 @@ func Get(Path string, Locale string) string {
 
 	Current := Manifest
 
-	for i, Key := range Keys {
+	if len(Keys) == 0 {
 
-		if i == (len(Keys) - 1) {
-
-			// Last key - should be the locale map
-
-			if LocaleMap, Valid := Current[Key].(map[string]interface{}); Valid {
-
-				// Tries requested locale
-
-				if Value, Exists := LocaleMap[Locale].(string); Exists {
-
-					return Value
-
-				}
-
-				// Fallbacks to 'default' locale
-
-				if Value, Exists := LocaleMap[Default].(string); Exists {
-
-					return Value
-
-				}
-
-				return fmt.Sprintf("[Missing: %s]", Path)
-
-			}
-
-			return fmt.Sprintf("[Invalid: %s]", Path)
-
-		}
-
-		// Attempts to traverse deeper
-
-		if Next, Valid := Current[Key].(map[string]interface{}); Valid {
-
-			Current = Next
-
-		} else {
-
-			return fmt.Sprintf("[NotFound: %s]", Path)
-
-		}
+		return fmt.Sprintf("[Error: %s]", Path)
 
 	}
 
-	return fmt.Sprintf("[Error: %s]", Path)
+	// Traverses to parent of final key
+
+	for _, Key := range Keys[:len(Keys)-1] { // All but last key
+
+		Next, Valid := Current[Key].(map[string]interface{})
+
+		if !Valid {
+
+			return fmt.Sprintf("[NotFound: %s]", Path) // Key not found at this level
+
+		}
+
+		Current = Next
+
+	}
+
+	// Final key should be locale map
+
+	Last := Keys[len(Keys)-1]
+
+	LocaleMap, Valid := Current[Last].(map[string]interface{})
+
+	if !Valid {
+
+		return fmt.Sprintf("[Invalid: %s]", Path) // Key not found at final level
+
+	}
+
+	if Value, Exists := LocaleMap[Locale].(string); Exists {
+
+		return Value // Found specific locale
+
+	}
+
+	if Value, Exists := LocaleMap[Default].(string); Exists {
+
+		return Value // Fallback to default locale
+
+	}
+
+	return fmt.Sprintf("[Missing: %s]", Path) // Nothing found
 
 }
 
