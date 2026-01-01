@@ -38,16 +38,6 @@ func InitWebServer() {
 
 	WebServer.Static("/assets", "./Web/dist/assets")
 
-	// CORS responses 
-
-	WebServer.Use(func(Context *gin.Context) {
-
-		Context.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		Context.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE, PATCH")
-		Context.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
-	
-	})
-
 }
 
 func ConnectDiscordClient() error {
