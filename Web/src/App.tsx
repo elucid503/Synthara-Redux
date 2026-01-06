@@ -310,7 +310,7 @@ function App() {
 
                     {/* Bar Track */}
 
-                    <div className="relative w-full h-1 bg-zinc-700 rounded-full cursor-pointer overflow-hidden">
+                    <div className="relative w-full h-1 bg-zinc-700 rounded-full overflow-hidden">
                     
                     {/* Bar Fill */}
                     
