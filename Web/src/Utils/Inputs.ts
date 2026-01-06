@@ -11,17 +11,17 @@ export const CalculateTimeFromPosition = (ClientX: number, Rect: DOMRect, Durati
 };
 
 // Handles click events on progress bar
-export const HandleProgressBarClick = (Event: React.MouseEvent<HTMLDivElement>, DurationSeconds: number, OnSeek: (time: number) => void ) => {
+export const HandleProgressBarClick = (Event: React.MouseEvent<HTMLDivElement>, DurationSeconds: number, OnTimeUpdate: (time: number) => void ) => {
    
     const Rect = Event.currentTarget.getBoundingClientRect();
     const NewTime = CalculateTimeFromPosition(Event.clientX, Rect, DurationSeconds);
 
-    OnSeek(Math.floor(NewTime));
+    OnTimeUpdate(Math.floor(NewTime));
 
 };
 
 // Handles mouse down events for dragging
-export const HandleProgressBarMouseDown = (Event: React.MouseEvent<HTMLDivElement>, DurationSeconds: number, OnTimeUpdate: (time: number) => void, OnSeek: (time: number) => void ) => {
+export const HandleProgressBarMouseDown = (Event: React.MouseEvent<HTMLDivElement>, DurationSeconds: number, OnTimeUpdate: (time: number) => void) => {
 
     const HandleMouseMove = (MoveEvent: MouseEvent) => {
 
@@ -37,7 +37,7 @@ export const HandleProgressBarMouseDown = (Event: React.MouseEvent<HTMLDivElemen
         const Rect = Event.currentTarget.getBoundingClientRect();
         const NewTime = CalculateTimeFromPosition(UpEvent.clientX, Rect, DurationSeconds);
         
-        OnSeek(Math.floor(NewTime));
+        OnTimeUpdate(Math.floor(NewTime));
 
         document.removeEventListener('mousemove', HandleMouseMove);
         document.removeEventListener('mouseup', HandleMouseUp);
@@ -50,7 +50,7 @@ export const HandleProgressBarMouseDown = (Event: React.MouseEvent<HTMLDivElemen
 };
 
 // Handles touch start events for dragging
-export const HandleProgressBarTouchStart = (Event: React.TouchEvent<HTMLDivElement>, DurationSeconds: number, OnTimeUpdate: (time: number) => void, OnSeek: (time: number) => void ) => {
+export const HandleProgressBarTouchStart = (Event: React.TouchEvent<HTMLDivElement>, DurationSeconds: number, OnTimeUpdate: (time: number) => void ) => {
     
     const HandleTouchMove = (MoveEvent: TouchEvent) => {
 
@@ -66,7 +66,7 @@ export const HandleProgressBarTouchStart = (Event: React.TouchEvent<HTMLDivEleme
         const Rect = Event.currentTarget.getBoundingClientRect();
         const NewTime = CalculateTimeFromPosition(EndEvent.changedTouches[0].clientX, Rect, DurationSeconds);
         
-        OnSeek(Math.floor(NewTime));
+        OnTimeUpdate(Math.floor(NewTime));
 
         document.removeEventListener('touchmove', HandleTouchMove);
         document.removeEventListener('touchend', HandleTouchEnd);

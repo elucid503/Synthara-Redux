@@ -4,7 +4,7 @@ go 1.24.1
 
 require (
 	github.com/asticode/go-astits v1.14.0
-	github.com/disgoorg/disgo v0.19.0-rc.13
+	github.com/disgoorg/disgo v0.19.0-rc.14
 	github.com/disgoorg/snowflake/v2 v2.0.3
 	github.com/elucid503/Overture-Play v0.0.0-20251212025804-2ae9b050a440
 	github.com/gin-gonic/gin v1.11.0

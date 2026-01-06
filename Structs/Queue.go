@@ -8,7 +8,6 @@ import (
 	"Synthara-Redux/Utils"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
@@ -48,7 +47,6 @@ type Queue struct {
 	WebSockets      map[*websocket.Conn]bool `json:"-"`
 	SocketMutex     sync.Mutex               `json:"-"`
 
-	ProgressTicker  *Audio.Playback `json:"-"`
 	TickerStopChan  chan bool       `json:"-"`
 
 }
@@ -87,64 +85,6 @@ func (Q *Queue) SendToWebsockets(Event string, Data interface{}) {
 
 }
 
-// StartProgressTicker starts a ticker that sends progress updates every 500ms
-func (Q *Queue) StartProgressTicker() {
-
-	if Q.TickerStopChan != nil {
-
-		Q.StopProgressTicker()
-
-	}
-
-	Q.TickerStopChan = make(chan bool)
-
-	go func() {
-
-		Ticker := time.NewTicker(500 * time.Millisecond)
-		defer Ticker.Stop()
-
-		for {
-
-			select {
-
-			case <-Ticker.C:
-
-				if Q.PlaybackSession != nil && Q.State == StatePlaying {
-
-					Progress := Q.PlaybackSession.Streamer.Progress
-
-					Q.SendToWebsockets(Event_ProgressUpdate, map[string]interface{}{
-
-						"Progress": Progress,
-
-					})
-
-				}
-
-			case <-Q.TickerStopChan:
-
-				return
-
-			}
-
-		}
-
-	}()
-
-}
-
-// StopProgressTicker stops the progress update ticker
-func (Q *Queue) StopProgressTicker() {
-
-	if Q.TickerStopChan != nil {
-
-		close(Q.TickerStopChan)
-		Q.TickerStopChan = nil
-
-	}
-
-}
-
 // Event-Like Handlers
 
 func QueueStateHandler(Queue *Queue, State int) {
@@ -157,8 +97,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 	switch State {
 
 		case StateIdle:
-
-			Queue.StopProgressTicker()
 
 			// Idle state; move to next song if available
 			// TODO: Repeat/Shuffle and autoplay logic
@@ -258,8 +196,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 		case StatePaused:
 
-			Queue.StopProgressTicker()
-
 			if Queue.PlaybackSession != nil {
 
 				Queue.PlaybackSession.Pause()
@@ -267,8 +203,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 			}
 
 		case StatePlaying:
-
-			Queue.StartProgressTicker()
 
 			if Queue.PlaybackSession != nil {
 

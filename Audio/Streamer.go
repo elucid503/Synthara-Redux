@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"Synthara-Redux/Utils"
 
@@ -26,12 +25,7 @@ type SegmentStreamer struct {
 	SegmentDuration int
 	Progress int64
 
-	ProgressTicker   *time.Ticker
-	ProgressStopChan chan struct{}
-
 	OpusFrameChan chan []byte
-	SeekChan      chan int
-	DoneChan      chan struct{}
 
 	Mutex sync.Mutex
 
@@ -57,19 +51,13 @@ func NewSegmentStreamer(SegmentDuration int, TotalSegments int) (*SegmentStreame
 		SegmentDuration: SegmentDuration,
 
 		Progress: 0,
-		ProgressTicker:   nil,
-		ProgressStopChan: nil,
 
 		OpusFrameChan: make(chan []byte, 50),
-		SeekChan:      make(chan int, 1),
-		DoneChan:      make(chan struct{}),
 
 	}
 
 	Streamer.Paused.Store(false)
 	Streamer.Stopped.Store(false)
-
-	Streamer.startProgressTicker()
 
 	return Streamer, nil
 
@@ -87,77 +75,7 @@ func (Streamer *SegmentStreamer) Resume() {
 
 }
 
-// startProgressTicker starts the internal progress ticker on a 20ms interval
-func (Streamer *SegmentStreamer) startProgressTicker() {
 
-	Streamer.Mutex.Lock()
-	defer Streamer.Mutex.Unlock()
-	
-	if Streamer.ProgressTicker != nil {
-
-		return // already running
-
-	}
-
-	Streamer.ProgressTicker = time.NewTicker(20 * time.Millisecond)
-	Streamer.ProgressStopChan = make(chan struct{})
-
-	go func() {
-
-		for {
-
-			if Streamer.IsPaused() {
-
-				time.Sleep(20 * time.Millisecond)
-				continue
-
-			}
-
-			if Streamer.IsStopped() {
-
-				return
-
-			}
-
-			select {
-				
-				case <-Streamer.ProgressTicker.C:
-
-					Streamer.Mutex.Lock()
-					Streamer.Progress += 20
-					Streamer.Mutex.Unlock()
-
-				case <-Streamer.ProgressStopChan:
-
-					// Stop signal received; return. The ticker is stopped by stopProgressTicker
-					// to avoid races where the ticker pointer is cleared concurrently.
-					return
-
-			}
-
-		}
-
-	}()
-
-}
-
-// stopProgressTicker stops the internal progress ticker
-func (Streamer *SegmentStreamer) stopProgressTicker() {
-
-	Streamer.Mutex.Lock()
-	defer Streamer.Mutex.Unlock()
-
-	if Streamer.ProgressTicker != nil && Streamer.ProgressStopChan != nil {
-
-		// Stop the ticker first to release underlying resources, then signal goroutine
-		Streamer.ProgressTicker.Stop()
-		close(Streamer.ProgressStopChan)
-		Streamer.ProgressStopChan = nil
-		Streamer.ProgressTicker = nil
-
-	}
-
-}
 
 func (Streamer *SegmentStreamer) IsPaused() bool {
 
@@ -188,6 +106,18 @@ func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) (int, b
 
 	}
 
+	// Recovers from panics (sends on closed channel)
+
+	defer func() {
+
+		if r := recover(); r != nil {
+
+			// noop; return default values
+
+		}
+
+	}()
+
 	for _, Frame := range OpusFrames {
 
 		if Streamer.IsStopped() {
@@ -196,33 +126,10 @@ func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) (int, b
 
 		}
 
-		select {
+		// Blocking send; will block until consumer reads or channel is closed
 
-			case <-Streamer.DoneChan:
-				
-				return 0, false
-
-			case Index := <-Streamer.SeekChan:
-
-				return Index, true
-
-			default:
-
-		}
-
-		select {
-
-			case <-Streamer.DoneChan:
-
-				return 0, false
-
-			case Index := <-Streamer.SeekChan:
-
-				return Index, true
-
-			case Streamer.OpusFrameChan <- Frame: // Blocking send
-				
-		}
+		Streamer.OpusFrameChan <- Frame
+		atomic.AddInt64(&Streamer.Progress, 20) // progress increment in ms per frame (20ms)
 
 	}
 
@@ -242,25 +149,21 @@ func (Streamer *SegmentStreamer) GetNextFrame() ([]byte, bool) {
 
 	}
 
-	select {
-	case <-Streamer.DoneChan:
-		return nil, false
-	case Frame, OK := <-Streamer.OpusFrameChan:
-		if !OK {
+	Frame, OK := <-Streamer.OpusFrameChan
 
-			return nil, false // channel closed
-	
-		}
-	
-		// Progress is now incremented by internal ticker, not by frame send
-	
-		return Frame, true
+	Streamer.Progress += 20 // 20ms per frame
+
+	if !OK {
+
+		return nil, false // Channel closed
+
 	}
+
+	return Frame, true
 
 }
 
 func (Streamer *SegmentStreamer) Stop() {
-	Streamer.stopProgressTicker()
 
 	if Streamer.Stopped.Swap(true) {
 
@@ -271,7 +174,7 @@ func (Streamer *SegmentStreamer) Stop() {
 	Streamer.Mutex.Lock()
 	defer Streamer.Mutex.Unlock()
 
-	// Safely close channel if not already closed
+	// Safely closes OpusFrameChan so consumers unblock
 
 	defer func() {
 
@@ -283,7 +186,7 @@ func (Streamer *SegmentStreamer) Stop() {
 
 	}()
 
-	close(Streamer.DoneChan)
+	close(Streamer.OpusFrameChan)
 
 	if Streamer.Processor != nil {
 
@@ -323,22 +226,11 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 
 	Playback.Stopped.Store(false)
 
-	// Fetch and process segments in background
+	// Fetches and processes segments in background
 
 	go func() {
 
 		for Index := 0; Index < len(Segments); {
-
-			select {
-
-				case NewIndex := <-Streamer.SeekChan:
-
-					Index = NewIndex
-					continue
-
-				default:
-					
-			}
 
 			if Playback.Stopped.Load() {
 
@@ -365,15 +257,8 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 
 			}
 
-			NewIndex, Seeked := Streamer.ProcessNextSegment(SegmentBytes)
+			_, _ = Streamer.ProcessNextSegment(SegmentBytes)
 			SegmentBytes = nil
-
-			if Seeked { // go to new index
-
-				Index = NewIndex
-				continue
-
-			}
 
 			Index++
 
@@ -382,6 +267,18 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 		// Close channel and trigger finished
 
 		Streamer.Mutex.Lock()
+
+		defer Streamer.Mutex.Unlock()
+
+		defer func() {
+
+			if r := recover(); r != nil {
+
+				// noop
+
+			}
+			
+		}()
 
 		close(Streamer.OpusFrameChan)
 
@@ -394,8 +291,6 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 			}
 
 		}
-
-		Streamer.Mutex.Unlock()
 
 	}()
 

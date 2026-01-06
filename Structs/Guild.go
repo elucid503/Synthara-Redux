@@ -225,7 +225,13 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 
 	Utils.Logger.Info(fmt.Sprintf("Cleaning up guild: %s", G.ID.String()))
 
-	G.Internal.Disconnecting = true
+	G.Internal.Disconnecting = true // Marks as disconnecting early to prevent re-entrancy
+
+	// Removes immediately from guild store so no new operations re-acquire this guild
+
+	GuildStoreMutex.Lock()
+	delete(GuildStore, G.ID)
+	GuildStoreMutex.Unlock()
 
 	// Stop playback session if present
 
@@ -238,25 +244,20 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 
 	}
 
-	// Stop the queue progress ticker
-	G.Queue.StopProgressTicker()
+	// Clears and closes all websockets safely
 
-	// Clear websockets safely
 	G.Queue.SocketMutex.Lock()
-
 	for conn := range G.Queue.WebSockets {
 
 		func(c *websocket.Conn) {
 
 			defer func() {
-
 				if r := recover(); r != nil {
 					// noop
 				}
-
 			}()
 
-			c.Close()
+			_ = c.Close()
 
 		}(conn)
 
@@ -264,10 +265,19 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 
 	}
 
+	// Releases map to allow GC of connection objects
+
+	G.Queue.WebSockets = nil
 	G.Queue.SocketMutex.Unlock()
 
-	// Closes voice connection if requested
+	// Clears queue items to free memory
 
+	G.Queue.Current = nil
+	G.Queue.Previous = nil
+	G.Queue.Upcoming = nil
+
+	// Closes voice connection if requested
+	
 	if CloseConn && G.VoiceConnection != nil {
 
 		ContextToUse, CancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
@@ -281,12 +291,6 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 		G.VoiceConnection = nil
 
 	}
-
-	// Removes from guild store
-
-	GuildStoreMutex.Lock()
-	delete(GuildStore, G.ID)
-	GuildStoreMutex.Unlock()
 
 	return nil
 

@@ -19,8 +19,6 @@ const (
 	OperationNext   = "Next"
 	OperationLast   = "Last"
 
-	OperationSeek   = "Seek"
-
 )
 
 var Upgrader = websocket.Upgrader{
@@ -148,20 +146,6 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 	case OperationLast:
 
 		Guild.Queue.Last()
-
-	case OperationSeek:
-
-		if Offset, Ok := Message["Offset"].(float64); Ok {
-
-			if Guild.Queue.PlaybackSession != nil {
-
-				Guild.Queue.PlaybackSession.Seek(int(Offset))
-
-				Guild.Queue.SendToWebsockets(Structs.Event_ProgressUpdate, map[string]interface{}{ "Progress": Guild.Queue.PlaybackSession.Streamer.Progress })
-
-			}
-
-		}
 
 	}
 

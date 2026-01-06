@@ -124,9 +124,7 @@ func InitializeHandlers() {
 
 					Commands.Last(Event)
 
-				case "seek":
 
-					Commands.Seek(Event)
 
 				case "lyrics":
 

@@ -45,8 +45,6 @@ export enum Operation {
     Next = "Next",
     Last = "Last",
 
-    Seek = "Seek", // Takes in a number (Offset)
-
 }
 
 export interface WSMessage<T> {

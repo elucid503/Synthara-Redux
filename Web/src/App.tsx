@@ -249,14 +249,6 @@ function App() {
 
     };
 
-    const HandleSeek = (Value: number) => {
-
-        const Offset = (Value - CurrentTime) / 1000; // convert ms to seconds for offset
-
-        SendOperation(Socket, Operation.Seek, { Offset });
-        SetCurrentTime(Value);
-
-    };
 
     if (!CurrentSong) {
 
@@ -327,11 +319,11 @@ function App() {
 
                     <div className="relative w-full h-1 bg-zinc-700 rounded-full cursor-pointer overflow-hidden"
                         
-                        onClick={(E) => HandleProgressBarClick(E, CurrentSong.duration.seconds, HandleSeek)}
+                        onClick={(E) => HandleProgressBarClick(E, CurrentSong.duration.seconds, SetCurrentTime)}
 
-                        onMouseDown={(E) => HandleProgressBarMouseDown(E, CurrentSong.duration.seconds, SetCurrentTime, HandleSeek)}
+                        onMouseDown={(E) => HandleProgressBarMouseDown(E, CurrentSong.duration.seconds, SetCurrentTime)}
 
-                        onTouchStart={(E) => HandleProgressBarTouchStart(E, CurrentSong.duration.seconds, SetCurrentTime, HandleSeek)}
+                        onTouchStart={(E) => HandleProgressBarTouchStart(E, CurrentSong.duration.seconds, SetCurrentTime)}
 
                     >
                     
