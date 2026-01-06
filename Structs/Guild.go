@@ -43,7 +43,6 @@ const (
 	Event_Initial = "INITIAL_STATE"
 	Event_QueueUpdated = "QUEUE_UPDATED"
 	Event_StateChanged = "STATE_CHANGED"
-	Event_ProgressUpdate = "PROGRESS_UPDATE"
 
 )
 
@@ -277,7 +276,7 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 	G.Queue.Upcoming = nil
 
 	// Closes voice connection if requested
-	
+
 	if CloseConn && G.VoiceConnection != nil {
 
 		ContextToUse, CancelFunc := context.WithTimeout(context.Background(), 5*time.Second)

@@ -129,7 +129,7 @@ func (Streamer *SegmentStreamer) ProcessNextSegment(SegmentBytes []byte) (int, b
 		// Blocking send; will block until consumer reads or channel is closed
 
 		Streamer.OpusFrameChan <- Frame
-		atomic.AddInt64(&Streamer.Progress, 20) // progress increment in ms per frame (20ms)
+		atomic.AddInt64(&Streamer.Progress, 20) // progress increments in ms per frame (20ms)
 
 	}
 
@@ -150,8 +150,6 @@ func (Streamer *SegmentStreamer) GetNextFrame() ([]byte, bool) {
 	}
 
 	Frame, OK := <-Streamer.OpusFrameChan
-
-	Streamer.Progress += 20 // 20ms per frame
 
 	if !OK {
 

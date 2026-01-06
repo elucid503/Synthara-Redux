@@ -3,7 +3,6 @@ import { Play, Pause, SkipBack, SkipForward, Trash2, CornerDownRight, RefreshCw 
 
 import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse } from './Types';
 import { NormalizeCoverURL, FormatTime, SendOperation, FetchLyrics } from './Utils/Misc';
-import { HandleProgressBarClick, HandleProgressBarMouseDown, HandleProgressBarTouchStart } from './Utils/Inputs';
 
 import DetailsView from './Views/Details';
 import LyricsView from './Views/Lyrics';
@@ -142,12 +141,6 @@ function App() {
                     SetCurrentTime(0);
 
                     SetLyrics(null);
-
-                break;
-
-                case WSEvents.Event_ProgressUpdate:
-                    
-                    SetCurrentTime(Math.max(0, (Message.Data.Progress - 100))); // slight buffer to account for latency
 
                 break;
 
@@ -317,15 +310,7 @@ function App() {
 
                     {/* Bar Track */}
 
-                    <div className="relative w-full h-1 bg-zinc-700 rounded-full cursor-pointer overflow-hidden"
-                        
-                        onClick={(E) => HandleProgressBarClick(E, CurrentSong.duration.seconds, SetCurrentTime)}
-
-                        onMouseDown={(E) => HandleProgressBarMouseDown(E, CurrentSong.duration.seconds, SetCurrentTime)}
-
-                        onTouchStart={(E) => HandleProgressBarTouchStart(E, CurrentSong.duration.seconds, SetCurrentTime)}
-
-                    >
+                    <div className="relative w-full h-1 bg-zinc-700 rounded-full cursor-pointer overflow-hidden">
                     
                     {/* Bar Fill */}
                     
