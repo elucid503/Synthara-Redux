@@ -218,48 +218,50 @@
 			}
 		},
 		"Lyrics": {
-			"Success": {
-				"en-US": "View the lyrics [here](%s)",
-				"en-GB": "View the lyrics [here](%s)",
-				"es-ES": "Ver la letra [aquí](%s)",
-				"es-419": "Ver la letra [aquí](%s)",
-				"zh-CN": "点击[此处](%s)查看歌词",
-				"fr": "Voir les paroles [ici](%s)",
-				"it": "Visualizza il testo [qui](%s)",
-				"de": "Liedtext [hier](%s) anzeigen",
-				"pl": "Zobacz tekst [tutaj](%s)",
-				"ru": "Посмотреть текст [здесь](%s)",
-				"ja": "歌詞を[こちら](%s)で見る"
-			}
-		},
-		"Controls": {
-			"Success": {
-				"en-US": "Get controls [here](%s)",
-				"en-GB": "Get controls [here](%s)",
-				"es-ES": "Obtener controles [aquí](%s)",
-				"es-419": "Obtener controles [aquí](%s)",
-				"zh-CN": "点击[此处](%s)获取控制面板",
-				"fr": "Accéder aux contrôles [ici](%s)",
-				"it": "Ottieni i controlli [qui](%s)",
-				"de": "Steuerung [hier](%s) abrufen",
-				"pl": "Uzyskaj sterowanie [tutaj](%s)",
-				"ru": "Получить управление [здесь](%s)",
-				"ja": "コントロールを[こちら](%s)で取得"
+			"Errors": {
+				"NoSong": {
+					"en-US": "No song is currently playing",
+					"en-GB": "No song is currently playing",
+					"es-ES": "No hay ninguna canción reproduciéndose",
+					"es-419": "No hay ninguna canción reproduciéndose",
+					"zh-CN": "当前没有正在播放的歌曲",
+					"fr": "Aucune chanson n'est en cours de lecture",
+					"it": "Nessuna canzone in riproduzione",
+					"de": "Derzeit wird kein Lied abgespielt",
+					"pl": "Aktualnie nie odtwarzany żaden utwór",
+					"ru": "В настоящий момент не воспроизводится ни одна песня",
+					"ja": "現在再生中の曲はありません"
+				},
+				"NotFound": {
+					"en-US": "Lyrics could not be found for this song",
+					"en-GB": "Lyrics could not be found for this song",
+					"es-ES": "No se encontraron letras para esta canción",
+					"es-419": "No se encontraron letras para esta canción",
+					"zh-CN": "未能找到该歌曲的歌词",
+					"fr": "Aucune parole trouvée pour cette chanson",
+					"it": "Testo non trovato per questa canzone",
+					"de": "Für dieses Lied konnten keine Liedtexte gefunden werden",
+					"pl": "Nie znaleziono tekstu dla tej piosenki",
+					"ru": "Текст песни не найден",
+					"ja": "この曲の歌詞は見つかりませんでした"
+				}
 			}
 		},
 		"Queue": {
-			"Success": {
-				"en-US": "View/Edit the Queue [here](%s)",
-				"en-GB": "View/Edit the Queue [here](%s)",
-				"es-ES": "Ver/Editar la cola [aquí](%s)",
-				"es-419": "Ver/Editar la cola [aquí](%s)",
-				"zh-CN": "点击[此处](%s)查看/编辑队列",
-				"fr": "Voir/Modifier la file d'attente [ici](%s)",
-				"it": "Visualizza/Modifica la coda [qui](%s)",
-				"de": "Warteschlange [hier](%s) anzeigen/bearbeiten",
-				"pl": "Zobacz/Edytuj kolejkę [tutaj](%s)",
-				"ru": "Посмотреть/Изменить очередь [здесь](%s)",
-				"ja": "キューを[こちら](%s)で表示/編集"
+			"Errors": {
+				"NoQueue": {
+					"en-US": "There are no songs in the queue",
+					"en-GB": "There are no songs in the queue",
+					"es-ES": "No hay canciones en la cola",
+					"es-419": "No hay canciones en la cola",
+					"zh-CN": "队列中没有歌曲",
+					"fr": "Il n'y a pas de chansons dans la file d'attente",
+					"it": "Non ci sono brani nella coda",
+					"de": "Es gibt keine Lieder in der Warteschlange",
+					"pl": "W kolejce nie ma utworów",
+					"ru": "В очереди нет песен",
+					"ja": "キューに曲がありません"
+				}
 			}
 		}
 	},
@@ -411,6 +413,196 @@
 				"pl": "%s Min",
 				"ru": "%s Мин",
 				"ja": "%s 分"
+			}
+		},
+		"Lyrics": {
+			"Title": {
+				"en-US": "Lyrics",
+				"en-GB": "Lyrics",
+				"es-ES": "Letra",
+				"es-419": "Letra",
+				"zh-CN": "歌词",
+				"fr": "Paroles",
+				"it": "Testo",
+				"de": "Liedtext",
+				"pl": "Tekst",
+				"ru": "Текст",
+				"ja": "歌詞"
+			},
+			"WrittenBy": {
+				"en-US": "Written by %s",
+				"en-GB": "Written by %s",
+				"es-ES": "Escrito por %s",
+				"es-419": "Escrito por %s",
+				"zh-CN": "作者 %s",
+				"fr": "Écrit par %s",
+				"it": "Scritto da %s",
+				"de": "Geschrieben von %s",
+				"pl": "Napisane przez %s",
+				"ru": "Написано %s",
+				"ja": "作詞 %s"
+			},
+			"Truncated": {
+				"en-US": "(truncated)",
+				"en-GB": "(truncated)",
+				"es-ES": "(truncado)",
+				"es-419": "(truncado)",
+				"zh-CN": "(已截断)",
+				"fr": "(tronqué)",
+				"it": "(troncato)",
+				"de": "(gekürzt)",
+				"pl": "(obcięte)",
+				"ru": "(усечено)",
+				"ja": "(切り捨て)"
+			},
+			"ViewWord": {
+				"en-US": "View Word-Synced Lyrics [Here](%s)",
+				"en-GB": "View Word-Synced Lyrics [Here](%s)",
+				"es-ES": "Ver letra sincronizada por palabra [aquí](%s)",
+				"es-419": "Ver letra sincronizada por palabra [aquí](%s)",
+				"zh-CN": "查看按单词同步的歌词 [此处](%s)",
+				"fr": "Voir paroles synchronisées mot à mot [ici](%s)",
+				"it": "Visualizza testo sincronizzato parola per parola [qui](%s)",
+				"de": "Wort-synchronisierte Liedtexte anzeigen [hier](%s)",
+				"pl": "Zobacz tekst zsynchronizowany według słów [tutaj](%s)",
+				"ru": "Посмотреть построчно/помарочно? [здесь](%s)",
+				"ja": "単語同期の歌詞を[こちら](%s)で見る"
+			},
+			"ViewLine": {
+				"en-US": "View Line-Synced Lyrics [Here](%s)",
+				"en-GB": "View Line-Synced Lyrics [Here](%s)",
+				"es-ES": "Ver letra sincronizada por línea [aquí](%s)",
+				"es-419": "Ver letra sincronizada por línea [aquí](%s)",
+				"zh-CN": "查看按行同步的歌词 [此处](%s)",
+				"fr": "Voir paroles synchronisées par ligne [ici](%s)",
+				"it": "Visualizza testo sincronizzato per riga [qui](%s)",
+				"de": "Zeilen-synchronisierte Liedtexte anzeigen [hier](%s)",
+				"pl": "Zobacz tekst zsynchronizowany według linii [tutaj](%s)",
+				"ru": "Посмотреть построчно [здесь](%s)",
+				"ja": "行同期の歌詞を[こちら](%s)で見る"
+			}
+		},
+		"Queue": {
+			"Title": {
+				"en-US": "Queue",
+				"en-GB": "Queue",
+				"es-ES": "Cola",
+				"es-419": "Cola",
+				"zh-CN": "队列",
+				"fr": "File d'attente",
+				"it": "Coda",
+				"de": "Warteschlange",
+				"pl": "Kolejka",
+				"ru": "Очередь",
+				"ja": "キュー"
+			},
+			"Errors": {
+				"NoQueue": {
+					"en-US": "There are no songs in the queue",
+					"en-GB": "There are no songs in the queue",
+					"es-ES": "No hay canciones en la cola",
+					"es-419": "No hay canciones en la cola",
+					"zh-CN": "队列中没有歌曲",
+					"fr": "Il n'y a pas de chansons dans la file d'attente",
+					"it": "Non ci sono brani in coda",
+					"de": "Es sind keine Lieder in der Warteschlange",
+					"pl": "Brak piosenek w kolejce",
+					"ru": "В очереди нет песен",
+					"ja": "キューに曲がありません"
+				}
+			},
+			"NowPlaying": {
+				"en-US": "Now Playing",
+				"en-GB": "Now Playing",
+				"es-ES": "Reproduciendo ahora",
+				"es-419": "Reproduciendo ahora",
+				"zh-CN": "正在播放",
+				"fr": "En cours de lecture",
+				"it": "In riproduzione",
+				"de": "Wird gespielt",
+				"pl": "Teraz odtwarzane",
+				"ru": "Сейчас играет",
+				"ja": "再生中"
+			},
+			"Upcoming": {
+				"en-US": "Up Next",
+				"en-GB": "Up Next",
+				"es-ES": "Siguiente",
+				"es-419": "Siguiente",
+				"zh-CN": "接下来",
+				"fr": "A suivre",
+				"it": "In arrivo",
+				"de": "Als nächstes",
+				"pl": "Następne",
+				"ru": "Далее",
+				"ja": "次に再生"
+			},
+			"NoUpcoming": {
+				"en-US": "No upcoming songs",
+				"en-GB": "No upcoming songs",
+				"es-ES": "No hay canciones próximas",
+				"es-419": "No hay canciones próximas",
+				"zh-CN": "没有即将播放的歌曲",
+				"fr": "Aucune chanson à venir",
+				"it": "Nessuna canzone in arrivo",
+				"de": "Keine anstehenden Songs",
+				"pl": "Brak nadchodzących utworów",
+				"ru": "Нет предстоящих песен",
+				"ja": "今後の曲はありません"
+			},
+			"More": {
+				"en-US": "and %d more...",
+				"en-GB": "and %d more...",
+				"es-ES": "y %d más...",
+				"es-419": "y %d más...",
+				"zh-CN": "还有 %d 首...",
+				"fr": "et %d de plus...",
+				"it": "e altri %d...",
+				"de": "und %d mehr...",
+				"pl": "i %d więcej...",
+				"ru": "и ещё %d...",
+				"ja": "さらに %d 曲..."
+			},
+			"View": {
+				"en-US": "View/Edit the Queue [Here](%s)",
+				"en-GB": "View/Edit the Queue [Here](%s)",
+				"es-ES": "Ver/Editar la cola [aquí](%s)",
+				"es-419": "Ver/Editar la cola [aquí](%s)",
+				"zh-CN": "查看/编辑队列 [此处](%s)",
+				"fr": "Voir/Modifier la file d'attente [ici](%s)",
+				"it": "Visualizza/Modifica la coda [qui](%s)",
+				"de": "Warteschlange anzeigen/bearbeiten [hier](%s)",
+				"pl": "Zobacz/Edytuj kolejkę [tutaj](%s)",
+				"ru": "Просмотреть/Изменить очередь [здесь](%s)",
+				"ja": "キューを表示/編集 [こちら](%s)"
+			}
+		},
+		"Controls": {
+			"Title": {
+				"en-US": "Controls",
+				"en-GB": "Controls",
+				"es-ES": "Controles",
+				"es-419": "Controles",
+				"zh-CN": "控制",
+				"fr": "Contrôles",
+				"it": "Controlli",
+				"de": "Steuerung",
+				"pl": "Sterowanie",
+				"ru": "Управление",
+				"ja": "コントロール"
+			},
+			"Description": {
+				"en-US": "Open controls [here](%s)",
+				"en-GB": "Open controls [here](%s)",
+				"es-ES": "Abrir controles [aquí](%s)",
+				"es-419": "Abrir controles [aquí](%s)",
+				"zh-CN": "在[此处](%s)打开控制",
+				"fr": "Ouvrir les contrôles [ici](%s)",
+				"it": "Apri i controlli [qui](%s)",
+				"de": "Steuerung öffnen [hier](%s)",
+				"pl": "Otwórz sterowanie [tutaj](%s)",
+				"ru": "Открыть управление [здесь](%s)",
+				"ja": "[こちら](%s)でコントロールを開く"
 			}
 		},
 		"Notifications": {

@@ -254,9 +254,13 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 		func(c *websocket.Conn) {
 
 			defer func() {
+
 				if r := recover(); r != nil {
+
 					// noop
+
 				}
+				
 			}()
 
 			_ = c.Close()
