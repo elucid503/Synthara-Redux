@@ -123,7 +123,7 @@ function App() {
                     SetPlayerStateValue(Message.Data.State);
                     
                     const InitialProgress = Message.Data.Progress;
-                    SetCurrentTime(InitialProgress);
+                    SetCurrentTime(Math.max(0, (InitialProgress - 250))); // slight buffer to account for latency
 
                 break;
                     
@@ -137,7 +137,7 @@ function App() {
 
                     // sent on next segment ready-to-be processed
 
-                    SetCurrentTime(Message.Data.Progress); 
+                    SetCurrentTime(Math.max(0, (Message.Data.Progress - 250))); // slight buffer to account for latency
 
                 break;
                     
