@@ -456,30 +456,30 @@
 				"ja": "(切り捨て)"
 			},
 			"ViewWord": {
-				"en-US": "View Word-Synced Lyrics [Here](%s)",
-				"en-GB": "View Word-Synced Lyrics [Here](%s)",
-				"es-ES": "Ver letra sincronizada por palabra [aquí](%s)",
-				"es-419": "Ver letra sincronizada por palabra [aquí](%s)",
-				"zh-CN": "查看按单词同步的歌词 [此处](%s)",
-				"fr": "Voir paroles synchronisées mot à mot [ici](%s)",
-				"it": "Visualizza testo sincronizzato parola per parola [qui](%s)",
-				"de": "Wort-synchronisierte Liedtexte anzeigen [hier](%s)",
-				"pl": "Zobacz tekst zsynchronizowany według słów [tutaj](%s)",
-				"ru": "Посмотреть построчно/помарочно? [здесь](%s)",
-				"ja": "単語同期の歌詞を[こちら](%s)で見る"
+				"en-US": "View Word-Synced Lyrics",
+				"en-GB": "View Word-Synced Lyrics",
+				"es-ES": "Ver letra sincronizada por palabra",
+				"es-419": "Ver letra sincronizada por palabra",
+				"zh-CN": "查看按单词同步的歌词",
+				"fr": "Voir paroles synchronisées mot à mot",
+				"it": "Visualizza testo sincronizzato parola per parola",
+				"de": "Wort-synchronisierte Liedtexte anzeigen",
+				"pl": "Zobacz tekst zsynchronizowany według słów",
+				"ru": "Посмотреть построчно/помарочно?",
+				"ja": "単語同期の歌詞を見る"
 			},
 			"ViewLine": {
-				"en-US": "View Line-Synced Lyrics [Here](%s)",
-				"en-GB": "View Line-Synced Lyrics [Here](%s)",
-				"es-ES": "Ver letra sincronizada por línea [aquí](%s)",
-				"es-419": "Ver letra sincronizada por línea [aquí](%s)",
-				"zh-CN": "查看按行同步的歌词 [此处](%s)",
-				"fr": "Voir paroles synchronisées par ligne [ici](%s)",
-				"it": "Visualizza testo sincronizzato per riga [qui](%s)",
-				"de": "Zeilen-synchronisierte Liedtexte anzeigen [hier](%s)",
-				"pl": "Zobacz tekst zsynchronizowany według linii [tutaj](%s)",
-				"ru": "Посмотреть построчно [здесь](%s)",
-				"ja": "行同期の歌詞を[こちら](%s)で見る"
+				"en-US": "View Line-Synced Lyrics",
+				"en-GB": "View Line-Synced Lyrics",
+				"es-ES": "Ver letra sincronizada por línea",
+				"es-419": "Ver letra sincronizada por línea",
+				"zh-CN": "查看按行同步的歌词",
+				"fr": "Voir paroles synchronisées par ligne",
+				"it": "Visualizza testo sincronizzato per riga",
+				"de": "Zeilen-synchronisierte Liedtexte anzeigen",
+				"pl": "Zobacz tekst zsynchronizowany według linii",
+				"ru": "Посмотреть построчно",
+				"ja": "行同期の歌詞を見る"
 			}
 		},
 		"Queue": {
@@ -564,17 +564,30 @@
 				"ja": "さらに %d 曲..."
 			},
 			"View": {
-				"en-US": "View/Edit the Queue [Here](%s)",
-				"en-GB": "View/Edit the Queue [Here](%s)",
-				"es-ES": "Ver/Editar la cola [aquí](%s)",
-				"es-419": "Ver/Editar la cola [aquí](%s)",
-				"zh-CN": "查看/编辑队列 [此处](%s)",
-				"fr": "Voir/Modifier la file d'attente [ici](%s)",
-				"it": "Visualizza/Modifica la coda [qui](%s)",
-				"de": "Warteschlange anzeigen/bearbeiten [hier](%s)",
-				"pl": "Zobacz/Edytuj kolejkę [tutaj](%s)",
-				"ru": "Просмотреть/Изменить очередь [здесь](%s)",
-				"ja": "キューを表示/編集 [こちら](%s)"
+				"en-US": "View/Edit",
+				"en-GB": "View/Edit",
+				"es-ES": "Ver/Editar",
+				"es-419": "Ver/Editar",
+				"zh-CN": "查看/编辑队列",
+				"fr": "Voir/Modifier la file d'attente",
+				"it": "Visualizza/Modifica la coda",
+				"de": "Warteschlange anzeigen/bearbeiten",
+				"pl": "Zobacz/Edytuj kolejkę",
+				"ru": "Просмотреть/Изменить очередь",
+				"ja": "キューを表示/編集"
+			},
+			"Stats": {
+				"en-US": "%d %s • %d Min • %d %s",
+				"en-GB": "%d %s • %d Min • %d %s",
+				"es-ES": "%d %s • %d Min • %d %s",
+				"es-419": "%d %s • %d Min • %d %s",
+				"zh-CN": "%d %s • %d 分钟 • %d %s",
+				"fr": "%d %s • %d Min • %d %s",
+				"it": "%d %s • %d Min • %d %s",
+				"de": "%d %s • %d Min • %d %s",
+				"pl": "%d %s • %d Min • %d %s",
+				"ru": "%d %s • %d Мин • %d %s",
+				"ja": "%d %s • %d 分 • %d %s"
 			}
 		},
 		"Controls": {
@@ -703,6 +716,32 @@
 			"pl": "Utwory",
 			"ru": "Песни",
 			"ja": "曲"
+		},
+		"Contributor": {
+			"en-US": "Contributor",
+			"en-GB": "Contributor",
+			"es-ES": "Colaborador",
+			"es-419": "Colaborador",
+			"zh-CN": "贡献者",
+			"fr": "Contributeur",
+			"it": "Contributore",
+			"de": "Mitarbeiter",
+			"pl": "Współtwórca",
+			"ru": "Участник",
+			"ja": "貢献者"
+		},
+		"Contributors": {
+			"en-US": "Contributors",
+			"en-GB": "Contributors",
+			"es-ES": "Colaboradores",
+			"es-419": "Colaboradores",
+			"zh-CN": "贡献者",
+			"fr": "Contributeurs",
+			"it": "Contributori",
+			"de": "Mitwirkende",
+			"pl": "Współtwórcy",
+			"ru": "Участники",
+			"ja": "貢献者"
 		}
 	}
 }

@@ -17,6 +17,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
+	"github.com/disgoorg/snowflake/v2"
 )
 
 type LyricsAPIResponse struct {
@@ -142,6 +143,10 @@ func LyricsFetcher(Title string, Artist string, Album string) (*LyricsAPIRespons
 
 func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
+	// Defer response since this may take a minute
+
+	Event.DeferCreateMessage(false)
+
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
 
@@ -149,10 +154,9 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Guild == nil || Guild.Queue.Current == nil {
 
-		Event.CreateMessage(discord.MessageCreate{
+		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.MessageUpdate{
 
-			Content: Localizations.Get("Commands.Lyrics.Errors.NoSong", Locale),
-
+			Content: Utils.PtrToStr(Localizations.Get("Commands.Lyrics.Errors.NoSong", Locale)),
 
 		})
 
@@ -193,9 +197,9 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Err != nil || APIRespPtr == nil {
 
-		Event.CreateMessage(discord.MessageCreate{
+		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.MessageUpdate{
 
-			Content: Localizations.Get("Commands.Lyrics.Errors.NotFound", Locale),
+			Content: Utils.PtrToStr(Localizations.Get("Commands.Lyrics.Errors.NotFound", Locale)),
 
 		})
 
@@ -248,7 +252,7 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	ViewText := Localizations.GetFormat(ViewKey, Locale, Page)
+	ViewLabel := Localizations.Get(ViewKey, Locale)
 
 	// Builds a single embed with truncation if necessary
 
@@ -263,16 +267,16 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	} 
 
-	if  len(Writers) + len(LyricsText) + 2 + len(ViewText) <= MaxDesc { // +2 for newlines
+	Truncated := Localizations.Get("Embeds.Lyrics.Truncated", Locale)
 
-		Desc = Writers + LyricsText + "\n\n" + ViewText
+	if len(Writers)+len(LyricsText) <= MaxDesc {
+
+		Desc = Writers + LyricsText
 
 	} else {
 
-		Truncated := Localizations.Get("Embeds.Lyrics.Truncated", Locale)
-		Reserve := len(Writers) + (len("\n\n") * 2) + len(Truncated) + len("\n\n") + 3 // 3 for ellipsis
-
-		Limit := MaxDesc - Reserve
+		suffix := "..." + "\n\n" + Truncated + "\n\n"
+		Limit := MaxDesc - len(suffix)
 
 		if Limit < 0 {
 
@@ -288,7 +292,7 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 		}
 
-		Desc = strings.TrimSpace(Prefix) + "..." + "\n\n" + Truncated + "\n\n"
+		Desc = strings.TrimSpace(Prefix) + suffix
 
 	}
 
@@ -303,10 +307,9 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	Embeds = append(Embeds, Embed.Build())
 
-	Event.CreateMessage(discord.MessageCreate{
-
-		Embeds: Embeds,
-
-	})
+	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
+		AddEmbeds(Embeds...).
+		AddActionRow(discord.NewButton(discord.ButtonStyleLink, ViewLabel, "", Page, snowflake.ID(0))).
+		Build())
 
 }

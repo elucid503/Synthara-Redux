@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Trash2, CornerDownRight, RefreshCw } from 'lucide-react';
 
 import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse } from './Types';
@@ -17,6 +17,9 @@ function App() {
     const [UpcomingSongs, SetUpcomingSongs] = useState<Song[]>([]);
 
     const [ActiveContextMenu, SetActiveContextMenu] = useState<{ type: 'Previous' | 'Upcoming', index: number, x: number, y: number } | null>(null);
+
+    const [Toast, SetToast] = useState<string | null>(null);
+    const ToastTimeoutRef = useRef<any>(null);
 
     // Close context menu on click outside or scroll
 
@@ -77,9 +80,15 @@ function App() {
 
     const [BackgroundImage, SetBackgroundImage] = useState<string>('');
 
+    const CurrentSongIdRef = useRef<string | null>(null);
+    const ActiveViewRef = useRef<'Details' | 'Queue' | 'Lyrics'>(ActiveView);
+    const UpcomingSongsLengthRef = useRef<number>(0);
+
     const [Lyrics, SetLyrics] = useState<LyricsResponse | null>(null);
     const [LyricsLoading, SetLyricsLoading] = useState(false);
     const [LyricsError, SetLyricsError] = useState(false);
+
+    const CurrentTimeBuffer = 1000; // 1 second buffer for progress updates
     
     const FetchLyricsAndSetState = async (Song: Song) => {
 
@@ -94,92 +103,134 @@ function App() {
 
     };
 
-    // WebSocket connection
+    const ShowToast = (Message: string) => {
+
+        if (ToastTimeoutRef.current) {
+
+            clearTimeout(ToastTimeoutRef.current);
+
+        }
+
+        SetToast(Message);
+        ToastTimeoutRef.current = setTimeout(() => SetToast(null), 3000);
+
+    };
+
+    // WebSocket connection with reconnection
 
     useEffect(() => {
 
         const Params = window.location.href.split('/');
-        const QueueID = Params[Params.length - 1].split('?')[0]; // ignores the query params
+        const QueueID = Params[Params.length - 1].split('?')[0];
 
-        const WS = new WebSocket(`${import.meta.env.VITE_SERVER_URL}/API/Queue?ID=${QueueID}`);
+        let WS: WebSocket | null = null;
 
-        WS.onopen = () => {
+        let ReconnectTimeout: any = null;
+        let ShouldReconnect = true;
 
-            console.log('WebSocket connected');
+        const Connect = () => {
 
-        };
+            WS = new WebSocket(`${import.meta.env.VITE_SERVER_URL}/API/Queue?ID=${QueueID}`);
 
-        WS.onmessage = (Event) => {
+            WS.onopen = () => {
 
-            const Message: WSMessage<any> = JSON.parse(Event.data);
-            
-            switch (Message.Event) {
+                console.log('WebSocket connected');
 
-                case WSEvents.Event_Initial:
+            };
 
-                    SetCurrentSong(Message.Data.Current);
-                    SetPreviousSongs(Message.Data.Previous || []);
-                    SetUpcomingSongs(Message.Data.Upcoming || []);
-                    SetPlayerStateValue(Message.Data.State);
-                    
-                    const InitialProgress = Message.Data.Progress;
-                    SetCurrentTime(Math.max(0, (InitialProgress - 500))); // slight buffer to account for latency
+            WS.onmessage = (Event) => {
 
-                break;
-                    
-                case WSEvents.Event_StateChanged:
-
-                    SetPlayerStateValue(Message.Data.State);
-
-                break;
+                const Message: WSMessage<any> = JSON.parse(Event.data);
                 
-                case WSEvents.Event_ProgressUpdate:
+                switch (Message.Event) {
 
-                    // sent on next segment ready-to-be processed
+                    case WSEvents.Event_Initial:
 
-                    SetCurrentTime(Math.max(0, (Message.Data.Progress - 500))); // slight buffer to account for latency
-
-                break;
-                    
-                case WSEvents.Event_QueueUpdated:
-
-                    SetPreviousSongs(Message.Data.Previous || []);
-                    SetUpcomingSongs(Message.Data.Upcoming || []); 
-
-                    // Sets time to 0, but only if current changed 
-
-                    if ((Message.Data.Current as Song).youtube_id != CurrentSong?.youtube_id) {
-
-                        SetCurrentTime(0);
                         SetCurrentSong(Message.Data.Current);
+                        SetPreviousSongs(Message.Data.Previous || []);
+                        SetUpcomingSongs(Message.Data.Upcoming || []);
+                        SetPlayerStateValue(Message.Data.State);
                         
-                    }
+                        const InitialProgress = Message.Data.Progress;
+                        SetCurrentTime(Math.max(0, (InitialProgress - CurrentTimeBuffer)));
 
-                    SetLyrics(null);
+                    break;
+                        
+                    case WSEvents.Event_StateChanged:
 
-                break;
+                        SetPlayerStateValue(Message.Data.State);
 
-            }
+                    break;
+                    
+                    case WSEvents.Event_ProgressUpdate:
+
+                        SetCurrentTime(Math.max(0, (Message.Data.Progress - CurrentTimeBuffer)));
+
+                    break;
+                        
+                    case WSEvents.Event_QueueUpdated:
+
+                        SetPreviousSongs(Message.Data.Previous || []);
+                        SetUpcomingSongs(Message.Data.Upcoming || []);
+
+                        const NewSong = Message.Data.Current as Song | null;
+                        const SongChanged = NewSong && NewSong.youtube_id != CurrentSongIdRef.current;
+
+                        if (SongChanged) {
+
+                            SetCurrentSong(NewSong);
+                            SetCurrentTime(0);
+                            SetLyrics(null);
+
+                            if (ActiveViewRef.current != 'Queue') {
+
+                                ShowToast(`Now Playing ${NewSong.title}`);
+
+                            }
+
+                        } else if (ActiveViewRef.current != 'Queue' && Message.Data.Upcoming.length > UpcomingSongsLengthRef.current) {
+
+                            ShowToast('Queue Updated');
+
+                        }
+
+                    break;
+
+                }
+
+            };
+
+            WS.onerror = (Error) => {
+
+                console.error('WebSocket error:', Error);
+
+            };
+
+            WS.onclose = () => {
+
+                console.log('WebSocket disconnected');
+                SetSocket(null);
+
+                if (ShouldReconnect) {
+
+                    ReconnectTimeout = setTimeout(() => Connect(), 2000);
+
+                }
+
+            };
+
+            SetSocket(WS);
 
         };
 
-        WS.onerror = (Error) => {
-
-            console.error('WebSocket error:', Error);
-
-        };
-
-        WS.onclose = () => {
-
-            console.log('WebSocket disconnected.');
-
-        };
-
-        SetSocket(WS);
+        Connect();
 
         return () => {
 
-            WS.close();
+            ShouldReconnect = false;
+            
+            clearTimeout(ReconnectTimeout);
+            WS?.close();
 
         };
 
@@ -191,13 +242,30 @@ function App() {
 
         if (CurrentSong) {
 
+            CurrentSongIdRef.current = CurrentSong.youtube_id;
             SetBackgroundImage(NormalizeCoverURL(CurrentSong.cover));
             
             ActiveView == 'Lyrics' && FetchLyricsAndSetState(CurrentSong);
 
+        } else {
+
+            CurrentSongIdRef.current = null;
+
         }
 
-    }, [CurrentSong]);
+    }, [CurrentSong, ActiveView]);
+
+    useEffect(() => {
+
+        ActiveViewRef.current = ActiveView;
+
+    }, [ActiveView]);
+
+    useEffect(() => {
+
+        UpcomingSongsLengthRef.current = UpcomingSongs.length;
+
+    }, [UpcomingSongs]);
 
     // Progress tracking
 
@@ -257,6 +325,32 @@ function App() {
 
     };
 
+    const HandleJump = (Index: number) => {
+
+        SendOperation(Socket, Operation.Jump, { Index: Index + 1 });
+        SetActiveContextMenu(null);
+
+    };
+
+    const HandleRemove = (Index: number) => {
+
+        SendOperation(Socket, Operation.Remove, { Index });
+        SetActiveContextMenu(null);
+
+    };
+
+    const HandleMove = (FromIndex: number, ToIndex: number) => {
+
+        SendOperation(Socket, Operation.Move, { FromIndex, ToIndex });
+
+    };
+
+    const HandleReplay = (Index: number) => {
+
+        SendOperation(Socket, Operation.Replay, { Index });
+        SetActiveContextMenu(null);
+
+    };
 
     if (!CurrentSong) {
 
@@ -311,7 +405,7 @@ function App() {
 
                         <div className="min-h-[200px] max-h-[500px] overflow-y-scroll">
 
-                            <QueueView Current={CurrentSong} PreviousSongs={PreviousSongs} UpcomingSongs={UpcomingSongs} ActiveContextMenu={ActiveContextMenu} SetActiveContextMenu={SetActiveContextMenu} />
+                            <QueueView Current={CurrentSong} PreviousSongs={PreviousSongs} UpcomingSongs={UpcomingSongs} ActiveContextMenu={ActiveContextMenu} SetActiveContextMenu={SetActiveContextMenu} OnMove={HandleMove} />
                             
                         </div>
 
@@ -392,7 +486,7 @@ function App() {
 
                             {IsPrevious && (
 
-                                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg transition-colors" >
+                                <button onClick={() => HandleReplay(ActiveContextMenu.index)} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg transition-colors" >
                                    
                                     <RefreshCw size={14} />
                                     Replay
@@ -401,7 +495,7 @@ function App() {
 
                             )}
 
-                            <button className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg ${IsPrevious ? 'text-zinc-400 cursor-not-allowed' : 'transition-colors'}`}>
+                            <button onClick={() => !IsPrevious && HandleJump(ActiveContextMenu.index)} className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg ${IsPrevious ? 'text-zinc-400 cursor-not-allowed' : 'transition-colors'}`}>
                                 
                                 <CornerDownRight size={14} />
                                 Jump To
@@ -410,7 +504,7 @@ function App() {
                             
                             {!IsPrevious && (
 
-                                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg text-red-400 hover:text-red-300 transition-colors">
+                                <button onClick={() => HandleRemove(ActiveContextMenu.index)} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg text-red-400 hover:text-red-300 transition-colors">
                                    
                                     <Trash2 size={14} />
                                     Remove
@@ -426,7 +520,15 @@ function App() {
                 );
 
             })()}
+            {Toast && (
 
+                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-white text-zinc-950 rounded-lg shadow-lg z-50 animate-fade-in">
+                    
+                    {Toast}
+
+                </div>
+
+            )}
         </div>
 
     );

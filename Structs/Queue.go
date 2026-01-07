@@ -47,8 +47,6 @@ type Queue struct {
 	WebSockets      map[*websocket.Conn]bool `json:"-"`
 	SocketMutex     sync.Mutex               `json:"-"`
 
-	TickerStopChan  chan bool       `json:"-"`
-
 }
 
 type QueueFunctions struct {
@@ -234,8 +232,6 @@ func QueueUpdatedHandler(Queue *Queue) {
 
 	// Pre-caches HLS manifest for next song
 	
-	Utils.Logger.Info(fmt.Sprintf("Queue %s updated; caching HLS manifest for song: %s", Queue.ParentID.String(), NextSong.Title))
-
 	_, ErrorGettingManifest := Innertube.GetSongManifestURL(NextSong.YouTubeID)
 
 	if ErrorGettingManifest != nil {
@@ -273,6 +269,93 @@ func (Q *Queue) Last() bool {
 func (Q *Queue) Jump(Index int) bool {
 
 	return Q.moveTo(Index, true)
+
+}
+
+// Remove deletes a song from the upcoming queue at the specified 0-indexed position; returns false for invalid positions.
+func (Q *Queue) Remove(Index int) bool {
+
+	if Index < 0 || Index >= len(Q.Upcoming) {
+
+		return false
+
+	}
+
+	Q.Upcoming = append(Q.Upcoming[:Index], Q.Upcoming[Index+1:]...)
+	Q.Functions.Updated(Q)
+
+	return true
+
+}
+
+// Move reorders a song in the upcoming queue from one 0-indexed position to another; returns false for invalid positions.
+func (Q *Queue) Move(FromIndex int, ToIndex int) bool {
+
+	if FromIndex < 0 || FromIndex >= len(Q.Upcoming) || ToIndex < 0 || ToIndex >= len(Q.Upcoming) {
+
+		return false
+
+	}
+
+	if FromIndex == ToIndex {
+
+		return true
+
+	}
+
+	Song := Q.Upcoming[FromIndex]
+	Q.Upcoming = append(Q.Upcoming[:FromIndex], Q.Upcoming[FromIndex+1:]...)
+
+	if ToIndex > FromIndex {
+
+		ToIndex--
+
+	}
+
+	Q.Upcoming = append(Q.Upcoming[:ToIndex], append([]*Innertube.Song{Song}, Q.Upcoming[ToIndex:]...)...)
+	Q.Functions.Updated(Q)
+
+	return true
+
+}
+
+// Replay moves to a previously played song at the specified 0-indexed position and starts playback; returns false for invalid positions.
+func (Q *Queue) Replay(Index int) bool {
+
+	if Index < 0 || Index >= len(Q.Previous) {
+
+		return false
+
+	}
+
+	// Move current song to front of upcoming
+
+	if Q.Current != nil {
+
+		Q.Upcoming = append([]*Innertube.Song{Q.Current}, Q.Upcoming...)
+
+	}
+
+	// Move songs after target index to front of upcoming (in reverse)
+
+	for i := len(Q.Previous) - 1; i > Index; i-- {
+
+		Q.Upcoming = append([]*Innertube.Song{Q.Previous[i]}, Q.Upcoming...)
+
+	}
+
+	// Set target song as current
+
+	Q.Current = Q.Previous[Index]
+
+	// Trim Previous array
+
+	Q.Previous = Q.Previous[:Index]
+
+	Q.Functions.Updated(Q)
+
+	go Q.Play()
+	return true
 
 }
 

@@ -32,3 +32,17 @@
   animation: lyric-reveal 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}

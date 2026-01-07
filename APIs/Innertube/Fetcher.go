@@ -5,6 +5,7 @@ import (
 	"Synthara-Redux/Utils"
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"slices"
 	"time"
@@ -209,6 +210,8 @@ func GetSongManifestURL(YouTubeID string) (string, error) {
 		HLSManifestURL = FoundManifest.(string)
 
 	} else {
+
+		Utils.Logger.Info(fmt.Sprintf("Fetching HLS manifest URL for song ID: %s", YouTubeID))
 
 		Video, ErrorFetchingVideo := OverturePlay.Info(YouTubeID, &OverturePlay.InfoOptions{
 

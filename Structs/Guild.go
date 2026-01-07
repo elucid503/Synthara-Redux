@@ -219,7 +219,7 @@ func (G *Guild) Disconnect(CloseConn bool) error {
 
 }
 
-// Stops playback, tickers, closes websockets, and the voice connection
+// Stops playback, closes websockets, and the voice connection
 func (G *Guild) Cleanup(CloseConn bool) error {
 
 	G.StreamerMutex.Lock()

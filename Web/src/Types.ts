@@ -46,6 +46,11 @@ export enum Operation {
     Next = "Next",
     Last = "Last",
 
+    Jump = "Jump",
+    Remove = "Remove",
+    Move = "Move",
+    Replay = "Replay",
+
 }
 
 export interface WSMessage<T> {

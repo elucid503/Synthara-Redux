@@ -13,11 +13,15 @@ interface QueueProps {
     ActiveContextMenu: { type: 'Previous' | 'Upcoming', index: number, x: number, y: number } | null;
     SetActiveContextMenu: (Menu: { type: 'Previous' | 'Upcoming', index: number, x: number, y: number } | null) => void;
 
+    OnMove: (FromIndex: number, ToIndex: number) => void;
+
 }
 
-function Queue({ Current, PreviousSongs, UpcomingSongs, ActiveContextMenu, SetActiveContextMenu }: QueueProps) {
+function Queue({ Current, PreviousSongs, UpcomingSongs, ActiveContextMenu, SetActiveContextMenu, OnMove }: QueueProps) {
 
     const [ShowPrevious, SetShowPrevious] = useState(false);
+    const [DraggedIndex, SetDraggedIndex] = useState<number | null>(null);
+    const [DragOverIndex, SetDragOverIndex] = useState<number | null>(null);
 
     const NormalizeCoverURL = (URL: string): string => {
 
@@ -30,6 +34,65 @@ function Queue({ Current, PreviousSongs, UpcomingSongs, ActiveContextMenu, SetAc
         const IsBig = Mode == 'Big';
         const IsPrevious = Mode == 'Muted';
         const ContextType = IsPrevious ? 'Previous' : 'Upcoming';
+
+        const IsDragging = !IsPrevious && DraggedIndex == Index;
+        const IsDragOver = !IsPrevious && DragOverIndex == Index;
+
+        const HandleDragStart = (E: React.DragEvent) => {
+
+            if (IsPrevious) return;
+            
+            SetDraggedIndex(Index);
+            E.dataTransfer.effectAllowed = 'move';
+
+        };
+
+        const HandleDragOver = (E: React.DragEvent) => {
+
+            if (IsPrevious || DraggedIndex == null) return;
+
+            E.preventDefault();
+            E.dataTransfer.dropEffect = 'move';
+
+            if (DraggedIndex != Index) {
+
+                SetDragOverIndex(Index);
+
+            }
+
+        };
+
+        const HandleDragLeave = () => {
+
+            if (IsPrevious) return;
+            
+            SetDragOverIndex(null);
+
+        };
+
+        const HandleDrop = (E: React.DragEvent) => {
+
+            if (IsPrevious) return;
+
+            E.preventDefault();
+
+            if (DraggedIndex != null && DraggedIndex != Index) {
+
+                OnMove(DraggedIndex, Index);
+
+            }
+
+            SetDraggedIndex(null);
+            SetDragOverIndex(null);
+
+        };
+
+        const HandleDragEnd = () => {
+
+            SetDraggedIndex(null);
+            SetDragOverIndex(null);
+
+        };
 
         if (IsBig) {
 
@@ -56,7 +119,13 @@ function Queue({ Current, PreviousSongs, UpcomingSongs, ActiveContextMenu, SetAc
 
         return (
 
-            <div key={Key} className={`flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group relative ${IsPrevious ? 'opacity-60' : ''}`}>
+            <div key={Key} draggable={!IsPrevious} onDragStart={HandleDragStart} onDragOver={HandleDragOver} onDragLeave={HandleDragLeave} onDrop={HandleDrop} onDragEnd={HandleDragEnd} onContextMenu={(E) => {
+                
+                E.preventDefault();
+                E.stopPropagation();
+                SetActiveContextMenu(ActiveContextMenu?.index === Index && ActiveContextMenu?.type === ContextType ? null : { type: ContextType, index: Index, x: E.clientX, y: E.clientY });
+            
+            }} className={`flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group relative ${IsPrevious ? 'opacity-60' : ''} ${!IsPrevious ? 'cursor-move' : '' } ${IsDragging ? 'opacity-30' : ''} ${IsDragOver ? 'border-t-2 rounded-tl-none rounded-tr-none border-white' : ''}`}>
                 
                 {!IsPrevious && (<div className="p-1 text-center text-zinc-500 font-medium text-sm">{Index + 1}</div>)}
 

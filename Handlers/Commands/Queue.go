@@ -1,6 +1,7 @@
 package Commands
 
 import (
+	"Synthara-Redux/Globals"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
+	"github.com/disgoorg/snowflake/v2"
 )
 
 func Queue(Event *events.ApplicationCommandInteractionCreate) {
@@ -36,6 +38,72 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 
 	var Body strings.Builder
 
+	// Stats
+
+	TotalSongs := len(Guild.Queue.Upcoming)
+
+	// Calculates total milliseconds until finished (including current remaining if available)
+
+	var TotalMs int64 = 0
+
+	if Guild.Queue.Current != nil {
+
+		CurrMs := int64(Guild.Queue.Current.Duration.Seconds * 1000)
+
+		if Guild.Queue.PlaybackSession != nil && Guild.Queue.PlaybackSession.Streamer != nil {
+
+			Prog := Guild.Queue.PlaybackSession.Streamer.Progress
+
+			CurrMs -= Prog
+
+			if CurrMs < 0 {
+
+				CurrMs = 0 // for sanity
+
+			}
+
+		}
+
+		TotalMs += CurrMs
+	}
+
+	for _, s := range Guild.Queue.Upcoming {
+
+		TotalMs += int64(s.Duration.Seconds * 1000)
+
+	}
+
+	Minutes := int((TotalMs + 59999) / 60000) // rounds up to minutes
+
+	// Counts unique contributors to the queue
+
+	ContribSet := map[string]bool{}
+
+	if Guild.Queue.Current != nil && Guild.Queue.Current.Internal.Requestor != "" {
+
+		ContribSet[Guild.Queue.Current.Internal.Requestor] = true
+
+	}
+
+	for _, s := range Guild.Queue.Upcoming {
+
+		if s.Internal.Requestor != "" {
+
+			ContribSet[s.Internal.Requestor] = true
+
+		}
+
+	}
+
+	Contributors := len(ContribSet)
+
+	SongWord := Localizations.Pluralize("Song", TotalSongs, Locale)
+	ContributorWord := Localizations.Pluralize("Contributor", Contributors, Locale)
+
+	Stats := Localizations.GetFormat("Embeds.Queue.Stats", Locale, TotalSongs, SongWord, Minutes, Contributors, ContributorWord)
+	
+	Body.WriteString(fmt.Sprintf("%s\n\n", Stats))
+
 	if len(Guild.Queue.Upcoming) > 0 {
 
 		Max := 10
@@ -50,8 +118,12 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 
 			SongItem := Guild.Queue.Upcoming[i]
 			ArtistNames := strings.Join(SongItem.Artists, ", ")
+			Req := ""
+			if SongItem.Internal.Requestor != "" {
+				Req = " • " + SongItem.Internal.Requestor
+			}
 
-			Body.WriteString(fmt.Sprintf("> **%s**\n> %s\n\n", SongItem.Title, ArtistNames))
+			Body.WriteString(fmt.Sprintf("%d. **%s** • %s%s\n", i + 1, SongItem.Title, ArtistNames, Req))
 		
 		} 
 
@@ -70,15 +142,28 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	// Append view link
+	// Get full guild 
 
-	Body.WriteString(fmt.Sprintf("%s", Localizations.GetFormat("Embeds.Queue.View", Locale, Page)))
+	FullGuild, Exists := Globals.DiscordClient.Caches.GuildCache().Get(GuildID)
+
+	if (!Exists) {
+
+		GuildFetchResp, GuildFetchErr := Globals.DiscordClient.Rest.GetGuild(GuildID, false)
+
+		if GuildFetchErr == nil {
+
+			FullGuild = GuildFetchResp.Guild
+
+		}
+
+	}
 
 	// Build embed
 
 	Embed := discord.NewEmbedBuilder()
 
-	Embed.SetTitle(Localizations.Get("Embeds.Queue.Title", Locale))
+	Embed.SetAuthor(Localizations.Get("Embeds.Queue.Title", Locale), "", "")
+	Embed.SetTitle(FullGuild.Name)
 	Embed.SetURL(Page)
 
 	if Guild.Queue.Current != nil {
@@ -95,10 +180,9 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 
 	Embed.SetDescription(Body.String())
 
-	Event.CreateMessage(discord.MessageCreate{
-
-		Embeds: []discord.Embed{Embed.Build()},
-
-	})
+	Event.CreateMessage(discord.NewMessageCreateBuilder().
+		AddEmbeds(Embed.Build()).
+		AddActionRow(discord.NewButton(discord.ButtonStyleLink, Localizations.Get("Embeds.Queue.View", Locale), "", Page, snowflake.ID(0))).
+		Build())
 
 }

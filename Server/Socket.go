@@ -19,6 +19,11 @@ const (
 	OperationNext   = "Next"
 	OperationLast   = "Last"
 
+	OperationJump   = "Jump"
+	OperationRemove = "Remove"
+	OperationMove   = "Move"
+	OperationReplay = "Replay"
+
 )
 
 var Upgrader = websocket.Upgrader{
@@ -88,6 +93,7 @@ func HandleWSConnections(Context *gin.Context) {
 			"Current": Guild.Queue.Current,
 			"Previous": Guild.Queue.Previous,
 			"Upcoming": Guild.Queue.Upcoming,
+			
 			"State": Guild.Queue.State,
 			"Progress": (Guild.Queue.PlaybackSession.Streamer.Progress),
 
@@ -131,21 +137,54 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 
 	switch Operation {
 
-	case OperationPause:
+		case OperationPause:
 
-		Guild.Queue.SetState(Structs.StatePaused)
+			Guild.Queue.SetState(Structs.StatePaused)
 
-	case OperationResume:
+		case OperationResume:
 
-		Guild.Queue.SetState(Structs.StatePlaying)
+			Guild.Queue.SetState(Structs.StatePlaying)
 
-	case OperationNext:
+		case OperationNext:
 
-		Guild.Queue.Next()
+			Guild.Queue.Next()
 
-	case OperationLast:
+		case OperationLast:
 
-		Guild.Queue.Last()
+			Guild.Queue.Last()
+
+		case OperationJump:
+
+			Index, Ok := Message["Index"].(float64)
+
+			if !Ok { return }
+
+			Guild.Queue.Jump(int(Index))
+
+		case OperationRemove:
+
+			Index, Ok := Message["Index"].(float64)
+
+			if !Ok { return }
+
+			Guild.Queue.Remove(int(Index))
+
+		case OperationMove:
+
+			FromIndex, FromOk := Message["FromIndex"].(float64)
+			ToIndex, ToOk := Message["ToIndex"].(float64)
+
+			if !FromOk || !ToOk { return }
+
+			Guild.Queue.Move(int(FromIndex), int(ToIndex))
+
+		case OperationReplay:
+
+			Index, Ok := Message["Index"].(float64)
+
+			if !Ok { return }
+
+			Guild.Queue.Replay(int(Index))
 
 	}
 
