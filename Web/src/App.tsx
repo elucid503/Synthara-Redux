@@ -18,6 +18,9 @@ function App() {
 
     const [ActiveContextMenu, SetActiveContextMenu] = useState<{ type: 'Previous' | 'Upcoming', index: number, x: number, y: number } | null>(null);
 
+    const [QueueEnded, SetQueueEnded] = useState(false);
+    const [HasEverConnected, SetHasEverConnected] = useState(false);
+
     const [Toast, SetToast] = useState<string | null>(null);
     const ToastTimeoutRef = useRef<any>(null);
 
@@ -127,6 +130,7 @@ function App() {
 
         let ReconnectTimeout: any = null;
         let ShouldReconnect = true;
+        let ReconnectAttempts = 0;
 
         const Connect = () => {
 
@@ -135,6 +139,9 @@ function App() {
             WS.onopen = () => {
 
                 console.log('WebSocket connected');
+                ReconnectAttempts = 0;
+                SetQueueEnded(false);
+                SetHasEverConnected(true);
 
             };
 
@@ -213,7 +220,18 @@ function App() {
 
                 if (ShouldReconnect) {
 
-                    ReconnectTimeout = setTimeout(() => Connect(), 2000);
+                    ReconnectAttempts++;
+                    
+                    if (ReconnectAttempts > 3) {
+
+                        SetQueueEnded(true);
+                        ShouldReconnect = false;
+
+                    } else {
+
+                        ReconnectTimeout = setTimeout(() => Connect(), 2000);
+
+                    }
 
                 }
 
@@ -352,13 +370,27 @@ function App() {
 
     };
 
+    if (QueueEnded) {
+
+        return (
+
+            <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+
+                <div className="text-zinc-500 text-lg">This Queue has Ended</div>
+
+            </div>
+
+        );
+
+    }
+
     if (!CurrentSong) {
 
         return (
 
             <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
 
-                <div className="text-zinc-500 text-lg">No Songs are currently playing.</div>
+                <div className="text-zinc-500 text-lg">{HasEverConnected ? 'No Songs are currently playing.' : 'No Queue Found'}</div>
 
             </div>
 

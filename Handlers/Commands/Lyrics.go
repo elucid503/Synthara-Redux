@@ -154,12 +154,11 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Guild == nil || Guild.Queue.Current == nil {
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.MessageUpdate{
-
-			Content: Utils.PtrToStr(Localizations.Get("Commands.Lyrics.Errors.NoSong", Locale)),
-
-		})
-
+		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
+			SetContent(Localizations.Get("Commands.Lyrics.Errors.NoSong", Locale)).
+			SetFlags(discord.MessageFlagsNone).
+			Build())
+		
 		return
 
 	}
@@ -197,11 +196,10 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Err != nil || APIRespPtr == nil {
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.MessageUpdate{
-
-			Content: Utils.PtrToStr(Localizations.Get("Commands.Lyrics.Errors.NotFound", Locale)),
-
-		})
+		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
+			SetContent(Localizations.Get("Commands.Lyrics.Errors.NotFound", Locale)).
+			SetFlags(discord.MessageFlagsNone).
+			Build())
 
 		return
 
@@ -310,6 +308,7 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
 		AddEmbeds(Embeds...).
 		AddActionRow(discord.NewButton(discord.ButtonStyleLink, ViewLabel, "", Page, snowflake.ID(0))).
+		SetFlags(discord.MessageFlagsNone).
 		Build())
 
 }

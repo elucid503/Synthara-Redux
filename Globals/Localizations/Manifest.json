@@ -101,8 +101,8 @@
 				}
 			},
 			"Success": {
-				"en-US": "Paused the currently playing song",
-				"en-GB": "Paused the currently playing song",
+				"en-US": "Paused the currently playing Song",
+				"en-GB": "Paused the currently playing Song",
 				"es-ES": "Se pausó la canción que se estaba reproduciendo",
 				"es-419": "Se pausó la canción que se estaba reproduciendo",
 				"zh-CN": "已暂停当前播放的歌曲",
@@ -131,8 +131,8 @@
 				}
 			},
 			"Success": {
-				"en-US": "Resumed the currently paused song",
-				"en-GB": "Resumed the currently paused song",
+				"en-US": "Resumed the currently paused Song",
+				"en-GB": "Resumed the currently paused Song",
 				"es-ES": "Se reanudó la canción pausada",
 				"es-419": "Se reanudó la canción pausada",
 				"zh-CN": "已恢复当前暂停的歌曲",
@@ -160,8 +160,8 @@
 					"ja": "アクティブな再生セッションが見つかりません！"
 				},
 				"NoNextSong": {
-					"en-US": "There is no next song in the queue",
-					"en-GB": "There is no next song in the queue",
+					"en-US": "There is no next Song in the Queue",
+					"en-GB": "There is no next Song in the Queue",
 					"es-ES": "No hay una siguiente canción en la cola",
 					"es-419": "No hay una siguiente canción en la cola",
 					"zh-CN": "队列中没有下一首歌曲",
@@ -174,8 +174,8 @@
 				}
 			},
 			"Success": {
-				"en-US": "Skipped to the next song",
-				"en-GB": "Skipped to the next song",
+				"en-US": "Skipped to the next Song",
+				"en-GB": "Skipped to the next Song",
 				"es-ES": "Se saltó a la siguiente canción",
 				"es-419": "Se saltó a la siguiente canción",
 				"zh-CN": "已跳至下一首歌曲",
@@ -190,8 +190,8 @@
 		"Last": {
 			"Errors": {
 				"NoPreviousSong": {
-					"en-US": "There is no previously played song",
-					"en-GB": "There is no previously played song",
+					"en-US": "There is no previously played Song",
+					"en-GB": "There is no previously played Song",
 					"es-ES": "No hay una canción reproducida anteriormente",
 					"es-419": "No hay una canción reproducida anteriormente",
 					"zh-CN": "没有之前播放的歌曲",
@@ -204,8 +204,8 @@
 				}
 			},
 			"Success": {
-				"en-US": "Playing the previous song",
-				"en-GB": "Playing the previous song",
+				"en-US": "Playing the previous Song",
+				"en-GB": "Playing the previous Song",
 				"es-ES": "Reproduciendo la canción anterior",
 				"es-419": "Reproduciendo la canción anterior",
 				"zh-CN": "正在播放上一首歌曲",
@@ -220,8 +220,8 @@
 		"Lyrics": {
 			"Errors": {
 				"NoSong": {
-					"en-US": "No song is currently playing",
-					"en-GB": "No song is currently playing",
+					"en-US": "No Song is currently playing",
+					"en-GB": "No Song is currently playing",
 					"es-ES": "No hay ninguna canción reproduciéndose",
 					"es-419": "No hay ninguna canción reproduciéndose",
 					"zh-CN": "当前没有正在播放的歌曲",
@@ -233,8 +233,8 @@
 					"ja": "現在再生中の曲はありません"
 				},
 				"NotFound": {
-					"en-US": "Lyrics could not be found for this song",
-					"en-GB": "Lyrics could not be found for this song",
+					"en-US": "Lyrics could not be found for this Song",
+					"en-GB": "Lyrics could not be found for this Song",
 					"es-ES": "No se encontraron letras para esta canción",
 					"es-419": "No se encontraron letras para esta canción",
 					"zh-CN": "未能找到该歌曲的歌词",
@@ -250,8 +250,8 @@
 		"Queue": {
 			"Errors": {
 				"NoQueue": {
-					"en-US": "There are no songs in the queue",
-					"en-GB": "There are no songs in the queue",
+					"en-US": "There are no Songs in the Queue",
+					"en-GB": "There are no Songs in the Queue",
 					"es-ES": "No hay canciones en la cola",
 					"es-419": "No hay canciones en la cola",
 					"zh-CN": "队列中没有歌曲",
@@ -498,8 +498,8 @@
 			},
 			"Errors": {
 				"NoQueue": {
-					"en-US": "There are no songs in the queue",
-					"en-GB": "There are no songs in the queue",
+					"en-US": "There are no Songs in the Queue",
+					"en-GB": "There are no Songs in the Queue",
 					"es-ES": "No hay canciones en la cola",
 					"es-419": "No hay canciones en la cola",
 					"zh-CN": "队列中没有歌曲",
@@ -538,8 +538,8 @@
 				"ja": "次に再生"
 			},
 			"NoUpcoming": {
-				"en-US": "No upcoming songs",
-				"en-GB": "No upcoming songs",
+				"en-US": "No upcoming Songs",
+				"en-GB": "No upcoming Songs",
 				"es-ES": "No hay canciones próximas",
 				"es-419": "No hay canciones próximas",
 				"zh-CN": "没有即将播放的歌曲",
@@ -675,8 +675,8 @@
 					"ja": "キューが終了しました"
 				},
 				"Description": {
-					"en-US": "The playback Queue has finished.\nNew songs may be added at any time.",
-					"en-GB": "The playback Queue has finished.\nNew songs may be added at any time.",
+					"en-US": "The playback Queue has finished.\nNew Songs may be added at any time.",
+					"en-GB": "The playback Queue has finished.\nNew Songs may be added at any time.",
 					"es-ES": "La cola de reproducción ha terminado.\nSe pueden agregar nuevas canciones en cualquier momento.",
 					"es-419": "La cola de reproducción ha terminado.\nSe pueden agregar nuevas canciones en cualquier momento.",
 					"zh-CN": "播放队列已结束。\n可以随时添加新歌曲。",

@@ -93,9 +93,3 @@ func Pluralize(Word string, Count int) string {
 	return Word + "s"
 
 }
-
-func PtrToStr(S string) *string {
-
-	return &S
-
-}
