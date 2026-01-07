@@ -41,8 +41,11 @@ type Guild struct {
 const (
 
 	Event_Initial = "INITIAL_STATE"
+
 	Event_QueueUpdated = "QUEUE_UPDATED"
 	Event_StateChanged = "STATE_CHANGED"
+
+	Event_ProgressUpdate = "PROGRESS_UPDATE"
 
 )
 
@@ -329,7 +332,7 @@ func (G *Guild) Play(Song *Innertube.Song) error {
 
 	}
 
-	Playback, ErrorCreatingPlayback := Audio.Play(Segments, SegmentDur, OnFinished)
+	Playback, ErrorCreatingPlayback := Audio.Play(Segments, SegmentDur, OnFinished, G.Queue.SendToWebsockets)
 
 	if ErrorCreatingPlayback != nil {
 

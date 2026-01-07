@@ -217,9 +217,11 @@ func QueueStateHandler(Queue *Queue, State int) {
 func QueueUpdatedHandler(Queue *Queue) {
 
 	Queue.SendToWebsockets(Event_QueueUpdated, map[string]interface{}{ 
+
 		"Current": Queue.Current,
 		"Previous": Queue.Previous,
 		"Upcoming": Queue.Upcoming,
+		
 	})
 
 	if len(Queue.Upcoming) == 0 {

@@ -197,7 +197,7 @@ func (Streamer *SegmentStreamer) Stop() {
 
 
 // Play starts playback and returns when finished or stopped
-func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinished func()) (*Playback, error) {
+func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinished func(), SendToWS func(Event string, Data any)) (*Playback, error) {
 
 	if len(Segments) == 0 {
 
@@ -254,6 +254,18 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 				continue
 
 			}
+
+			// We should send a progress update to any/all connected websockets here
+			// We aren't using the events enum since we cant import structs here :(
+
+			go SendToWS("PROGRESS_UPDATE", map[string]interface{}{
+
+				"Progress": Playback.Streamer.Progress,
+				"Index":   Playback.Streamer.CurrentIndex,
+
+			})
+
+			// Time for the processing now
 
 			_, _ = Streamer.ProcessNextSegment(SegmentBytes)
 			SegmentBytes = nil

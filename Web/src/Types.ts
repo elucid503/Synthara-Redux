@@ -34,6 +34,8 @@ export enum WSEvents {
     Event_StateChanged = "STATE_CHANGED",
     Event_QueueUpdated = "QUEUE_UPDATED",
 
+    Event_ProgressUpdate = "PROGRESS_UPDATE",
+
 }
 
 export enum Operation {

@@ -61,7 +61,7 @@ function App() {
     }, [ActiveContextMenu]);
 
     const [PlayerStateValue, SetPlayerStateValue] = useState<PlayerState>(PlayerState.Idle);
-    const [CurrentTime, SetCurrentTime] = useState(0);
+    const [CurrentTime, SetCurrentTime] = useState(0); // in milliseconds
     
     const [ActiveView, SetActiveView] = useState<'Details' | 'Queue' | 'Lyrics'>(() => {
 
@@ -132,13 +132,28 @@ function App() {
                     SetPlayerStateValue(Message.Data.State);
 
                 break;
+                
+                case WSEvents.Event_ProgressUpdate:
+
+                    // sent on next segment ready-to-be processed
+
+                    SetCurrentTime(Message.Data.Progress); 
+
+                break;
                     
                 case WSEvents.Event_QueueUpdated:
 
-                    SetCurrentSong(Message.Data.Current);
                     SetPreviousSongs(Message.Data.Previous || []);
-                    SetUpcomingSongs(Message.Data.Upcoming || []);
-                    SetCurrentTime(0);
+                    SetUpcomingSongs(Message.Data.Upcoming || []); 
+
+                    // Sets time to 0, but only if current changed 
+
+                    if ((Message.Data.Current as Song).youtube_id != CurrentSong?.youtube_id) {
+
+                        SetCurrentTime(0);
+                        SetCurrentSong(Message.Data.Current);
+                        
+                    }
 
                     SetLyrics(null);
 
