@@ -59,6 +59,78 @@ func InitClient() error {
 
 }
 
+func GetSong(YouTubeID string) (Song, error) {
+
+	RequestContext, RequestCancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer RequestCancel()
+
+	VideoDetails, VideoDetailsError := InnerTubeClient.Next(RequestContext, &YouTubeID, nil, nil, nil, nil)
+
+	if VideoDetailsError != nil {
+
+		return Song{}, VideoDetailsError
+
+	}
+
+	TabsVal, TabsExists := Utils.GetNestedValue(VideoDetails, "contents", "singleColumnMusicWatchNextResultsRenderer", "tabbedRenderer", "watchNextTabbedResultsRenderer", "tabs", )
+	
+	if !TabsExists {
+
+		return Song{}, errors.New("could not find tabs in VideoDetails response")
+
+	}
+
+	Tabs, TabsOK := TabsVal.([]interface{})
+
+	if !TabsOK || len(Tabs) == 0 {
+
+		return Song{}, errors.New("tabs is not a valid slice or is empty")
+
+	}
+
+	TabRendererVal, TabRendererExists := Utils.GetNestedValue(Tabs[0], "tabRenderer", "content", "musicQueueRenderer", "content", "playlistPanelRenderer", "contents")
+	
+	if !TabRendererExists {
+
+		return Song{}, errors.New("could not find playlistPanelRenderer.contents in tabRenderer")
+	}
+
+	Contents, ContentsOK := TabRendererVal.([]interface{})
+
+	if !ContentsOK || len(Contents) == 0 {
+
+		return Song{}, errors.New("playlistPanelRenderer.contents is not a valid slice or is empty")
+
+	}
+
+	SongPanelVal, SongPanelExists := Utils.GetNestedValue(Contents[0], "playlistPanelVideoRenderer")
+
+	if !SongPanelExists {
+
+		return Song{}, errors.New("could not find playlistPanelVideoRenderer in contents")
+
+	}
+
+	SongPanelMap, SongPanelMapOK := SongPanelVal.(map[string]interface{})
+
+	if !SongPanelMapOK {
+
+		return Song{}, errors.New("playlistPanelVideoRenderer is not a valid map")
+
+	}
+
+	ParsedSong, ParseError := ParseSongPanel(SongPanelMap)
+
+	if ParseError != nil {
+
+		return Song{}, ParseError
+
+	}
+
+	return ParsedSong, nil
+
+}
+
 func SearchForSongs(Query string) []Song {
 
 	Results := []Song{}
@@ -144,7 +216,7 @@ func SearchForSongs(Query string) []Song {
 
 		}
 
-		Song, CreateError := ParseSong(Renderer)
+		Song, CreateError := ParseSongItem(Renderer)
 
 		if CreateError == nil {
 
@@ -344,5 +416,179 @@ func GetSearchSuggestions(Query string) []SearchSuggestion {
 	}
 
 	return Results
+
+}
+
+func GetPlaylistSongs(PlaylistID string) ([]Song, error) {
+
+	Results := []Song{}
+
+	RequestContext, RequestCancel := context.WithTimeout(context.Background(), 5 * time.Second)
+
+	defer RequestCancel()
+
+	PlaylistResponse, PlaylistResponseError := InnerTubeClient.Browse(RequestContext, &PlaylistID, nil, nil)
+
+	if PlaylistResponseError != nil {
+
+		Utils.Logger.Error("Error fetching playlist: " + PlaylistResponseError.Error())
+		return Results, PlaylistResponseError
+
+	}
+
+	// Extract playlist name
+
+	PlaylistName := ""
+
+	if NameVal, NameExists := Utils.GetNestedValue(PlaylistResponse, "microformat", "microformatDataRenderer", "title"); NameExists {
+
+		if Name, NameValid := NameVal.(string); NameValid {
+
+			PlaylistName = Name
+
+		}
+
+	}
+
+	// Extract songs from musicPlaylistShelfRenderer
+
+	SongItemsVal, SongItemsExists := Utils.GetNestedValue(PlaylistResponse, "contents", "twoColumnBrowseResultsRenderer", "secondaryContents", "sectionListRenderer", "contents")
+
+	if !SongItemsExists {
+
+		return Results, errors.New("could not find playlist contents")
+
+	}
+
+	SectionContents, SectionContentsValid := SongItemsVal.([]interface{})
+
+	if !SectionContentsValid || len(SectionContents) == 0 {
+
+		return Results, errors.New("section contents is not a valid slice or is empty")
+
+	}
+
+	ShelfContentsVal, ShelfContentsExists := Utils.GetNestedValue(SectionContents[0], "musicPlaylistShelfRenderer", "contents")
+
+	if !ShelfContentsExists {
+
+		return Results, errors.New("could not find musicPlaylistShelfRenderer contents")
+
+	}
+
+	SongItems, SongItemsValid := ShelfContentsVal.([]interface{})
+
+	if !SongItemsValid {
+
+		return Results, errors.New("musicPlaylistShelfRenderer contents is not a valid slice")
+
+	}
+
+	// Parse each song item
+
+	for Index, Item := range SongItems {
+
+		ItemMap, ItemMapValid := Item.(map[string]interface{})
+
+		if !ItemMapValid {
+
+			continue
+
+		}
+
+		Renderer, RendererExists := ItemMap["musicResponsiveListItemRenderer"].(map[string]interface{})
+
+		if !RendererExists {
+
+			continue
+
+		}
+
+		ParsedSong, ParseError := ParsePlaylistSongItem(Renderer)
+
+		if ParseError != nil {
+
+			continue
+
+		}
+
+		// Set playlist metadata
+
+		ParsedSong.Internal.Playlist = PlaylistMeta{
+
+			Platform: "YouTube",
+
+			Index: Index + 1,
+			Total: len(SongItems),
+
+			Name: PlaylistName,
+			ID:   PlaylistID,
+
+		}
+
+		Results = append(Results, ParsedSong)
+
+	}
+
+	return Results, nil
+
+}
+
+func GetArtistSongs(ArtistID string) ([]Song, error) {
+
+	Results := []Song{}
+
+	RequestContext, RequestCancel := context.WithTimeout(context.Background(), 5 * time.Second)
+
+	defer RequestCancel()
+
+	ArtistResponse, ArtistResponseError := InnerTubeClient.Browse(RequestContext, &ArtistID, nil, nil)
+
+	if ArtistResponseError != nil {
+
+		Utils.Logger.Error("Error fetching artist: " + ArtistResponseError.Error())
+		return Results, ArtistResponseError
+
+	}
+
+	// Extract playlist ID from musicShelfRenderer bottomEndpoint
+
+	PlaylistID := ""
+
+	if PlaylistIDVal, PlaylistIDExists := Utils.GetNestedValue(ArtistResponse, "contents", "singleColumnBrowseResultsRenderer", "tabs"); PlaylistIDExists {
+
+		if Tabs, TabsValid := PlaylistIDVal.([]interface{}); TabsValid && len(Tabs) > 0 {
+
+			if SectionContentsVal, SectionContentsExists := Utils.GetNestedValue(Tabs[0], "tabRenderer", "content", "sectionListRenderer", "contents"); SectionContentsExists {
+
+				if SectionContents, SectionContentsValid := SectionContentsVal.([]interface{}); SectionContentsValid && len(SectionContents) > 0 {
+
+					if BrowseIDVal, BrowseIDExists := Utils.GetNestedValue(SectionContents[0], "musicShelfRenderer", "bottomEndpoint", "browseEndpoint", "browseId"); BrowseIDExists {
+
+						if BrowseID, BrowseIDValid := BrowseIDVal.(string); BrowseIDValid {
+
+							PlaylistID = BrowseID
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	if PlaylistID == "" {
+
+		return Results, errors.New("could not extract playlist ID from artist response")
+
+	}
+
+	// Fetch playlist songs
+
+	return GetPlaylistSongs(PlaylistID)
 
 }

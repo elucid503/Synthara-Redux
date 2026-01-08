@@ -49,6 +49,20 @@ type SongInternal struct {
 
 	Requestor string `json:"requestor"`
 
+	Playlist PlaylistMeta `json:"playlist"`
+
+}
+
+type PlaylistMeta struct {
+
+	Platform string `json:"platform"`
+
+	Index int `json:"index"`
+	Total int `json:"total"`
+
+	Name string `json:"name"`
+	ID  string `json:"id"`
+
 }
 
 func (S *Song) Embed(State QueueInfo) discord.Embed {

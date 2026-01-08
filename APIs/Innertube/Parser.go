@@ -9,7 +9,196 @@ import (
 
 // Parser Functons
 
-func ParseSong(Renderer map[string]interface{}) (Song, error) {
+func ParseSongPanel(Renderer map[string]interface{}) (Song, error) {
+
+	// Extract YouTubeID
+
+	VideoID, _ := Renderer["videoId"].(string)
+
+	if VideoID == "" {
+
+		return Song{}, errors.New("videoId not found in playlistPanelVideoRenderer")
+
+	}
+
+	// Extract Title
+
+	Title := ""
+
+	if TitleObj, OK := Renderer["title"].(map[string]interface{}); OK {
+
+		if Runs, OK := TitleObj["runs"].([]interface{}); OK && len(Runs) > 0 {
+
+			if Run, OK := Runs[0].(map[string]interface{}); OK {
+
+				Title, _ = Run["text"].(string)
+
+			}
+
+		}
+
+	}
+
+	// Extract Artists and Album from longBylineText
+
+	Artists := []string{}
+	Album := ""
+
+	if BylineObj, OK := Renderer["longBylineText"].(map[string]interface{}); OK {
+
+		if Runs, OK := BylineObj["runs"].([]interface{}); OK {
+
+			Segments := []string{}
+			CurrentSegment := strings.Builder{}
+
+			for _, Run := range Runs {
+
+				if RunMap, OK := Run.(map[string]interface{}); OK {
+
+					if text, ok := RunMap["text"].(string); ok {
+
+						// Detects major separator (bullet only - comma separates artists)
+						
+						if text == " • " {
+
+							if CurrentSegment.Len() > 0 {
+
+								Segments = append(Segments, strings.TrimSpace(CurrentSegment.String()))
+
+								CurrentSegment.Reset()
+
+							}
+
+							continue
+
+						}
+
+						CurrentSegment.WriteString(text)
+
+					}
+
+				}
+
+			}
+
+			if CurrentSegment.Len() > 0 {
+
+				Segments = append(Segments, strings.TrimSpace(CurrentSegment.String()))
+
+			}
+
+			// Extracts artist(s) from first segment
+			
+			if len(Segments) > 0 {
+
+				ArtistText := Segments[0]
+								
+				NormalizedArtists := strings.ReplaceAll(ArtistText, " & ", ", ")
+
+				SplitArtists := strings.Split(NormalizedArtists, ", ")
+
+				for _, Artist := range SplitArtists {
+
+					TrimmedArtist := strings.TrimSpace(strings.ReplaceAll(Artist, "\u0026", "&"))
+
+					if TrimmedArtist != "" {
+
+						Artists = append(Artists, TrimmedArtist)
+
+					}
+
+				}
+
+			}
+
+			// Extracts album from second segment if it exists and is non-empty
+			
+			if len(Segments) > 1 {
+
+				CandidateAlbum := Segments[1]
+
+				if CandidateAlbum != "" {
+
+					Album = CandidateAlbum
+
+				}
+
+			}
+
+		}
+
+	}
+
+	// Duration
+
+	DurationFormatted := ""
+	DurationSeconds := 0
+
+	if LengthText, OK := Renderer["lengthText"].(map[string]interface{}); OK {
+
+		if Runs, OK := LengthText["runs"].([]interface{}); OK && len(Runs) > 0 {
+
+			if Run, OK := Runs[0].(map[string]interface{}); OK {
+
+				DurationFormatted, _ = Run["text"].(string)
+
+			}
+		}
+
+	}
+	// Parse formatted duration to seconds
+
+	if DurationFormatted != "" {
+
+		var Min, Sec int
+
+		if _, Err := fmt.Sscanf(DurationFormatted, "%d:%d", &Min, &Sec); Err == nil {
+
+			DurationSeconds = Min * 60 + Sec
+
+		}
+
+	}
+
+	// Cover
+
+	Cover := ""
+
+	if ThumbObj, OK := Renderer["thumbnail"].(map[string]interface{}); OK {
+
+		if Thumbs, OK := ThumbObj["thumbnails"].([]interface{}); OK && len(Thumbs) > 0 {
+
+			if LastThumb, OK := Thumbs[len(Thumbs)-1].(map[string]interface{}); OK {
+
+				Cover, _ = LastThumb["url"].(string)
+			}
+
+		}
+
+	}
+
+	return Song{
+
+		YouTubeID: VideoID,
+
+		Title:     Title,
+		Artists:   Artists,
+		Album:     Album,
+
+		Duration: Duration{
+
+			Seconds:   DurationSeconds,
+			Formatted: DurationFormatted,
+
+		},
+
+		Cover: Cover,
+
+	}, nil
+
+}
+
+func ParseSongItem(Renderer map[string]interface{}) (Song, error) {
 
     VideoIDVal, VideoIDExists := Utils.GetNestedValue(Renderer, "playlistItemData", "videoId")
 
@@ -128,13 +317,182 @@ func ParseSong(Renderer map[string]interface{}) (Song, error) {
 
 			if len(Segments) > 1 {
 
-				Album = Segments[1]
+				// Validates album segment - skip if empty/whitespace
+
+				CandidateAlbum := strings.TrimSpace(Segments[1])
+
+				if CandidateAlbum != "" {
+
+					Album = CandidateAlbum
+
+				}
 
 			}
 
 			if len(Segments) > 2 {
 
 				DurationFormatted = Segments[2]
+
+			}
+
+		}
+
+	}
+
+	Cover := ExtractSongThumbnail(Renderer)
+	DurationSeconds := ParseFormattedDuration(DurationFormatted)
+
+	return Song{
+
+		YouTubeID: VideoID,
+
+		Title:     Title,
+		Artists:   Artists,
+		Album:     Album,
+
+		Duration: Duration{
+
+			Seconds:   DurationSeconds,
+			Formatted: DurationFormatted,
+
+		},
+		Cover: Cover,
+
+	}, nil
+
+}
+
+func ParsePlaylistSongItem(Renderer map[string]interface{}) (Song, error) {
+
+	VideoIDVal, VideoIDExists := Utils.GetNestedValue(Renderer, "playlistItemData", "videoId")
+
+	if !VideoIDExists {
+
+		return Song{}, errors.New("video ID not found in renderer")
+
+	}
+
+	VideoID, VideoIDValid := VideoIDVal.(string)
+
+	if !VideoIDValid || VideoID == "" {
+
+		return Song{}, errors.New("invalid video ID in renderer")
+
+	}
+
+	FlexColumns, FlexColumnsExists := Renderer["flexColumns"].([]interface{})
+
+	if !FlexColumnsExists || len(FlexColumns) < 4 {
+
+		return Song{}, errors.New("insufficient flex columns in renderer")
+
+	}
+
+	// Extract title from flexColumns[0]
+
+	Title := ""
+
+	TitleRuns, TitleRunsValid := Utils.GetNestedValue(FlexColumns[0], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
+
+	if TitleRunsValid {
+
+		if Runs, RunsOK := TitleRuns.([]interface{}); RunsOK && len(Runs) > 0 {
+
+			if FirstRun, FirstRunOK := Runs[0].(map[string]interface{}); FirstRunOK {
+
+				if TitleText, TitleTextOK := FirstRun["text"].(string); TitleTextOK {
+
+					Title = TitleText
+
+				}
+
+			}
+
+		}
+
+	}
+
+	// Extract artists from flexColumns[1]
+
+	Artists := []string{}
+
+	ArtistRuns, ArtistRunsValid := Utils.GetNestedValue(FlexColumns[1], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
+
+	if ArtistRunsValid {
+
+		if Runs, RunsOK := ArtistRuns.([]interface{}); RunsOK {
+
+			for _, Run := range Runs {
+
+				if RunMap, RunMapOK := Run.(map[string]interface{}); RunMapOK {
+
+					if ArtistText, ArtistTextOK := RunMap["text"].(string); ArtistTextOK {
+
+						TrimmedArtist := strings.TrimSpace(ArtistText)
+
+						if TrimmedArtist != "" && TrimmedArtist != ", " && TrimmedArtist != " & " {
+
+							Artists = append(Artists, TrimmedArtist)
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	// Extract album from flexColumns[3]
+
+	Album := ""
+
+	AlbumRuns, AlbumRunsValid := Utils.GetNestedValue(FlexColumns[3], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
+
+	if AlbumRunsValid {
+
+		if Runs, RunsOK := AlbumRuns.([]interface{}); RunsOK && len(Runs) > 0 {
+
+			if FirstRun, FirstRunOK := Runs[0].(map[string]interface{}); FirstRunOK {
+
+				if AlbumText, AlbumTextOK := FirstRun["text"].(string); AlbumTextOK {
+
+					Album = strings.TrimSpace(AlbumText)
+
+				}
+
+			}
+
+		}
+
+	}
+
+	// Extract duration from fixedColumns[0]
+
+	DurationFormatted := ""
+
+	FixedColumns, FixedColumnsExists := Renderer["fixedColumns"].([]interface{})
+
+	if FixedColumnsExists && len(FixedColumns) > 0 {
+
+		DurationRuns, DurationRunsValid := Utils.GetNestedValue(FixedColumns[0], "musicResponsiveListItemFixedColumnRenderer", "text", "runs")
+
+		if DurationRunsValid {
+
+			if Runs, RunsOK := DurationRuns.([]interface{}); RunsOK && len(Runs) > 0 {
+
+				if FirstRun, FirstRunOK := Runs[0].(map[string]interface{}); FirstRunOK {
+
+					if DurationText, DurationTextOK := FirstRun["text"].(string); DurationTextOK {
+
+						DurationFormatted = DurationText
+
+					}
+
+				}
 
 			}
 

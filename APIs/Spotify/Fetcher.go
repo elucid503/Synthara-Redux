@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var Client *Spotify
+var Client *SPClient
 
 type Token struct {
 
@@ -22,7 +22,7 @@ type Token struct {
 
 }
 
-type Spotify struct {
+type SPClient struct {
 
 	client_id     string
 	client_secret string
@@ -357,19 +357,72 @@ func (Pl *Playlist) GetItems() []PlaylistItem {
 
 }
 
-func Initialize(ID, Secret string) *Spotify {
+func (Pl *Playlist) GetAllItems() ([]PlaylistItem, error) {
 
-	Client = &Spotify{
+	Items := make([]PlaylistItem, 0, Pl.Tracks.Total) // preallocates the slice with total size
+	Items = append(Items, Pl.Tracks.Items...) // adds the first page of items
+
+	// If we already have all tracks, we should return now
+
+	if Pl.Tracks.Total <= len(Items) {
+
+		return Items, nil
+
+	}
+
+	Next := Pl.Tracks.Next
+
+	for Next != "" {
+
+		Body, Err := Client.MakeRequest(Next)
+
+		if Err != nil {
+
+			return nil, Err
+
+		}
+
+		var Page PagingPlaylistTracks
+
+		if Err := json.Unmarshal(Body, &Page); Err != nil {
+
+			return nil, Err
+
+		}
+
+		Items = append(Items, Page.Items...)
+
+		// Check if we've reached the total number of items
+
+		if len(Items) >= Page.Total {
+
+			break
+
+		}
+
+		Next = Page.Next
+
+	}
+
+	return Items, nil
+	
+}
+
+func Initialize(ID, Secret string) *SPClient {
+
+	Client = &SPClient{
+
 		client_id:     ID,
 		client_secret: Secret,
 		AccessToken:   Token{},
+
 	}
 
 	return Client
 
 }
 
-func (St *Spotify) Refresh() error {
+func (St *SPClient) Refresh() error {
 
 	if St.AccessToken.Token == "" {
 
@@ -395,7 +448,7 @@ func (St *Spotify) Refresh() error {
 
 }
 
-func (St *Spotify) MakeRequest(URL string) ([]byte, error) {
+func (St *SPClient) MakeRequest(URL string) ([]byte, error) {
 
 	if Err := St.Refresh(); Err != nil {
 
@@ -426,6 +479,7 @@ func (St *Spotify) MakeRequest(URL string) ([]byte, error) {
 	defer Resp.Body.Close()
 
 	Body, Err := io.ReadAll(Resp.Body)
+
 	if Err != nil {
 
 		return nil, Err
@@ -444,7 +498,7 @@ func (St *Spotify) MakeRequest(URL string) ([]byte, error) {
 
 }
 
-func (St *Spotify) NewToken() error {
+func (St *SPClient) NewToken() error {
 
 	Data := url.Values{}
 
@@ -453,6 +507,7 @@ func (St *Spotify) NewToken() error {
 	Data.Set("client_secret", St.client_secret)
 
 	Req, Err := http.NewRequest("POST", "https://accounts.spotify.com/api/token", bytes.NewBufferString(Data.Encode()))
+
 	if Err != nil {
 
 		return Err
@@ -464,6 +519,7 @@ func (St *Spotify) NewToken() error {
 	Client := &http.Client{}
 
 	Resp, Err := Client.Do(Req)
+
 	if Err != nil {
 
 		return Err
@@ -472,6 +528,7 @@ func (St *Spotify) NewToken() error {
 	defer Resp.Body.Close()
 
 	Body, Err := io.ReadAll(Resp.Body)
+
 	if Err != nil {
 
 		return Err
@@ -489,6 +546,7 @@ func (St *Spotify) NewToken() error {
 	var TokenVar Token
 
 	Err = json.Unmarshal(Body, &TokenVar)
+
 	if Err != nil {
 
 		return Err
@@ -503,9 +561,10 @@ func (St *Spotify) NewToken() error {
 
 }
 
-func (St *Spotify) GetArtist(ID string) (*Artists, error) {
+func (St *SPClient) GetArtist(ID string) (*Artists, error) {
 
 	Body, Err := St.MakeRequest(fmt.Sprintf("https://api.spotify.com/v1/artists/%s", ID))
+
 	if Err != nil {
 
 		return nil, Err
@@ -515,6 +574,7 @@ func (St *Spotify) GetArtist(ID string) (*Artists, error) {
 	var Info Artists
 
 	Err = json.Unmarshal(Body, &Info)
+
 	if Err != nil {
 
 		return nil, Err
@@ -525,9 +585,10 @@ func (St *Spotify) GetArtist(ID string) (*Artists, error) {
 
 }
 
-func (St *Spotify) GetUser(ID string) (*User, error) {
+func (St *SPClient) GetUser(ID string) (*User, error) {
 
 	Body, Err := St.MakeRequest(fmt.Sprintf("https://api.spotify.com/v1/users/%s", ID))
+
 	if Err != nil {
 
 		return nil, Err
@@ -537,6 +598,7 @@ func (St *Spotify) GetUser(ID string) (*User, error) {
 	var Info User
 
 	Err = json.Unmarshal(Body, &Info)
+
 	if Err != nil {
 
 		return nil, Err
@@ -547,9 +609,10 @@ func (St *Spotify) GetUser(ID string) (*User, error) {
 
 }
 
-func (St *Spotify) GetAlbum(ID string) (*Album, error) {
+func (St *SPClient) GetAlbum(ID string) (*Album, error) {
 
 	Body, Err := St.MakeRequest(fmt.Sprintf("https://api.spotify.com/v1/albums/%s", ID))
+
 	if Err != nil {
 
 		return nil, Err
@@ -559,6 +622,7 @@ func (St *Spotify) GetAlbum(ID string) (*Album, error) {
 	var Info Album
 
 	Err = json.Unmarshal(Body, &Info)
+
 	if Err != nil {
 
 		return nil, Err
@@ -569,9 +633,10 @@ func (St *Spotify) GetAlbum(ID string) (*Album, error) {
 
 }
 
-func (St *Spotify) GetTrack(ID string) (*Track, error) {
+func (St *SPClient) GetTrack(ID string) (*Track, error) {
 
 	Body, Err := St.MakeRequest(fmt.Sprintf("https://api.spotify.com/v1/tracks/%s", ID))
+
 	if Err != nil {
 
 		return nil, Err
@@ -592,9 +657,10 @@ func (St *Spotify) GetTrack(ID string) (*Track, error) {
 
 }
 
-func (St *Spotify) GetPlaylist(ID string) (*Playlist, error) {
+func (St *SPClient) GetPlaylist(ID string) (*Playlist, error) {
 
 	Body, Err := St.MakeRequest(fmt.Sprintf("https://api.spotify.com/v1/playlists/%s", ID))
+
 	if Err != nil {
 
 		return nil, Err
@@ -604,6 +670,7 @@ func (St *Spotify) GetPlaylist(ID string) (*Playlist, error) {
 	var Info Playlist
 
 	Err = json.Unmarshal(Body, &Info)
+
 	if Err != nil {
 
 		return nil, Err
@@ -614,9 +681,10 @@ func (St *Spotify) GetPlaylist(ID string) (*Playlist, error) {
 
 }
 
-func (St *Spotify) SearchTrack(Q string, Limit int) (*SearchTrack, error) {
+func (St *SPClient) SearchTrack(Q string, Limit int) (*SearchTrack, error) {
 
 	Body, Err := St.MakeRequest(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=%d", strings.ReplaceAll(Q, " ", ""), Limit))
+
 	if Err != nil {
 
 		return nil, Err
@@ -626,6 +694,7 @@ func (St *Spotify) SearchTrack(Q string, Limit int) (*SearchTrack, error) {
 	var Info Search
 
 	Err = json.Unmarshal(Body, &Info)
+
 	if Err != nil {
 
 		return nil, Err
@@ -636,9 +705,10 @@ func (St *Spotify) SearchTrack(Q string, Limit int) (*SearchTrack, error) {
 
 }
 
-func (St *Spotify) SearchArtist(Q string, Limit int) (*SearchArtist, error) {
+func (St *SPClient) SearchArtist(Q string, Limit int) (*SearchArtist, error) {
 
 	Body, Err := St.MakeRequest(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=artist&limit=%d", strings.ReplaceAll(Q, " ", ""), Limit))
+
 	if Err != nil {
 
 		return nil, Err
@@ -648,6 +718,7 @@ func (St *Spotify) SearchArtist(Q string, Limit int) (*SearchArtist, error) {
 	var Info Search
 
 	Err = json.Unmarshal(Body, &Info)
+
 	if Err != nil {
 
 		return nil, Err
@@ -658,9 +729,10 @@ func (St *Spotify) SearchArtist(Q string, Limit int) (*SearchArtist, error) {
 
 }
 
-func (St *Spotify) SearchAlbum(Q string, Limit int) (*SearchAlbum, error) {
+func (St *SPClient) SearchAlbum(Q string, Limit int) (*SearchAlbum, error) {
 
 	Body, Err := St.MakeRequest(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=album&limit=%d", strings.ReplaceAll(Q, " ", ""), Limit))
+
 	if Err != nil {
 
 		return nil, Err
@@ -670,6 +742,7 @@ func (St *Spotify) SearchAlbum(Q string, Limit int) (*SearchAlbum, error) {
 	var Info Search
 
 	Err = json.Unmarshal(Body, &Info)
+
 	if Err != nil {
 
 		return nil, Err
@@ -680,9 +753,10 @@ func (St *Spotify) SearchAlbum(Q string, Limit int) (*SearchAlbum, error) {
 
 }
 
-func (St *Spotify) SearchPlaylist(Q string, Limit int) (*SearchPlaylist, error) {
+func (St *SPClient) SearchPlaylist(Q string, Limit int) (*SearchPlaylist, error) {
 
 	Body, Err := St.MakeRequest(fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=playlist&limit=%d", strings.ReplaceAll(Q, " ", ""), Limit))
+
 	if Err != nil {
 
 		return nil, Err
@@ -692,6 +766,7 @@ func (St *Spotify) SearchPlaylist(Q string, Limit int) (*SearchPlaylist, error) 
 	var Info Search
 
 	Err = json.Unmarshal(Body, &Info)
+
 	if Err != nil {
 
 		return nil, Err

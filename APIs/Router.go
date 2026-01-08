@@ -1,4 +1,4 @@
-package Innertube
+package APIs
 
 import (
 	"errors"
@@ -81,40 +81,5 @@ func ParseURI(Input string) (string, string, error) {
 	}
 
 	return Parts[0], Parts[1], nil
-
-}
-
-// RouteURI takes a Synthara-Redux URI string and returns a list of Songs found/cooresponding to that URI.
-func RouteURI(URI string) ([]*Song, error) {
-
-	Type, _, ErrorParsing := ParseURI(URI)
-
-	if ErrorParsing != nil {
-
-		return nil, ErrorParsing
-
-	}
-
-	switch Type {
-
-		case URITypeSong:
-
-		case URITypeVideo:
-
-		case URITypeAlbum:
-
-		case URITypeArtist:
-
-		case URITypePlaylist:
-
-		case URITypeSPSong:
-
-		case URITypeSPAlbum:
-
-		case URITypeSPPlaylist:
-
-	}
-
-	return []*Song{}, nil
 
 }

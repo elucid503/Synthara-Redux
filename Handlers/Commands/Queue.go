@@ -118,12 +118,8 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 
 			SongItem := Guild.Queue.Upcoming[i]
 			ArtistNames := strings.Join(SongItem.Artists, ", ")
-			Req := ""
-			if SongItem.Internal.Requestor != "" {
-				Req = " • " + SongItem.Internal.Requestor
-			}
 
-			Body.WriteString(fmt.Sprintf("%d. **%s** • %s%s\n", i + 1, SongItem.Title, ArtistNames, Req))
+			Body.WriteString(fmt.Sprintf("%d. **%s** • %s\n", i + 1, SongItem.Title, ArtistNames))
 		
 		} 
 

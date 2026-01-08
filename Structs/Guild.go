@@ -1,6 +1,7 @@
 package Structs
 
 import (
+	"Synthara-Redux/APIs"
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/Audio"
 	"Synthara-Redux/Globals"
@@ -299,6 +300,91 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 	}
 
 	return nil
+
+}
+
+// RouteURI takes a Synthara-Redux URI string and handles adding/playing the content. Returns if the content was played immediately
+func (G *Guild) HandleURI(URI string, Requestor string) (bool, error) {
+
+	Type, ID, ErrorParsing := APIs.ParseURI(URI)
+
+	if ErrorParsing != nil {
+
+		return false, ErrorParsing
+
+	}
+
+	var ShouldPlay bool
+	var SongFound *Innertube.Song
+
+	switch Type {
+
+		case APIs.URITypeSong:
+
+			Song, SongFetchErr := Innertube.GetSong(ID)
+
+			if SongFetchErr != nil {
+
+				return false, SongFetchErr
+
+			}
+
+			SongFound = &Song
+
+			Pos := G.Queue.Add(SongFound, Requestor)
+
+			ShouldPlay = Pos == 0
+
+
+		case APIs.URITypeVideo:
+
+			// Can do the same thing as a song probably
+
+			Song, SongFetchErr := Innertube.GetSong(ID)
+
+			if SongFetchErr != nil {
+
+				return false, SongFetchErr
+
+			}
+
+			SongFound = &Song
+
+			Pos := G.Queue.Add(SongFound, Requestor)
+
+			ShouldPlay = Pos == 0
+
+		case APIs.URITypeAlbum:
+
+		case APIs.URITypeArtist:
+
+		case APIs.URITypePlaylist:
+
+		case APIs.URITypeSPSong:
+
+		case APIs.URITypeSPAlbum:
+
+		case APIs.URITypeSPPlaylist:
+
+	}
+
+	if ShouldPlay {
+
+		go func() { // done as to not block
+
+			PlayError := G.Play(SongFound)
+
+			if PlayError != nil {
+
+				Utils.Logger.Error(fmt.Sprintf("Error playing song: %s", PlayError.Error()))
+
+			}
+
+		}()
+
+	}	
+
+	return ShouldPlay, nil
 
 }
 
