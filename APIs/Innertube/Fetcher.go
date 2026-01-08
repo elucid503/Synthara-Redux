@@ -158,43 +158,6 @@ func SearchForSongs(Query string) []Song {
 
 }
 
-func GetSongByYouTubeID(YouTubeID string) (*Song, error) {
-
-	Cookie := os.Getenv("YOUTUBE_COOKIE")
-
-	FetchedVideo, ErrorFetching := OverturePlay.Info(YouTubeID, nil, nil, &Cookie)
-
-	if ErrorFetching != nil {
-
-		return nil, ErrorFetching
-
-	}
-
-	FetchedVideoDetails := FetchedVideo.Details()
-
-	Song := &Song{
-
-		Title: FetchedVideoDetails.Title,
-		YouTubeID: FetchedVideoDetails.ID,
-
-		Artists: []string{ FetchedVideoDetails.Author },
-		Album: FetchedVideoDetails.Title, // YouTube videos don't have albums, so we use title as placeholder
-
-		Duration: Duration{
-
-			Seconds: int(FetchedVideoDetails.Duration) / 1000,
-			Formatted: FormatDuration(int(FetchedVideoDetails.Duration) / 1000),
-
-		},
-		
-		Cover: FetchedVideoDetails.Thumbnails[0].URL, // Uses first thumbnail as cover
-
-	}
-
-	return Song, nil
-
-}
-
 func GetSongManifestURL(YouTubeID string) (string, error) {
 	
 	Cookie := os.Getenv("YOUTUBE_COOKIE")

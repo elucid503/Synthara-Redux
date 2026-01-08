@@ -20,6 +20,19 @@ const (
 	URITypeSPAlbum = "SPAlbum"
 	URITypeSPPlaylist = "SPPlaylist"
 
+	// Apple Music 
+
+	URITypeAMSong = "AMSong"
+	URITypeAMAlbum = "AMAlbum"
+	URITypeAMPlaylist = "AMPlaylist"
+
+)
+
+const (
+
+	ExternalPlatformSpotify = "Spotify"
+	ExternalPlatformAppleMusic = "AppleMusic"
+
 )
 
 // URI Schema: Synthara-Redux:<Type>:<ID>
@@ -74,7 +87,7 @@ func ParseURI(Input string) (string, string, error) {
 // RouteURI takes a Synthara-Redux URI string and returns a list of Songs found/cooresponding to that URI.
 func RouteURI(URI string) ([]*Song, error) {
 
-	Type, ID, ErrorParsing := ParseURI(URI)
+	Type, _, ErrorParsing := ParseURI(URI)
 
 	if ErrorParsing != nil {
 
@@ -86,31 +99,7 @@ func RouteURI(URI string) ([]*Song, error) {
 
 		case URITypeSong:
 
-			// Song from YouTube ID. TODO: Possibly improve fetch function
-
-			FetchedSong, ErrorFetchingSong := GetSongByYouTubeID(ID)
-
-			if ErrorFetchingSong != nil {
-
-				return nil, ErrorFetchingSong
-
-			}
-
-			return []*Song{FetchedSong}, nil
-
 		case URITypeVideo:
-
-			// Same process
-
-			FetchedSong, ErrorFetchingSong := GetSongByYouTubeID(ID)
-
-			if ErrorFetchingSong != nil {
-
-				return nil, ErrorFetchingSong
-
-			}
-
-			return []*Song{FetchedSong}, nil
 
 		case URITypeAlbum:
 
