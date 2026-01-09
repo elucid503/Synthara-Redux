@@ -46,7 +46,7 @@ const (
 // IsURI checks if the given input string is a Synthara-Redux URI.
 func IsURI(Input string) bool {
 
-	return len(Input) > 14 && Input[:14] == "Synthara-Redux:"
+	return len(Input) > 15 && strings.HasPrefix(Input, "Synthara-Redux:")
 
 }
 
@@ -63,7 +63,7 @@ func ParseURI(Input string) (string, string, error) {
 
 	CurrentPart := ""
 
-	for i := 14; i < len(Input); i++ {
+	for i := 15; i < len(Input); i++ {
 
 		if Input[i] == ':' {
 
