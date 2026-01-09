@@ -1,6 +1,7 @@
 package Commands
 
 import (
+	"Synthara-Redux/APIs"
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
@@ -63,22 +64,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	ChannelID := VoiceState.ChannelID
 
-	// Search for songs
-
-	SearchResults := Innertube.SearchForSongs(Query)
-
-	if len(SearchResults) == 0 {
-
-		Event.CreateMessage(discord.MessageCreate{
-
-			Content: Localizations.Get("Commands.Play.Errors.NoResults", Locale),
-
-		})
-
-		return
-
-	}
-
 	Guild := Structs.GetGuild(GuildID, true) // creates if not found
 
 	// Connect to voice channel
@@ -96,10 +81,40 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 		return
 
 	}
-	
-	// Play/Add result 
 
-	Pos := Guild.Queue.Add(&SearchResults[0], Event.User().Mention())
+	// Route the input to a URI
+
+	URI, ErrorRouting := APIs.Route(Query)
+
+	if ErrorRouting != nil {
+
+		Event.CreateMessage(discord.MessageCreate{
+
+			Content: Localizations.GetFormat("Commands.Play.Errors.InvalidInput", Locale, ErrorRouting.Error()),
+
+		})
+
+		return
+
+	}
+
+	// Handle the URI
+
+	SongFound, Pos, ErrorHandling := Guild.HandleURI(URI, Event.User().Mention())
+
+	if ErrorHandling != nil {
+
+		Event.CreateMessage(discord.MessageCreate{
+
+			Content: Localizations.GetFormat("Commands.Play.Errors.FailedToHandle", Locale, ErrorHandling.Error()),
+
+		})
+
+		return
+
+	}
+
+	// Send response with current song info
 
 	State := Innertube.QueueInfo{
 
@@ -116,14 +131,8 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Embeds: []discord.Embed{SearchResults[0].Embed(State)},
-		
+		Embeds: []discord.Embed{SongFound.Embed(State)},
+
 	})
-
-	if Pos == 0 {
-	
-		Guild.Play(Guild.Queue.Current)
-
-	}
 
 }

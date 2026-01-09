@@ -35,6 +35,46 @@ func SpotifyIDToSong(SpotifyID string) (Innertube.Song, *Track, error) {
 
 }
 
+func SpotifyAlbumToFirstSong(SpotifyAlbumID string) (Innertube.Song, *Album, error) {
+
+	SpotifyAlbum, ErrorFetching := Client.GetAlbum(SpotifyAlbumID)
+
+	if ErrorFetching != nil {
+
+		return Innertube.Song{}, nil, ErrorFetching
+
+	}
+
+	if len(SpotifyAlbum.Tracks.Items) == 0 {
+
+		return Innertube.Song{}, nil, fmt.Errorf("Spotify album has no tracks: %s", SpotifyAlbumID)
+
+	}
+
+	FirstSong, _, FirstSongError := SpotifyIDToSong(SpotifyAlbum.Tracks.Items[0].ID)
+
+	if FirstSongError != nil {
+
+		return Innertube.Song{}, nil, FirstSongError
+
+	}
+
+	FirstSong.Internal.Playlist = Innertube.PlaylistMeta{
+
+		Platform: "Spotify",
+
+		Index: 0,
+		Total: len(SpotifyAlbum.Tracks.Items),
+
+		Name: SpotifyAlbum.Name,
+		ID:   SpotifyAlbum.ID,
+
+	}
+
+	return FirstSong, SpotifyAlbum, nil
+
+}
+
 func SpotifyPlaylistToFirstSong(SpotifyPlaylistID string) (Innertube.Song, *Playlist, error) {
 
 	// Gets only the first song from the playlist
@@ -61,7 +101,99 @@ func SpotifyPlaylistToFirstSong(SpotifyPlaylistID string) (Innertube.Song, *Play
 
 	}
 
+	FirstSong.Internal.Playlist = Innertube.PlaylistMeta{
+
+		Platform: "Spotify",
+		
+		Index: 0,
+		Total: len(SpotifyPlaylist.Tracks.Items),
+
+		Name: SpotifyPlaylist.Name,
+		ID:   SpotifyPlaylist.ID,
+
+	}
+
 	return FirstSong, SpotifyPlaylist, nil
+
+}
+
+func SpotifyAlbumToAllSongs(SpotifyAlbum *Album, IgnoreFirst bool) ([]Innertube.Song, *Album, error) {
+
+	AllAlbumItems, ErrorFetchingTracks := SpotifyAlbum.GetAllItems()
+
+	if (len(AllAlbumItems) < 1 || (IgnoreFirst && len(AllAlbumItems) < 2)) {
+
+		return []Innertube.Song{}, SpotifyAlbum, fmt.Errorf("Spotify album has no tracks to process")
+
+	}
+
+	if IgnoreFirst {
+
+		AllAlbumItems = AllAlbumItems[1:] // removes the first item; is useful if processing the first seperately to save time
+
+	}
+
+	if ErrorFetchingTracks != nil {
+
+		return []Innertube.Song{}, SpotifyAlbum, ErrorFetchingTracks
+
+	}
+
+	// We now will, in parallel, convert all Spotify tracks to Innertube songs
+
+	InnertubeSongs := make([]Innertube.Song, 0, len(AllAlbumItems))
+
+	var WriteMutex sync.Mutex
+	var WaitGroup sync.WaitGroup
+
+	for i := range AllAlbumItems {
+
+		WaitGroup.Add(1)
+
+		go func(Index int) {
+
+			defer WaitGroup.Done()
+
+			CurrentItem := AllAlbumItems[Index]
+			
+			ConvertedSong, _, ErrorConverting := SpotifyIDToSong(CurrentItem.ID)
+
+			if ErrorConverting == nil {
+
+				ConvertedSong.Internal.Playlist = Innertube.PlaylistMeta{
+
+					Platform: "Spotify",
+					
+					Index:    Index + 1,
+					Total:    len(AllAlbumItems),
+
+					Name: SpotifyAlbum.Name,
+
+					ID:   SpotifyAlbum.ID,
+
+				}
+
+				WriteMutex.Lock()
+				InnertubeSongs = append(InnertubeSongs, ConvertedSong)
+				WriteMutex.Unlock()
+
+			}
+
+		}(i)
+
+	}
+
+	WaitGroup.Wait() // we will wait for all goroutines to finish
+
+	// We must now sort the InnertubeSongs by their Playlist.Index to maintain order
+
+	slices.SortFunc(InnertubeSongs, func(a, b Innertube.Song) int {
+
+		return a.Internal.Playlist.Index - b.Internal.Playlist.Index
+
+	})
+
+	return InnertubeSongs, SpotifyAlbum, nil
 
 }
 

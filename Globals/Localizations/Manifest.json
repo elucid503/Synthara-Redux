@@ -81,6 +81,34 @@
 					"pl": "Nie udało się połączyć z kanałem głosowym: %s",
 					"ru": "Не удалось подключиться к голосовому каналу: %s",
 					"ja": "ボイスチャンネルへの接続に失敗しました：%s"
+				},
+				"FailedToHandle": {
+					"en-US": "Failed to handle the provided content: %s",
+					"en-GB": "Failed to handle the provided content: %s",
+					"es-ES": "Error al procesar el contenido proporcionado: %s",
+					"es-419": "Error al procesar el contenido proporcionado: %s",
+					"zh-CN": "无法处理提供的内容：%s",
+					"fr": "Échec du traitement du contenu fourni : %s",
+					"it": "Impossibile gestire il contenuto fornito: %s",
+					"de": "Fehler beim Verarbeiten des bereitgestellten Inhalts: %s",
+					"pl": "Nie udało się przetworzyć dostarczonej zawartości: %s",
+					"ru": "Не удалось обработать предоставленный контент: %s",
+					"ja": "提供されたコンテンツの処理に失敗しました：%s"
+				}
+			},
+			"Success": {
+				"AddedToQueue": {
+					"en-US": "Added %d %s from **%s** to the Queue.",
+					"en-GB": "Added %d %s from **%s** to the Queue.",
+					"es-ES": "Se agregaron %d %s de **%s** a la cola.",
+					"es-419": "Se agregaron %d %s de **%s** a la cola.",
+					"zh-CN": "已将 **%s** 中的 %d %s添加到队列。",
+					"fr": "%d %s de **%s** ajoutées à la file d'attente.",
+					"it": "Aggiunte %d %s da **%s** alla coda.",
+					"de": "%d %s von **%s** zur Warteschlange hinzugefügt.",
+					"pl": "Dodano %d %s z **%s** do kolejki.",
+					"ru": "Добавлено %d %s из **%s** в очередь.",
+					"ja": "**%s** から %d %sをキューに追加しました。"
 				}
 			}
 		},
@@ -374,6 +402,19 @@
 				"pl": "Na **%s**",
 				"ru": "На **%s**",
 				"ja": "アルバム **%s**"
+			},
+			"DescriptionInPlaylist": {
+				"en-US": "Song %d of %d %s in **%s**",
+				"en-GB": "Song %d of %d %s in **%s**",
+				"es-ES": "Pista %d de %d %s en **%s**",
+				"es-419": "Pista %d de %d %s en **%s**",
+				"zh-CN": "**%s** 中的第 %d/%d %s",
+				"fr": "Piste %d sur %d %s dans **%s**",
+				"it": "Traccia %d di %d %s in **%s**",
+				"de": "Titel %d von %d %s in **%s**",
+				"pl": "Utwór %d z %d %s w **%s**",
+				"ru": "Трек %d из %d %s в **%s**",
+				"ja": "**%s** のトラック %d/%d %s"
 			},
 			"FieldArtists": {
 				"en-US": "Artists",

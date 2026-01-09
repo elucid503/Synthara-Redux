@@ -351,6 +351,57 @@ func (Al *Album) GetItems() []AlbumItem {
 
 }
 
+func (Al *Album) GetAllItems() ([]AlbumItem, error) {
+
+	Items := make([]AlbumItem, 0, Al.Tracks.Total)
+	Items = append(Items, Al.Tracks.Items...) // adds the first page of items
+
+	// If we already have all tracks, we should return now
+
+	if Al.Tracks.Total <= len(Items) {
+
+		return Items, nil
+
+	}
+
+	Next := Al.Tracks.Next
+
+	for Next != "" {
+
+		Body, Err := Client.MakeRequest(Next)
+
+		if Err != nil {
+
+			return nil, Err
+
+		}
+
+		var Page PagingAlbumTracks
+
+		if Err := json.Unmarshal(Body, &Page); Err != nil {
+
+			return nil, Err
+
+		}
+
+		Items = append(Items, Page.Items...)
+
+		// Check if we've reached the total number of items
+
+		if len(Items) >= Page.Total {
+
+			break
+
+		}
+
+		Next = Page.Next
+
+	}
+
+	return Items, nil
+
+}
+
 func (Pl *Playlist) GetItems() []PlaylistItem {
 
 	return Pl.Tracks.Items

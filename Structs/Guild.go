@@ -3,8 +3,10 @@ package Structs
 import (
 	"Synthara-Redux/APIs"
 	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/APIs/Spotify"
 	"Synthara-Redux/Audio"
 	"Synthara-Redux/Globals"
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Utils"
 	"context"
 	"errors"
@@ -304,20 +306,37 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 }
 
 // RouteURI takes a Synthara-Redux URI string and handles adding/playing the content. Returns if the content was played immediately
-func (G *Guild) HandleURI(URI string, Requestor string) (bool, error) {
+func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, error) {
 
 	Type, ID, ErrorParsing := APIs.ParseURI(URI)
 
 	if ErrorParsing != nil {
 
-		return false, ErrorParsing
+		return nil, -1, ErrorParsing
 
 	}
 
-	var ShouldPlay bool
+	var PosAdded int
 	var SongFound *Innertube.Song
 
 	switch Type {
+
+		case APIs.URITypeNone:
+
+			// Search for songs using the query
+
+			SearchResults := Innertube.SearchForSongs(ID)
+
+			if len(SearchResults) == 0 {
+
+				return nil, -1, errors.New("no search results found")
+
+			}
+
+			SongFound = &SearchResults[0]
+
+			PosAdded = G.Queue.Add(SongFound, Requestor)
+
 
 		case APIs.URITypeSong:
 
@@ -325,16 +344,13 @@ func (G *Guild) HandleURI(URI string, Requestor string) (bool, error) {
 
 			if SongFetchErr != nil {
 
-				return false, SongFetchErr
+				return nil, -1, SongFetchErr
 
 			}
 
 			SongFound = &Song
 
-			Pos := G.Queue.Add(SongFound, Requestor)
-
-			ShouldPlay = Pos == 0
-
+			PosAdded = G.Queue.Add(SongFound, Requestor)
 
 		case APIs.URITypeVideo:
 
@@ -344,31 +360,199 @@ func (G *Guild) HandleURI(URI string, Requestor string) (bool, error) {
 
 			if SongFetchErr != nil {
 
-				return false, SongFetchErr
+				return nil, -1, SongFetchErr
 
 			}
 
 			SongFound = &Song
 
-			Pos := G.Queue.Add(SongFound, Requestor)
-
-			ShouldPlay = Pos == 0
+			PosAdded = G.Queue.Add(SongFound, Requestor)
 
 		case APIs.URITypeAlbum:
 
+			AlbumSongs, AlbumFetchErr := Innertube.GetAlbumSongs(ID)
+
+			if AlbumFetchErr != nil {
+
+				return nil, -1, AlbumFetchErr
+
+			}
+
+			if len(AlbumSongs) == 0 {
+
+				return nil, -1, errors.New("album contains no songs")
+
+			}
+
+			SongFound = &AlbumSongs[0]
+
+			for i, Song := range AlbumSongs {
+
+				Pos := G.Queue.Add(&Song, Requestor)
+
+				if i == 0 {
+
+					PosAdded = Pos // records Pos of first song added
+
+				}
+
+			}
+
 		case APIs.URITypeArtist:
+
+			ArtistSongs, ArtistFetchErr := Innertube.GetArtistSongs(ID)
+
+			if ArtistFetchErr != nil {
+
+				return nil, -1, ArtistFetchErr
+
+			}
+
+			if len(ArtistSongs) == 0 {
+
+				return nil, -1, errors.New("artist contains no songs")
+
+			}
+
+			SongFound = &ArtistSongs[0]
+
+			for i, Song := range ArtistSongs {
+
+				Pos := G.Queue.Add(&Song, Requestor)
+
+				if i == 0 {
+
+					PosAdded = Pos 
+					
+				}
+
+			}
 
 		case APIs.URITypePlaylist:
 
+			PlaylistSongs, PlaylistFetchErr := Innertube.GetPlaylistSongs(ID)
+
+			if PlaylistFetchErr != nil {
+
+				return nil, -1, PlaylistFetchErr
+
+			}
+
+			if len(PlaylistSongs) == 0 {
+
+				return nil, -1, errors.New("playlist contains no songs")
+
+			}
+
+			SongFound = &PlaylistSongs[0]
+
+			for i, Song := range PlaylistSongs {
+
+				Pos := G.Queue.Add(&Song, Requestor)
+
+				if i == 0 {
+
+					PosAdded = Pos
+
+				}
+
+			}
+
 		case APIs.URITypeSPSong:
+
+			ResolvedSong, _, SpotifyFetchErr := Spotify.SpotifyIDToSong(ID)
+
+			if SpotifyFetchErr != nil {
+
+				return nil, -1, SpotifyFetchErr
+
+			}
+
+			SongFound = &ResolvedSong
+
+			PosAdded = G.Queue.Add(SongFound, Requestor)
 
 		case APIs.URITypeSPAlbum:
 
+			FirstSong, SpotifyAlbum, FirstSongError := Spotify.SpotifyAlbumToFirstSong(ID)
+
+			if FirstSongError != nil {
+
+				return nil, -1, FirstSongError
+
+			}
+
+			SongFound = &FirstSong
+
+			PosAdded = G.Queue.Add(&FirstSong, Requestor)
+
+			go func() {
+
+				// Add rest 
+
+				AllOtherSongs, _, OtherFetchError := Spotify.SpotifyAlbumToAllSongs(SpotifyAlbum, true) // ignores first
+
+				if OtherFetchError != nil {
+
+					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of Spotify album songs: %s", OtherFetchError.Error()))
+					return
+
+				}
+
+				for _, Song := range AllOtherSongs {
+
+					G.Queue.Add(&Song, Requestor)
+
+				}
+
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
+					SetContent(Localizations.GetFormat("Commands.Play.Success.AddedToQueue", G.Locale.Code(), len(AllOtherSongs) +1 , Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code()), SpotifyAlbum.Name)).
+					Build())
+
+			}()
+			
 		case APIs.URITypeSPPlaylist:
+
+			FirstSong, SpotifyPlaylist, FirstSongError := Spotify.SpotifyPlaylistToFirstSong(ID)
+
+			if FirstSongError != nil {
+
+				return nil, -1, FirstSongError
+
+			}
+
+			SongFound = &FirstSong
+
+			PosAdded = G.Queue.Add(&FirstSong, Requestor)
+
+			go func() {
+
+				// Add rest. same as album
+
+				AllOtherSongs, _, OtherFetchError := Spotify.SpotifyPlaylistToAllSongs(SpotifyPlaylist, true) // ignores first
+
+				if OtherFetchError != nil {
+
+					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of Spotify playlist songs: %s", OtherFetchError.Error()))
+					return
+
+				}
+
+				for _, Song := range AllOtherSongs {
+
+					G.Queue.Add(&Song, Requestor)
+
+				}
+
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
+					SetContent(Localizations.GetFormat("Commands.Play.Success.AddedToQueue", G.Locale.Code(), len(AllOtherSongs) +1 , Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code()), SpotifyPlaylist.Name)).
+					Build())
+
+			}()
 
 	}
 
-	if ShouldPlay {
+	if PosAdded == 0 {
 
 		go func() { // done as to not block
 
@@ -384,7 +568,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (bool, error) {
 
 	}	
 
-	return ShouldPlay, nil
+	return SongFound, PosAdded, nil
 
 }
 

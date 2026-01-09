@@ -362,6 +362,108 @@ func ParseSongItem(Renderer map[string]interface{}) (Song, error) {
 
 }
 
+func ParseAlbumSongItem(Renderer map[string]interface{}, AlbumName string, AlbumArtists []string, AlbumCover string) (Song, error) {
+
+	VideoIDVal, VideoIDExists := Utils.GetNestedValue(Renderer, "playlistItemData", "videoId")
+
+	if !VideoIDExists {
+
+		return Song{}, errors.New("video ID not found in renderer")
+
+	}
+
+	VideoID, VideoIDValid := VideoIDVal.(string)
+
+	if !VideoIDValid || VideoID == "" {
+
+		return Song{}, errors.New("invalid video ID in renderer")
+
+	}
+
+	FlexColumns, FlexColumnsExists := Renderer["flexColumns"].([]interface{})
+
+	if !FlexColumnsExists || len(FlexColumns) < 1 {
+
+		return Song{}, errors.New("insufficient flex columns in renderer")
+
+	}
+
+	// Extract title from flexColumns[0]
+
+	Title := ""
+
+	TitleRuns, TitleRunsValid := Utils.GetNestedValue(FlexColumns[0], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
+
+	if TitleRunsValid {
+
+		if Runs, RunsOK := TitleRuns.([]interface{}); RunsOK && len(Runs) > 0 {
+
+			if FirstRun, FirstRunOK := Runs[0].(map[string]interface{}); FirstRunOK {
+
+				if TitleText, TitleTextOK := FirstRun["text"].(string); TitleTextOK {
+
+					Title = TitleText
+
+				}
+
+			}
+
+		}
+
+	}
+
+	// Extract duration from fixedColumns[0]
+
+	DurationFormatted := ""
+
+	FixedColumns, FixedColumnsExists := Renderer["fixedColumns"].([]interface{})
+
+	if FixedColumnsExists && len(FixedColumns) > 0 {
+
+		DurationRuns, DurationRunsValid := Utils.GetNestedValue(FixedColumns[0], "musicResponsiveListItemFixedColumnRenderer", "text", "runs")
+
+		if DurationRunsValid {
+
+			if Runs, RunsOK := DurationRuns.([]interface{}); RunsOK && len(Runs) > 0 {
+
+				if FirstRun, FirstRunOK := Runs[0].(map[string]interface{}); FirstRunOK {
+
+					if DurationText, DurationTextOK := FirstRun["text"].(string); DurationTextOK {
+
+						DurationFormatted = DurationText
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	DurationSeconds := ParseFormattedDuration(DurationFormatted)
+
+	return Song{
+
+		YouTubeID: VideoID,
+
+		Title:     Title,
+		Artists:   AlbumArtists,
+		Album:     AlbumName,
+
+		Duration: Duration{
+
+			Seconds:   DurationSeconds,
+			Formatted: DurationFormatted,
+
+		},
+		Cover: AlbumCover,
+
+	}, nil
+
+}
+
 func ParsePlaylistSongItem(Renderer map[string]interface{}) (Song, error) {
 
 	VideoIDVal, VideoIDExists := Utils.GetNestedValue(Renderer, "playlistItemData", "videoId")

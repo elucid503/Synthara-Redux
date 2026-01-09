@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"strings"
 	"time"
 
 	OverturePlay "github.com/elucid503/Overture-Play/Public"
@@ -590,5 +591,211 @@ func GetArtistSongs(ArtistID string) ([]Song, error) {
 	// Fetch playlist songs
 
 	return GetPlaylistSongs(PlaylistID)
+
+}
+
+func GetAlbumSongs(AlbumID string) ([]Song, error) {
+
+	Results := []Song{}
+
+	RequestContext, RequestCancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer RequestCancel()
+
+	AlbumResponse, AlbumResponseError := InnerTubeClient.Browse(RequestContext, &AlbumID, nil, nil)
+
+	if AlbumResponseError != nil {
+
+		Utils.Logger.Error("Error fetching album: " + AlbumResponseError.Error())
+		return Results, AlbumResponseError
+
+	}
+
+	// Marshalled, _ := json.MarshalIndent(AlbumResponse, "", "  ")
+
+	// os.WriteFile("album_response.json", Marshalled, 0644);
+
+	// Extract album name and cover from header
+
+	AlbumName := ""
+	AlbumCover := "https://cdn.discordapp.com/embed/avatars/1.png" // Default fallback
+	AlbumArtists := []string{}
+
+	HeaderSubtitleVal, HeaderSubtitleExists := Utils.GetNestedValue(AlbumResponse, "contents", "twoColumnBrowseResultsRenderer", "tabs")
+
+	if HeaderSubtitleExists {
+
+		if Tabs, TabsOK := HeaderSubtitleVal.([]interface{}); TabsOK && len(Tabs) > 0 {
+
+			HeaderContentsVal, HeaderContentsExists := Utils.GetNestedValue(Tabs[0], "tabRenderer", "content", "sectionListRenderer", "contents")
+
+			if HeaderContentsExists {
+
+				if HeaderContents, HeaderContentsOK := HeaderContentsVal.([]interface{}); HeaderContentsOK && len(HeaderContents) > 0 {
+
+				// Extract album name
+
+				TitleRuns, TitleRunsValid := Utils.GetNestedValue(HeaderContents[0], "musicResponsiveHeaderRenderer", "title", "runs")
+
+				if TitleRunsValid {
+
+					if Runs, RunsOK := TitleRuns.([]interface{}); RunsOK && len(Runs) > 0 {
+
+						if FirstRun, FirstRunOK := Runs[0].(map[string]interface{}); FirstRunOK {
+
+							if TitleText, TitleTextOK := FirstRun["text"].(string); TitleTextOK {
+
+								AlbumName = TitleText
+
+							}
+
+						}
+
+					}
+
+				}
+
+				// Extract album cover
+
+				ThumbnailsVal, ThumbnailsExists := Utils.GetNestedValue(HeaderContents[0], "musicResponsiveHeaderRenderer", "thumbnail", "musicThumbnailRenderer", "thumbnail", "thumbnails")
+
+				if ThumbnailsExists {
+
+					if Thumbnails, ThumbnailsOK := ThumbnailsVal.([]interface{}); ThumbnailsOK && len(Thumbnails) > 0 {
+
+						if LastThumbnail, LastThumbnailOK := Thumbnails[len(Thumbnails)-1].(map[string]interface{}); LastThumbnailOK {
+
+							if URL, URLOK := LastThumbnail["url"].(string); URLOK {
+
+								AlbumCover = URL
+
+							}
+
+						}
+
+					}
+
+				}
+
+				// Extract album artists
+
+				ArtistRuns, ArtistRunsValid := Utils.GetNestedValue(HeaderContents[0], "musicResponsiveHeaderRenderer", "straplineTextOne", "runs")
+
+				if ArtistRunsValid {
+
+					if Runs, RunsOK := ArtistRuns.([]interface{}); RunsOK {
+
+						for _, Run := range Runs {
+
+							if RunMap, RunMapOK := Run.(map[string]interface{}); RunMapOK {
+
+								if ArtistText, ArtistTextOK := RunMap["text"].(string); ArtistTextOK {
+
+									TrimmedArtist := strings.TrimSpace(ArtistText)
+
+									if TrimmedArtist != "" && TrimmedArtist != " & " && TrimmedArtist != ", " {
+
+										AlbumArtists = append(AlbumArtists, TrimmedArtist)
+
+									}
+
+									}
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	// Extract songs from musicShelfRenderer
+
+	SongItemsVal, SongItemsExists := Utils.GetNestedValue(AlbumResponse, "contents", "twoColumnBrowseResultsRenderer", "secondaryContents", "sectionListRenderer", "contents")
+
+	if !SongItemsExists {
+
+		return Results, errors.New("could not find album contents")
+
+	}
+
+	SectionContents, SectionContentsValid := SongItemsVal.([]interface{})
+
+	if !SectionContentsValid || len(SectionContents) == 0 {
+
+		return Results, errors.New("section contents is not a valid slice or is empty")
+
+	}
+
+	ShelfContentsVal, ShelfContentsExists := Utils.GetNestedValue(SectionContents[0], "musicShelfRenderer", "contents")
+
+	if !ShelfContentsExists {
+
+		return Results, errors.New("could not find musicShelfRenderer contents")
+
+	}
+
+	SongItems, SongItemsValid := ShelfContentsVal.([]interface{})
+
+	if !SongItemsValid {
+
+		return Results, errors.New("musicShelfRenderer contents is not a valid slice")
+
+	}
+
+	// Parse each song item
+
+	for Index, Item := range SongItems {
+
+		ItemMap, ItemMapValid := Item.(map[string]interface{})
+
+		if !ItemMapValid {
+
+			continue
+
+		}
+
+		Renderer, RendererExists := ItemMap["musicResponsiveListItemRenderer"].(map[string]interface{})
+
+		if !RendererExists {
+
+			continue
+
+		}
+
+		ParsedSong, ParseError := ParseAlbumSongItem(Renderer, AlbumName, AlbumArtists, AlbumCover)
+
+		if ParseError != nil {
+
+			continue
+
+		}
+
+		// Set album metadata
+
+		ParsedSong.Internal.Playlist = PlaylistMeta{
+
+			Platform: "YouTube",
+
+			Index: Index + 1,
+			Total: len(SongItems),
+
+			Name: AlbumName,
+			ID:   AlbumID,
+
+		}
+
+		Results = append(Results, ParsedSong)
+
+	}
+
+	return Results, nil
 
 }
