@@ -2,6 +2,7 @@ package main
 
 import (
 	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/APIs/Spotify"
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Handlers"
@@ -75,6 +76,10 @@ func main() {
 		os.Exit(1);
 
 	}
+
+	Spotify.Initialize(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
+	
+	Utils.Logger.Info("Spotify client initialized.")
 
 	Utils.Hang()
 

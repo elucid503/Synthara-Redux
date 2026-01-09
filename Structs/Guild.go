@@ -305,7 +305,7 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 
 }
 
-// RouteURI takes a Synthara-Redux URI string and handles adding/playing the content. Returns if the content was played immediately
+// RouteURI takes a Synthara-Redux URI string and handles adding/playing the content. Returns the song, its position in the queue, and any error
 func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, error) {
 
 	Type, ID, ErrorParsing := APIs.ParseURI(URI)
@@ -506,7 +506,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 				}
 
 				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
-					SetContent(Localizations.GetFormat("Commands.Play.Success.AddedToQueue", G.Locale.Code(), len(AllOtherSongs) +1 , Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code()), SpotifyAlbum.Name)).
+					SetContent(Localizations.GetFormat("Commands.Play.Success.AddedToQueue", G.Locale.Code(), len(AllOtherSongs)+1 , Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code()), SpotifyAlbum.Name)).
 					Build())
 
 			}()

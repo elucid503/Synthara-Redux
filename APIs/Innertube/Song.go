@@ -117,8 +117,7 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 
 	if (S.Internal.Playlist.Index >= 0) && (S.Internal.Playlist.Total > 0) {
 
-		PlaylistWord := Localizations.Pluralize("Song", S.Internal.Playlist.Total, Locale)
-		Description += "\n" + Localizations.GetFormat("Embeds.NowPlaying.DescriptionInPlaylist", Locale, S.Internal.Playlist.Index + 1, PlaylistWord, S.Internal.Playlist.Name)
+		Description += "\n" + Localizations.GetFormat("Embeds.NowPlaying.DescriptionInPlaylist", Locale, S.Internal.Playlist.Index + 1, S.Internal.Playlist.Total, S.Internal.Playlist.Name)
 		
 	}
 

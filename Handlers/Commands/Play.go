@@ -6,7 +6,6 @@ import (
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
-	"fmt"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -86,8 +85,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 	// Route the input to a URI
 
 	URI, ErrorRouting := APIs.Route(Query)
-
-	fmt.Println("Routed URI:", URI)
 
 	if ErrorRouting != nil {
 

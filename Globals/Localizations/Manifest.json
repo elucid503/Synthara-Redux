@@ -404,17 +404,17 @@
 				"ja": "アルバム **%s**"
 			},
 			"DescriptionInPlaylist": {
-				"en-US": "Song %d of %d %s in **%s**",
-				"en-GB": "Song %d of %d %s in **%s**",
-				"es-ES": "Pista %d de %d %s en **%s**",
-				"es-419": "Pista %d de %d %s en **%s**",
-				"zh-CN": "**%s** 中的第 %d/%d %s",
-				"fr": "Piste %d sur %d %s dans **%s**",
-				"it": "Traccia %d di %d %s in **%s**",
-				"de": "Titel %d von %d %s in **%s**",
-				"pl": "Utwór %d z %d %s w **%s**",
-				"ru": "Трек %d из %d %s в **%s**",
-				"ja": "**%s** のトラック %d/%d %s"
+				"en-US": "Song %d of %d in **%s**",
+				"en-GB": "Song %d of %d in **%s**",
+				"es-ES": "Pista %d de %d en **%s**",
+				"es-419": "Pista %d de %d en **%s**",
+				"zh-CN": "**%s** 中的第 %d/%d",
+				"fr": "Piste %d sur %d dans **%s**",
+				"it": "Traccia %d di %d in **%s**",
+				"de": "Titel %d von %d in **%s**",
+				"pl": "Utwór %d z %d w **%s**",
+				"ru": "Трек %d из %d в **%s**",
+				"ja": "**%s** のトラック %d/%d"
 			},
 			"FieldArtists": {
 				"en-US": "Artists",
