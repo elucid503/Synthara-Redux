@@ -83,8 +83,8 @@
 					"ja": "ボイスチャンネルへの接続に失敗しました：%s"
 				},
 				"FailedToHandle": {
-					"en-US": "Failed to handle the provided content: %s",
-					"en-GB": "Failed to handle the provided content: %s",
+					"en-US": "Failed to route the provided content: %s",
+					"en-GB": "Failed to route the provided content: %s",
 					"es-ES": "Error al procesar el contenido proporcionado: %s",
 					"es-419": "Error al procesar el contenido proporcionado: %s",
 					"zh-CN": "无法处理提供的内容：%s",

@@ -104,15 +104,25 @@ func Route(Input string) (string, error) {
 
 	Input = strings.TrimSpace(Input)
 
+	// Checks if input is a URI; if so, we skip further processing
+
+	if IsURI(Input) {
+
+		return Input, nil
+
+	}
+
 	// Check if the input is a URL
 
 	if !IsURL(Input) {
 
-		// Not a URL, treat as search query
+		// Not a URL, treat as search query and return the corresponding URI
 
 		return "Synthara-Redux:" + URITypeNone +":" + Input, nil
 
 	}
+
+	// Now, since we have a URL, we must determine which platform it belongs to
 
 	URL := Input
 
