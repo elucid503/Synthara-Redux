@@ -3,6 +3,7 @@ package Commands
 import (
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
+	"Synthara-Redux/Utils"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -19,7 +20,14 @@ func Pause(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: Localizations.Get("Commands.Pause.Errors.NoSession", Locale),
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Pause.Error.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Commands.Pause.Error.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})},
 
 		})
 
@@ -31,7 +39,13 @@ func Pause(Event *events.ApplicationCommandInteractionCreate) {
 
 	Event.CreateMessage(discord.MessageCreate{
 		
-		Content: Localizations.Get("Commands.Pause.Success", Locale),
+		Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+			Title:       Localizations.Get("Commands.Pause.Title", Locale),
+			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
+			Description: Localizations.Get("Commands.Pause.Description", Locale),
+
+		})},
 		
 	})
 	

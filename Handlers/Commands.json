@@ -14,19 +14,19 @@
 			"ru": "пинг",
 			"ja": "ping"
 		},
-		"description": "Replies with Pong!",
+		"description": "Use this command to check if the bot is online and responding.",
 		"description_localizations": {
-			"en-US": "Replies with Pong!",
-			"en-GB": "Replies with Pong!",
-			"es-ES": "¡Responde con Pong!",
-			"es-419": "¡Responde con Pong!",
-			"zh-CN": "回复 乓！",
-			"fr": "Répond avec Pong !",
-			"it": "Risponde con Pong!",
-			"de": "Antwortet mit Pong!",
-			"pl": "Odpowiada Pong!",
-			"ru": "Отвечает «Понг!»",
-			"ja": "「ポン！」と返信します"
+			"en-US": "Use this command to check if the bot is online and responding.",
+			"en-GB": "Use this command to check if the bot is online and responding.",
+			"es-ES": "Usa este comando para verificar si el bot está en línea y respondiendo.",
+			"es-419": "Usa este comando para verificar si el bot está en línea y respondiendo.",
+			"zh-CN": "使用此命令检查机器人是否在线并响应。",
+			"fr": "Utilisez cette commande pour vérifier si le bot est en ligne et répond.",
+			"it": "Usa questo comando per verificare se il bot è online e risponde.",
+			"de": "Verwende diesen Befehl, um zu prüfen, ob der Bot online ist und antwortet.",
+			"pl": "Użyj tej komendy, aby sprawdzić, czy bot jest online i odpowiada.",
+			"ru": "Используйте эту команду, чтобы проверить, онлайн ли бот и отвечает.",
+			"ja": "このコマンドを使用して、ボットがオンラインで応答しているかを確認します。"
 		}
 	},
 	{
@@ -44,19 +44,19 @@
 			"ru": "играть",
 			"ja": "再生"
 		},
-		"description": "Search and play a song",
+		"description": "Use this command to search for and play a Song.",
 		"description_localizations": {
-			"en-US": "Search and play a song",
-			"en-GB": "Search and play a song",
-			"es-ES": "Buscar y reproducir una canción",
-			"es-419": "Buscar y reproducir una canción",
-			"zh-CN": "搜索并播放歌曲",
-			"fr": "Rechercher et jouer une chanson",
-			"it": "Cerca e riproduci una canzone",
-			"de": "Suchen und Abspielen eines Liedes",
-			"pl": "Wyszukaj i odtwórz utwór",
-			"ru": "Найти и воспроизвести песню",
-			"ja": "曲を検索して再生する"
+			"en-US": "Use this command to search for and play a Song.",
+			"en-GB": "Use this command to search for and play a Song.",
+			"es-ES": "Usa este comando para buscar y reproducir una canción.",
+			"es-419": "Usa este comando para buscar y reproducir una canción.",
+			"zh-CN": "使用此命令搜索并播放歌曲。",
+			"fr": "Utilisez cette commande pour rechercher et jouer une chanson.",
+			"it": "Usa questo comando per cercare e riprodurre una canzone.",
+			"de": "Verwende diesen Befehl, um ein Lied zu suchen und abzuspielen.",
+			"pl": "Użyj tej komendy, aby wyszukać i odtworzyć utwór.",
+			"ru": "Используйте эту команду для поиска и воспроизведения песни.",
+			"ja": "このコマンドを使用して曲を検索して再生します。"
 		},
 		"options": [
 			{
@@ -75,19 +75,19 @@
 					"ru": "запрос",
 					"ja": "クエリ"
 				},
-				"description": "The song to search for",
+				"description": "Use this option to specify the Song name or URL to search for.",
 				"description_localizations": {
-					"en-US": "The song to search for",
-					"en-GB": "The song to search for",
-					"es-ES": "La canción a buscar",
-					"es-419": "La canción a buscar",
-					"zh-CN": "要搜索的歌曲",
-					"fr": "La chanson à rechercher",
-					"it": "La canzone da cercare",
-					"de": "Das zu suchende Lied",
-					"pl": "Utwór do wyszukania",
-					"ru": "Песня для поиска",
-					"ja": "検索する曲"
+					"en-US": "Use this option to specify the Song name or URL to search for.",
+					"en-GB": "Use this option to specify the Song name or URL to search for.",
+					"es-ES": "Usa esta opción para especificar el nombre de la canción o URL a buscar.",
+					"es-419": "Usa esta opción para especificar el nombre de la canción o URL a buscar.",
+					"zh-CN": "使用此选项指定要搜索的歌曲名称或URL。",
+					"fr": "Utilisez cette option pour spécifier le nom de la chanson ou l'URL à rechercher.",
+					"it": "Usa questa opzione per specificare il nome della canzone o l'URL da cercare.",
+					"de": "Verwende diese Option, um den Liedtitel oder die URL anzugeben, nach der gesucht werden soll.",
+					"pl": "Użyj tej opcji, aby określić nazwę utworu lub adres URL do wyszukania.",
+					"ru": "Используйте эту опцию, чтобы указать название песни или URL для поиска.",
+					"ja": "このオプションを使用して、検索する曲名またはURLを指定します。"
 				},
 				"required": true,
 				"autocomplete": true
@@ -109,19 +109,19 @@
 			"ru": "пауза",
 			"ja": "一時停止"
 		},
-		"description": "Pauses the currently playing song",
+		"description": "Use this command to pause the currently playing Song.",
 		"description_localizations": {
-			"en-US": "Pauses the currently playing song",
-			"en-GB": "Pauses the currently playing song",
-			"es-ES": "Pausa la canción que se está reproduciendo",
-			"es-419": "Pausa la canción que se está reproduciendo",
-			"zh-CN": "暂停当前播放的歌曲",
-			"fr": "Met en pause la chanson en cours",
-			"it": "Mette in pausa la canzone in riproduzione",
-			"de": "Pausiert das aktuell gespielte Lied",
-			"pl": "Wstrzymuje odtwarzany utwór",
-			"ru": "Приостанавливает воспроизведение текущей песни",
-			"ja": "現在再生中の曲を一時停止します"
+			"en-US": "Use this command to pause the currently playing Song.",
+			"en-GB": "Use this command to pause the currently playing Song.",
+			"es-ES": "Usa este comando para pausar la canción que se está reproduciendo.",
+			"es-419": "Usa este comando para pausar la canción que se está reproduciendo.",
+			"zh-CN": "使用此命令暂停当前播放的歌曲。",
+			"fr": "Utilisez cette commande pour mettre en pause la chanson en cours.",
+			"it": "Usa questo comando per mettere in pausa la canzone in riproduzione.",
+			"de": "Verwende diesen Befehl, um das aktuell gespielte Lied zu pausieren.",
+			"pl": "Użyj tej komendy, aby wstrzymać odtwarzany utwór.",
+			"ru": "Используйте эту команду, чтобы приостановить текущую песню.",
+			"ja": "このコマンドを使用して、現在再生中の曲を一時停止します。"
 		}
 	},
 	{
@@ -139,19 +139,19 @@
 			"ru": "продолжить",
 			"ja": "再開"
 		},
-		"description": "Resumes the currently paused song",
+		"description": "Use this command to resume the currently paused Song.",
 		"description_localizations": {
-			"en-US": "Resumes the currently paused song",
-			"en-GB": "Resumes the currently paused song",
-			"es-ES": "Reanuda la canción pausada",
-			"es-419": "Reanuda la canción pausada",
-			"zh-CN": "恢复暂停的歌曲",
-			"fr": "Reprend la chanson en pause",
-			"it": "Riprende la canzone in pausa",
-			"de": "Setzt das pausierte Lied fort",
-			"pl": "Wznawia wstrzymany utwór",
-			"ru": "Возобновляет воспроизведение приостановленной песни",
-			"ja": "一時停止中の曲を再開します"
+			"en-US": "Use this command to resume the currently paused Song.",
+			"en-GB": "Use this command to resume the currently paused Song.",
+			"es-ES": "Usa este comando para reanudar la canción pausada.",
+			"es-419": "Usa este comando para reanudar la canción pausada.",
+			"zh-CN": "使用此命令恢复当前暂停的歌曲。",
+			"fr": "Utilisez cette commande pour reprendre la chanson en pause.",
+			"it": "Usa questo comando per riprendere la canzone in pausa.",
+			"de": "Verwende diesen Befehl, um das pausierte Lied fortzusetzen.",
+			"pl": "Użyj tej komendy, aby wznowić wstrzymany utwór.",
+			"ru": "Используйте эту команду, чтобы возобновить приостановленную песню.",
+			"ja": "このコマンドを使用して、一時停止中の曲を再開します。"
 		}
 	},
 	{
@@ -169,19 +169,19 @@
 			"ru": "следующий",
 			"ja": "次"
 		},
-		"description": "Skips to the next song in the queue",
+		"description": "Use this command to skip to the next Song in the Queue.",
 		"description_localizations": {
-			"en-US": "Skips to the next song in the queue",
-			"en-GB": "Skips to the next song in the queue",
-			"es-ES": "Salta a la siguiente canción en la cola",
-			"es-419": "Salta a la siguiente canción en la cola",
-			"zh-CN": "跳到队列中的下一首歌曲",
-			"fr": "Passe à la chanson suivante dans la file d'attente",
-			"it": "Passa alla canzone successiva nella coda",
-			"de": "Springt zum nächsten Lied in der Warteschlange",
-			"pl": "Przechodzi do następnego utworu w kolejce",
-			"ru": "Переходит к следующей песне в очереди",
-			"ja": "キューの次の曲にスキップします"
+			"en-US": "Use this command to skip to the next Song in the Queue.",
+			"en-GB": "Use this command to skip to the next Song in the Queue.",
+			"es-ES": "Usa este comando para saltar a la siguiente canción en la cola.",
+			"es-419": "Usa este comando para saltar a la siguiente canción en la cola.",
+			"zh-CN": "使用此命令跳到队列中的下一首歌曲。",
+			"fr": "Utilisez cette commande pour passer à la chanson suivante dans la file d'attente.",
+			"it": "Usa questo comando per passare alla canzone successiva nella coda.",
+			"de": "Verwende diesen Befehl, um zum nächsten Lied in der Warteschlange zu springen.",
+			"pl": "Użyj tej komendy, aby przejść do następnego utworu w kolejce.",
+			"ru": "Используйте эту команду, чтобы перейти к следующей песне в очереди.",
+			"ja": "このコマンドを使用して、キューの次の曲にスキップします。"
 		}
 	},
 	{
@@ -199,19 +199,19 @@
 			"ru": "предыдущий",
 			"ja": "前"
 		},
-		"description": "Plays the previously played song",
+		"description": "Use this command to play the previously played Song.",
 		"description_localizations": {
-			"en-US": "Plays the previously played song",
-			"en-GB": "Plays the previously played song",
-			"es-ES": "Reproduce la canción reproducida anteriormente",
-			"es-419": "Reproduce la canción reproducida anteriormente",
-			"zh-CN": "播放上一首歌曲",
-			"fr": "Joue la chanson précédemment jouée",
-			"it": "Riproduce la canzone riprodotta in precedenza",
-			"de": "Spielt das zuvor gespielte Lied",
-			"pl": "Odtwarza poprzednio odtwarzany utwór",
-			"ru": "Воспроизводит предыдущую песню",
-			"ja": "前に再生した曲を再生します"
+			"en-US": "Use this command to play the previously played Song.",
+			"en-GB": "Use this command to play the previously played Song.",
+			"es-ES": "Usa este comando para reproducir la canción reproducida anteriormente.",
+			"es-419": "Usa este comando para reproducir la canción reproducida anteriormente.",
+			"zh-CN": "使用此命令播放上一首播放的歌曲。",
+			"fr": "Utilisez cette commande pour jouer la chanson précédemment jouée.",
+			"it": "Usa questo comando per riprodurre la canzone riprodotta in precedenza.",
+			"de": "Verwende diesen Befehl, um das zuvor gespielte Lied abzuspielen.",
+			"pl": "Użyj tej komendy, aby odtworzyć poprzednio odtwarzany utwór.",
+			"ru": "Используйте эту команду, чтобы воспроизвести предыдущую песню.",
+			"ja": "このコマンドを使用して、前に再生した曲を再生します。"
 		}
 	},
 	{
@@ -229,19 +229,19 @@
 			"ru": "текст",
 			"ja": "歌詞"
 		},
-		"description": "Get the lyrics for the currently playing song",
+		"description": "Use this command to get the lyrics for the currently playing Song.",
 		"description_localizations": {
-			"en-US": "Get the lyrics for the currently playing song",
-			"en-GB": "Get the lyrics for the currently playing song",
-			"es-ES": "Obtener la letra de la canción que se está reproduciendo",
-			"es-419": "Obtener la letra de la canción que se está reproduciendo",
-			"zh-CN": "获取当前播放歌曲的歌词",
-			"fr": "Obtenir les paroles de la chanson en cours",
-			"it": "Ottieni il testo della canzone in riproduzione",
-			"de": "Liedtext des aktuell gespielten Liedes abrufen",
-			"pl": "Uzyskaj tekst odtwarzanego utworu",
-			"ru": "Получить текст текущей песни",
-			"ja": "現在再生中の曲の歌詞を取得します"
+			"en-US": "Use this command to get the lyrics for the currently playing Song.",
+			"en-GB": "Use this command to get the lyrics for the currently playing Song.",
+			"es-ES": "Usa este comando para obtener la letra de la canción que se está reproduciendo.",
+			"es-419": "Usa este comando para obtener la letra de la canción que se está reproduciendo.",
+			"zh-CN": "使用此命令获取当前播放歌曲的歌词。",
+			"fr": "Utilisez cette commande pour obtenir les paroles de la chanson en cours.",
+			"it": "Usa questo comando per ottenere il testo della canzone in riproduzione.",
+			"de": "Verwende diesen Befehl, um den Liedtext des aktuell gespielten Liedes zu erhalten.",
+			"pl": "Użyj tej komendy, aby uzyskać tekst odtwarzanego utworu.",
+			"ru": "Используйте эту команду, чтобы получить текст текущей песни.",
+			"ja": "このコマンドを使用して、現在再生中の曲の歌詞を取得します。"
 		}
 	},
 	{
@@ -259,19 +259,19 @@
 			"ru": "управление",
 			"ja": "コントロール"
 		},
-		"description": "Get playback controls",
+		"description": "Use this command to get a link to the playback controls interface.",
 		"description_localizations": {
-			"en-US": "Get playback controls",
-			"en-GB": "Get playback controls",
-			"es-ES": "Obtener controles de reproducción",
-			"es-419": "Obtener controles de reproducción",
-			"zh-CN": "获取播放控制",
-			"fr": "Obtenir les contrôles de lecture",
-			"it": "Ottieni i controlli di riproduzione",
-			"de": "Wiedergabesteuerung abrufen",
-			"pl": "Uzyskaj sterowanie odtwarzaniem",
-			"ru": "Получить элементы управления воспроизведением",
-			"ja": "再生コントロールを取得します"
+			"en-US": "Use this command to get a link to the playback controls interface.",
+			"en-GB": "Use this command to get a link to the playback controls interface.",
+			"es-ES": "Usa este comando para obtener un enlace a la interfaz de controles de reproducción.",
+			"es-419": "Usa este comando para obtener un enlace a la interfaz de controles de reproducción.",
+			"zh-CN": "使用此命令获取播放控制界面的链接。",
+			"fr": "Utilisez cette commande pour obtenir un lien vers l'interface de contrôles de lecture.",
+			"it": "Usa questo comando per ottenere un link all'interfaccia dei controlli di riproduzione.",
+			"de": "Verwende diesen Befehl, um einen Link zur Wiedergabesteuerungsschnittstelle zu erhalten.",
+			"pl": "Użyj tej komendy, aby uzyskać link do interfejsu sterowania odtwarzaniem.",
+			"ru": "Используйте эту команду, чтобы получить ссылку на интерфейс управления воспроизведением.",
+			"ja": "このコマンドを使用して、再生コントロールインターフェースへのリンクを取得します。"
 		}
 	},
 	{
@@ -289,19 +289,19 @@
 			"ru": "очередь",
 			"ja": "キュー"
 		},
-		"description": "View and edit the current song Queue",
+		"description": "Use this command to view and edit the current Song Queue.",
 		"description_localizations": {
-			"en-US": "View and edit the current song Queue",
-			"en-GB": "View and edit the current song Queue",
-			"es-ES": "Ver y editar la cola de canciones actual",
-			"es-419": "Ver y editar la cola de canciones actual",
-			"zh-CN": "查看和编辑当前歌曲队列",
-			"fr": "Voir et modifier la file d'attente des chansons",
-			"it": "Visualizza e modifica la coda delle canzoni corrente",
-			"de": "Aktuelle Lied-Warteschlange anzeigen und bearbeiten",
-			"pl": "Zobacz i edytuj bieżącą kolejkę utworów",
-			"ru": "Просмотреть и изменить текущую очередь песен",
-			"ja": "現在の曲のキューを表示および編集します"
+			"en-US": "Use this command to view and edit the current Song Queue.",
+			"en-GB": "Use this command to view and edit the current Song Queue.",
+			"es-ES": "Usa este comando para ver y editar la cola de canciones actual.",
+			"es-419": "Usa este comando para ver y editar la cola de canciones actual.",
+			"zh-CN": "使用此命令查看和编辑当前歌曲队列。",
+			"fr": "Utilisez cette commande pour voir et modifier la file d'attente des chansons.",
+			"it": "Usa questo comando per visualizzare e modificare la coda delle canzoni corrente.",
+			"de": "Verwende diesen Befehl, um die aktuelle Lied-Warteschlange anzuzeigen und zu bearbeiten.",
+			"pl": "Użyj tej komendy, aby zobaczyć i edytować bieżącą kolejkę utworów.",
+			"ru": "Используйте эту команду для просмотра и редактирования текущей очереди песен.",
+			"ja": "このコマンドを使用して、現在の曲のキューを表示および編集します。"
 		}
 	}
 ]

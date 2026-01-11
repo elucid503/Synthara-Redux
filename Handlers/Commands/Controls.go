@@ -2,6 +2,7 @@ package Commands
 
 import (
 	"Synthara-Redux/Globals/Localizations"
+	"Synthara-Redux/Utils"
 
 	"fmt"
 	"os"
@@ -17,18 +18,16 @@ func Conrols(Event *events.ApplicationCommandInteractionCreate) {
 
 	Page := fmt.Sprintf("%s/Queues/%s?View=Details", os.Getenv("DOMAIN"), GuildID.String())
 
-	Embed := discord.NewEmbedBuilder()
-
-	Embed.SetTitle(Localizations.Get("Embeds.Controls.Title", Locale))
-	Embed.SetDescription(Localizations.GetFormat("Embeds.Controls.Description", Locale, Page))
-	Embed.SetAuthor(Localizations.Get("Embeds.Notifications.Author", Locale), "", "")
-	
-	Embed.SetColor(0xFFFFFF)
-	Embed.SetURL(Page)
-
 	Event.CreateMessage(discord.MessageCreate{
 
-		Embeds: []discord.Embed{Embed.Build()},
+		Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+			Title:       Localizations.Get("Commands.Controls.Title", Locale),
+			Author:      Localizations.Get("Embeds.Categories.Controls", Locale),
+			Description: Localizations.GetFormat("Commands.Controls.Description", Locale, Page),
+			URL:         Page,
+
+		})},
 
 	})
 

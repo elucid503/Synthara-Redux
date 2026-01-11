@@ -26,7 +26,14 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: Localizations.Get("Commands.Queue.Errors.NoQueue", Locale),
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Queue.Error.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Commands.Queue.Error.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})},
 			
 		})
 

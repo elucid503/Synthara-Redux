@@ -505,12 +505,16 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 
 				}
 
-				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
-					SetContent(Localizations.GetFormat("Commands.Play.Success.AddedToQueue", G.Locale.Code(), len(AllOtherSongs)+1 , Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code()), SpotifyAlbum.Name)).
-					Build())
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+					Title:       Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Title", G.Locale.Code(), SpotifyAlbum.Name),
+					Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
+					Description: Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Description", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code())),
+
+				})).Build())
 
 			}()
-			
+
 		case APIs.URITypeSPPlaylist:
 
 			FirstSong, SpotifyPlaylist, FirstSongError := Spotify.SpotifyPlaylistToFirstSong(ID)
@@ -545,14 +549,15 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 				}
 
 				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
-					SetContent(Localizations.GetFormat("Commands.Play.Success.AddedToQueue", G.Locale.Code(), len(AllOtherSongs) +1 , Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code()), SpotifyPlaylist.Name)).
-					Build())
+					AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+						Title:       Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Title", G.Locale.Code(), SpotifyPlaylist.Name),
+						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
+						Description: Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Description", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code())),
+
+					})).Build())
 
 			}()
-
-	}
-
-	if PosAdded == 0 {
 
 		go func() { // done as to not block
 

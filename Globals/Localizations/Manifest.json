@@ -1,7 +1,7 @@
 {
 	"Commands": {
 		"Ping": {
-			"Success": {
+			"Title": {
 				"en-US": "Pong!",
 				"en-GB": "Pong!",
 				"es-ES": "¡Pong!",
@@ -13,380 +13,757 @@
 				"pl": "Pong!",
 				"ru": "Понг!",
 				"ja": "ポン！"
+			},
+			"Description": {
+				"en-US": "The bot is online and responding.",
+				"en-GB": "The bot is online and responding.",
+				"es-ES": "El bot está en línea y respondiendo.",
+				"es-419": "El bot está en línea y respondiendo.",
+				"zh-CN": "机器人在线并正在响应。",
+				"fr": "Le bot est en ligne et répond.",
+				"it": "Il bot è online e risponde.",
+				"de": "Der Bot ist online und antwortet.",
+				"pl": "Bot jest online i odpowiada.",
+				"ru": "Бот онлайн и отвечает.",
+				"ja": "ボットはオンラインで応答しています。"
 			}
 		},
 		"Play": {
-			"Errors": {
+			"Error": {
 				"NoQuery": {
-					"en-US": "Please provide a search query!",
-					"en-GB": "Please provide a search query!",
-					"es-ES": "¡Por favor, proporciona una consulta de búsqueda!",
-					"es-419": "¡Por favor, proporciona una consulta de búsqueda!",
-					"zh-CN": "请提供搜索查询！",
-					"fr": "Veuillez fournir une requête de recherche !",
-					"it": "Per favore, fornisci una query di ricerca!",
-					"de": "Bitte gib eine Suchanfrage ein!",
-					"pl": "Proszę podać zapytanie wyszukiwania!",
-					"ru": "Пожалуйста, введите поисковый запрос!",
-					"ja": "検索クエリを入力してください！"
+					"Title": {
+						"en-US": "No Query Provided",
+						"en-GB": "No Query Provided",
+						"es-ES": "No Se Proporcionó Consulta",
+						"es-419": "No Se Proporcionó Consulta",
+						"zh-CN": "未提供查询",
+						"fr": "Aucune Requête Fournie",
+						"it": "Nessuna Query Fornita",
+						"de": "Keine Abfrage Bereitgestellt",
+						"pl": "Nie Podano Zapytania",
+						"ru": "Запрос Не Предоставлен",
+						"ja": "クエリが提供されていません"
+					},
+					"Description": {
+						"en-US": "Please provide a search query to find a Song.",
+						"en-GB": "Please provide a search query to find a Song.",
+						"es-ES": "Por favor, proporciona una consulta de búsqueda para encontrar una canción.",
+						"es-419": "Por favor, proporciona una consulta de búsqueda para encontrar una canción.",
+						"zh-CN": "请提供搜索查询以查找歌曲。",
+						"fr": "Veuillez fournir une requête de recherche pour trouver une chanson.",
+						"it": "Fornisci una query di ricerca per trovare una canzone.",
+						"de": "Bitte gib eine Suchanfrage ein, um ein Lied zu finden.",
+						"pl": "Podaj zapytanie wyszukiwania, aby znaleźć utwór.",
+						"ru": "Пожалуйста, введите поисковый запрос, чтобы найти песню.",
+						"ja": "曲を検索するためのクエリを入力してください。"
+					}
 				},
 				"NotInGuild": {
-					"en-US": "You must be in a guild to use this command!",
-					"en-GB": "You must be in a guild to use this command!",
-					"es-ES": "¡Debes estar en un servidor para usar este comando!",
-					"es-419": "¡Debes estar en un servidor para usar este comando!",
-					"zh-CN": "你必须在服务器中才能使用此命令！",
-					"fr": "Vous devez être dans un serveur pour utiliser cette commande !",
-					"it": "Devi essere in un server per usare questo comando!",
-					"de": "Du musst in einem Server sein, um diesen Befehl zu verwenden!",
-					"pl": "Musisz być na serwerze, aby użyć tej komendy!",
-					"ru": "Вы должны быть на сервере, чтобы использовать эту команду!",
-					"ja": "このコマンドを使用するにはサーバーにいる必要があります！"
+					"Title": {
+						"en-US": "Not In Server",
+						"en-GB": "Not In Server",
+						"es-ES": "No Está En El Servidor",
+						"es-419": "No Está En El Servidor",
+						"zh-CN": "不在服务器中",
+						"fr": "Pas Dans Le Serveur",
+						"it": "Non Nel Server",
+						"de": "Nicht Im Server",
+						"pl": "Nie Na Serwerze",
+						"ru": "Не На Сервере",
+						"ja": "サーバーにいません"
+					},
+					"Description": {
+						"en-US": "You must be in a server to use this command.",
+						"en-GB": "You must be in a server to use this command.",
+						"es-ES": "Debes estar en un servidor para usar este comando.",
+						"es-419": "Debes estar en un servidor para usar este comando.",
+						"zh-CN": "您必须在服务器中才能使用此命令。",
+						"fr": "Vous devez être dans un serveur pour utiliser cette commande.",
+						"it": "Devi essere in un server per usare questo comando.",
+						"de": "Du musst in einem Server sein, um diesen Befehl zu verwenden.",
+						"pl": "Musisz być na serwerze, aby użyć tej komendy.",
+						"ru": "Вы должны быть на сервере, чтобы использовать эту команду.",
+						"ja": "このコマンドを使用するにはサーバーにいる必要があります。"
+					}
 				},
 				"NotInVoiceChannel": {
-					"en-US": "You must be in a voice channel to use this command!",
-					"en-GB": "You must be in a voice channel to use this command!",
-					"es-ES": "¡Debes estar en un canal de voz para usar este comando!",
-					"es-419": "¡Debes estar en un canal de voz para usar este comando!",
-					"zh-CN": "你必须在语音频道中才能使用此命令！",
-					"fr": "Vous devez être dans un canal vocal pour utiliser cette commande !",
-					"it": "Devi essere in un canale vocale per usare questo comando!",
-					"de": "Du musst in einem Sprachkanal sein, um diesen Befehl zu verwenden!",
-					"pl": "Musisz być na kanale głosowym, aby użyć tej komendy!",
-					"ru": "Вы должны быть в голосовом канале, чтобы использовать эту команду!",
-					"ja": "このコマンドを使用するにはボイスチャンネルにいる必要があります！"
-				},
-				"NoResults": {
-					"en-US": "No results were found for your query!",
-					"en-GB": "No results were found for your query!",
-					"es-ES": "¡No se encontraron resultados para tu búsqueda!",
-					"es-419": "¡No se encontraron resultados para tu búsqueda!",
-					"zh-CN": "未找到与您的查询相关的结果！",
-					"fr": "Aucun résultat trouvé pour votre recherche !",
-					"it": "Nessun risultato trovato per la tua ricerca!",
-					"de": "Keine Ergebnisse für deine Suche gefunden!",
-					"pl": "Nie znaleziono wyników dla twojego zapytania!",
-					"ru": "По вашему запросу ничего не найдено!",
-					"ja": "検索結果が見つかりませんでした！"
+					"Title": {
+						"en-US": "Not In Voice Channel",
+						"en-GB": "Not In Voice Channel",
+						"es-ES": "No Está En Canal De Voz",
+						"es-419": "No Está En Canal De Voz",
+						"zh-CN": "不在语音频道中",
+						"fr": "Pas Dans Un Canal Vocal",
+						"it": "Non In Un Canale Vocale",
+						"de": "Nicht Im Sprachkanal",
+						"pl": "Nie Na Kanale Głosowym",
+						"ru": "Не В Голосовом Канале",
+						"ja": "ボイスチャンネルにいません"
+					},
+					"Description": {
+						"en-US": "You must be in a Voice Channel to play music.",
+						"en-GB": "You must be in a Voice Channel to play music.",
+						"es-ES": "Debes estar en un canal de voz para reproducir música.",
+						"es-419": "Debes estar en un canal de voz para reproducir música.",
+						"zh-CN": "您必须在语音频道中才能播放音乐。",
+						"fr": "Vous devez être dans un canal vocal pour jouer de la musique.",
+						"it": "Devi essere in un canale vocale per riprodurre musica.",
+						"de": "Du musst in einem Sprachkanal sein, um Musik abzuspielen.",
+						"pl": "Musisz być na kanale głosowym, aby odtwarzać muzykę.",
+						"ru": "Вы должны находиться в голосовом канале, чтобы воспроизводить музыку.",
+						"ja": "音楽を再生するにはボイスチャンネルにいる必要があります。"
+					}
 				},
 				"FailedToConnect": {
-					"en-US": "Failed to connect to voice channel: %s",
-					"en-GB": "Failed to connect to voice channel: %s",
-					"es-ES": "Error al conectarse al canal de voz: %s",
-					"es-419": "Error al conectarse al canal de voz: %s",
-					"zh-CN": "连接语音频道失败：%s",
-					"fr": "Échec de la connexion au canal vocal : %s",
-					"it": "Impossibile connettersi al canale vocale: %s",
-					"de": "Verbindung zum Sprachkanal fehlgeschlagen: %s",
-					"pl": "Nie udało się połączyć z kanałem głosowym: %s",
-					"ru": "Не удалось подключиться к голосовому каналу: %s",
-					"ja": "ボイスチャンネルへの接続に失敗しました：%s"
+					"Title": {
+						"en-US": "Connection Failed",
+						"en-GB": "Connection Failed",
+						"es-ES": "Conexión Fallida",
+						"es-419": "Conexión Fallida",
+						"zh-CN": "连接失败",
+						"fr": "Échec De La Connexion",
+						"it": "Connessione Fallita",
+						"de": "Verbindung Fehlgeschlagen",
+						"pl": "Połączenie Nieudane",
+						"ru": "Ошибка Подключения",
+						"ja": "接続に失敗しました"
+					},
+					"Description": {
+						"en-US": "Failed to connect to the voice channel: %s",
+						"en-GB": "Failed to connect to the voice channel: %s",
+						"es-ES": "Error al conectarse al canal de voz: %s",
+						"es-419": "Error al conectarse al canal de voz: %s",
+						"zh-CN": "连接语音频道失败：%s",
+						"fr": "Échec de la connexion au canal vocal : %s",
+						"it": "Impossibile connettersi al canale vocale: %s",
+						"de": "Verbindung zum Sprachkanal fehlgeschlagen: %s",
+						"pl": "Nie udało się połączyć z kanałem głosowym: %s",
+						"ru": "Не удалось подключиться к голосовому каналу: %s",
+						"ja": "ボイスチャンネルへの接続に失敗しました：%s"
+					}
+				},
+				"InvalidInput": {
+					"Title": {
+						"en-US": "Invalid Input",
+						"en-GB": "Invalid Input",
+						"es-ES": "Entrada Inválida",
+						"es-419": "Entrada Inválida",
+						"zh-CN": "输入无效",
+						"fr": "Entrée Invalide",
+						"it": "Input Non Valido",
+						"de": "Ungültige Eingabe",
+						"pl": "Nieprawidłowe Dane",
+						"ru": "Неверный Ввод",
+						"ja": "無効な入力"
+					},
+					"Description": {
+						"en-US": "Could not process the provided input: %s",
+						"en-GB": "Could not process the provided input: %s",
+						"es-ES": "No se pudo procesar la entrada proporcionada: %s",
+						"es-419": "No se pudo procesar la entrada proporcionada: %s",
+						"zh-CN": "无法处理提供的输入：%s",
+						"fr": "Impossible de traiter l'entrée fournie : %s",
+						"it": "Impossibile elaborare l'input fornito: %s",
+						"de": "Die bereitgestellte Eingabe konnte nicht verarbeitet werden: %s",
+						"pl": "Nie można przetworzyć podanych danych: %s",
+						"ru": "Не удалось обработать предоставленные данные: %s",
+						"ja": "提供された入力を処理できませんでした：%s"
+					}
 				},
 				"FailedToHandle": {
-					"en-US": "Failed to route the provided content: %s",
-					"en-GB": "Failed to route the provided content: %s",
-					"es-ES": "Error al procesar el contenido proporcionado: %s",
-					"es-419": "Error al procesar el contenido proporcionado: %s",
-					"zh-CN": "无法处理提供的内容：%s",
-					"fr": "Échec du traitement du contenu fourni : %s",
-					"it": "Impossibile gestire il contenuto fornito: %s",
-					"de": "Fehler beim Verarbeiten des bereitgestellten Inhalts: %s",
-					"pl": "Nie udało się przetworzyć dostarczonej zawartości: %s",
-					"ru": "Не удалось обработать предоставленный контент: %s",
-					"ja": "提供されたコンテンツの処理に失敗しました：%s"
-				}
-			},
-			"Success": {
-				"AddedToQueue": {
-					"en-US": "Added %d %s from **%s** to the Queue.",
-					"en-GB": "Added %d %s from **%s** to the Queue.",
-					"es-ES": "Se agregaron %d %s de **%s** a la cola.",
-					"es-419": "Se agregaron %d %s de **%s** a la cola.",
-					"zh-CN": "已将 **%s** 中的 %d %s添加到队列。",
-					"fr": "%d %s de **%s** ajoutées à la file d'attente.",
-					"it": "Aggiunte %d %s da **%s** alla coda.",
-					"de": "%d %s von **%s** zur Warteschlange hinzugefügt.",
-					"pl": "Dodano %d %s z **%s** do kolejki.",
-					"ru": "Добавлено %d %s из **%s** в очередь.",
-					"ja": "**%s** から %d %sをキューに追加しました。"
+					"Title": {
+						"en-US": "Processing Failed",
+						"en-GB": "Processing Failed",
+						"es-ES": "Procesamiento Fallido",
+						"es-419": "Procesamiento Fallido",
+						"zh-CN": "处理失败",
+						"fr": "Échec Du Traitement",
+						"it": "Elaborazione Fallita",
+						"de": "Verarbeitung Fehlgeschlagen",
+						"pl": "Przetwarzanie Nieudane",
+						"ru": "Ошибка Обработки",
+						"ja": "処理に失敗しました"
+					},
+					"Description": {
+						"en-US": "Failed to process the content: %s",
+						"en-GB": "Failed to process the content: %s",
+						"es-ES": "Error al procesar el contenido: %s",
+						"es-419": "Error al procesar el contenido: %s",
+						"zh-CN": "无法处理内容：%s",
+						"fr": "Échec du traitement du contenu : %s",
+						"it": "Impossibile elaborare il contenuto: %s",
+						"de": "Fehler beim Verarbeiten des Inhalts: %s",
+						"pl": "Nie udało się przetworzyć zawartości: %s",
+						"ru": "Не удалось обработать содержимое: %s",
+						"ja": "コンテンツの処理に失敗しました：%s"
+					}
 				}
 			}
 		},
 		"Pause": {
-			"Errors": {
-				"NoSession": {
-					"en-US": "No active playback session found!",
-					"en-GB": "No active playback session found!",
-					"es-ES": "¡No se encontró una sesión de reproducción activa!",
-					"es-419": "¡No se encontró una sesión de reproducción activa!",
-					"zh-CN": "未找到活动的播放会话！",
-					"fr": "Aucune session de lecture active trouvée !",
-					"it": "Nessuna sessione di riproduzione attiva trovata!",
-					"de": "Keine aktive Wiedergabesitzung gefunden!",
-					"pl": "Nie znaleziono aktywnej sesji odtwarzania!",
-					"ru": "Активный сеанс воспроизведения не найден!",
-					"ja": "アクティブな再生セッションが見つかりません！"
-				}
+			"Title": {
+				"en-US": "Playback Paused",
+				"en-GB": "Playback Paused",
+				"es-ES": "Reproducción Pausada",
+				"es-419": "Reproducción Pausada",
+				"zh-CN": "播放已暂停",
+				"fr": "Lecture En Pause",
+				"it": "Riproduzione In Pausa",
+				"de": "Wiedergabe Pausiert",
+				"pl": "Odtwarzanie Wstrzymane",
+				"ru": "Воспроизведение Приостановлено",
+				"ja": "再生が一時停止されました"
 			},
-			"Success": {
-				"en-US": "Paused the currently playing Song",
-				"en-GB": "Paused the currently playing Song",
-				"es-ES": "Se pausó la canción que se estaba reproduciendo",
-				"es-419": "Se pausó la canción que se estaba reproduciendo",
-				"zh-CN": "已暂停当前播放的歌曲",
-				"fr": "La chanson en cours de lecture a été mise en pause",
-				"it": "Riproduzione messa in pausa",
-				"de": "Wiedergabe pausiert",
-				"pl": "Wstrzymano odtwarzanie utworu",
-				"ru": "Воспроизведение приостановлено",
-				"ja": "現在再生中の曲を一時停止しました"
+			"Description": {
+				"en-US": "The currently playing Song has been paused.",
+				"en-GB": "The currently playing Song has been paused.",
+				"es-ES": "La canción que se está reproduciendo ha sido pausada.",
+				"es-419": "La canción que se está reproduciendo ha sido pausada.",
+				"zh-CN": "当前播放的歌曲已暂停。",
+				"fr": "La chanson en cours de lecture a été mise en pause.",
+				"it": "La canzone in riproduzione è stata messa in pausa.",
+				"de": "Das aktuell gespielte Lied wurde pausiert.",
+				"pl": "Aktualnie odtwarzany utwór został wstrzymany.",
+				"ru": "Текущая воспроизводимая песня была приостановлена.",
+				"ja": "現在再生中の曲が一時停止されました。"
+			},
+			"Error": {
+				"Title": {
+					"en-US": "No Active Session",
+					"en-GB": "No Active Session",
+					"es-ES": "No Hay Sesión Activa",
+					"es-419": "No Hay Sesión Activa",
+					"zh-CN": "没有活动会话",
+					"fr": "Aucune Session Active",
+					"it": "Nessuna Sessione Attiva",
+					"de": "Keine Aktive Sitzung",
+					"pl": "Brak Aktywnej Sesji",
+					"ru": "Нет Активного Сеанса",
+					"ja": "アクティブなセッションがありません"
+				},
+				"Description": {
+					"en-US": "There is no active playback session to pause.",
+					"en-GB": "There is no active playback session to pause.",
+					"es-ES": "No hay una sesión de reproducción activa para pausar.",
+					"es-419": "No hay una sesión de reproducción activa para pausar.",
+					"zh-CN": "没有要暂停的活动播放会话。",
+					"fr": "Il n'y a pas de session de lecture active à mettre en pause.",
+					"it": "Non c'è alcuna sessione di riproduzione attiva da mettere in pausa.",
+					"de": "Es gibt keine aktive Wiedergabesitzung zum Pausieren.",
+					"pl": "Nie ma aktywnej sesji odtwarzania do wstrzymania.",
+					"ru": "Нет активного сеанса воспроизведения для приостановки.",
+					"ja": "一時停止するアクティブな再生セッションがありません。"
+				}
 			}
 		},
 		"Resume": {
-			"Errors": {
-				"NoSession": {
-					"en-US": "No active playback session found!",
-					"en-GB": "No active playback session found!",
-					"es-ES": "¡No se encontró una sesión de reproducción activa!",
-					"es-419": "¡No se encontró una sesión de reproducción activa!",
-					"zh-CN": "未找到活动的播放会话！",
-					"fr": "Aucune session de lecture active trouvée !",
-					"it": "Nessuna sessione di riproduzione attiva trovata!",
-					"de": "Keine aktive Wiedergabesitzung gefunden!",
-					"pl": "Nie znaleziono aktywnej sesji odtwarzania!",
-					"ru": "Активный сеанс воспроизведения не найден!",
-					"ja": "アクティブな再生セッションが見つかりません！"
-				}
+			"Title": {
+				"en-US": "Playback Resumed",
+				"en-GB": "Playback Resumed",
+				"es-ES": "Reproducción Reanudada",
+				"es-419": "Reproducción Reanudada",
+				"zh-CN": "播放已恢复",
+				"fr": "Lecture Reprise",
+				"it": "Riproduzione Ripresa",
+				"de": "Wiedergabe Fortgesetzt",
+				"pl": "Odtwarzanie Wznowione",
+				"ru": "Воспроизведение Возобновлено",
+				"ja": "再生が再開されました"
 			},
-			"Success": {
-				"en-US": "Resumed the currently paused Song",
-				"en-GB": "Resumed the currently paused Song",
-				"es-ES": "Se reanudó la canción pausada",
-				"es-419": "Se reanudó la canción pausada",
-				"zh-CN": "已恢复当前暂停的歌曲",
-				"fr": "La lecture de la chanson a été reprise",
-				"it": "Riproduzione ripresa",
-				"de": "Wiedergabe fortgesetzt",
-				"pl": "Wznowiono odtwarzanie utworu",
-				"ru": "Воспроизведение возобновлено",
-				"ja": "一時停止中の曲を再開しました"
+			"Description": {
+				"en-US": "The paused Song has been resumed.",
+				"en-GB": "The paused Song has been resumed.",
+				"es-ES": "La canción pausada ha sido reanudada.",
+				"es-419": "La canción pausada ha sido reanudada.",
+				"zh-CN": "暂停的歌曲已恢复播放。",
+				"fr": "La chanson en pause a été reprise.",
+				"it": "La canzone in pausa è stata ripresa.",
+				"de": "Das pausierte Lied wurde fortgesetzt.",
+				"pl": "Wstrzymany utwór został wznowiony.",
+				"ru": "Приостановленная песня была возобновлена.",
+				"ja": "一時停止された曲が再開されました。"
+			},
+			"Error": {
+				"Title": {
+					"en-US": "No Active Session",
+					"en-GB": "No Active Session",
+					"es-ES": "No Hay Sesión Activa",
+					"es-419": "No Hay Sesión Activa",
+					"zh-CN": "没有活动会话",
+					"fr": "Aucune Session Active",
+					"it": "Nessuna Sessione Attiva",
+					"de": "Keine Aktive Sitzung",
+					"pl": "Brak Aktywnej Sesji",
+					"ru": "Нет Активного Сеанса",
+					"ja": "アクティブなセッションがありません"
+				},
+				"Description": {
+					"en-US": "There is no active playback session to resume.",
+					"en-GB": "There is no active playback session to resume.",
+					"es-ES": "No hay una sesión de reproducción activa para reanudar.",
+					"es-419": "No hay una sesión de reproducción activa para reanudar.",
+					"zh-CN": "没有要恢复的活动播放会话。",
+					"fr": "Il n'y a pas de session de lecture active à reprendre.",
+					"it": "Non c'è alcuna sessione di riproduzione attiva da riprendere.",
+					"de": "Es gibt keine aktive Wiedergabesitzung zum Fortsetzen.",
+					"pl": "Nie ma aktywnej sesji odtwarzania do wznowienia.",
+					"ru": "Нет активного сеанса воспроизведения для возобновления.",
+					"ja": "再開するアクティブな再生セッションがありません。"
+				}
 			}
 		},
 		"Next": {
-			"Errors": {
+			"Title": {
+				"en-US": "Skipped To Next Song",
+				"en-GB": "Skipped To Next Song",
+				"es-ES": "Se Saltó A La Siguiente Canción",
+				"es-419": "Se Saltó A La Siguiente Canción",
+				"zh-CN": "已跳至下一首歌曲",
+				"fr": "Passé À La Chanson Suivante",
+				"it": "Passato Alla Canzone Successiva",
+				"de": "Zum Nächsten Lied Gesprungen",
+				"pl": "Przeskoczono Do Następnego Utworu",
+				"ru": "Переход К Следующей Песне",
+				"ja": "次の曲にスキップしました"
+			},
+			"Description": {
+				"en-US": "Now playing the next Song in the Queue.",
+				"en-GB": "Now playing the next Song in the Queue.",
+				"es-ES": "Ahora reproduciendo la siguiente canción en la cola.",
+				"es-419": "Ahora reproduciendo la siguiente canción en la cola.",
+				"zh-CN": "现在播放队列中的下一首歌曲。",
+				"fr": "Lecture de la chanson suivante dans la file d'attente.",
+				"it": "Ora riproduce la canzone successiva nella coda.",
+				"de": "Jetzt wird das nächste Lied in der Warteschlange abgespielt.",
+				"pl": "Teraz odtwarzanie następnego utworu w kolejce.",
+				"ru": "Сейчас воспроизводится следующая песня в очереди.",
+				"ja": "キュー内の次の曲を再生しています。"
+			},
+			"Error": {
 				"NoSession": {
-					"en-US": "No active playback session found!",
-					"en-GB": "No active playback session found!",
-					"es-ES": "¡No se encontró una sesión de reproducción activa!",
-					"es-419": "¡No se encontró una sesión de reproducción activa!",
-					"zh-CN": "未找到活动的播放会话！",
-					"fr": "Aucune session de lecture active trouvée !",
-					"it": "Nessuna sessione di riproduzione attiva trovata!",
-					"de": "Keine aktive Wiedergabesitzung gefunden!",
-					"pl": "Nie znaleziono aktywnej sesji odtwarzania!",
-					"ru": "Активный сеанс воспроизведения не найден!",
-					"ja": "アクティブな再生セッションが見つかりません！"
+					"Title": {
+						"en-US": "No Active Session",
+						"en-GB": "No Active Session",
+						"es-ES": "No Hay Sesión Activa",
+						"es-419": "No Hay Sesión Activa",
+						"zh-CN": "没有活动会话",
+						"fr": "Aucune Session Active",
+						"it": "Nessuna Sessione Attiva",
+						"de": "Keine Aktive Sitzung",
+						"pl": "Brak Aktywnej Sesji",
+						"ru": "Нет Активного Сеанса",
+						"ja": "アクティブなセッションがありません"
+					},
+					"Description": {
+						"en-US": "There is no active playback session.",
+						"en-GB": "There is no active playback session.",
+						"es-ES": "No hay una sesión de reproducción activa.",
+						"es-419": "No hay una sesión de reproducción activa.",
+						"zh-CN": "没有活动的播放会话。",
+						"fr": "Il n'y a pas de session de lecture active.",
+						"it": "Non c'è alcuna sessione di riproduzione attiva.",
+						"de": "Es gibt keine aktive Wiedergabesitzung.",
+						"pl": "Nie ma aktywnej sesji odtwarzania.",
+						"ru": "Нет активного сеанса воспроизведения.",
+						"ja": "アクティブな再生セッションがありません。"
+					}
 				},
 				"NoNextSong": {
-					"en-US": "There is no next Song in the Queue",
-					"en-GB": "There is no next Song in the Queue",
-					"es-ES": "No hay una siguiente canción en la cola",
-					"es-419": "No hay una siguiente canción en la cola",
-					"zh-CN": "队列中没有下一首歌曲",
-					"fr": "Il n'y a pas de chanson suivante dans la file d'attente",
-					"it": "Non c'è una prossima canzone nella coda",
-					"de": "Es gibt kein nächstes Lied in der Warteschlange",
-					"pl": "Nie ma następnego utworu w kolejce",
-					"ru": "В очереди нет следующей песни",
-					"ja": "キューに次の曲がありません"
+					"Title": {
+						"en-US": "No Next Song",
+						"en-GB": "No Next Song",
+						"es-ES": "No Hay Siguiente Canción",
+						"es-419": "No Hay Siguiente Canción",
+						"zh-CN": "没有下一首歌曲",
+						"fr": "Pas De Chanson Suivante",
+						"it": "Nessuna Canzone Successiva",
+						"de": "Kein Nächstes Lied",
+						"pl": "Brak Następnego Utworu",
+						"ru": "Нет Следующей Песни",
+						"ja": "次の曲がありません"
+					},
+					"Description": {
+						"en-US": "There is no next Song in the Queue.",
+						"en-GB": "There is no next Song in the Queue.",
+						"es-ES": "No hay una siguiente canción en la cola.",
+						"es-419": "No hay una siguiente canción en la cola.",
+						"zh-CN": "队列中没有下一首歌曲。",
+						"fr": "Il n'y a pas de chanson suivante dans la file d'attente.",
+						"it": "Non c'è una canzone successiva nella coda.",
+						"de": "Es gibt kein nächstes Lied in der Warteschlange.",
+						"pl": "Nie ma następnego utworu w kolejce.",
+						"ru": "В очереди нет следующей песни.",
+						"ja": "キューに次の曲がありません。"
+					}
 				}
-			},
-			"Success": {
-				"en-US": "Skipped to the next Song",
-				"en-GB": "Skipped to the next Song",
-				"es-ES": "Se saltó a la siguiente canción",
-				"es-419": "Se saltó a la siguiente canción",
-				"zh-CN": "已跳至下一首歌曲",
-				"fr": "Passage à la chanson suivante",
-				"it": "Passato alla canzone successiva",
-				"de": "Zum nächsten Lied gesprungen",
-				"pl": "Przeskoczono do następnego utworu",
-				"ru": "Переход к следующей песне",
-				"ja": "次の曲にスキップしました"
 			}
 		},
 		"Last": {
-			"Errors": {
-				"NoPreviousSong": {
-					"en-US": "There is no previously played Song",
-					"en-GB": "There is no previously played Song",
-					"es-ES": "No hay una canción reproducida anteriormente",
-					"es-419": "No hay una canción reproducida anteriormente",
-					"zh-CN": "没有之前播放的歌曲",
-					"fr": "Il n'y a pas de chanson précédente",
-					"it": "Non c'è una canzone precedente",
-					"de": "Es gibt kein zuvor gespieltes Lied",
-					"pl": "Nie ma poprzedniego utworu",
-					"ru": "Нет предыдущей песни",
-					"ja": "前に再生した曲がありません"
-				}
+			"Title": {
+				"en-US": "Playing Previous Song",
+				"en-GB": "Playing Previous Song",
+				"es-ES": "Reproduciendo Canción Anterior",
+				"es-419": "Reproduciendo Canción Anterior",
+				"zh-CN": "播放上一首歌曲",
+				"fr": "Lecture De La Chanson Précédente",
+				"it": "Riproduzione Della Canzone Precedente",
+				"de": "Vorheriges Lied Wird Abgespielt",
+				"pl": "Odtwarzanie Poprzedniego Utworu",
+				"ru": "Воспроизведение Предыдущей Песни",
+				"ja": "前の曲を再生中"
 			},
-			"Success": {
-				"en-US": "Playing the previous Song",
-				"en-GB": "Playing the previous Song",
-				"es-ES": "Reproduciendo la canción anterior",
-				"es-419": "Reproduciendo la canción anterior",
-				"zh-CN": "正在播放上一首歌曲",
-				"fr": "Lecture de la chanson précédente",
-				"it": "Riproduzione della canzone precedente",
-				"de": "Vorheriges Lied wird abgespielt",
-				"pl": "Odtwarzanie poprzedniego utworu",
-				"ru": "Воспроизведение предыдущей песни",
-				"ja": "前の曲を再生しています"
+			"Description": {
+				"en-US": "Now playing the previously played Song.",
+				"en-GB": "Now playing the previously played Song.",
+				"es-ES": "Ahora reproduciendo la canción reproducida anteriormente.",
+				"es-419": "Ahora reproduciendo la canción reproducida anteriormente.",
+				"zh-CN": "现在播放之前播放的歌曲。",
+				"fr": "Lecture de la chanson précédemment jouée.",
+				"it": "Ora riproduce la canzone riprodotta in precedenza.",
+				"de": "Jetzt wird das zuvor gespielte Lied abgespielt.",
+				"pl": "Teraz odtwarzanie poprzednio odtwarzanego utworu.",
+				"ru": "Сейчас воспроизводится предыдущая песня.",
+				"ja": "以前に再生した曲を再生しています。"
+			},
+			"Error": {
+				"Title": {
+					"en-US": "No Previous Song",
+					"en-GB": "No Previous Song",
+					"es-ES": "No Hay Canción Anterior",
+					"es-419": "No Hay Canción Anterior",
+					"zh-CN": "没有上一首歌曲",
+					"fr": "Pas De Chanson Précédente",
+					"it": "Nessuna Canzone Precedente",
+					"de": "Kein Vorheriges Lied",
+					"pl": "Brak Poprzedniego Utworu",
+					"ru": "Нет Предыдущей Песни",
+					"ja": "前の曲がありません"
+				},
+				"Description": {
+					"en-US": "There is no previously played Song to return to.",
+					"en-GB": "There is no previously played Song to return to.",
+					"es-ES": "No hay una canción reproducida anteriormente a la que volver.",
+					"es-419": "No hay una canción reproducida anteriormente a la que volver.",
+					"zh-CN": "没有之前播放的歌曲可返回。",
+					"fr": "Il n'y a pas de chanson précédente à laquelle revenir.",
+					"it": "Non c'è una canzone precedente a cui tornare.",
+					"de": "Es gibt kein zuvor gespieltes Lied, zu dem zurückgekehrt werden kann.",
+					"pl": "Nie ma poprzedniego utworu, do którego można wrócić.",
+					"ru": "Нет предыдущей песни, к которой можно вернуться.",
+					"ja": "戻る前の曲がありません。"
+				}
 			}
 		},
 		"Lyrics": {
-			"Errors": {
+			"Error": {
 				"NoSong": {
-					"en-US": "No Song is currently playing",
-					"en-GB": "No Song is currently playing",
-					"es-ES": "No hay ninguna canción reproduciéndose",
-					"es-419": "No hay ninguna canción reproduciéndose",
-					"zh-CN": "当前没有正在播放的歌曲",
-					"fr": "Aucune chanson n'est en cours de lecture",
-					"it": "Nessuna canzone in riproduzione",
-					"de": "Derzeit wird kein Lied abgespielt",
-					"pl": "Aktualnie nie odtwarzany żaden utwór",
-					"ru": "В настоящий момент не воспроизводится ни одна песня",
-					"ja": "現在再生中の曲はありません"
+					"Title": {
+						"en-US": "No Song Playing",
+						"en-GB": "No Song Playing",
+						"es-ES": "No Hay Canción Reproduciéndose",
+						"es-419": "No Hay Canción Reproduciéndose",
+						"zh-CN": "没有正在播放的歌曲",
+						"fr": "Aucune Chanson En Cours",
+						"it": "Nessuna Canzone In Riproduzione",
+						"de": "Kein Lied Wird Abgespielt",
+						"pl": "Brak Odtwarzanego Utworu",
+						"ru": "Нет Воспроизводимой Песни",
+						"ja": "再生中の曲がありません"
+					},
+					"Description": {
+						"en-US": "There is no Song currently playing to fetch lyrics for.",
+						"en-GB": "There is no Song currently playing to fetch lyrics for.",
+						"es-ES": "No hay ninguna canción reproduciéndose para obtener la letra.",
+						"es-419": "No hay ninguna canción reproduciéndose para obtener la letra.",
+						"zh-CN": "当前没有正在播放的歌曲可获取歌词。",
+						"fr": "Il n'y a pas de chanson en cours pour récupérer les paroles.",
+						"it": "Non c'è alcuna canzone in riproduzione per cui recuperare il testo.",
+						"de": "Es wird derzeit kein Lied abgespielt, für das Liedtexte abgerufen werden können.",
+						"pl": "Nie ma obecnie odtwarzanego utworu, dla którego można pobrać tekst.",
+						"ru": "Нет воспроизводимой песни, для которой можно получить текст.",
+						"ja": "歌詞を取得する再生中の曲がありません。"
+					}
 				},
 				"NotFound": {
-					"en-US": "Lyrics could not be found for this Song",
-					"en-GB": "Lyrics could not be found for this Song",
-					"es-ES": "No se encontraron letras para esta canción",
-					"es-419": "No se encontraron letras para esta canción",
-					"zh-CN": "未能找到该歌曲的歌词",
-					"fr": "Aucune parole trouvée pour cette chanson",
-					"it": "Testo non trovato per questa canzone",
-					"de": "Für dieses Lied konnten keine Liedtexte gefunden werden",
-					"pl": "Nie znaleziono tekstu dla tej piosenki",
-					"ru": "Текст песни не найден",
-					"ja": "この曲の歌詞は見つかりませんでした"
+					"Title": {
+						"en-US": "Lyrics Not Found",
+						"en-GB": "Lyrics Not Found",
+						"es-ES": "Letra No Encontrada",
+						"es-419": "Letra No Encontrada",
+						"zh-CN": "未找到歌词",
+						"fr": "Paroles Non Trouvées",
+						"it": "Testo Non Trovato",
+						"de": "Liedtext Nicht Gefunden",
+						"pl": "Nie Znaleziono Tekstu",
+						"ru": "Текст Не Найден",
+						"ja": "歌詞が見つかりません"
+					},
+					"Description": {
+						"en-US": "Lyrics could not be found for this Song.",
+						"en-GB": "Lyrics could not be found for this Song.",
+						"es-ES": "No se encontró la letra para esta canción.",
+						"es-419": "No se encontró la letra para esta canción.",
+						"zh-CN": "未能找到该歌曲的歌词。",
+						"fr": "Les paroles n'ont pas pu être trouvées pour cette chanson.",
+						"it": "Non è stato possibile trovare il testo per questa canzone.",
+						"de": "Für dieses Lied konnten keine Liedtexte gefunden werden.",
+						"pl": "Nie znaleziono tekstu dla tego utworu.",
+						"ru": "Текст этой песни не найден.",
+						"ja": "この曲の歌詞は見つかりませんでした。"
+					}
 				}
 			}
 		},
 		"Queue": {
-			"Errors": {
-				"NoQueue": {
-					"en-US": "There are no Songs in the Queue",
-					"en-GB": "There are no Songs in the Queue",
-					"es-ES": "No hay canciones en la cola",
-					"es-419": "No hay canciones en la cola",
-					"zh-CN": "队列中没有歌曲",
-					"fr": "Il n'y a pas de chansons dans la file d'attente",
-					"it": "Non ci sono brani nella coda",
-					"de": "Es gibt keine Lieder in der Warteschlange",
-					"pl": "W kolejce nie ma utworów",
-					"ru": "В очереди нет песен",
-					"ja": "キューに曲がありません"
+			"Error": {
+				"Title": {
+					"en-US": "Queue Is Empty",
+					"en-GB": "Queue Is Empty",
+					"es-ES": "La Cola Está Vacía",
+					"es-419": "La Cola Está Vacía",
+					"zh-CN": "队列为空",
+					"fr": "La File D'attente Est Vide",
+					"it": "La Coda È Vuota",
+					"de": "Die Warteschlange Ist Leer",
+					"pl": "Kolejka Jest Pusta",
+					"ru": "Очередь Пуста",
+					"ja": "キューは空です"
+				},
+				"Description": {
+					"en-US": "There are no Songs in the Queue to display.",
+					"en-GB": "There are no Songs in the Queue to display.",
+					"es-ES": "No hay canciones en la cola para mostrar.",
+					"es-419": "No hay canciones en la cola para mostrar.",
+					"zh-CN": "队列中没有要显示的歌曲。",
+					"fr": "Il n'y a pas de chansons dans la file d'attente à afficher.",
+					"it": "Non ci sono canzoni nella coda da visualizzare.",
+					"de": "Es sind keine Lieder in der Warteschlange anzuzeigen.",
+					"pl": "Nie ma utworów w kolejce do wyświetlenia.",
+					"ru": "В очереди нет песен для отображения.",
+					"ja": "表示するキュー内に曲がありません。"
 				}
 			}
-		}
-	},
-	"Autocomplete": {
-		"Play": {
-			"InputTooShort": {
-				"en-US": "Input must be at least 3 characters long",
-				"en-GB": "Input must be at least 3 characters long",
-				"es-ES": "La entrada debe tener al menos 3 caracteres",
-				"es-419": "La entrada debe tener al menos 3 caracteres",
-				"zh-CN": "输入必须至少3个字符",
-				"fr": "L'entrée doit contenir au moins 3 caractères",
-				"it": "L'input deve essere di almeno 3 caratteri",
-				"de": "Eingabe muss mindestens 3 Zeichen lang sein",
-				"pl": "Dane muszą mieć co najmniej 3 znaki",
-				"ru": "Введите не менее 3 символов",
-				"ja": "入力は3文字以上である必要があります"
+		},
+		"Controls": {
+			"Title": {
+				"en-US": "Playback Controls",
+				"en-GB": "Playback Controls",
+				"es-ES": "Controles De Reproducción",
+				"es-419": "Controles De Reproducción",
+				"zh-CN": "播放控制",
+				"fr": "Contrôles De Lecture",
+				"it": "Controlli Di Riproduzione",
+				"de": "Wiedergabesteuerung",
+				"pl": "Sterowanie Odtwarzaniem",
+				"ru": "Управление Воспроизведением",
+				"ja": "再生コントロール"
 			},
-			"NoSuggestions": {
-				"en-US": "No suggestions found",
-				"en-GB": "No suggestions found",
-				"es-ES": "No se encontraron sugerencias",
-				"es-419": "No se encontraron sugerencias",
-				"zh-CN": "未找到建议",
-				"fr": "Aucune suggestion trouvée",
-				"it": "Nessun suggerimento trovato",
-				"de": "Keine Vorschläge gefunden",
-				"pl": "Nie znaleziono sugestii",
-				"ru": "Предложения не найдены",
-				"ja": "候補が見つかりません"
-			},
-			"Placeholder": {
-				"en-US": "N/A",
-				"en-GB": "N/A",
-				"es-ES": "N/D",
-				"es-419": "N/D",
-				"zh-CN": "不适用",
-				"fr": "N/D",
-				"it": "N/D",
-				"de": "K.A.",
-				"pl": "Brak",
-				"ru": "Н/Д",
-				"ja": "該当なし"
+			"Description": {
+				"en-US": "Open the playback controls interface [here](%s).",
+				"en-GB": "Open the playback controls interface [here](%s).",
+				"es-ES": "Abre la interfaz de controles de reproducción [aquí](%s).",
+				"es-419": "Abre la interfaz de controles de reproducción [aquí](%s).",
+				"zh-CN": "在[此处](%s)打开播放控制界面。",
+				"fr": "Ouvrez l'interface de contrôles de lecture [ici](%s).",
+				"it": "Apri l'interfaccia dei controlli di riproduzione [qui](%s).",
+				"de": "Öffne die Wiedergabesteuerungsschnittstelle [hier](%s).",
+				"pl": "Otwórz interfejs sterowania odtwarzaniem [tutaj](%s).",
+				"ru": "Откройте интерфейс управления воспроизведением [здесь](%s).",
+				"ja": "再生コントロールインターフェースを[こちら](%s)で開く。"
 			}
 		}
 	},
 	"Embeds": {
+		"Categories": {
+			"Notifications": {
+				"en-US": "Notifications",
+				"en-GB": "Notifications",
+				"es-ES": "Notificaciones",
+				"es-419": "Notificaciones",
+				"zh-CN": "通知",
+				"fr": "Notifications",
+				"it": "Notifiche",
+				"de": "Benachrichtigungen",
+				"pl": "Powiadomienia",
+				"ru": "Уведомления",
+				"ja": "通知"
+			},
+			"Error": {
+				"en-US": "Error",
+				"en-GB": "Error",
+				"es-ES": "Error",
+				"es-419": "Error",
+				"zh-CN": "错误",
+				"fr": "Erreur",
+				"it": "Errore",
+				"de": "Fehler",
+				"pl": "Błąd",
+				"ru": "Ошибка",
+				"ja": "エラー"
+			},
+			"Playback": {
+				"en-US": "Playback",
+				"en-GB": "Playback",
+				"es-ES": "Reproducción",
+				"es-419": "Reproducción",
+				"zh-CN": "播放",
+				"fr": "Lecture",
+				"it": "Riproduzione",
+				"de": "Wiedergabe",
+				"pl": "Odtwarzanie",
+				"ru": "Воспроизведение",
+				"ja": "再生"
+			},
+			"Controls": {
+				"en-US": "Controls",
+				"en-GB": "Controls",
+				"es-ES": "Controles",
+				"es-419": "Controles",
+				"zh-CN": "控制",
+				"fr": "Contrôles",
+				"it": "Controlli",
+				"de": "Steuerung",
+				"pl": "Sterowanie",
+				"ru": "Управление",
+				"ja": "コントロール"
+			}
+		},
+		"Notifications": {
+			"ManualDisconnect": {
+				"Title": {
+					"en-US": "Manually Disconnected",
+					"en-GB": "Manually Disconnected",
+					"es-ES": "Desconectado Manualmente",
+					"es-419": "Desconectado Manualmente",
+					"zh-CN": "手动断开连接",
+					"fr": "Déconnecté Manuellement",
+					"it": "Disconnesso Manualmente",
+					"de": "Manuell Getrennt",
+					"pl": "Ręcznie Rozłączono",
+					"ru": "Отключено Вручную",
+					"ja": "手動で切断されました"
+				},
+				"Description": {
+					"en-US": "The Queue has been reset and the bot has been disconnected.",
+					"en-GB": "The Queue has been reset and the bot has been disconnected.",
+					"es-ES": "La cola ha sido reiniciada y el bot ha sido desconectado.",
+					"es-419": "La cola ha sido reiniciada y el bot ha sido desconectado.",
+					"zh-CN": "队列已重置，机器人已断开连接。",
+					"fr": "La file d'attente a été réinitialisée et le bot a été déconnecté.",
+					"it": "La coda è stata reimpostata e il bot è stato disconnesso.",
+					"de": "Die Warteschlange wurde zurückgesetzt und der Bot wurde getrennt.",
+					"pl": "Kolejka została zresetowana i bot został rozłączony.",
+					"ru": "Очередь была сброшена, и бот был отключен.",
+					"ja": "キューがリセットされ、ボットが切断されました。"
+				}
+			},
+			"QueueEnded": {
+				"Title": {
+					"en-US": "Queue Ended",
+					"en-GB": "Queue Ended",
+					"es-ES": "Cola Finalizada",
+					"es-419": "Cola Finalizada",
+					"zh-CN": "队列已结束",
+					"fr": "File D'attente Terminée",
+					"it": "Coda Terminata",
+					"de": "Warteschlange Beendet",
+					"pl": "Kolejka Zakończona",
+					"ru": "Очередь Завершена",
+					"ja": "キューが終了しました"
+				},
+				"Description": {
+					"en-US": "The playback Queue has finished. New Songs may be added at any time.",
+					"en-GB": "The playback Queue has finished. New Songs may be added at any time.",
+					"es-ES": "La cola de reproducción ha terminado. Se pueden agregar nuevas canciones en cualquier momento.",
+					"es-419": "La cola de reproducción ha terminado. Se pueden agregar nuevas canciones en cualquier momento.",
+					"zh-CN": "播放队列已结束。可以随时添加新歌曲。",
+					"fr": "La file d'attente de lecture est terminée. De nouvelles chansons peuvent être ajoutées à tout moment.",
+					"it": "La coda di riproduzione è terminata. Nuove canzoni possono essere aggiunte in qualsiasi momento.",
+					"de": "Die Wiedergabe-Warteschlange ist beendet. Neue Lieder können jederzeit hinzugefügt werden.",
+					"pl": "Kolejka odtwarzania została zakończona. Nowe utwory można dodać w każdej chwili.",
+					"ru": "Очередь воспроизведения завершена. Новые песни можно добавить в любое время.",
+					"ja": "再生キューが終了しました。新しい曲はいつでも追加できます。"
+				}
+			},
+			"AddedToQueue": {
+				"Title": {
+					"en-US": "Added %s To Queue",
+					"en-GB": "Added %s To Queue",
+					"es-ES": "Se Agregó %s A La Cola",
+					"es-419": "Se Agregó %s A La Cola",
+					"zh-CN": "已将 %s 添加到队列",
+					"fr": "%s Ajouté À La File D'attente",
+					"it": "%s Aggiunto Alla Coda",
+					"de": "%s Zur Warteschlange Hinzugefügt",
+					"pl": "Dodano %s Do Kolejki",
+					"ru": "%s Добавлено В Очередь",
+					"ja": "%s をキューに追加しました"
+				},
+				"Description": {
+					"en-US": "Added %d %s to the Queue.",
+					"en-GB": "Added %d %s to the Queue.",
+					"es-ES": "Se agregaron %d %s a la cola.",
+					"es-419": "Se agregaron %d %s a la cola.",
+					"zh-CN": "已将 %d %s添加到队列。",
+					"fr": "%d %s ajoutées à la file d'attente.",
+					"it": "%d %s aggiunte alla coda.",
+					"de": "%d %s zur Warteschlange hinzugefügt.",
+					"pl": "Dodano %d %s do kolejki.",
+					"ru": "%d %s добавлено в очередь.",
+					"ja": "%d %sをキューに追加しました。"
+				}
+			}
+		},
 		"NowPlaying": {
 			"AuthorNowPlaying": {
 				"en-US": "Now Playing",
 				"en-GB": "Now Playing",
-				"es-ES": "Reproduciendo ahora",
-				"es-419": "Reproduciendo ahora",
+				"es-ES": "Reproduciendo Ahora",
+				"es-419": "Reproduciendo Ahora",
 				"zh-CN": "正在播放",
-				"fr": "En cours de lecture",
-				"it": "In riproduzione",
-				"de": "Wird gespielt",
-				"pl": "Teraz odtwarzane",
-				"ru": "Сейчас играет",
+				"fr": "En Cours De Lecture",
+				"it": "In Riproduzione",
+				"de": "Wird Gespielt",
+				"pl": "Teraz Odtwarzane",
+				"ru": "Сейчас Играет",
 				"ja": "再生中"
 			},
 			"AuthorSongsAway": {
 				"en-US": "%d %s Away",
 				"en-GB": "%d %s Away",
-				"es-ES": "%d %s en cola",
-				"es-419": "%d %s en cola",
+				"es-ES": "%d %s En Cola",
+				"es-419": "%d %s En Cola",
 				"zh-CN": "还有 %d %s",
-				"fr": "%d %s en attente",
-				"it": "%d %s in coda",
-				"de": "%d %s entfernt",
-				"pl": "%d %s w kolejce",
+				"fr": "%d %s En Attente",
+				"it": "%d %s In Coda",
+				"de": "%d %s Entfernt",
+				"pl": "%d %s W Kolejce",
 				"ru": "Через %d %s",
 				"ja": "%d %s 後"
 			},
 			"StatePlayedBy": {
 				"en-US": "Played By",
 				"en-GB": "Played By",
-				"es-ES": "Reproducido por",
-				"es-419": "Reproducido por",
+				"es-ES": "Reproducido Por",
+				"es-419": "Reproducido Por",
 				"zh-CN": "播放者",
-				"fr": "Joué par",
-				"it": "Riprodotto da",
-				"de": "Gespielt von",
-				"pl": "Odtworzone przez",
+				"fr": "Joué Par",
+				"it": "Riprodotto Da",
+				"de": "Gespielt Von",
+				"pl": "Odtworzone Przez",
 				"ru": "Воспроизвёл",
 				"ja": "再生者"
 			},
 			"StateEnqueuedBy": {
 				"en-US": "Enqueued By",
 				"en-GB": "Enqueued By",
-				"es-ES": "Añadido por",
-				"es-419": "Añadido por",
+				"es-ES": "Añadido Por",
+				"es-419": "Añadido Por",
 				"zh-CN": "添加者",
-				"fr": "Ajouté par",
-				"it": "Aggiunto da",
-				"de": "Hinzugefügt von",
-				"pl": "Dodane przez",
+				"fr": "Ajouté Par",
+				"it": "Aggiunto Da",
+				"de": "Hinzugefügt Von",
+				"pl": "Dodane Przez",
 				"ru": "Добавил",
 				"ja": "追加者"
 			},
@@ -404,16 +781,16 @@
 				"ja": "アルバム **%s**"
 			},
 			"DescriptionInPlaylist": {
-				"en-US": "Song %d of %d in **%s**",
-				"en-GB": "Song %d of %d in **%s**",
-				"es-ES": "Pista %d de %d en **%s**",
-				"es-419": "Pista %d de %d en **%s**",
+				"en-US": "Song %d Of %d In **%s**",
+				"en-GB": "Song %d Of %d In **%s**",
+				"es-ES": "Pista %d De %d En **%s**",
+				"es-419": "Pista %d De %d En **%s**",
 				"zh-CN": "**%s** 中的第 %d/%d",
-				"fr": "Piste %d sur %d dans **%s**",
-				"it": "Traccia %d di %d in **%s**",
-				"de": "Titel %d von %d in **%s**",
-				"pl": "Utwór %d z %d w **%s**",
-				"ru": "Трек %d из %d в **%s**",
+				"fr": "Piste %d Sur %d Dans **%s**",
+				"it": "Traccia %d Di %d In **%s**",
+				"de": "Titel %d Von %d In **%s**",
+				"pl": "Utwór %d Z %d W **%s**",
+				"ru": "Трек %d Из %d В **%s**",
 				"ja": "**%s** のトラック %d/%d"
 			},
 			"FieldArtists": {
@@ -438,7 +815,7 @@
 				"fr": "Durée",
 				"it": "Durata",
 				"de": "Dauer",
-				"pl": "Czas trwania",
+				"pl": "Czas Trwania",
 				"ru": "Длительность",
 				"ja": "長さ"
 			},
@@ -471,15 +848,15 @@
 				"ja": "歌詞"
 			},
 			"WrittenBy": {
-				"en-US": "Written by %s",
-				"en-GB": "Written by %s",
-				"es-ES": "Escrito por %s",
-				"es-419": "Escrito por %s",
+				"en-US": "Written By %s",
+				"en-GB": "Written By %s",
+				"es-ES": "Escrito Por %s",
+				"es-419": "Escrito Por %s",
 				"zh-CN": "作者 %s",
-				"fr": "Écrit par %s",
-				"it": "Scritto da %s",
-				"de": "Geschrieben von %s",
-				"pl": "Napisane przez %s",
+				"fr": "Écrit Par %s",
+				"it": "Scritto Da %s",
+				"de": "Geschrieben Von %s",
+				"pl": "Napisane Przez %s",
 				"ru": "Написано %s",
 				"ja": "作詞 %s"
 			},
@@ -495,32 +872,6 @@
 				"pl": "(obcięte)",
 				"ru": "(усечено)",
 				"ja": "(切り捨て)"
-			},
-			"ViewWord": {
-				"en-US": "View Word-Synced Lyrics",
-				"en-GB": "View Word-Synced Lyrics",
-				"es-ES": "Ver letra sincronizada por palabra",
-				"es-419": "Ver letra sincronizada por palabra",
-				"zh-CN": "查看按单词同步的歌词",
-				"fr": "Voir paroles synchronisées mot à mot",
-				"it": "Visualizza testo sincronizzato parola per parola",
-				"de": "Wort-synchronisierte Liedtexte anzeigen",
-				"pl": "Zobacz tekst zsynchronizowany według słów",
-				"ru": "Посмотреть построчно/помарочно?",
-				"ja": "単語同期の歌詞を見る"
-			},
-			"ViewLine": {
-				"en-US": "View Line-Synced Lyrics",
-				"en-GB": "View Line-Synced Lyrics",
-				"es-ES": "Ver letra sincronizada por línea",
-				"es-419": "Ver letra sincronizada por línea",
-				"zh-CN": "查看按行同步的歌词",
-				"fr": "Voir paroles synchronisées par ligne",
-				"it": "Visualizza testo sincronizzato per riga",
-				"de": "Zeilen-synchronisierte Liedtexte anzeigen",
-				"pl": "Zobacz tekst zsynchronizowany według linii",
-				"ru": "Посмотреть построчно",
-				"ja": "行同期の歌詞を見る"
 			}
 		},
 		"Queue": {
@@ -530,65 +881,24 @@
 				"es-ES": "Cola",
 				"es-419": "Cola",
 				"zh-CN": "队列",
-				"fr": "File d'attente",
+				"fr": "File D'attente",
 				"it": "Coda",
 				"de": "Warteschlange",
 				"pl": "Kolejka",
 				"ru": "Очередь",
 				"ja": "キュー"
 			},
-			"Errors": {
-				"NoQueue": {
-					"en-US": "There are no Songs in the Queue",
-					"en-GB": "There are no Songs in the Queue",
-					"es-ES": "No hay canciones en la cola",
-					"es-419": "No hay canciones en la cola",
-					"zh-CN": "队列中没有歌曲",
-					"fr": "Il n'y a pas de chansons dans la file d'attente",
-					"it": "Non ci sono brani in coda",
-					"de": "Es sind keine Lieder in der Warteschlange",
-					"pl": "Brak piosenek w kolejce",
-					"ru": "В очереди нет песен",
-					"ja": "キューに曲がありません"
-				}
-			},
-			"NowPlaying": {
-				"en-US": "Now Playing",
-				"en-GB": "Now Playing",
-				"es-ES": "Reproduciendo ahora",
-				"es-419": "Reproduciendo ahora",
-				"zh-CN": "正在播放",
-				"fr": "En cours de lecture",
-				"it": "In riproduzione",
-				"de": "Wird gespielt",
-				"pl": "Teraz odtwarzane",
-				"ru": "Сейчас играет",
-				"ja": "再生中"
-			},
-			"Upcoming": {
-				"en-US": "Up Next",
-				"en-GB": "Up Next",
-				"es-ES": "Siguiente",
-				"es-419": "Siguiente",
-				"zh-CN": "接下来",
-				"fr": "A suivre",
-				"it": "In arrivo",
-				"de": "Als nächstes",
-				"pl": "Następne",
-				"ru": "Далее",
-				"ja": "次に再生"
-			},
 			"NoUpcoming": {
-				"en-US": "No upcoming Songs",
-				"en-GB": "No upcoming Songs",
-				"es-ES": "No hay canciones próximas",
-				"es-419": "No hay canciones próximas",
+				"en-US": "No Upcoming Songs",
+				"en-GB": "No Upcoming Songs",
+				"es-ES": "No Hay Canciones Próximas",
+				"es-419": "No Hay Canciones Próximas",
 				"zh-CN": "没有即将播放的歌曲",
-				"fr": "Aucune chanson à venir",
-				"it": "Nessuna canzone in arrivo",
-				"de": "Keine anstehenden Songs",
-				"pl": "Brak nadchodzących utworów",
-				"ru": "Нет предстоящих песен",
+				"fr": "Aucune Chanson À Venir",
+				"it": "Nessuna Canzone In Arrivo",
+				"de": "Keine Anstehenden Songs",
+				"pl": "Brak Nadchodzących Utworów",
+				"ru": "Нет Предстоящих Песен",
 				"ja": "今後の曲はありません"
 			},
 			"More": {
@@ -605,16 +915,16 @@
 				"ja": "さらに %d 曲..."
 			},
 			"View": {
-				"en-US": "View/Edit",
-				"en-GB": "View/Edit",
-				"es-ES": "Ver/Editar",
-				"es-419": "Ver/Editar",
+				"en-US": "View/Edit Queue",
+				"en-GB": "View/Edit Queue",
+				"es-ES": "Ver/Editar Cola",
+				"es-419": "Ver/Editar Cola",
 				"zh-CN": "查看/编辑队列",
-				"fr": "Voir/Modifier la file d'attente",
-				"it": "Visualizza/Modifica la coda",
-				"de": "Warteschlange anzeigen/bearbeiten",
-				"pl": "Zobacz/Edytuj kolejkę",
-				"ru": "Просмотреть/Изменить очередь",
+				"fr": "Voir/Modifier La File D'attente",
+				"it": "Visualizza/Modifica La Coda",
+				"de": "Warteschlange Anzeigen/Bearbeiten",
+				"pl": "Zobacz/Edytuj Kolejkę",
+				"ru": "Просмотреть/Изменить Очередь",
 				"ja": "キューを表示/編集"
 			},
 			"Stats": {
@@ -630,104 +940,48 @@
 				"ru": "%d %s • %d Мин • %d %s",
 				"ja": "%d %s • %d 分 • %d %s"
 			}
-		},
-		"Controls": {
-			"Title": {
-				"en-US": "Controls",
-				"en-GB": "Controls",
-				"es-ES": "Controles",
-				"es-419": "Controles",
-				"zh-CN": "控制",
-				"fr": "Contrôles",
-				"it": "Controlli",
-				"de": "Steuerung",
-				"pl": "Sterowanie",
-				"ru": "Управление",
-				"ja": "コントロール"
+		}
+	},
+	"Autocomplete": {
+		"Play": {
+			"InputTooShort": {
+				"en-US": "Input must be at least 3 characters long.",
+				"en-GB": "Input must be at least 3 characters long.",
+				"es-ES": "La entrada debe tener al menos 3 caracteres.",
+				"es-419": "La entrada debe tener al menos 3 caracteres.",
+				"zh-CN": "输入必须至少3个字符。",
+				"fr": "L'entrée doit contenir au moins 3 caractères.",
+				"it": "L'input deve essere di almeno 3 caratteri.",
+				"de": "Eingabe muss mindestens 3 Zeichen lang sein.",
+				"pl": "Dane muszą mieć co najmniej 3 znaki.",
+				"ru": "Введите не менее 3 символов.",
+				"ja": "入力は3文字以上である必要があります。"
 			},
-			"Description": {
-				"en-US": "Open controls [here](%s)",
-				"en-GB": "Open controls [here](%s)",
-				"es-ES": "Abrir controles [aquí](%s)",
-				"es-419": "Abrir controles [aquí](%s)",
-				"zh-CN": "在[此处](%s)打开控制",
-				"fr": "Ouvrir les contrôles [ici](%s)",
-				"it": "Apri i controlli [qui](%s)",
-				"de": "Steuerung öffnen [hier](%s)",
-				"pl": "Otwórz sterowanie [tutaj](%s)",
-				"ru": "Открыть управление [здесь](%s)",
-				"ja": "[こちら](%s)でコントロールを開く"
-			}
-		},
-		"Notifications": {
-			"Author": {
-				"en-US": "Notifications",
-				"en-GB": "Notifications",
-				"es-ES": "Notificaciones",
-				"es-419": "Notificaciones",
-				"zh-CN": "通知",
-				"fr": "Notifications",
-				"it": "Notifiche",
-				"de": "Benachrichtigungen",
-				"pl": "Powiadomienia",
-				"ru": "Уведомления",
-				"ja": "通知"
+			"NoSuggestions": {
+				"en-US": "No suggestions found.",
+				"en-GB": "No suggestions found.",
+				"es-ES": "No se encontraron sugerencias.",
+				"es-419": "No se encontraron sugerencias.",
+				"zh-CN": "未找到建议。",
+				"fr": "Aucune suggestion trouvée.",
+				"it": "Nessun suggerimento trovato.",
+				"de": "Keine Vorschläge gefunden.",
+				"pl": "Nie znaleziono sugestii.",
+				"ru": "Предложения не найдены.",
+				"ja": "候補が見つかりません。"
 			},
-			"ManualDisconnect": {
-				"Title": {
-					"en-US": "Manually Disconnected",
-					"en-GB": "Manually Disconnected",
-					"es-ES": "Desconectado manualmente",
-					"es-419": "Desconectado manualmente",
-					"zh-CN": "手动断开连接",
-					"fr": "Déconnecté manuellement",
-					"it": "Disconnesso manualmente",
-					"de": "Manuell getrennt",
-					"pl": "Ręcznie rozłączono",
-					"ru": "Отключено вручную",
-					"ja": "手動で切断されました"
-				},
-				"Description": {
-					"en-US": "The Queue has been reset.",
-					"en-GB": "The Queue has been reset.",
-					"es-ES": "La cola ha sido reiniciada.",
-					"es-419": "La cola ha sido reiniciada.",
-					"zh-CN": "队列已重置。",
-					"fr": "La file d'attente a été réinitialisée.",
-					"it": "La coda è stata reimpostata.",
-					"de": "Die Warteschlange wurde zurückgesetzt.",
-					"pl": "Kolejka została zresetowana.",
-					"ru": "Очередь была сброшена.",
-					"ja": "キューがリセットされました。"
-				}
-			},
-			"QueueEnded": {
-				"Title": {
-					"en-US": "Queue Ended",
-					"en-GB": "Queue Ended",
-					"es-ES": "Cola finalizada",
-					"es-419": "Cola finalizada",
-					"zh-CN": "队列结束",
-					"fr": "File d'attente terminée",
-					"it": "Coda terminata",
-					"de": "Warteschlange beendet",
-					"pl": "Kolejka zakończona",
-					"ru": "Очередь завершена",
-					"ja": "キューが終了しました"
-				},
-				"Description": {
-					"en-US": "The playback Queue has finished.\nNew Songs may be added at any time.",
-					"en-GB": "The playback Queue has finished.\nNew Songs may be added at any time.",
-					"es-ES": "La cola de reproducción ha terminado.\nSe pueden agregar nuevas canciones en cualquier momento.",
-					"es-419": "La cola de reproducción ha terminado.\nSe pueden agregar nuevas canciones en cualquier momento.",
-					"zh-CN": "播放队列已结束。\n可以随时添加新歌曲。",
-					"fr": "La file d'attente de lecture est terminée.\nDe nouvelles chansons peuvent être ajoutées à tout moment.",
-					"it": "La coda di riproduzione è terminata.\nNuove canzoni possono essere aggiunte in qualsiasi momento.",
-					"de": "Die Wiedergabe-Warteschlange ist beendet.\nNeue Lieder können jederzeit hinzugefügt werden.",
-					"pl": "Kolejka odtwarzania została zakończona.\nNowe utwory można dodać w każdej chwili.",
-					"ru": "Очередь воспроизведения завершена.\nНовые песни можно добавить в любое время.",
-					"ja": "再生キューが終了しました。\n新しい曲はいつでも追加できます。"
-				}
+			"Placeholder": {
+				"en-US": "N/A",
+				"en-GB": "N/A",
+				"es-ES": "N/D",
+				"es-419": "N/D",
+				"zh-CN": "不适用",
+				"fr": "N/D",
+				"it": "N/D",
+				"de": "K.A.",
+				"pl": "Brak",
+				"ru": "Н/Д",
+				"ja": "該当なし"
 			}
 		}
 	},

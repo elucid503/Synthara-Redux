@@ -162,19 +162,13 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(TextChannelID, discord.MessageCreate{
 
-						Embeds: []discord.Embed{{
+						Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 							Title:       Localizations.Get("Embeds.Notifications.QueueEnded.Title", Guild.Locale.Code()),
+							Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
 							Description: Localizations.Get("Embeds.Notifications.QueueEnded.Description", Guild.Locale.Code()),
-							Color:       0xFFFFFF, // White
-							
-							Author: &discord.EmbedAuthor{
 
-								Name: Localizations.Get("Embeds.Notifications.Author", Guild.Locale.Code()),
-
-							},
-
-						}},
+						})},
 
 					})
 

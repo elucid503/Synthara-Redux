@@ -24,7 +24,14 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: Localizations.Get("Commands.Play.Errors.NoQuery", Locale),
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Play.Error.NoQuery.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Commands.Play.Error.NoQuery.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})},
 
 		})
 
@@ -38,7 +45,14 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: Localizations.Get("Commands.Play.Errors.NotInGuild", Locale),
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Play.Error.NotInGuild.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Commands.Play.Error.NotInGuild.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})},
 
 		})
 
@@ -54,7 +68,14 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: Localizations.Get("Commands.Play.Errors.NotInVoiceChannel", Locale),
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})},
 
 		})
 
@@ -74,7 +95,14 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: Localizations.GetFormat("Commands.Play.Errors.FailedToConnect", Locale, ErrorConnecting.Error()),
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Play.Error.FailedToConnect.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.GetFormat("Commands.Play.Error.FailedToConnect.Description", Locale, ErrorConnecting.Error()),
+				Color:       0xFFB3BA,
+
+			})},
 
 		})
 
@@ -90,7 +118,14 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: Localizations.GetFormat("Commands.Play.Errors.InvalidInput", Locale, ErrorRouting.Error()),
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Play.Error.InvalidInput.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.GetFormat("Commands.Play.Error.InvalidInput.Description", Locale, ErrorRouting.Error()),
+				Color:       0xFFB3BA,
+
+			})},
 
 		})
 
@@ -106,7 +141,14 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 		Event.CreateMessage(discord.MessageCreate{
 
-			Content: Localizations.GetFormat("Commands.Play.Errors.FailedToHandle", Locale, ErrorHandling.Error()),
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Play.Error.FailedToHandle.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.GetFormat("Commands.Play.Error.FailedToHandle.Description", Locale, ErrorHandling.Error()),
+				Color:       0xFFB3BA,
+
+			})},
 
 		})
 

@@ -2,6 +2,7 @@ package Commands
 
 import (
 	"Synthara-Redux/Globals/Localizations"
+	"Synthara-Redux/Utils"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -13,7 +14,13 @@ func Ping(Event *events.ApplicationCommandInteractionCreate) {
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Content: Localizations.Get("Commands.Ping.Success", Locale),
+		Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+			Title:       Localizations.Get("Commands.Ping.Title", Locale),
+			Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
+			Description: Localizations.Get("Commands.Ping.Description", Locale),
+
+		})},
 
 	})
 

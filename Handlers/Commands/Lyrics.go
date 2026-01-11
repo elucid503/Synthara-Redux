@@ -155,7 +155,14 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 	if Guild == nil || Guild.Queue.Current == nil {
 
 		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
-			SetContent(Localizations.Get("Commands.Lyrics.Errors.NoSong", Locale)).
+			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Lyrics.Error.NoSong.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Commands.Lyrics.Error.NoSong.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})).
 			SetFlags(discord.MessageFlagsNone).
 			Build())
 		
@@ -197,7 +204,14 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 	if Err != nil || APIRespPtr == nil {
 
 		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
-			SetContent(Localizations.Get("Commands.Lyrics.Errors.NotFound", Locale)).
+			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Lyrics.Error.NotFound.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Commands.Lyrics.Error.NotFound.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})).
 			SetFlags(discord.MessageFlagsNone).
 			Build())
 
