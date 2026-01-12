@@ -17,10 +17,9 @@ func Ping(Event *events.ApplicationCommandInteractionCreate) {
 		Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Commands.Ping.Title", Locale),
-			Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
 			Description: Localizations.Get("Commands.Ping.Description", Locale),
 
-		})},
+		})}, // no author here, nothing really fits
 
 	})
 

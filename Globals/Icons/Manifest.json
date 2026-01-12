@@ -1,0 +1,50 @@
+{
+  "Albums": {
+    "Name": "albums",
+    "ID": "1460123462856347658"
+  },
+  "Call": {
+    "Name": "call",
+    "ID": "1460123615646191616"
+  },
+  "ChatBubbles": {
+    "Name": "chatbubbles",
+    "ID": "1460123698832085014"
+  },
+  "Pause": {
+    "Name": "pause",
+    "ID": "1460123783322009912"
+  },
+  "Play": {
+    "Name": "play",
+    "ID": "1460123878545166530"
+  },
+  "PlaySkipBack": {
+    "Name": "playskipback",
+    "ID": "1460123998485483876"
+  },
+  "PlaySkipForward": {
+    "Name": "playskipforward",
+    "ID": "1460124072196309187"
+  },
+  "Repeat": {
+    "Name": "repeat",
+    "ID": "1460124127271845990"
+  },
+  "Shuffle": {
+    "Name": "shuffle",
+    "ID": "1460124180879118641"
+  },
+  "Sparkles": {
+    "Name": "sparkles",
+    "ID": "1460124251305803883"
+  },
+  "Star": {
+    "Name": "star",
+    "ID": "1460124312211161099"
+  },
+  "Trash": {
+    "Name": "trash",
+    "ID": "1460124373972287654"
+  }
+}
