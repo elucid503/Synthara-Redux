@@ -223,6 +223,10 @@ func InitializeHandlers() {
 
 					Components.Reconnect(Event)
 
+				case "AutoPlay":
+
+					Components.Autoplay(Event)
+
 			}
 
 		}()
