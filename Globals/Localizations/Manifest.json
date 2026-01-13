@@ -651,6 +651,19 @@
 			"pl": "Połącz Ponownie",
 			"ru": "Переподключиться",
 			"ja": "再接続"
+		},
+		"Disconnect": {
+			"en-US": "Disconnect",
+			"en-GB": "Disconnect",
+			"es-ES": "Desconectar",
+			"es-419": "Desconectar",
+			"zh-CN": "断开连接",
+			"fr": "Déconnecter",
+			"it": "Disconnetti",
+			"de": "Trennen",
+			"pl": "Rozłącz",
+			"ru": "Отключить",
+			"ja": "切断"
 		}
 	},
 	"Embeds": {
@@ -967,6 +980,32 @@
 				"pl": "Napisane Przez %s",
 				"ru": "Написано %s",
 				"ja": "作詞 %s"
+			},
+			"ViewWord": {
+				"en-US": "View Word-Synced Lyrics",
+				"en-GB": "View Word-Synced Lyrics",
+				"es-ES": "Ver letras sincronizadas por palabra",
+				"es-419": "Ver letras sincronizadas por palabra",
+				"zh-CN": "查看逐字同步歌词",
+				"fr": "Voir les paroles synchronisées mot-à-mot",
+				"it": "Visualizza i testi sincronizzati parola per parola",
+				"de": "Wort-synchronisierte Liedtexte anzeigen",
+				"pl": "Pokaż tekst zsynchronizowany na poziomie słów",
+				"ru": "Просмотреть синхронизированные по словам тексты",
+				"ja": "語ごとに同期された歌詞を表示"
+			},
+			"ViewLine": {
+				"en-US": "View Line-Synced Lyrics",
+				"en-GB": "View Line-Synced Lyrics",
+				"es-ES": "Ver letras sincronizadas por línea",
+				"es-419": "Ver letras sincronizadas por línea",
+				"zh-CN": "查看逐行同步歌词",
+				"fr": "Voir les paroles synchronisées par ligne",
+				"it": "Visualizza i testi sincronizzati riga per riga",
+				"de": "Zeilen-synchronisierte Liedtexte anzeigen",
+				"pl": "Pokaż tekst zsynchronizowany na poziomie wierszy",
+				"ru": "Просмотреть синхронизированные по строкам тексты",
+				"ja": "行ごとに同期された歌詞を表示"
 			},
 			"Truncated": {
 				"en-US": "(truncated)",

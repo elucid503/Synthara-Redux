@@ -188,7 +188,7 @@ func InitializeHandlers() {
 
 			go func() { 
 
-				ReconnectButton := discord.NewButton(discord.ButtonStylePrimary, Localizations.Get("Buttons.Reconnect", Guild.Locale.Code()), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
+				ReconnectButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.Reconnect", Guild.Locale.Code()), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
 
 					ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
 

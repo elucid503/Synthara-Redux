@@ -53,7 +53,7 @@ func Resume(Event *events.ApplicationCommandInteractionCreate) {
 
 	Buttons = append(Buttons, LastButton)
 
-	PauseButton := discord.NewButton(discord.ButtonStylePrimary, Localizations.Get("Buttons.Pause", Locale), "Pause", "", 0).WithEmoji(discord.ComponentEmoji{
+	PauseButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.Pause", Locale), "Pause", "", 0).WithEmoji(discord.ComponentEmoji{
 
 		ID: snowflake.MustParse(Icons.GetID(Icons.Pause)),
 

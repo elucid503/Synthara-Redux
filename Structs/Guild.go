@@ -6,6 +6,7 @@ import (
 	"Synthara-Redux/APIs/Spotify"
 	"Synthara-Redux/Audio"
 	"Synthara-Redux/Globals"
+	"Synthara-Redux/Globals/Icons"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Utils"
 	"context"
@@ -357,6 +358,12 @@ func (G *Guild) StartInactivityTimer() {
 		// Send notification message before disconnecting
 		go func() {
 
+			DisconnectButton := discord.NewButton(discord.ButtonStyleDanger, Localizations.Get("Buttons.Reconnect", Locale), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
+
+				ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
+
+			})
+
 			_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
 				AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
@@ -365,6 +372,7 @@ func (G *Guild) StartInactivityTimer() {
 					Description: Localizations.GetFormat("Embeds.Notifications.InactivityDisconnect.Description", Locale, Localizations.Get(DurationKey, Locale)),
 
 				})).
+				AddActionRow(DisconnectButton).
 				Build())
 
 			if ErrorSending != nil {

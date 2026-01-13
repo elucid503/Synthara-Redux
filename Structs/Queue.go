@@ -159,22 +159,28 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				go func() { 
 
-					AutoPlayButton := discord.NewButton(discord.ButtonStylePrimary, Localizations.Get("Buttons.AutoPlay", Guild.Locale.Code()), "AutoPlay", "", 0).WithEmoji(discord.ComponentEmoji{
+					AutoPlayButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.AutoPlay", Guild.Locale.Code()), "AutoPlay", "", 0).WithEmoji(discord.ComponentEmoji{
 
 						ID: snowflake.MustParse(Icons.GetID(Icons.Sparkles)),
 
 					})
+					
+					DisconnectButton := discord.NewButton(discord.ButtonStyleDanger, Localizations.Get("Buttons.Disconnect", Guild.Locale.Code()), "Disconnect", "", 0).WithEmoji(discord.ComponentEmoji{
 
-				_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(TextChannelID, discord.NewMessageCreateBuilder().
-					AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+						ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
 
-						Title:       Localizations.Get("Embeds.Notifications.QueueEnded.Title", Guild.Locale.Code()),
-						Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
-						Description: Localizations.Get("Embeds.Notifications.QueueEnded.Description", Guild.Locale.Code()),
+					})
 
-					})).
-					AddActionRow(AutoPlayButton).
-					Build())
+					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(TextChannelID, discord.NewMessageCreateBuilder().
+						AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+							Title:       Localizations.Get("Embeds.Notifications.QueueEnded.Title", Guild.Locale.Code()),
+							Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
+							Description: Localizations.Get("Embeds.Notifications.QueueEnded.Description", Guild.Locale.Code()),
+
+						})).
+						AddActionRow(AutoPlayButton, DisconnectButton).
+						Build())
 
 					if ErrorSending != nil {
 
