@@ -6,11 +6,13 @@ import (
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Handlers/Autocomplete"
 	"Synthara-Redux/Handlers/Commands"
+	"Synthara-Redux/Handlers/Components"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/discord"
@@ -155,6 +157,71 @@ func InitializeHandlers() {
 				case "play":
 
 					Autocomplete.PlayAutocomplete(Event)
+
+			}
+
+		}()
+
+	}))
+
+	// Component Interactions
+
+	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.ComponentInteractionCreate) {
+
+		go func() {
+
+			CustomID := Event.Data.CustomID()
+
+			// Parses custom ID for arguments (ex: "RemoveSong:YouTubeID")
+
+			Parts := strings.Split(CustomID, ":")
+			BaseID := Parts[0]
+			
+			switch BaseID {
+
+				case "Last":
+
+					Components.Last(Event)
+
+				case "Lyrics":
+
+					Components.Lyrics(Event)
+
+				case "Play":
+
+					Components.Play(Event)
+
+				case "Pause":
+
+					Components.Pause(Event)
+
+				case "Queue":
+
+					Components.Queue(Event)
+
+				case "Next":
+
+					Components.Next(Event)
+
+				case "RemoveSong":
+
+					if len(Parts) > 1 {
+
+						Components.RemoveSong(Event, Parts[1])
+
+					}
+
+				case "JumpToSong":
+
+					if len(Parts) > 1 {
+
+						Components.JumpToSong(Event, Parts[1])
+
+					}
+
+				case "Reconnect":
+
+					Components.Reconnect(Event)
 
 			}
 
