@@ -137,6 +137,9 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	SongFound, Pos, ErrorHandling := Guild.HandleURI(URI, Event.User().Mention())
 
+	// Reset inactivity timer on activity
+	Guild.ResetInactivityTimer()
+
 	if ErrorHandling != nil {
 
 		Event.CreateMessage(discord.MessageCreate{
@@ -160,6 +163,8 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	State := Innertube.QueueInfo{
 
+		Playing: true, // Forced here
+
 		GuildID: GuildID,
 
 		SongPosition: Pos,
@@ -171,10 +176,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	Event.CreateMessage(discord.MessageCreate{
-
-		Embeds: []discord.Embed{SongFound.Embed(State)},
-
-	})
+	Event.CreateMessage(discord.NewMessageCreateBuilder().AddEmbeds(SongFound.Embed(State)).AddActionRow(SongFound.Buttons(State)...).Build())
 
 }

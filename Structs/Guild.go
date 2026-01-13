@@ -71,6 +71,9 @@ type GuildInternal struct {
 
 	Disconnecting bool `json:"disconnecting"`
 
+	InactivityTimer *time.Timer `json:"-"`
+	InactivityMutex sync.Mutex   `json:"-"`
+
 }
 
 // NewGuild Creates a new Guild instance
@@ -122,6 +125,8 @@ func NewGuild(ID snowflake.ID, Locale discord.Locale) *Guild {
 		Internal: GuildInternal{
 
 			Disconnecting: false,
+
+			InactivityTimer: nil,
 
 		},
 		
@@ -232,6 +237,9 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 
 	G.Internal.Disconnecting = true // Marks as disconnecting early to prevent re-entrancy
 
+	// Stop inactivity timer if present
+	G.StopInactivityTimer()
+
 	// Removes immediately from guild store so no new operations re-acquire this guild
 
 	GuildStoreMutex.Lock()
@@ -302,6 +310,118 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 	}
 
 	return nil
+
+}
+
+// StartInactivityTimer starts or resets the inactivity timer
+func (G *Guild) StartInactivityTimer() {
+
+	G.Internal.InactivityMutex.Lock()
+	defer G.Internal.InactivityMutex.Unlock()
+
+	// Stop existing timer if present
+	if G.Internal.InactivityTimer != nil {
+
+		G.Internal.InactivityTimer.Stop()
+
+	}
+
+	// Determine timeout duration based on AutoPlay setting
+	Duration := 1 * time.Hour
+
+	if G.Features.Autoplay {
+
+		Duration = 3 * time.Hour
+
+	}
+
+	Utils.Logger.Info(fmt.Sprintf("Starting inactivity timer for guild %s with duration: %s", G.ID.String(), Duration.String()))
+
+	// Create new timer
+	G.Internal.InactivityTimer = time.AfterFunc(Duration, func() {
+
+		Utils.Logger.Info(fmt.Sprintf("Inactivity timer expired for guild %s, disconnecting...", G.ID.String()))
+
+		// Get guild locale for translations
+		Locale := G.Locale.Code()
+
+		// Determine duration string for message
+		DurationKey := "Common.OneHour"
+
+		if G.Features.Autoplay {
+
+			DurationKey = "Common.ThreeHours"
+
+		}
+
+		// Send notification message before disconnecting
+		go func() {
+
+			_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
+				AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+					Title:       Localizations.Get("Embeds.Notifications.InactivityDisconnect.Title", Locale),
+					Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
+					Description: Localizations.GetFormat("Embeds.Notifications.InactivityDisconnect.Description", Locale, Localizations.Get(DurationKey, Locale)),
+
+				})).
+				Build())
+
+			if ErrorSending != nil {
+
+				Utils.Logger.Error(fmt.Sprintf("Error sending inactivity disconnect message to guild %s: %s", G.ID.String(), ErrorSending.Error()))
+
+			}
+
+		}()
+
+		G.Disconnect(true)
+
+	})
+
+}
+
+// ResetInactivityTimer resets the inactivity timer if it exists
+func (G *Guild) ResetInactivityTimer() {
+
+	G.Internal.InactivityMutex.Lock()
+	defer G.Internal.InactivityMutex.Unlock()
+
+	if G.Internal.InactivityTimer != nil {
+
+		Utils.Logger.Info(fmt.Sprintf("Resetting inactivity timer for guild %s", G.ID.String()))
+
+		G.Internal.InactivityTimer.Stop()
+
+		// Determine timeout duration based on AutoPlay setting
+		Duration := 1 * time.Hour
+
+		if G.Features.Autoplay {
+
+			Duration = 3 * time.Hour
+
+		}
+
+		G.Internal.InactivityTimer.Reset(Duration)
+
+	}
+
+}
+
+// StopInactivityTimer stops and clears the inactivity timer
+func (G *Guild) StopInactivityTimer() {
+
+	G.Internal.InactivityMutex.Lock()
+	defer G.Internal.InactivityMutex.Unlock()
+
+	if G.Internal.InactivityTimer != nil {
+
+		Utils.Logger.Info(fmt.Sprintf("Stopping inactivity timer for guild %s", G.ID.String()))
+
+		G.Internal.InactivityTimer.Stop()
+		G.Internal.InactivityTimer = nil
+
+	}
 
 }
 
@@ -559,6 +679,10 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 
 			}()
 
+	}
+		
+	if (PosAdded == 0 && G.Queue.State != StatePlaying) {
+
 		go func() { // done as to not block
 
 			PlayError := G.Play(SongFound)
@@ -571,7 +695,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 
 		}()
 
-	}	
+	}
 
 	return SongFound, PosAdded, nil
 
@@ -641,6 +765,9 @@ func (G *Guild) Play(Song *Innertube.Song) error {
 
 	G.Queue.SetState(StatePlaying)
 	G.Queue.PlaybackSession = Playback
+
+	// Stop inactivity timer when playback starts
+	G.StopInactivityTimer()
 
 	return nil
 

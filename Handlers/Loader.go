@@ -2,6 +2,7 @@ package Handlers
 
 import (
 	"Synthara-Redux/Globals"
+	"Synthara-Redux/Globals/Icons"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Handlers/Autocomplete"
 	"Synthara-Redux/Handlers/Commands"
@@ -14,6 +15,7 @@ import (
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
+	"github.com/disgoorg/snowflake/v2"
 )
 
 type CommandEntry struct {
@@ -186,25 +188,30 @@ func InitializeHandlers() {
 
 			go func() { 
 
-				_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.MessageCreate{
+				ReconnectButton := discord.NewButton(discord.ButtonStylePrimary, Localizations.Get("Buttons.Reconnect", Guild.Locale.Code()), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
 
-					Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
-
-						Title:       Localizations.Get("Embeds.Notifications.ManualDisconnect.Title", Guild.Locale.Code()),
-						Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
-						Description: Localizations.Get("Embeds.Notifications.ManualDisconnect.Description", Guild.Locale.Code()),
-
-					})},
+					ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
 
 				})
 
-				if ErrorSending != nil {
+			_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+				AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
-					Utils.Logger.Error(fmt.Sprintf("Error sending manual disconnect message to guild %s: %s", Guild.ID, ErrorSending.Error()))
-				
-				}
+					Title:       Localizations.Get("Embeds.Notifications.ManualDisconnect.Title", Guild.Locale.Code()),
+					Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
+					Description: Localizations.Get("Embeds.Notifications.ManualDisconnect.Description", Guild.Locale.Code()),
 
-			}()
+				})).
+				AddActionRow(ReconnectButton).
+				Build())
+
+			if ErrorSending != nil {
+
+				Utils.Logger.Error(fmt.Sprintf("Error sending manual disconnect message to guild %s: %s", Guild.ID, ErrorSending.Error()))
+			
+			}
+
+		}()
 
 		}
 		

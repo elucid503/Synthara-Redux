@@ -41,11 +41,11 @@ export const FetchLyrics = async (Song: Song): Promise<{ data: LyricsResponse | 
     const CleanedTitle = Song.title.replace(/\s*\(.*?\)/g, '').trim();
     const OriginalTitle = Song.title;
 
-    const Result = await LyricsFetcher(CleanedTitle, Song.artists[0], Song.album);
+    const Result = await LyricsFetcher(CleanedTitle, Song.artists[0]);
 
     if (Result.error && CleanedTitle != OriginalTitle) {
 
-        return await LyricsFetcher(OriginalTitle, Song.artists[0], Song.album);
+        return await LyricsFetcher(OriginalTitle, Song.artists[0]);
 
     }
 
@@ -54,7 +54,7 @@ export const FetchLyrics = async (Song: Song): Promise<{ data: LyricsResponse | 
 };
 
 // Helper function to fetch lyrics with specific title/artist/album strings
-const LyricsFetcher = async (Title: string, Artist: string, Album: string): Promise<{ data: LyricsResponse | null, error: boolean }> => {
+const LyricsFetcher = async (Title: string, Artist: string): Promise<{ data: LyricsResponse | null, error: boolean }> => {
 
     try {
 
@@ -62,7 +62,6 @@ const LyricsFetcher = async (Title: string, Artist: string, Album: string): Prom
 
             title: Title,
             artist: Artist,
-            album: Album,
 
             source: 'apple,lyricsplus,musixmatch,spotify,musixmatch-word'
 

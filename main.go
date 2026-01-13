@@ -4,6 +4,7 @@ import (
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/APIs/Spotify"
 	"Synthara-Redux/Globals"
+	"Synthara-Redux/Globals/Icons"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Handlers"
 	"Synthara-Redux/Server"
@@ -30,6 +31,17 @@ func main() {
 	}
 
 	Utils.Logger.Info("Localizations loaded.")
+
+	IconsErr := Icons.Initialize()
+
+	if IconsErr != nil {
+
+		Utils.Logger.Error(fmt.Sprintf("Failed to initialize/read icons: %s", IconsErr.Error()))
+		os.Exit(1)
+
+	}
+
+	Utils.Logger.Info("Icons loaded.")
 
 	InitErr := Globals.InitDiscordClient()
 

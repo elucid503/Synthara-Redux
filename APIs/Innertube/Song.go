@@ -1,6 +1,7 @@
 package Innertube
 
 import (
+	"Synthara-Redux/Globals/Icons"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Utils"
 	"fmt"
@@ -35,6 +36,8 @@ type Duration struct {
 
 type QueueInfo struct {
 
+	Playing bool `json:"playing"`
+	
 	GuildID snowflake.ID `json:"guild_id"`
 
 	SongPosition  int `json:"song_position"`
@@ -140,5 +143,91 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 	Embed.SetColor(DominantColor)
 
 	return Embed.Build()
+
+}
+
+func (S *Song) Buttons(State QueueInfo) []discord.InteractiveComponent {
+
+	// Different buttons for now playing vs queued songs
+
+	Buttons := []discord.InteractiveComponent{}
+
+	if State.SongPosition == 0 {
+
+		PlayPauseIcon := Icons.Play
+		PlayPauseID := "Play"
+
+		if (State.Playing) {
+
+			PlayPauseIcon = Icons.Pause
+			PlayPauseID = "Pause"
+
+		}
+
+		// Now playing buttons
+
+		LastButton := discord.NewButton(discord.ButtonStyleSecondary, "", "Last", "", 0).WithEmoji(discord.ComponentEmoji{
+
+			ID: snowflake.MustParse(Icons.GetID(Icons.PlaySkipBack)),
+
+		})
+
+		Buttons = append(Buttons, LastButton)
+
+		LyricsButton := discord.NewButton(discord.ButtonStyleSecondary, "", "Lyrics", "", 0).WithEmoji(discord.ComponentEmoji{
+
+			ID: snowflake.MustParse(Icons.GetID(Icons.ChatBubbles)),
+
+		})
+
+		Buttons = append(Buttons, LyricsButton)
+
+		PlayPauseButton := discord.NewButton(discord.ButtonStyleSecondary, "", PlayPauseID, "", 0).WithEmoji(discord.ComponentEmoji{
+
+			ID: snowflake.MustParse(Icons.GetID(PlayPauseIcon)),
+
+		})
+
+		Buttons = append(Buttons, PlayPauseButton)
+
+		QueueButton := discord.NewButton(discord.ButtonStyleSecondary, "", "Queue", "", 0).WithEmoji(discord.ComponentEmoji{
+
+			ID: snowflake.MustParse(Icons.GetID(Icons.Albums)),
+
+		})
+
+		Buttons = append(Buttons, QueueButton)
+
+		NextButton := discord.NewButton(discord.ButtonStyleSecondary, "", "Next", "", 0).WithEmoji(discord.ComponentEmoji{
+
+			ID: snowflake.MustParse(Icons.GetID(Icons.PlaySkipForward)),
+
+		})
+
+		Buttons = append(Buttons, NextButton)
+
+	} else {
+
+		// Queued song buttons
+
+		RemoveButton := discord.NewButton(discord.ButtonStyleDanger, Localizations.Get("Buttons.RemoveSong", State.Locale), fmt.Sprintf("RemoveSong:%s", S.YouTubeID), "", 0).WithEmoji(discord.ComponentEmoji{
+
+			ID: snowflake.MustParse(Icons.GetID(Icons.Trash)),
+
+		})
+
+		Buttons = append(Buttons, RemoveButton)
+
+		JumpToButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.JumpToSong", State.Locale), fmt.Sprintf("JumpToSong:%s", S.YouTubeID), "", 0).WithEmoji(discord.ComponentEmoji{
+
+			ID: snowflake.MustParse(Icons.GetID(Icons.Play)),
+
+		})
+
+		Buttons = append(Buttons, JumpToButton)
+
+	}
+
+	return Buttons
 
 }

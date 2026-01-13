@@ -4,6 +4,7 @@ import (
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/Audio"
 	"Synthara-Redux/Globals"
+	"Synthara-Redux/Globals/Icons"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Utils"
 	"fmt"
@@ -111,6 +112,8 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				State := Innertube.QueueInfo{
 
+					Playing: true, // Forced here
+
 					GuildID: Queue.ParentID,
 
 					SongPosition: 0,
@@ -124,11 +127,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				go func() { // we don't need to wait for this...
 
-					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.MessageCreate{
-
-						Embeds: []discord.Embed{Queue.Current.Embed(State)},
-						
-					})
+					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Queue.Current.Embed(State)).AddActionRow(Queue.Current.Buttons(State)...).Build())
 
 					if ErrorSending != nil {
 
@@ -160,17 +159,22 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				go func() { 
 
-					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(TextChannelID, discord.MessageCreate{
+					AutoPlayButton := discord.NewButton(discord.ButtonStylePrimary, Localizations.Get("Buttons.AutoPlay", Guild.Locale.Code()), "AutoPlay", "", 0).WithEmoji(discord.ComponentEmoji{
 
-						Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
-
-							Title:       Localizations.Get("Embeds.Notifications.QueueEnded.Title", Guild.Locale.Code()),
-							Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
-							Description: Localizations.Get("Embeds.Notifications.QueueEnded.Description", Guild.Locale.Code()),
-
-						})},
+						ID: snowflake.MustParse(Icons.GetID(Icons.Sparkles)),
 
 					})
+
+				_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(TextChannelID, discord.NewMessageCreateBuilder().
+					AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+						Title:       Localizations.Get("Embeds.Notifications.QueueEnded.Title", Guild.Locale.Code()),
+						Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
+						Description: Localizations.Get("Embeds.Notifications.QueueEnded.Description", Guild.Locale.Code()),
+
+					})).
+					AddActionRow(AutoPlayButton).
+					Build())
 
 					if ErrorSending != nil {
 
@@ -180,7 +184,8 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				}()
 
-				Guild.Cleanup(true)
+				// Start inactivity timer instead of immediate cleanup
+				Guild.StartInactivityTimer()
 
 				Queue.Current = nil;
 

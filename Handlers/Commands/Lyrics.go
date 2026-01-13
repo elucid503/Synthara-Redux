@@ -78,7 +78,7 @@ func ChunkString(S string, Size int) []string {
 	return Chunks
 }
 
-func LyricsFetcher(Title string, Artist string, Album string) (*LyricsAPIResponse, error) {
+func LyricsFetcher(Title string, Artist string) (*LyricsAPIResponse, error) {
 
 	Params := url.Values{}
 	Params.Set("title", Title)
@@ -89,7 +89,6 @@ func LyricsFetcher(Title string, Artist string, Album string) (*LyricsAPIRespons
 
 	}
 
-	Params.Set("album", Album)
 	Params.Set("source", "apple,lyricsplus,musixmatch,spotify,musixmatch-word")
 
 	ReqURL := fmt.Sprintf("https://lyricsplus.prjktla.workers.dev/v2/lyrics/get?%s", Params.Encode())
@@ -170,6 +169,8 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
+	Guild.ResetInactivityTimer()
+
 	Song := Guild.Queue.Current
 
 	// Page for web lyrics view
@@ -191,13 +192,13 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	APIRespPtr, Err := LyricsFetcher(Cleaned, Artist, Song.Album)
+	APIRespPtr, Err := LyricsFetcher(Cleaned, Artist)
 
 	if Err != nil && Cleaned != Song.Title {
 
 		// Retries with original title
 
-		APIRespPtr, Err = LyricsFetcher(Song.Title, Artist, Song.Album)
+		APIRespPtr, Err = LyricsFetcher(Song.Title, Artist)
 
 	}
 

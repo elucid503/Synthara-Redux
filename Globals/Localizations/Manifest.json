@@ -573,6 +573,86 @@
 			}
 		}
 	},
+	"Buttons": {
+		"RemoveSong": {
+			"en-US": "Remove Song",
+			"en-GB": "Remove Song",
+			"es-ES": "Eliminar Canción",
+			"es-419": "Eliminar Canción",
+			"zh-CN": "移除歌曲",
+			"fr": "Supprimer la chanson",
+			"it": "Rimuovi canzone",
+			"de": "Titel entfernen",
+			"pl": "Usuń utwór",
+			"ru": "Удалить песню",
+			"ja": "曲を削除"
+		},
+		"JumpToSong": {
+			"en-US": "Jump To Song",
+			"en-GB": "Jump To Song",
+			"es-ES": "Saltar a la canción",
+			"es-419": "Saltar a la canción",
+			"zh-CN": "跳到歌曲",
+			"fr": "Aller à la chanson",
+			"it": "Vai alla canzone",
+			"de": "Zum Lied springen",
+			"pl": "Przejdź do utworu",
+			"ru": "Перейти к песне",
+			"ja": "曲にジャンプ"
+		},
+		"Resume": {
+			"en-US": "Resume",
+			"en-GB": "Resume",
+			"es-ES": "Reanudar",
+			"es-419": "Reanudar",
+			"zh-CN": "恢复",
+			"fr": "Reprendre",
+			"it": "Riprendi",
+			"de": "Fortsetzen",
+			"pl": "Wznów",
+			"ru": "Возобновить",
+			"ja": "再開"
+		},
+		"Pause": {
+			"en-US": "Pause",
+			"en-GB": "Pause",
+			"es-ES": "Pausar",
+			"es-419": "Pausar",
+			"zh-CN": "暂停",
+			"fr": "Pause",
+			"it": "Pausa",
+			"de": "Pausieren",
+			"pl": "Wstrzymaj",
+			"ru": "Пауза",
+			"ja": "一時停止"
+		},
+		"AutoPlay": {
+			"en-US": "AutoPlay",
+			"en-GB": "AutoPlay",
+			"es-ES": "Reproducción Automática",
+			"es-419": "Reproducción Automática",
+			"zh-CN": "自动播放",
+			"fr": "Lecture Automatique",
+			"it": "Riproduzione Automatica",
+			"de": "Automatische Wiedergabe",
+			"pl": "Autoodtwarzanie",
+			"ru": "Автовоспроизведение",
+			"ja": "自動再生"
+		},
+		"Reconnect": {
+			"en-US": "Reconnect",
+			"en-GB": "Reconnect",
+			"es-ES": "Reconectar",
+			"es-419": "Reconectar",
+			"zh-CN": "重新连接",
+			"fr": "Reconnecter",
+			"it": "Riconnetti",
+			"de": "Neu Verbinden",
+			"pl": "Połącz Ponownie",
+			"ru": "Переподключиться",
+			"ja": "再接続"
+		}
+	},
 	"Embeds": {
 		"Categories": {
 			"Notifications": {
@@ -683,6 +763,34 @@
 					"pl": "Kolejka odtwarzania została zakończona. Nowe utwory można dodać w każdej chwili.",
 					"ru": "Очередь воспроизведения завершена. Новые песни можно добавить в любое время.",
 					"ja": "再生キューが終了しました。新しい曲はいつでも追加できます。"
+				}
+			},
+			"InactivityDisconnect": {
+				"Title": {
+					"en-US": "Disconnected Due to Inactivity",
+					"en-GB": "Disconnected Due to Inactivity",
+					"es-ES": "Desconectado Por Inactividad",
+					"es-419": "Desconectado Por Inactividad",
+					"zh-CN": "由于不活动已断开连接",
+					"fr": "Déconnecté Pour Inactivité",
+					"it": "Disconnesso Per Inattività",
+					"de": "Wegen Inaktivität Getrennt",
+					"pl": "Rozłączono Z Powodu Bezczynności",
+					"ru": "Отключено Из-За Неактивности",
+					"ja": "非アクティブのため切断されました"
+				},
+				"Description": {
+					"en-US": "The bot has been disconnected after %s of inactivity.",
+					"en-GB": "The bot has been disconnected after %s of inactivity.",
+					"es-ES": "El bot ha sido desconectado después de %s de inactividad.",
+					"es-419": "El bot ha sido desconectado después de %s de inactividad.",
+					"zh-CN": "机器人在 %s 不活动后已断开连接。",
+					"fr": "Le bot a été déconnecté après %s d'inactivité.",
+					"it": "Il bot è stato disconnesso dopo %s di inattività.",
+					"de": "Der Bot wurde nach %s Inaktivität getrennt.",
+					"pl": "Bot został rozłączony po %s bezczynności.",
+					"ru": "Бот был отключен после %s бездействия.",
+					"ja": "%s 非アクティブ後、ボットが切断されました。"
 				}
 			},
 			"AddedToQueue": {
@@ -1037,6 +1145,32 @@
 			"pl": "Współtwórcy",
 			"ru": "Участники",
 			"ja": "貢献者"
+		},
+		"OneHour": {
+			"en-US": "1 hour",
+			"en-GB": "1 hour",
+			"es-ES": "1 hora",
+			"es-419": "1 hora",
+			"zh-CN": "1小时",
+			"fr": "1 heure",
+			"it": "1 ora",
+			"de": "1 Stunde",
+			"pl": "1 godzina",
+			"ru": "1 час",
+			"ja": "1時間"
+		},
+		"ThreeHours": {
+			"en-US": "3 hours",
+			"en-GB": "3 hours",
+			"es-ES": "3 horas",
+			"es-419": "3 horas",
+			"zh-CN": "3小时",
+			"fr": "3 heures",
+			"it": "3 ore",
+			"de": "3 Stunden",
+			"pl": "3 godziny",
+			"ru": "3 часа",
+			"ja": "3時間"
 		}
 	}
 }
