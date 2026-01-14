@@ -190,6 +190,10 @@ func InitializeHandlers() {
 
 					Commands.Album(Event)
 
+				case "leave":
+
+					Commands.Leave(Event)
+
 			}
 
 		}()

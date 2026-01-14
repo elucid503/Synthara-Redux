@@ -26,6 +26,7 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 		
 		ErrorEmbed := Validation.GuildSessionError(Locale)
 		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}})
+		
 		return
 
 	}

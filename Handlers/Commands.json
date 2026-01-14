@@ -862,5 +862,35 @@
 			"ru": "Используйте эту команду для просмотра и воспроизведения альбома текущей песни.",
 			"ja": "このコマンドを使用して、現在再生中の曲のアルバムを表示および再生します。"
 		}
+	},
+	{
+		"name": "leave",
+		"name_localizations": {
+			"en-US": "leave",
+			"en-GB": "leave",
+			"es-ES": "salir",
+			"es-419": "salir",
+			"zh-CN": "离开",
+			"fr": "quitter",
+			"it": "esci",
+			"de": "verlassen",
+			"pl": "wyjdź",
+			"ru": "выйти",
+			"ja": "退出"
+		},
+		"description": "Use this command to disconnect the bot from the voice channel.",
+		"description_localizations": {
+			"en-US": "Use this command to disconnect the bot from the voice channel.",
+			"en-GB": "Use this command to disconnect the bot from the voice channel.",
+			"es-ES": "Usa este comando para desconectar el bot del canal de voz.",
+			"es-419": "Usa este comando para desconectar el bot del canal de voz.",
+			"zh-CN": "使用此命令断开机器人与语音频道的连接。",
+			"fr": "Utilisez cette commande pour déconnecter le bot du canal vocal.",
+			"it": "Usa questo comando per disconnettere il bot dal canale vocale.",
+			"de": "Verwende diesen Befehl, um den Bot vom Sprachkanal zu trennen.",
+			"pl": "Użyj tej komendy, aby odłączyć bota od kanału głosowego.",
+			"ru": "Используйте эту команду, чтобы отключить бота от голосового канала.",
+			"ja": "このコマンドを使用して、ボットをボイスチャンネルから切断します。"
+		}
 	}
 ]

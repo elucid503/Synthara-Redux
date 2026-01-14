@@ -1392,6 +1392,64 @@
 				}
 			}
 		},
+		"Leave": {
+			"Error": {
+				"Title": {
+					"en-US": "Not Connected",
+					"en-GB": "Not Connected",
+					"es-ES": "No Conectado",
+					"es-419": "No Conectado",
+					"zh-CN": "未连接",
+					"fr": "Non Connecté",
+					"it": "Non Connesso",
+					"de": "Nicht Verbunden",
+					"pl": "Nie Połączono",
+					"ru": "Не Подключено",
+					"ja": "接続されていません"
+				},
+				"Description": {
+					"en-US": "The bot is not currently connected to a voice channel.",
+					"en-GB": "The bot is not currently connected to a voice channel.",
+					"es-ES": "El bot no está conectado actualmente a un canal de voz.",
+					"es-419": "El bot no está conectado actualmente a un canal de voz.",
+					"zh-CN": "机器人当前未连接到语音频道。",
+					"fr": "Le bot n'est actuellement pas connecté à un canal vocal.",
+					"it": "Il bot non è attualmente connesso a un canale vocale.",
+					"de": "Der Bot ist derzeit nicht mit einem Sprachkanal verbunden.",
+					"pl": "Bot nie jest obecnie połączony z kanałem głosowym.",
+					"ru": "Бот в настоящее время не подключен к голосовому каналу.",
+					"ja": "ボットは現在ボイスチャンネルに接続されていません。"
+				}
+			},
+			"Success": {
+				"Title": {
+					"en-US": "Disconnected",
+					"en-GB": "Disconnected",
+					"es-ES": "Desconectado",
+					"es-419": "Desconectado",
+					"zh-CN": "已断开连接",
+					"fr": "Déconnecté",
+					"it": "Disconnesso",
+					"de": "Getrennt",
+					"pl": "Rozłączono",
+					"ru": "Отключено",
+					"ja": "切断しました"
+				},
+				"Description": {
+					"en-US": "Successfully disconnected from the voice channel.",
+					"en-GB": "Successfully disconnected from the voice channel.",
+					"es-ES": "Desconectado exitosamente del canal de voz.",
+					"es-419": "Desconectado exitosamente del canal de voz.",
+					"zh-CN": "成功断开与语音频道的连接。",
+					"fr": "Déconnecté avec succès du canal vocal.",
+					"it": "Disconnesso con successo dal canale vocale.",
+					"de": "Erfolgreich vom Sprachkanal getrennt.",
+					"pl": "Pomyślnie rozłączono z kanału głosowego.",
+					"ru": "Успешно отключено от голосового канала.",
+					"ja": "ボイスチャンネルから正常に切断されました。"
+				}
+			}
+		},
 		"Queue": {
 			"Error": {
 				"Title": {
