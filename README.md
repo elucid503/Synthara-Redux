@@ -16,7 +16,7 @@ Synthara-Redux provides seamless music streaming in Discord voice channels with 
 - **Album Playback**: Queue entire albums with a single command
 
 ### User Experience
-- **Localization**: Full support for 11 languages (English, Spanish, Chinese, French, Italian, German, Polish, Russian, Japanese)
+- **Localization**: Full support for many different languages (English, Spanish, Chinese, French, Italian, German, Polish, Russian, Japanese)
 - **Web Dashboard**: Real-time React interface for queue viewing, lyrics, playback control, and song details
 - **Lyrics Integration**: Synchronized (Word-Synced) lyrics fetched from multiple providers
 - **User History**: Records listening history and preferences
