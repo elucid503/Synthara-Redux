@@ -1,70 +1,42 @@
 # Synthara-Redux
 
-A Go rewrite of the Synthara music bot, aiming to provide efficient and convenient music with friends. 
+A high-performance Discord music bot written in Go, featuring real-time audio transcoding, comprehensive playback controls, multi-language support, and a modern web interface.
 
 ## Overview
 
-Unlike many other bots which use FFMPEG or a similar executable for audio processing, Synthara-Redux provides music streaming capabilities with real-time and native audio transcoding. The bot searches YouTube for music, downloads and processes audio streams, and plays them directly in Discord voice channels with minimal latency and high (enough) audio quality.
+Synthara-Redux provides seamless music streaming in Discord voice channels with native transcoding. The bot supports YouTube, Spotify, and Apple Music URLs, includes full Queue management, lyrics display, and a React-based web dashboard for remote control.
+
+## Features
+
+### Music Playback
+- **Multi-Platform Support**: YouTube, Spotify, and Apple Music URLs
+- **Search Integration**: Natural language search via InnerTube (YouTube Music)
+- **Queue Management**: Add, move, remove, jump, and shuffle songs
+- **Playback Controls**: Play, pause, resume, next, previous, repeat modes, and seek
+- **Album Playback**: Queue entire albums with a single command
+
+### User Experience
+- **Localization**: Full support for 11 languages (English, Spanish, Chinese, French, Italian, German, Polish, Russian, Japanese)
+- **Web Dashboard**: Real-time React interface for queue viewing, lyrics, playback control, and song details
+- **Lyrics Integration**: Synchronized (Word-Synced) lyrics fetched from multiple providers
+- **User History**: Records listening history and preferences
+- **Web Controls Lock**: Optional security to restrict web-based operations
+
+### Audio Quality
+- Native AAC decoding via FDK-AAC (no FFMPEG dependency)
+- Real-time sample rate conversion (44.1kHz → 48kHz)
+- Opus encoding at 128kbps for Discord streaming
+- Low-latency HLS segment buffering
 
 ## Audio Processing Pipeline
 
-The bot implements a multi-stage audio processing pipeline:
+The bot uses a custom audio transcoding pipeline:
 
-### 1. Stream Acquisition
-- Uses InnerTube (YouTube's internal API) and a custom scraper to search for songs and retrieve HLS manifests
-- Downloads MPEG-TS segments containing AAC-encoded audio
-
-### 2. Demuxing & Frame Extraction
-- Parses MPEG-TS containers using `astits` demuxer
-- Identifies and extracts AAC audio frames from transport stream packets
-- Handles ADTS (Audio Data Transport Stream) framing
-
-### 3. AAC Decoding
-- Decodes AAC frames to raw PCM audio using FDK-AAC library via CGO
-- Supports automatic sample rate conversion (typically 44.1kHz → 48kHz)
-- Uses linear interpolation for high-quality resampling
-
-### 4. Opus Encoding
-- Encodes PCM audio to Opus format at 128kbps bitrate
-- Configured for 48kHz sample rate, stereo, 20ms frame size
-- Optimized for voice/music streaming (960 samples per frame)
-
-### 5. Discord Streaming
-- Transmits Opus packets directly to Discord voice gateway
-- Maintains low latency buffering and synchronization
-
-## CGO Integration
-
-This project makes extensive use of CGO to interface with native C libraries for better audio processing performance.
-
-### FDK-AAC Decoder
-
-The bot uses FDK-AAC (Fraunhofer FDK AAC) through CGO bindings for AAC decoding:
-
-```go
-#cgo pkg-config: fdk-aac
-#include <fdk-aac/aacdecoder_lib.h>
-```
-
-**Why FDK-AAC?**
-- Industry-standard AAC decoder with exceptional quality
-- Superior performance compared to pure Go implementations
-- Robust handling of various AAC profiles and formats
-- Required for decoding YouTube's audio streams
-
-The decoder handles:
-- ADTS frame parsing and validation
-- Multi-channel audio decoding
-- Stream info extraction (sample rate, channels, frame size)
-- Memory-safe buffer management
-
-### Build Considerations
-
-CGO requires a C compiler and introduces platform-specific build requirements:
-
-- **Build tags**: `//go:build linux || darwin || windows` ensures cross-platform compatibility
-- **pkg-config**: Used to locate FDK-AAC headers and libraries
-- **Compiler flags**: Optimizations enabled via `CGO_CFLAGS`
+1. **Stream Acquisition**: Fetches HLS manifests from YouTube/InnerTube API and downloads MPEG-TS segments
+2. **Demuxing**: Extracts AAC frames from transport stream using `astits`
+3. **AAC Decoding**: Decodes to PCM via FDK-AAC (CGO bindings) with automatic resampling
+4. **Opus Encoding**: Encodes to Opus at 128kbps/48kHz for Discord
+5. **Streaming**: Direct packet transmission to Discord voice gateway
 
 ## Environment Configuration
 
@@ -85,92 +57,87 @@ REFRESH_COMMANDS=false
 
 ### Prerequisites
 
-1. **Go 1.24.1 or later**
-   ```bash
-   go version
-   ```
+**Bot**
+- Go 1.24.1+
+- FDK-AAC library
+- C compiler (GCC/Clang)
+- pkg-config
 
-2. **FDK-AAC library** (required for CGO)
-   
-   **Linux (Debian/Ubuntu):**
-   ```bash
-   sudo apt-get update
-   sudo apt-get install libfdk-aac-dev pkg-config
-   ```
-   
-   **macOS:**
-   ```bash
-   brew install fdk-aac pkg-config
-   ```
-   
-   **Windows:**
-   - Install MSYS2 from https://www.msys2.org/
-   - Open MSYS2 MinGW 64-bit terminal:
-     ```bash
-     pacman -S mingw-w64-x86_64-fdk-aac mingw-w64-x86_64-pkg-config mingw-w64-x86_64-gcc
-     ```
-   - Add MinGW bin to PATH: `C:\msys64\mingw64\bin`
+**Web**
+- Node.js 18+
+- Bun or Deno
 
-3. **C Compiler (GCC or Clang)**
-   - Linux: Usually pre-installed or via `build-essential`
-   - macOS: Install Xcode Command Line Tools
-   - Windows: Provided by MSYS2 (see above)
+### System Dependencies
+
+**Linux (Debian/Ubuntu)**
+```bash
+sudo apt-get install libfdk-aac-dev pkg-config build-essential
+```
+
+**macOS**
+```bash
+brew install fdk-aac pkg-config
+```
+
+**Windows**
+```bash
+Good Luck... use WSL
+```
 
 ### Build Script
 
-The project includes a build script that sets optimal CGO flags:
-
+**Bot**
 ```bash
 chmod +x build.sh
 ./build.sh
 ```
 
-The build script:
-- Enables CGO explicitly
-- Sets `-O3` optimization for C code
-- Suppresses false-positive compiler warnings
-- Produces optimized binary: `synthara-redux`
-
-### Manual Build
-
-Alternatively, build manually:
-
+**Web**
 ```bash
-export CGO_ENABLED=1
-export CGO_CFLAGS="-O3"
-go build -v -o synthara-redux
+cd Web
+bun install
+bun run build
 ```
 
-## Running the Bot
+## Running Everything
 
 ```bash
 ./synthara-redux
 ```
 
-The bot will:
-1. Load environment variables from `.env`
-2. Initialize Discord client with gateway connection
-3. Register slash commands (if `REFRESH_COMMANDS=true`)
-4. Initialize InnerTube client for YouTube API access
-5. Start listening for commands
+The bot will initialize Discord gateway, register commands, and start the web server on port `3000` or whatever is specified in the `PORT` environment variable.
 
-## Usage
+## Available Commands
 
-**Play Command:**
-```
-/play query:<song name or artist>
-```
-
-The bot will:
-- Search YouTube Music for the query
-- Join your voice channel
-- Stream the top result with real-time transcoding
+- `/play <query>` - Search and play a song (supports URLs)
+- `/pause` / `/resume` - Control playback
+- `/next` / `/last` - Navigate queue
+- `/jump <position>` - Jump to specific song
+- `/replay <position>` - Restart from specific position
+- `/repeat <mode>` - Set repeat mode (Off/One/All)
+- `/shuffle <enabled>` - Toggle shuffle
+- `/queue` - View current queue
+- `/move <song> <position>` - Reorder queue
+- `/lyrics` - Display synchronized lyrics
+- `/album` - Play entire album
+- `/controls` - Get web dashboard link
+- `/lock` / `/unlock` - Manage web control permissions
+- `/stats` - View listening statistics
+- `/forget` - Clear your listening history
+- `/leave` - Disconnect from voice channel
 
 ## Technical Stack
 
-- **Language**: Go 1.24.1
-- **Discord Library**: disgoorg/disgo
-- **Audio Decoding**: FDK-AAC (via CGO)
-- **Audio Encoding**: gopus (Opus encoder)
-- **YouTube API**: innertube-go + Overture-Play
-- **Container Parsing**: astits (MPEG-TS), joy4 (AAC parsing)
+**Bot**
+- Go 1.24.1
+- disgoorg/disgo (Discord library)
+- FDK-AAC (AAC decoding via CGO)
+- gopus (Opus encoding)
+- innertube-go + custom scrapers
+
+**Web**
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- WebSocket (real-time updates)
