@@ -1,10 +1,9 @@
 package Components
 
 import (
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Handlers/Commands"
-	"Synthara-Redux/Structs"
-	"Synthara-Redux/Validation"
-	"unsafe"
+	"Synthara-Redux/Utils"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -12,21 +11,33 @@ import (
 
 func Queue(Event *events.ComponentInteractionCreate) {
 
+	Event.DeferUpdateMessage()
+
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
 
-	Guild := Structs.GetGuild(GuildID, false)
+	Response, Err := Commands.BuildQueueResponse(GuildID, Locale)
 
-	// Validate guild session exists
-	if Guild == nil {
+	if Err != nil {
 
-		ErrorEmbed := Validation.GuildSessionError(Locale)
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
+		Event.UpdateMessage(discord.NewMessageUpdateBuilder().
+		
+			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Queue.Error.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Commands.Queue.Error.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})).Build())
+
 		return
 
 	}
 
-	// Delegates to command using unsafe pointer conversion
-	Commands.Queue(*(**events.ApplicationCommandInteractionCreate)(unsafe.Pointer(&Event)))
+	Event.UpdateMessage(discord.NewMessageUpdateBuilder().
+		AddEmbeds(Response.Embeds...).
+		AddActionRow(Response.Buttons...).
+		Build())
 
 }

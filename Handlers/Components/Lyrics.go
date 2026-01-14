@@ -1,10 +1,9 @@
 package Components
 
 import (
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Handlers/Commands"
-	"Synthara-Redux/Structs"
-	"Synthara-Redux/Validation"
-	"unsafe"
+	"Synthara-Redux/Utils"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -12,21 +11,47 @@ import (
 
 func Lyrics(Event *events.ComponentInteractionCreate) {
 
+	Event.DeferUpdateMessage()
+
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
 
-	Guild := Structs.GetGuild(GuildID, false)
+	Response, Err := Commands.BuildLyricsResponse(GuildID, Locale)
 
-	// Validate playback exists
-	if Guild == nil || Guild.Queue.Current == nil {
+	if Err != nil {
 
-		ErrorEmbed := Validation.PlaybackError(Locale)
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
+		var ErrorTitle, ErrorDesc string
+
+		if Err.Error() == "no song playing" {
+
+			ErrorTitle = Localizations.Get("Commands.Lyrics.Error.NoSong.Title", Locale)
+			ErrorDesc = Localizations.Get("Commands.Lyrics.Error.NoSong.Description", Locale)
+
+		} else {
+
+			ErrorTitle = Localizations.Get("Commands.Lyrics.Error.NotFound.Title", Locale)
+			ErrorDesc = Localizations.Get("Commands.Lyrics.Error.NotFound.Description", Locale)
+
+		}
+
+		Event.UpdateMessage(discord.NewMessageUpdateBuilder().
+			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       ErrorTitle,
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: ErrorDesc,
+				Color:       0xFFB3BA,
+
+			})).
+			Build())
+
 		return
 
 	}
 
-	// Delegates to command using unsafe pointer conversion
-	Commands.Lyrics(*(**events.ApplicationCommandInteractionCreate)(unsafe.Pointer(&Event)))
+	Event.UpdateMessage(discord.NewMessageUpdateBuilder().
+		AddEmbeds(Response.Embeds...).
+		AddActionRow(Response.Buttons...).
+		Build())
 
 }

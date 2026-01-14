@@ -50,7 +50,22 @@ DISCORD_TOKEN=your_discord_bot_token_here
 YOUTUBE_COOKIE=your_youtube_cookie_here
 
 # Required: MongoDB URI for data storage
-MONGO_URI=your_mongodb_uri_here
+MONGO
+    Native AAC decoding via FDK-AAC (no FFMPEG dependency)
+    Real-time sample rate conversion (44.1kHz → 48kHz)
+    Opus encoding at 128kbps for Discord streaming
+    Low-latency HLS segment buffering
+
+Audio Processing Pipeline
+
+The bot uses a custom audio transcoding pipeline:
+
+    Stream Acquisition: Fetches HLS manifests from YouTube/InnerTube API and downloads MPEG-TS segments
+    Demuxing: Extracts AAC frames from transport stream using astits
+    AAC Decoding: Decodes to PCM via FDK-AAC (CGO bindings) with automatic resampling
+    Opus Encoding: Encodes to Opus at 128kbps/48kHz for Discord
+    Streaming: Direct packet transmission to Discord voice gateway
+_URI=your_mongodb_uri_here
 
 # Optional: Force application-command registration on startup (set to "true" to refresh)
 REFRESH_COMMANDS=false

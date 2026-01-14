@@ -140,32 +140,20 @@ func LyricsFetcher(Title string, Artist string) (*LyricsAPIResponse, error) {
 
 }
 
-func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
+type LyricsResponse struct {
 
-	// Defer response since this may take a minute
+	Embeds []discord.Embed
+	Buttons []discord.InteractiveComponent
+	
+}
 
-	Event.DeferCreateMessage(false)
-
-	Locale := Event.Locale().Code()
-	GuildID := *Event.GuildID()
+func BuildLyricsResponse(GuildID snowflake.ID, Locale string) (*LyricsResponse, error) {
 
 	Guild := Structs.GetGuild(GuildID, false)
 
 	if Guild == nil || Guild.Queue.Current == nil {
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
-			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
-
-				Title:       Localizations.Get("Commands.Lyrics.Error.NoSong.Title", Locale),
-				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
-				Description: Localizations.Get("Commands.Lyrics.Error.NoSong.Description", Locale),
-				Color:       0xFFB3BA,
-
-			})).
-			SetFlags(discord.MessageFlagsNone).
-			Build())
-		
-		return
+		return nil, fmt.Errorf("no song playing")
 
 	}
 
@@ -202,19 +190,7 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Err != nil || APIRespPtr == nil {
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
-			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
-
-				Title:       Localizations.Get("Commands.Lyrics.Error.NotFound.Title", Locale),
-				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
-				Description: Localizations.Get("Commands.Lyrics.Error.NotFound.Description", Locale),
-				Color:       0xFFB3BA,
-
-			})).
-			SetFlags(discord.MessageFlagsNone).
-			Build())
-
-		return
+		return nil, fmt.Errorf("lyrics not found")
 
 	}
 
@@ -250,7 +226,6 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	LyricsText := strings.TrimSpace(strings.Join(Parts, "\n"))
 
-	Embeds := []discord.Embed{}
 	SongColor, _ := Utils.GetDominantColorHex(Song.Cover)
 
 	// Determine which view link to use (word vs line)
@@ -316,11 +291,59 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 	Embed.SetColor(SongColor)
 	Embed.SetAuthor(Localizations.Get("Embeds.Lyrics.Title", Locale), "", "")
 
-	Embeds = append(Embeds, Embed.Build())
+	return &LyricsResponse{
+		Embeds: []discord.Embed{Embed.Build()},
+		Buttons: []discord.InteractiveComponent{discord.NewButton(discord.ButtonStyleLink, ViewLabel, "", Page, snowflake.ID(0))},
+	}, nil
+
+}
+
+func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
+
+	// Defer response since this may take a minute
+
+	Event.DeferCreateMessage(false)
+
+	Locale := Event.Locale().Code()
+	GuildID := *Event.GuildID()
+
+	Response, Err := BuildLyricsResponse(GuildID, Locale)
+
+	if Err != nil {
+
+		var ErrorTitle, ErrorDesc string
+
+		if Err.Error() == "no song playing" {
+
+			ErrorTitle = Localizations.Get("Commands.Lyrics.Error.NoSong.Title", Locale)
+			ErrorDesc = Localizations.Get("Commands.Lyrics.Error.NoSong.Description", Locale)
+
+		} else {
+
+			ErrorTitle = Localizations.Get("Commands.Lyrics.Error.NotFound.Title", Locale)
+			ErrorDesc = Localizations.Get("Commands.Lyrics.Error.NotFound.Description", Locale)
+
+		}
+
+		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
+			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       ErrorTitle,
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: ErrorDesc,
+				Color:       0xFFB3BA,
+
+			})).
+			SetFlags(discord.MessageFlagsNone).
+			Build())
+
+		return
+
+	}
 
 	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
-		AddEmbeds(Embeds...).
-		AddActionRow(discord.NewButton(discord.ButtonStyleLink, ViewLabel, "", Page, snowflake.ID(0))).
+		AddEmbeds(Response.Embeds...).
+		AddActionRow(Response.Buttons...).
 		SetFlags(discord.MessageFlagsNone).
 		Build())
 

@@ -15,31 +15,18 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 )
 
-func Queue(Event *events.ApplicationCommandInteractionCreate) {
+type QueueResponse struct {
+	Embeds []discord.Embed
+	Buttons []discord.InteractiveComponent
+}
 
-	Locale := Event.Locale().Code()
-	GuildID := *Event.GuildID()
+func BuildQueueResponse(GuildID snowflake.ID, Locale string) (*QueueResponse, error) {
 
 	Guild := Structs.GetGuild(GuildID, false)
 
 	if Guild == nil || (Guild.Queue.Current == nil && len(Guild.Queue.Upcoming) == 0) {
 
-		Event.CreateMessage(discord.MessageCreate{
-
-			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
-
-				Title:       Localizations.Get("Commands.Queue.Error.Title", Locale),
-				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
-				Description: Localizations.Get("Commands.Queue.Error.Description", Locale),
-				Color:       0xFFB3BA,
-
-			})},
-
-			Flags: discord.MessageFlagEphemeral,
-			
-		})
-
-		return
+		return nil, fmt.Errorf("no queue")
 
 	}
 
@@ -185,9 +172,44 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 
 	Embed.SetDescription(Body.String())
 
+	return &QueueResponse{
+		Embeds: []discord.Embed{Embed.Build()},
+		Buttons: []discord.InteractiveComponent{discord.NewButton(discord.ButtonStyleLink, Localizations.Get("Embeds.Queue.View", Locale), "", Page, snowflake.ID(0))},
+	}, nil
+
+}
+
+func Queue(Event *events.ApplicationCommandInteractionCreate) {
+
+	Locale := Event.Locale().Code()
+	GuildID := *Event.GuildID()
+
+	Response, Err := BuildQueueResponse(GuildID, Locale)
+
+	if Err != nil {
+
+		Event.CreateMessage(discord.MessageCreate{
+
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Commands.Queue.Error.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Commands.Queue.Error.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})},
+
+			Flags: discord.MessageFlagEphemeral,
+			
+		})
+
+		return
+
+	}
+
 	Event.CreateMessage(discord.NewMessageCreateBuilder().
-		AddEmbeds(Embed.Build()).
-		AddActionRow(discord.NewButton(discord.ButtonStyleLink, Localizations.Get("Embeds.Queue.View", Locale), "", Page, snowflake.ID(0))).
+		AddEmbeds(Response.Embeds...).
+		AddActionRow(Response.Buttons...).
 		Build())
 
 }
