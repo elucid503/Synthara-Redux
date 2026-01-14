@@ -21,7 +21,7 @@ func Lyrics(Event *events.ComponentInteractionCreate) {
 	if Guild == nil || Guild.Queue.Current == nil {
 
 		ErrorEmbed := Validation.PlaybackError(Locale)
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}})
+		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
 		return
 
 	}

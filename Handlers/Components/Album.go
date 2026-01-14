@@ -25,7 +25,7 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 	if Guild == nil {
 		
 		ErrorEmbed := Validation.GuildSessionError(Locale)
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}})
+		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
 		
 		return
 
@@ -45,6 +45,8 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 			
 		})
 
@@ -68,6 +70,8 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 			
 		})
 
@@ -109,7 +113,7 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 	if Guild == nil {
 
 		ErrorEmbed := Validation.GuildSessionError(Locale)
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}})
+		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
 		return
 
 	}
@@ -128,6 +132,8 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 			
 		})
 
@@ -153,6 +159,8 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 			
 		})
 

@@ -32,6 +32,8 @@ func Next(Event *events.ApplicationCommandInteractionCreate) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return
@@ -52,6 +54,8 @@ func Next(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 
 		})
 

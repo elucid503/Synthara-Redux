@@ -33,6 +33,8 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return
@@ -53,6 +55,8 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 
 		})
 
@@ -76,6 +80,8 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 
 		})
 
@@ -104,6 +110,8 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return
@@ -127,6 +135,8 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return
@@ -149,6 +159,8 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 
 		})
 

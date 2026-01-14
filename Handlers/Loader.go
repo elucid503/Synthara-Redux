@@ -78,7 +78,14 @@ func InitializeCommands() {
 
 	}
 
-	Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, CommandsToRegister)
+	_, ErrorSetting := Globals.DiscordClient.Rest.SetGlobalCommands(Globals.DiscordClient.ApplicationID, CommandsToRegister)
+
+	if ErrorSetting != nil {
+
+		Utils.Logger.Error("Failed to set global slash commands: " + ErrorSetting.Error())
+		return
+
+	}
 
 	Utils.Logger.Info("Slash commands initialized.")
 

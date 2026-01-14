@@ -22,8 +22,9 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 
 			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
-				Title:       Localizations.Get("Common.Error.Title", Locale),
-				Description: Localizations.Get("Common.Error.Description", Locale),
+				Title:       Localizations.Get("Commands.Lock.Error.Title", Locale),
+				Description: Localizations.Get("Commands.Lock.Error.Description", Locale),
+				Color:       0xFFB3BA,
 
 			})},
 

@@ -34,6 +34,8 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 			
 		})
 

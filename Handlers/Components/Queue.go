@@ -21,7 +21,7 @@ func Queue(Event *events.ComponentInteractionCreate) {
 	if Guild == nil {
 
 		ErrorEmbed := Validation.GuildSessionError(Locale)
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}})
+		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
 		return
 
 	}

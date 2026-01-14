@@ -21,7 +21,7 @@ func RemoveSong(Event *events.ComponentInteractionCreate, YouTubeID string) {
 	if Guild == nil {
 
 		ErrorEmbed := Validation.GuildSessionError(Locale)
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}})
+		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
 		return
 
 	}
@@ -29,7 +29,7 @@ func RemoveSong(Event *events.ComponentInteractionCreate, YouTubeID string) {
 	// Validate user is in voice
 	if ErrorEmbed := Validation.VoiceStateError(GuildID, Event.User().ID, Locale); ErrorEmbed != nil {
 
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{*ErrorEmbed}})
+		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{*ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
 		return
 
 	}
@@ -60,6 +60,8 @@ func RemoveSong(Event *events.ComponentInteractionCreate, YouTubeID string) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return
@@ -80,6 +82,8 @@ func RemoveSong(Event *events.ComponentInteractionCreate, YouTubeID string) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 
 		})
 

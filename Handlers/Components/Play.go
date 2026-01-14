@@ -21,7 +21,7 @@ func Play(Event *events.ComponentInteractionCreate) {
 	if Guild == nil {
 
 		ErrorEmbed := Validation.GuildSessionError(Locale)
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}})
+		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
 		return
 
 	}
@@ -29,7 +29,7 @@ func Play(Event *events.ComponentInteractionCreate) {
 	// Validate user is in voice
 	if ErrorEmbed := Validation.VoiceStateError(GuildID, Event.User().ID, Locale); ErrorEmbed != nil {
 
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{*ErrorEmbed}})
+		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{*ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
 		return
 
 	}

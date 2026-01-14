@@ -29,6 +29,8 @@ func Lock(Event *events.ApplicationCommandInteractionCreate) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return

@@ -31,6 +31,8 @@ func Resume(Event *events.ApplicationCommandInteractionCreate) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return

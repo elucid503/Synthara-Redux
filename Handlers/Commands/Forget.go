@@ -28,6 +28,8 @@ func Forget(Event *events.ApplicationCommandInteractionCreate) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return
@@ -48,6 +50,8 @@ func Forget(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFF0000,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 
 		})
 

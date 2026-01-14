@@ -21,7 +21,7 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 	if Guild == nil {
 
 		ErrorEmbed := Validation.GuildSessionError(Locale)
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}})
+		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
 		
 		return
 
@@ -29,7 +29,7 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 
 	if ErrorEmbed := Validation.VoiceStateError(GuildID, Event.User().ID, Locale); ErrorEmbed != nil {
 
-		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{*ErrorEmbed}})
+		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{*ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
 		return
 
 	}
@@ -53,6 +53,8 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 
 		})
 
@@ -83,6 +85,8 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return
@@ -108,6 +112,8 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return
@@ -128,6 +134,8 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 
 		})
 

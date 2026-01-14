@@ -30,6 +30,8 @@ func Reconnect(Event *events.ComponentInteractionCreate) {
 
 			})},
 
+			Flags: discord.MessageFlagEphemeral,
+
 		})
 
 		return
@@ -51,6 +53,8 @@ func Reconnect(Event *events.ComponentInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 
 		})
 
@@ -75,6 +79,8 @@ func Reconnect(Event *events.ComponentInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
+
+			Flags: discord.MessageFlagEphemeral,
 
 		})
 
