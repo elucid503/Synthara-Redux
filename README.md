@@ -49,8 +49,20 @@ DISCORD_TOKEN=your_discord_bot_token_here
 # Optional: YouTube cookie string from authenticated YouTube session
 YOUTUBE_COOKIE=your_youtube_cookie_here
 
+# Required: MongoDB URI for data storage
+MONGO_URI=your_mongodb_uri_here
+
 # Optional: Force application-command registration on startup (set to "true" to refresh)
 REFRESH_COMMANDS=false
+
+# Web Server Settings
+PORT=your_desired_port_here
+DOMAIN=your_domain_here
+
+# Spotify API
+SPOTIFY_CLIENT_ID=your_spotify_client_id_here
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
+
 ```
 
 ## Building the Project
