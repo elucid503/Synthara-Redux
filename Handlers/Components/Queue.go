@@ -11,8 +11,6 @@ import (
 
 func Queue(Event *events.ComponentInteractionCreate) {
 
-	Event.DeferUpdateMessage()
-
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
 
@@ -20,22 +18,26 @@ func Queue(Event *events.ComponentInteractionCreate) {
 
 	if Err != nil {
 
-		Event.UpdateMessage(discord.NewMessageUpdateBuilder().
+		Event.CreateMessage(discord.MessageCreate{
 		
-			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       Localizations.Get("Commands.Queue.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Queue.Error.Description", Locale),
 				Color:       0xFFB3BA,
 
-			})).Build())
+			})},
+
+			Flags: discord.MessageFlagEphemeral,
+
+		})
 
 		return
 
 	}
 
-	Event.UpdateMessage(discord.NewMessageUpdateBuilder().
+	Event.CreateMessage(discord.NewMessageCreateBuilder().
 		AddEmbeds(Response.Embeds...).
 		AddActionRow(Response.Buttons...).
 		Build())

@@ -260,7 +260,7 @@ func InitializeHandlers() {
 
 				case "Play":
 
-					Components.Play(Event)
+					Components.Resume(Event)
 
 				case "Pause":
 

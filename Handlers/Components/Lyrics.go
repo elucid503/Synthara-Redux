@@ -11,8 +11,6 @@ import (
 
 func Lyrics(Event *events.ComponentInteractionCreate) {
 
-	Event.DeferUpdateMessage()
-
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
 
@@ -34,22 +32,26 @@ func Lyrics(Event *events.ComponentInteractionCreate) {
 
 		}
 
-		Event.UpdateMessage(discord.NewMessageUpdateBuilder().
-			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+		Event.CreateMessage(discord.MessageCreate{
+		
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       ErrorTitle,
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: ErrorDesc,
 				Color:       0xFFB3BA,
 
-			})).
-			Build())
+			})},
+
+			Flags: discord.MessageFlagEphemeral,
+
+		})
 
 		return
 
 	}
 
-	Event.UpdateMessage(discord.NewMessageUpdateBuilder().
+	Event.CreateMessage(discord.NewMessageCreateBuilder().
 		AddEmbeds(Response.Embeds...).
 		AddActionRow(Response.Buttons...).
 		Build())

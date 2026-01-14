@@ -2555,6 +2555,19 @@
 					"ja": "再生中：%s"
 				}
 			}
+		},
+		"Prefix": {
+			"en-US": "**From Web:**",
+			"en-GB": "**From Web:**",
+			"es-ES": "**Desde Web:**",
+			"es-419": "**Desde Web:**",
+			"zh-CN": "**来自网页：**",
+			"fr": "**Depuis le Web :**",
+			"it": "**Dal Web:**",
+			"de": "**Vom Web:**",
+			"pl": "**Z Sieci:**",
+			"ru": "**Из Веб:**",
+			"ja": "**Webから：**"
 		}
 	},
 	"Components": {

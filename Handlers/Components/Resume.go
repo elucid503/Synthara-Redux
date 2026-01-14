@@ -11,7 +11,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func Pause(Event *events.ComponentInteractionCreate) {
+func Resume(Event *events.ComponentInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
@@ -35,14 +35,14 @@ func Pause(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	Guild.Queue.SetState(Structs.StatePaused)
+	Guild.Queue.SetState(Structs.StatePlaying)
 
 	// Update the original message with the new pause/play button
 	if Guild.Queue.Current != nil {
 
 		State := Innertube.QueueInfo{
 
-			Playing: false, // Now paused
+			Playing: true, // Now playing
 
 			GuildID: GuildID,
 
@@ -66,9 +66,9 @@ func Pause(Event *events.ComponentInteractionCreate) {
 
 			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
-				Title:       Localizations.Get("Commands.Pause.Title", Locale),
+				Title:       Localizations.Get("Commands.Resume.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
-				Description: Localizations.Get("Commands.Pause.Description", Locale),
+				Description: Localizations.Get("Commands.Resume.Description", Locale),
 
 			})},
 
