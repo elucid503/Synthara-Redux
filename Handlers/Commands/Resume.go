@@ -39,10 +39,8 @@ func Resume(Event *events.ApplicationCommandInteractionCreate) {
 
 	Guild.Queue.SetState(Structs.StatePlaying)
 
-	// Reset inactivity timer on activity
-	Guild.ResetInactivityTimer()
+	// Control buttons
 
-	// Create control buttons
 	Buttons := []discord.InteractiveComponent{}
 
 	LastButton := discord.NewButton(discord.ButtonStyleSecondary, "", "Last", "", 0).WithEmoji(discord.ComponentEmoji{

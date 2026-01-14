@@ -169,8 +169,6 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	Guild.ResetInactivityTimer()
-
 	Song := Guild.Queue.Current
 
 	// Page for web lyrics view

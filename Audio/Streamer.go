@@ -197,7 +197,7 @@ func (Streamer *SegmentStreamer) Stop() {
 
 
 // Play starts playback and returns when finished or stopped
-func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinished func(), SendToWS func(Event string, Data any)) (*Playback, error) {
+func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinished func(), SendToWS func(Event string, Data any), OnStreamingError func()) (*Playback, error) {
 
 	if len(Segments) == 0 {
 
@@ -228,6 +228,9 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 
 	go func() {
 
+		const MaxConsecutiveFailures = 3
+		ConsecutiveFailures := 0
+
 		for Index := 0; Index < len(Segments); {
 
 			if Playback.Stopped.Load() {
@@ -246,14 +249,50 @@ func Play(Segments []InnertubeStructs.HLSSegment, SegmentDuration int, OnFinishe
 
 			SegmentBytes, ErrorFetching := InnertubeFuncs.GetHLSSegment(Segment.URI, &InnertubeFuncs.HLSOptions{})
 
+			// Checks for HTTP errors or empty body
+
+			Failed := false
+
 			if ErrorFetching != nil {
 
 				Utils.Logger.Error("Error fetching segment: " + ErrorFetching.Error())
+				Failed = true
+
+			} else if len(SegmentBytes) == 0 {
+
+				Utils.Logger.Error("Empty segment received")
+				Failed = true
+
+			}
+
+			if Failed {
+
+				ConsecutiveFailures++
+
+				if ConsecutiveFailures >= MaxConsecutiveFailures {
+
+					Utils.Logger.Error(fmt.Sprintf("Multiple consecutive segment failures (%d), triggering streaming error", ConsecutiveFailures))
+
+					Playback.Stop()
+
+					if OnStreamingError != nil {
+
+						OnStreamingError()
+
+					}
+
+					break
+
+				}
 
 				Index++
 				continue
 
 			}
+
+			// Resets consecutive failures on success
+			
+			ConsecutiveFailures = 0
 
 			// We should send a progress update to any/all connected websockets here
 			// We aren't using the events enum since we cant import structs here :(

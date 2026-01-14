@@ -8,6 +8,7 @@ import (
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Utils"
 	"fmt"
+	"math/rand"
 	"sync"
 
 	"github.com/disgoorg/disgo/discord"
@@ -98,17 +99,53 @@ func QueueStateHandler(Queue *Queue, State int) {
 		case StateIdle:
 
 			// Idle state; move to next song if available
-			// TODO: Repeat/Shuffle and autoplay logic
 
 			Utils.Logger.Info(fmt.Sprintf("Queue %s is now idle; moving on...", Queue.ParentID.String()))
+
+			Guild := GetGuild(Queue.ParentID, false)
+
+			if Guild == nil {
+
+				return
+
+			}
+
+			// Handle Repeat One - replay current song
+			if Guild.Features.Repeat == RepeatOne && Queue.Current != nil {
+
+				Utils.Logger.Info(fmt.Sprintf("Queue %s repeating current song: %s", Queue.ParentID.String(), Queue.Current.Title))
+
+				go Queue.Play()
+				return
+
+			}
+
+			// Handle Shuffle - pick random song from upcoming queue
+			if Guild.Features.Shuffle && len(Queue.Upcoming) > 0 {
+
+				Utils.Logger.Info(fmt.Sprintf("Queue %s shuffling to random song", Queue.ParentID.String()))
+
+				RandomIndex := rand.Intn(len(Queue.Upcoming))
+
+				if RandomIndex > 0 {
+
+					Queue.Jump(RandomIndex + 1)
+
+				} else {
+
+					Queue.Next()
+
+				}
+
+				return
+
+			}
 
 			Advanced := Queue.Next()
 
 			if Advanced {
 
 				Utils.Logger.Info(fmt.Sprintf("Queue %s advanced to next song: %s", Queue.ParentID.String(), Queue.Current.Title))
-
-				Guild := GetGuild(Queue.ParentID, false) // does not create if not found
 
 				State := Innertube.QueueInfo{
 
@@ -147,6 +184,34 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 			} else {
 
+				// Handle Repeat All - move all previous songs back to upcoming queue
+				if Guild.Features.Repeat == RepeatAll && len(Queue.Previous) > 0 {
+
+					Utils.Logger.Info(fmt.Sprintf("Queue %s repeating all songs", Queue.ParentID.String()))
+
+					// Move all previous songs to upcoming in reverse order
+					for i := len(Queue.Previous) - 1; i >= 0; i-- {
+
+						Queue.Upcoming = append(Queue.Upcoming, Queue.Previous[i])
+
+					}
+
+					Queue.Previous = []*Innertube.Song{}
+
+					// Move current song to previous
+					if Queue.Current != nil {
+
+						Queue.Previous = append(Queue.Previous, Queue.Current)
+
+					}
+
+					// Advance to first song
+					Queue.Next()
+
+					return
+
+				}
+
 				Utils.Logger.Info(fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
 
 				// Send queue update to notify UI that queue has ended
@@ -154,7 +219,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				// Sends a message indicating the queue has ended
 
-				Guild := GetGuild(Queue.ParentID, false) // does not create if not found
 				TextChannelID := Guild.Channels.Text
 
 				go func() { 

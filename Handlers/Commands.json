@@ -215,6 +215,317 @@
 		}
 	},
 	{
+		"name": "jump",
+		"name_localizations": {
+			"en-US": "jump",
+			"en-GB": "jump",
+			"es-ES": "saltar",
+			"es-419": "saltar",
+			"zh-CN": "跳转",
+			"fr": "sauter",
+			"it": "salta",
+			"de": "springen",
+			"pl": "skocz",
+			"ru": "прыгнуть",
+			"ja": "ジャンプ"
+		},
+		"description": "Use this command to jump to a specific Song in the Queue.",
+		"description_localizations": {
+			"en-US": "Use this command to jump to a specific Song in the Queue.",
+			"en-GB": "Use this command to jump to a specific Song in the Queue.",
+			"es-ES": "Usa este comando para saltar a una canción específica en la cola.",
+			"es-419": "Usa este comando para saltar a una canción específica en la cola.",
+			"zh-CN": "使用此命令跳转到队列中的特定歌曲。",
+			"fr": "Utilisez cette commande pour sauter à une chanson spécifique dans la file.",
+			"it": "Usa questo comando per saltare a una canzone specifica nella coda.",
+			"de": "Verwende diesen Befehl, um zu einem bestimmten Lied in der Warteschlange zu springen.",
+			"pl": "Użyj tej komendy, aby przeskoczyć do określonego utworu w kolejce.",
+			"ru": "Используйте эту команду, чтобы перейти к определенной песне в очереди.",
+			"ja": "このコマンドを使用して、キュー内の特定の曲にジャンプします。"
+		},
+		"options": [
+			{
+				"type": 4,
+				"name": "position",
+				"name_localizations": {
+					"en-US": "position",
+					"en-GB": "position",
+					"es-ES": "posición",
+					"es-419": "posición",
+					"zh-CN": "位置",
+					"fr": "position",
+					"it": "posizione",
+					"de": "position",
+					"pl": "pozycja",
+					"ru": "позиция",
+					"ja": "位置"
+				},
+				"description": "Use this option to specify the position of the Song to jump to.",
+				"description_localizations": {
+					"en-US": "Use this option to specify the position of the Song to jump to.",
+					"en-GB": "Use this option to specify the position of the Song to jump to.",
+					"es-ES": "Usa esta opción para especificar la posición de la canción a la que saltar.",
+					"es-419": "Usa esta opción para especificar la posición de la canción a la que saltar.",
+					"zh-CN": "使用此选项指定要跳转到的歌曲位置。",
+					"fr": "Utilisez cette option pour spécifier la position de la chanson à laquelle sauter.",
+					"it": "Usa questa opzione per specificare la posizione della canzone a cui saltare.",
+					"de": "Verwende diese Option, um die Position des Liedes anzugeben, zu dem gesprungen werden soll.",
+					"pl": "Użyj tej opcji, aby określić pozycję utworu, do którego chcesz przeskoczyć.",
+					"ru": "Используйте эту опцию, чтобы указать позицию песни для перехода.",
+					"ja": "このオプションを使用して、ジャンプする曲の位置を指定します。"
+				},
+				"required": true,
+				"autocomplete": true
+			}
+		]
+	},
+	{
+		"name": "replay",
+		"name_localizations": {
+			"en-US": "replay",
+			"en-GB": "replay",
+			"es-ES": "reproducir",
+			"es-419": "reproducir",
+			"zh-CN": "重播",
+			"fr": "rejouer",
+			"it": "riproduci",
+			"de": "wiederholen",
+			"pl": "powtórz",
+			"ru": "повторить",
+			"ja": "再生"
+		},
+		"description": "Use this command to replay a Song from the playback history.",
+		"description_localizations": {
+			"en-US": "Use this command to replay a Song from the playback history.",
+			"en-GB": "Use this command to replay a Song from the playback history.",
+			"es-ES": "Usa este comando para reproducir una canción del historial de reproducción.",
+			"es-419": "Usa este comando para reproducir una canción del historial de reproducción.",
+			"zh-CN": "使用此命令重播播放历史记录中的歌曲。",
+			"fr": "Utilisez cette commande pour rejouer une chanson de l'historique de lecture.",
+			"it": "Usa questo comando per riprodurre una canzone dalla cronologia di riproduzione.",
+			"de": "Verwende diesen Befehl, um ein Lied aus dem Wiedergabeverlauf wiederzugeben.",
+			"pl": "Użyj tej komendy, aby powtórzyć utwór z historii odtwarzania.",
+			"ru": "Используйте эту команду, чтобы повторить песню из истории воспроизведения.",
+			"ja": "このコマンドを使用して、再生履歴から曲を再生します。"
+		},
+		"options": [
+			{
+				"type": 4,
+				"name": "position",
+				"name_localizations": {
+					"en-US": "position",
+					"en-GB": "position",
+					"es-ES": "posición",
+					"es-419": "posición",
+					"zh-CN": "位置",
+					"fr": "position",
+					"it": "posizione",
+					"de": "position",
+					"pl": "pozycja",
+					"ru": "позиция",
+					"ja": "位置"
+				},
+				"description": "Use this option to specify the position of the Song to replay.",
+				"description_localizations": {
+					"en-US": "Use this option to specify the position of the Song to replay.",
+					"en-GB": "Use this option to specify the position of the Song to replay.",
+					"es-ES": "Usa esta opción para especificar la posición de la canción a reproducir.",
+					"es-419": "Usa esta opción para especificar la posición de la canción a reproducir.",
+					"zh-CN": "使用此选项指定要重播的歌曲位置。",
+					"fr": "Utilisez cette option pour spécifier la position de la chanson à rejouer.",
+					"it": "Usa questa opzione per specificare la posizione della canzone da riprodurre.",
+					"de": "Verwende diese Option, um die Position des Liedes anzugeben, das wiedergegeben werden soll.",
+					"pl": "Użyj tej opcji, aby określić pozycję utworu do powtórzenia.",
+					"ru": "Используйте эту опцию, чтобы указать позицию песни для повтора.",
+					"ja": "このオプションを使用して、再生する曲の位置を指定します。"
+				},
+				"required": true,
+				"autocomplete": true
+			}
+		]
+	},
+	{
+		"name": "repeat",
+		"name_localizations": {
+			"en-US": "repeat",
+			"en-GB": "repeat",
+			"es-ES": "repetir",
+			"es-419": "repetir",
+			"zh-CN": "重复",
+			"fr": "répéter",
+			"it": "ripeti",
+			"de": "wiederholen",
+			"pl": "powtórz",
+			"ru": "повторить",
+			"ja": "リピート"
+		},
+		"description": "Use this command to set the repeat mode for playback.",
+		"description_localizations": {
+			"en-US": "Use this command to set the repeat mode for playback.",
+			"en-GB": "Use this command to set the repeat mode for playback.",
+			"es-ES": "Usa este comando para configurar el modo de repetición para la reproducción.",
+			"es-419": "Usa este comando para configurar el modo de repetición para la reproducción.",
+			"zh-CN": "使用此命令设置播放的重复模式。",
+			"fr": "Utilisez cette commande pour définir le mode de répétition pour la lecture.",
+			"it": "Usa questo comando per impostare la modalità di ripetizione per la riproduzione.",
+			"de": "Verwende diesen Befehl, um den Wiederholungsmodus für die Wiedergabe festzulegen.",
+			"pl": "Użyj tej komendy, aby ustawić tryb powtarzania dla odtwarzania.",
+			"ru": "Используйте эту команду для установки режима повтора воспроизведения.",
+			"ja": "このコマンドを使用して、再生のリピートモードを設定します。"
+		},
+		"options": [
+			{
+				"type": 4,
+				"name": "mode",
+				"name_localizations": {
+					"en-US": "mode",
+					"en-GB": "mode",
+					"es-ES": "modo",
+					"es-419": "modo",
+					"zh-CN": "模式",
+					"fr": "mode",
+					"it": "modalità",
+					"de": "modus",
+					"pl": "tryb",
+					"ru": "режим",
+					"ja": "モード"
+				},
+				"description": "Use this option to select the repeat mode (0 = Off, 1 = One, 2 = All).",
+				"description_localizations": {
+					"en-US": "Use this option to select the repeat mode (0 = Off, 1 = One, 2 = All).",
+					"en-GB": "Use this option to select the repeat mode (0 = Off, 1 = One, 2 = All).",
+					"es-ES": "Usa esta opción para seleccionar el modo de repetición (0 = Apagado, 1 = Una, 2 = Todas).",
+					"es-419": "Usa esta opción para seleccionar el modo de repetición (0 = Apagado, 1 = Una, 2 = Todas).",
+					"zh-CN": "使用此选项选择重复模式（0 = 关闭，1 = 单曲，2 = 全部）。",
+					"fr": "Utilisez cette option pour sélectionner le mode de répétition (0 = Désactivé, 1 = Une, 2 = Toutes).",
+					"it": "Usa questa opzione per selezionare la modalità di ripetizione (0 = Disattivato, 1 = Una, 2 = Tutte).",
+					"de": "Verwende diese Option, um den Wiederholungsmodus auszuwählen (0 = Aus, 1 = Eines, 2 = Alle).",
+					"pl": "Użyj tej opcji, aby wybrać tryb powtarzania (0 = Wyłączony, 1 = Jeden, 2 = Wszystkie).",
+					"ru": "Используйте эту опцию для выбора режима повтора (0 = Выкл, 1 = Один, 2 = Все).",
+					"ja": "このオプションを使用して、リピートモードを選択します（0 = オフ、1 = 1曲、2 = 全曲）。"
+				},
+				"required": true,
+				"choices": [
+					{
+						"name": "Off",
+						"name_localizations": {
+							"en-US": "Off",
+							"en-GB": "Off",
+							"es-ES": "Apagado",
+							"es-419": "Apagado",
+							"zh-CN": "关闭",
+							"fr": "Désactivé",
+							"it": "Disattivato",
+							"de": "Aus",
+							"pl": "Wyłączony",
+							"ru": "Выкл",
+							"ja": "オフ"
+						},
+						"value": 0
+					},
+					{
+						"name": "One",
+						"name_localizations": {
+							"en-US": "One",
+							"en-GB": "One",
+							"es-ES": "Una",
+							"es-419": "Una",
+							"zh-CN": "单曲",
+							"fr": "Une",
+							"it": "Una",
+							"de": "Eines",
+							"pl": "Jeden",
+							"ru": "Один",
+							"ja": "1曲"
+						},
+						"value": 1
+					},
+					{
+						"name": "All",
+						"name_localizations": {
+							"en-US": "All",
+							"en-GB": "All",
+							"es-ES": "Todas",
+							"es-419": "Todas",
+							"zh-CN": "全部",
+							"fr": "Toutes",
+							"it": "Tutte",
+							"de": "Alle",
+							"pl": "Wszystkie",
+							"ru": "Все",
+							"ja": "全曲"
+						},
+						"value": 2
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "shuffle",
+		"name_localizations": {
+			"en-US": "shuffle",
+			"en-GB": "shuffle",
+			"es-ES": "aleatorio",
+			"es-419": "aleatorio",
+			"zh-CN": "随机",
+			"fr": "aléatoire",
+			"it": "casuale",
+			"de": "zufällig",
+			"pl": "losowo",
+			"ru": "перемешать",
+			"ja": "シャッフル"
+		},
+		"description": "Use this command to toggle shuffle mode for the Queue.",
+		"description_localizations": {
+			"en-US": "Use this command to toggle shuffle mode for the Queue.",
+			"en-GB": "Use this command to toggle shuffle mode for the Queue.",
+			"es-ES": "Usa este comando para alternar el modo aleatorio para la cola.",
+			"es-419": "Usa este comando para alternar el modo aleatorio para la cola.",
+			"zh-CN": "使用此命令切换队列的随机模式。",
+			"fr": "Utilisez cette commande pour activer/désactiver le mode aléatoire pour la file d'attente.",
+			"it": "Usa questo comando per attivare/disattivare la modalità casuale per la coda.",
+			"de": "Verwende diesen Befehl, um den Zufallsmodus für die Warteschlange umzuschalten.",
+			"pl": "Użyj tej komendy, aby przełączyć tryb losowy dla kolejki.",
+			"ru": "Используйте эту команду для переключения режима перемешивания для очереди.",
+			"ja": "このコマンドを使用して、キューのシャッフルモードを切り替えます。"
+		},
+		"options": [
+			{
+				"type": 5,
+				"name": "enabled",
+				"name_localizations": {
+					"en-US": "enabled",
+					"en-GB": "enabled",
+					"es-ES": "activado",
+					"es-419": "activado",
+					"zh-CN": "启用",
+					"fr": "activé",
+					"it": "abilitato",
+					"de": "aktiviert",
+					"pl": "włączony",
+					"ru": "включено",
+					"ja": "有効"
+				},
+				"description": "Use this option to enable or disable shuffle mode.",
+				"description_localizations": {
+					"en-US": "Use this option to enable or disable shuffle mode.",
+					"en-GB": "Use this option to enable or disable shuffle mode.",
+					"es-ES": "Usa esta opción para activar o desactivar el modo aleatorio.",
+					"es-419": "Usa esta opción para activar o desactivar el modo aleatorio.",
+					"zh-CN": "使用此选项启用或禁用随机模式。",
+					"fr": "Utilisez cette option pour activer ou désactiver le mode aléatoire.",
+					"it": "Usa questa opzione per abilitare o disabilitare la modalità casuale.",
+					"de": "Verwende diese Option, um den Zufallsmodus zu aktivieren oder zu deaktivieren.",
+					"pl": "Użyj tej opcji, aby włączyć lub wyłączyć tryb losowy.",
+					"ru": "Используйте эту опцию для включения или отключения режима перемешивания.",
+					"ja": "このオプションを使用して、シャッフルモードを有効または無効にします。"
+				},
+				"required": true
+			}
+		]
+	},
+	{
 		"name": "lyrics",
 		"name_localizations": {
 			"en-US": "lyrics",
@@ -302,6 +613,254 @@
 			"pl": "Użyj tej komendy, aby zobaczyć i edytować bieżącą kolejkę utworów.",
 			"ru": "Используйте эту команду для просмотра и редактирования текущей очереди песен.",
 			"ja": "このコマンドを使用して、現在の曲のキューを表示および編集します。"
+		}
+	},
+	{
+		"name": "move",
+		"name_localizations": {
+			"en-US": "move",
+			"en-GB": "move",
+			"es-ES": "mover",
+			"es-419": "mover",
+			"zh-CN": "移动",
+			"fr": "déplacer",
+			"it": "sposta",
+			"de": "verschieben",
+			"pl": "przenieś",
+			"ru": "переместить",
+			"ja": "移動"
+		},
+		"description": "Use this command to move a Song to a different position in the Queue.",
+		"description_localizations": {
+			"en-US": "Use this command to move a Song to a different position in the Queue.",
+			"en-GB": "Use this command to move a Song to a different position in the Queue.",
+			"es-ES": "Usa este comando para mover una canción a una posición diferente en la cola.",
+			"es-419": "Usa este comando para mover una canción a una posición diferente en la cola.",
+			"zh-CN": "使用此命令将歌曲移动到队列中的不同位置。",
+			"fr": "Utilisez cette commande pour déplacer une chanson vers une position différente dans la file d'attente.",
+			"it": "Usa questo comando per spostare una canzone in una posizione diversa nella coda.",
+			"de": "Verwende diesen Befehl, um ein Lied an eine andere Position in der Warteschlange zu verschieben.",
+			"pl": "Użyj tej komendy, aby przenieść utwór na inną pozycję w kolejce.",
+			"ru": "Используйте эту команду для перемещения песни в другую позицию в очереди.",
+			"ja": "このコマンドを使用して、キュー内の曲を別の位置に移動します。"
+		},
+		"options": [
+			{
+				"type": 4,
+				"name": "song",
+				"name_localizations": {
+					"en-US": "song",
+					"en-GB": "song",
+					"es-ES": "canción",
+					"es-419": "canción",
+					"zh-CN": "歌曲",
+					"fr": "chanson",
+					"it": "canzone",
+					"de": "lied",
+					"pl": "utwór",
+					"ru": "песня",
+					"ja": "曲"
+				},
+				"description": "Use this option to specify the Song to move.",
+				"description_localizations": {
+					"en-US": "Use this option to specify the Song to move.",
+					"en-GB": "Use this option to specify the Song to move.",
+					"es-ES": "Usa esta opción para especificar la canción a mover.",
+					"es-419": "Usa esta opción para especificar la canción a mover.",
+					"zh-CN": "使用此选项指定要移动的歌曲。",
+					"fr": "Utilisez cette option pour spécifier la chanson à déplacer.",
+					"it": "Usa questa opzione per specificare la canzone da spostare.",
+					"de": "Verwende diese Option, um das zu verschiebende Lied anzugeben.",
+					"pl": "Użyj tej opcji, aby określić utwór do przeniesienia.",
+					"ru": "Используйте эту опцию, чтобы указать песню для перемещения.",
+					"ja": "このオプションを使用して、移動する曲を指定します。"
+				},
+				"required": true,
+				"autocomplete": true
+			},
+			{
+				"type": 4,
+				"name": "position",
+				"name_localizations": {
+					"en-US": "position",
+					"en-GB": "position",
+					"es-ES": "posición",
+					"es-419": "posición",
+					"zh-CN": "位置",
+					"fr": "position",
+					"it": "posizione",
+					"de": "position",
+					"pl": "pozycja",
+					"ru": "позиция",
+					"ja": "位置"
+				},
+				"description": "Use this option to specify where to move the Song (after this position).",
+				"description_localizations": {
+					"en-US": "Use this option to specify where to move the Song (after this position).",
+					"en-GB": "Use this option to specify where to move the Song (after this position).",
+					"es-ES": "Usa esta opción para especificar dónde mover la canción (después de esta posición).",
+					"es-419": "Usa esta opción para especificar dónde mover la canción (después de esta posición).",
+					"zh-CN": "使用此选项指定将歌曲移动到何处（在此位置之后）。",
+					"fr": "Utilisez cette option pour spécifier où déplacer la chanson (après cette position).",
+					"it": "Usa questa opzione per specificare dove spostare la canzone (dopo questa posizione).",
+					"de": "Verwende diese Option, um anzugeben, wohin das Lied verschoben werden soll (nach dieser Position).",
+					"pl": "Użyj tej opcji, aby określić, gdzie przenieść utwór (po tej pozycji).",
+					"ru": "Используйте эту опцию, чтобы указать, куда переместить песню (после этой позиции).",
+					"ja": "このオプションを使用して、曲を移動する場所を指定します（この位置の後）。"
+				},
+				"required": true,
+				"autocomplete": true
+			}
+		]
+	},
+	{
+		"name": "forget",
+		"name_localizations": {
+			"en-US": "forget",
+			"en-GB": "forget",
+			"es-ES": "olvidar",
+			"es-419": "olvidar",
+			"zh-CN": "忘记",
+			"fr": "oublier",
+			"it": "dimentica",
+			"de": "vergessen",
+			"pl": "zapomnij",
+			"ru": "забыть",
+			"ja": "忘れる"
+		},
+		"description": "Use this command to clear your recent search history.",
+		"description_localizations": {
+			"en-US": "Use this command to clear your recent search history.",
+			"en-GB": "Use this command to clear your recent search history.",
+			"es-ES": "Usa este comando para borrar tu historial de búsqueda reciente.",
+			"es-419": "Usa este comando para borrar tu historial de búsqueda reciente.",
+			"zh-CN": "使用此命令清除您的最近搜索历史记录。",
+			"fr": "Utilisez cette commande pour effacer votre historique de recherche récent.",
+			"it": "Usa questo comando per cancellare la cronologia delle ricerche recenti.",
+			"de": "Verwende diesen Befehl, um deinen letzten Suchverlauf zu löschen.",
+			"pl": "Użyj tej komendy, aby wyczyścić swoją ostatnią historię wyszukiwania.",
+			"ru": "Используйте эту команду, чтобы очистить историю последних поисков.",
+			"ja": "このコマンドを使用して、最近の検索履歴をクリアします。"
+		}
+	},
+	{
+		"name": "lock",
+		"name_localizations": {
+			"en-US": "lock",
+			"en-GB": "lock",
+			"es-ES": "bloquear",
+			"es-419": "bloquear",
+			"zh-CN": "锁定",
+			"fr": "verrouiller",
+			"it": "blocca",
+			"de": "sperren",
+			"pl": "zablokuj",
+			"ru": "заблокировать",
+			"ja": "ロック"
+		},
+		"description": "Use this command to lock web controls and prevent operations from the web interface.",
+		"description_localizations": {
+			"en-US": "Use this command to lock web controls and prevent operations from the web interface.",
+			"en-GB": "Use this command to lock web controls and prevent operations from the web interface.",
+			"es-ES": "Usa este comando para bloquear los controles web y evitar operaciones desde la interfaz web.",
+			"es-419": "Usa este comando para bloquear los controles web y evitar operaciones desde la interfaz web.",
+			"zh-CN": "使用此命令锁定网络控件并防止通过网络界面进行操作。",
+			"fr": "Utilisez cette commande pour verrouiller les contrôles web et empêcher les opérations depuis l'interface web.",
+			"it": "Usa questo comando per bloccare i controlli web e impedire operazioni dall'interfaccia web.",
+			"de": "Verwende diesen Befehl, um die Websteuerung zu sperren und Operationen über die Weboberfläche zu verhindern.",
+			"pl": "Użyj tej komendy, aby zablokować kontrolki webowe i zapobiec operacjom z interfejsu webowego.",
+			"ru": "Используйте эту команду, чтобы заблокировать веб-управление и предотвратить операции через веб-интерфейс.",
+			"ja": "このコマンドを使用して、Webコントロールをロックし、Webインターフェースからの操作を防ぎます。"
+		}
+	},
+	{
+		"name": "unlock",
+		"name_localizations": {
+			"en-US": "unlock",
+			"en-GB": "unlock",
+			"es-ES": "desbloquear",
+			"es-419": "desbloquear",
+			"zh-CN": "解锁",
+			"fr": "déverrouiller",
+			"it": "sblocca",
+			"de": "entsperren",
+			"pl": "odblokuj",
+			"ru": "разблокировать",
+			"ja": "ロック解除"
+		},
+		"description": "Use this command to unlock web controls and allow operations from the web interface.",
+		"description_localizations": {
+			"en-US": "Use this command to unlock web controls and allow operations from the web interface.",
+			"en-GB": "Use this command to unlock web controls and allow operations from the web interface.",
+			"es-ES": "Usa este comando para desbloquear los controles web y permitir operaciones desde la interfaz web.",
+			"es-419": "Usa este comando para desbloquear los controles web y permitir operaciones desde la interfaz web.",
+			"zh-CN": "使用此命令解锁网络控件并允许通过网络界面进行操作。",
+			"fr": "Utilisez cette commande pour déverrouiller les contrôles web et autoriser les opérations depuis l'interface web.",
+			"it": "Usa questo comando per sbloccare i controlli web e consentire operazioni dall'interfaccia web.",
+			"de": "Verwende diesen Befehl, um die Websteuerung zu entsperren und Operationen über die Weboberfläche zu erlauben.",
+			"pl": "Użyj tej komendy, aby odblokować kontrolki webowe i pozwolić na operacje z interfejsu webowego.",
+			"ru": "Используйте эту команду, чтобы разблокировать веб-управление и разрешить операции через веб-интерфейс.",
+			"ja": "このコマンドを使用して、Webコントロールのロックを解除し、Webインターフェースからの操作を許可します。"
+		}
+	},
+	{
+		"name": "stats",
+		"name_localizations": {
+			"en-US": "stats",
+			"en-GB": "stats",
+			"es-ES": "estadísticas",
+			"es-419": "estadísticas",
+			"zh-CN": "统计",
+			"fr": "statistiques",
+			"it": "statistiche",
+			"de": "statistiken",
+			"pl": "statystyki",
+			"ru": "статистика",
+			"ja": "統計"
+		},
+		"description": "Use this command to get stats for nerds.",
+		"description_localizations": {
+			"en-US": "Use this command to get stats for nerds.",
+			"en-GB": "Use this command to get stats for nerds.",
+			"es-ES": "Usa este comando para obtener estadísticas para nerds.",
+			"es-419": "Usa este comando para obtener estadísticas para nerds.",
+			"zh-CN": "使用此命令获取极客统计信息。",
+			"fr": "Utilisez cette commande pour obtenir des statistiques pour les nerds.",
+			"it": "Usa questo comando per ottenere statistiche per nerd.",
+			"de": "Verwende diesen Befehl, um Statistiken für Nerds zu erhalten.",
+			"pl": "Użyj tej komendy, aby uzyskać statystyki dla nerdów.",
+			"ru": "Используйте эту команду для получения статистики для нердов.",
+			"ja": "このコマンドを使用して、オタク向けの統計を取得します。"
+		}
+	},
+	{
+		"name": "album",
+		"name_localizations": {
+			"en-US": "album",
+			"en-GB": "album",
+			"es-ES": "álbum",
+			"es-419": "álbum",
+			"zh-CN": "专辑",
+			"fr": "album",
+			"it": "album",
+			"de": "album",
+			"pl": "album",
+			"ru": "альбом",
+			"ja": "アルバム"
+		},
+		"description": "Use this command to view and play the album of the currently playing Song.",
+		"description_localizations": {
+			"en-US": "Use this command to view and play the album of the currently playing Song.",
+			"en-GB": "Use this command to view and play the album of the currently playing Song.",
+			"es-ES": "Usa este comando para ver y reproducir el álbum de la canción que se está reproduciendo.",
+			"es-419": "Usa este comando para ver y reproducir el álbum de la canción que se está reproduciendo.",
+			"zh-CN": "使用此命令查看并播放当前播放歌曲的专辑。",
+			"fr": "Utilisez cette commande pour voir et jouer l'album de la chanson en cours.",
+			"it": "Usa questo comando per visualizzare e riprodurre l'album della canzone in riproduzione.",
+			"de": "Verwende diesen Befehl, um das Album des aktuell gespielten Liedes anzuzeigen und abzuspielen.",
+			"pl": "Użyj tej komendy, aby wyświetlić i odtworzyć album odtwarzanego utworu.",
+			"ru": "Используйте эту команду для просмотра и воспроизведения альбома текущей песни.",
+			"ja": "このコマンドを使用して、現在再生中の曲のアルバムを表示および再生します。"
 		}
 	}
 ]

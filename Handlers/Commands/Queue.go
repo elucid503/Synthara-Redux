@@ -41,9 +41,6 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	// Reset inactivity timer on activity
-	Guild.ResetInactivityTimer()
-
 	Page := fmt.Sprintf("%s/Queues/%s?View=Queue", os.Getenv("DOMAIN"), GuildID.String())
 
 	var Body strings.Builder

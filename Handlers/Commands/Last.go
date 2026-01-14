@@ -5,6 +5,7 @@ import (
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
+	"fmt"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -19,9 +20,6 @@ func Last(Event *events.ApplicationCommandInteractionCreate) {
 	Guild := Structs.GetGuild(GuildID, false) // does not create if not found
 
 	Success := Guild.Queue.Last()
-
-	// Reset inactivity timer on activity
-	Guild.ResetInactivityTimer()
 
 	if !Success {
 
@@ -74,7 +72,7 @@ func Last(Event *events.ApplicationCommandInteractionCreate) {
 
 			Title:       Localizations.Get("Commands.Last.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
-			Description: Localizations.Get("Commands.Last.Description", Locale),
+			Description: fmt.Sprintf(Localizations.Get("Commands.Last.Description", Locale), Guild.Queue.Current.Title),
 
 		})).
 		AddActionRow(Buttons...).

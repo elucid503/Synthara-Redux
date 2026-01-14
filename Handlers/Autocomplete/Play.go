@@ -3,6 +3,7 @@ package Autocomplete
 import (
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/Globals/Localizations"
+	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
 	"fmt"
 	"strings"
@@ -16,19 +17,96 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 	Locale := Event.Locale().Code()
 	Input := Event.Data.String("query");
 
+	// Get user's recent searches from MongoDB
+	RecentlyPlayedChoices := []discord.AutocompleteChoice{}
+
+	User, UserError := Structs.GetUser(Event.User().ID.String())
+
+	// User Found, Processing Recent Searches
+
+	if UserError == nil {
+
+		if User.FirstUse {
+
+			if len(Input) < 3 {
+
+				Event.AutocompleteResult([]discord.AutocompleteChoice{
+
+					discord.AutocompleteChoiceString{
+
+						Name:  Localizations.Get("Autocomplete.Play.Welcome", Locale),
+						Value: Localizations.Get("Autocomplete.Play.Placeholder", Locale),
+						
+					},
+				})
+
+				return
+
+			}
+
+		} else if len(User.RecentSearches) > 0 {
+
+			RecentlyPlayedLabel := Localizations.Get("Autocomplete.Play.RecentlyPlayed", Locale)
+
+			for _, Search := range User.RecentSearches {
+
+				RecentlyPlayedChoices = append(RecentlyPlayedChoices, discord.AutocompleteChoiceString{
+
+					Name:  fmt.Sprintf("%s • %s", RecentlyPlayedLabel, Search.Title),
+					Value: Search.URI,
+
+				})
+
+			}
+
+		}
+
+	}
+
+	// Input Length Check
+
 	if len(Input) < 3 {
 
+		if len(RecentlyPlayedChoices) > 0 {
+
+			Event.AutocompleteResult(RecentlyPlayedChoices)
+
+		} else {
+
+			Event.AutocompleteResult([]discord.AutocompleteChoice{
+				
+				discord.AutocompleteChoiceString{
+
+					Name:  Localizations.Get("Autocomplete.Play.NoRecentSearches", Locale),
+					Value: Localizations.Get("Autocomplete.Play.Placeholder", Locale),
+				},
+
+			})
+
+		}
+
+		return;
+
+	}
+
+	// URL
+
+	if strings.HasPrefix(Input, "http://") || strings.HasPrefix(Input, "https://") {
+
+		DirectURLLabel := Localizations.Get("Autocomplete.Play.DirectURL", Locale)
+
 		Event.AutocompleteResult([]discord.AutocompleteChoice{
-			
+
 			discord.AutocompleteChoiceString{
 
-				Name:  Localizations.Get("Autocomplete.Play.InputTooShort", Locale),
-				Value: Localizations.Get("Autocomplete.Play.Placeholder", Locale),
+				Name:  fmt.Sprintf("%s • %s", DirectURLLabel, Input),
+				Value: Input,
+
 			},
 
 		})
 
-		return;
+		return
 
 	}
 
@@ -100,6 +178,15 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 
 	}
 
-	Event.AutocompleteResult(append(AutocompleteMetadataResults, AutocompleteTextResults...)); // Metadata results are prefered over text results
+	// Combine results: Recently Played + Metadata + Text
+	AllResults := append(RecentlyPlayedChoices, AutocompleteMetadataResults...)
+	AllResults = append(AllResults, AutocompleteTextResults...)
+
+	// Limit to 25 results (Discord limit)
+	if len(AllResults) > 25 {
+		AllResults = AllResults[:25]
+	}
+
+	Event.AutocompleteResult(AllResults)
 
 }

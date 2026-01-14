@@ -201,6 +201,13 @@ function App() {
 
                         }
 
+                        break;
+                    
+                    case WSEvents.Event_Error:
+
+                        const ErrorData = Message.Data as { Message: string };
+                        ShowToast(ErrorData.Message);
+
                     break;
 
                 }

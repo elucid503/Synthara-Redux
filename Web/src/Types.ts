@@ -35,6 +35,8 @@ export enum WSEvents {
     Event_QueueUpdated = "QUEUE_UPDATED",
 
     Event_ProgressUpdate = "PROGRESS_UPDATE",
+    
+    Event_Error = "ERROR",
 
 }
 

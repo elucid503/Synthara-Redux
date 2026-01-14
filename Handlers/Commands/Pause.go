@@ -39,9 +39,6 @@ func Pause(Event *events.ApplicationCommandInteractionCreate) {
 
 	Guild.Queue.SetState(Structs.StatePaused)
 
-	// Reset inactivity timer on activity
-	Guild.ResetInactivityTimer()
-
 	// Create control buttons
 	Buttons := []discord.InteractiveComponent{}
 

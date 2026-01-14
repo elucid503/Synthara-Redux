@@ -43,6 +43,7 @@ func ParseSongPanel(Renderer map[string]interface{}) (Song, error) {
 
 	Artists := []string{}
 	Album := ""
+	AlbumID := ""
 
 	if BylineObj, OK := Renderer["longBylineText"].(map[string]interface{}); OK {
 
@@ -125,6 +126,35 @@ func ParseSongPanel(Renderer map[string]interface{}) (Song, error) {
 
 			}
 
+			// Extract album ID from navigationEndpoint
+
+			for _, Run := range Runs {
+
+				if RunMap, OK := Run.(map[string]interface{}); OK {
+
+					if PageType, PageTypeExists := Utils.GetNestedValue(RunMap, "navigationEndpoint", "browseEndpoint", "browseEndpointContextSupportedConfigs", "browseEndpointContextMusicConfig", "pageType"); PageTypeExists {
+
+						if PageTypeStr, PageTypeOK := PageType.(string); PageTypeOK && PageTypeStr == "MUSIC_PAGE_TYPE_ALBUM" {
+
+							if BrowseID, BrowseIDExists := Utils.GetNestedValue(RunMap, "navigationEndpoint", "browseEndpoint", "browseId"); BrowseIDExists {
+
+								if BrowseIDStr, BrowseIDOK := BrowseID.(string); BrowseIDOK {
+
+									AlbumID = BrowseIDStr
+									break
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
 		}
 
 	}
@@ -184,6 +214,7 @@ func ParseSongPanel(Renderer map[string]interface{}) (Song, error) {
 		Title:     Title,
 		Artists:   Artists,
 		Album:     Album,
+		AlbumID:   AlbumID,
 
 		Duration: Duration{
 
@@ -249,9 +280,10 @@ func ParseSongItem(Renderer map[string]interface{}) (Song, error) {
     Artists := []string{}
 
     Album := ""
-    DurationFormatted := ""
+	AlbumID := ""
+	DurationFormatted := ""
 
-    RunsVal, RunsValueOK := Utils.GetNestedValue(FlexColumns[1], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
+	RunsVal, RunsValueOK := Utils.GetNestedValue(FlexColumns[1], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
 
     if RunsValueOK {
 
@@ -335,6 +367,35 @@ func ParseSongItem(Renderer map[string]interface{}) (Song, error) {
 
 			}
 
+			// Extract album ID from navigationEndpoint
+
+			for _, Run := range Runs {
+
+				if RunMap, RunMapOK := Run.(map[string]interface{}); RunMapOK {
+
+					if PageType, PageTypeExists := Utils.GetNestedValue(RunMap, "navigationEndpoint", "browseEndpoint", "browseEndpointContextSupportedConfigs", "browseEndpointContextMusicConfig", "pageType"); PageTypeExists {
+
+						if PageTypeStr, PageTypeOK := PageType.(string); PageTypeOK && PageTypeStr == "MUSIC_PAGE_TYPE_ALBUM" {
+
+							if BrowseID, BrowseIDExists := Utils.GetNestedValue(RunMap, "navigationEndpoint", "browseEndpoint", "browseId"); BrowseIDExists {
+
+								if BrowseIDStr, BrowseIDOK := BrowseID.(string); BrowseIDOK {
+
+									AlbumID = BrowseIDStr
+									break
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
 		}
 
 	}
@@ -349,6 +410,7 @@ func ParseSongItem(Renderer map[string]interface{}) (Song, error) {
 		Title:     Title,
 		Artists:   Artists,
 		Album:     Album,
+		AlbumID:   AlbumID,
 
 		Duration: Duration{
 
@@ -362,7 +424,7 @@ func ParseSongItem(Renderer map[string]interface{}) (Song, error) {
 
 }
 
-func ParseAlbumSongItem(Renderer map[string]interface{}, AlbumName string, AlbumArtists []string, AlbumCover string) (Song, error) {
+func ParseAlbumSongItem(Renderer map[string]interface{}, AlbumName string, AlbumArtists []string, AlbumCover string, AlbumID string) (Song, error) {
 
 	VideoIDVal, VideoIDExists := Utils.GetNestedValue(Renderer, "playlistItemData", "videoId")
 
@@ -451,6 +513,7 @@ func ParseAlbumSongItem(Renderer map[string]interface{}, AlbumName string, Album
 		Title:     Title,
 		Artists:   AlbumArtists,
 		Album:     AlbumName,
+		AlbumID:   AlbumID,
 
 		Duration: Duration{
 
@@ -551,6 +614,7 @@ func ParsePlaylistSongItem(Renderer map[string]interface{}) (Song, error) {
 	// Extract album from flexColumns[3]
 
 	Album := ""
+	AlbumID := ""
 
 	AlbumRuns, AlbumRunsValid := Utils.GetNestedValue(FlexColumns[3], "musicResponsiveListItemFlexColumnRenderer", "text", "runs")
 
@@ -563,6 +627,26 @@ func ParsePlaylistSongItem(Renderer map[string]interface{}) (Song, error) {
 				if AlbumText, AlbumTextOK := FirstRun["text"].(string); AlbumTextOK {
 
 					Album = strings.TrimSpace(AlbumText)
+
+				}
+
+				// Extract album ID from navigationEndpoint
+
+				if PageType, PageTypeExists := Utils.GetNestedValue(FirstRun, "navigationEndpoint", "browseEndpoint", "browseEndpointContextSupportedConfigs", "browseEndpointContextMusicConfig", "pageType"); PageTypeExists {
+
+					if PageTypeStr, PageTypeOK := PageType.(string); PageTypeOK && PageTypeStr == "MUSIC_PAGE_TYPE_ALBUM" {
+
+						if BrowseID, BrowseIDExists := Utils.GetNestedValue(FirstRun, "navigationEndpoint", "browseEndpoint", "browseId"); BrowseIDExists {
+
+							if BrowseIDStr, BrowseIDOK := BrowseID.(string); BrowseIDOK {
+
+								AlbumID = BrowseIDStr
+
+							}
+
+						}
+
+					}
 
 				}
 
@@ -612,6 +696,7 @@ func ParsePlaylistSongItem(Renderer map[string]interface{}) (Song, error) {
 		Title:     Title,
 		Artists:   Artists,
 		Album:     Album,
+		AlbumID:   AlbumID,
 
 		Duration: Duration{
 

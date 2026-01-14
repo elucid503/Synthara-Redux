@@ -1,11 +1,14 @@
 package Server
 
 import (
+	"Synthara-Redux/Globals"
+	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
 	"fmt"
 	"net/http"
 
+	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -135,15 +138,34 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 
 	if !Ok { return }
 
+	// Check if guild is locked
+	if Guild.Features.Locked {
+
+		Guild.Queue.SendToWebsockets("ERROR", map[string]interface{}{
+
+			"Message": "Web controls are locked. Use <code>/unlock</code> to enable.",
+
+		})
+
+		return
+
+	}
+
+	Locale := Guild.Locale.Code()
+
 	switch Operation {
 
 		case OperationPause:
 
 			Guild.Queue.SetState(Structs.StatePaused)
+			
+			SendWebOperationMessage(Guild, "Commands.Pause.Title", "Commands.Pause.Description", Locale)
 
 		case OperationResume:
 
 			Guild.Queue.SetState(Structs.StatePlaying)
+
+			SendWebOperationMessage(Guild, "Commands.Resume.Title", "Commands.Resume.Description", Locale)
 
 		case OperationNext:
 
@@ -153,6 +175,12 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 
 			Guild.Queue.Last()
 
+			if Guild.Queue.Current != nil {
+
+				SendWebOperationMessageWithSong(Guild, "Commands.Last.Title", "Commands.Last.Description", Locale, Guild.Queue.Current.Title)
+
+			}
+
 		case OperationJump:
 
 			Index, Ok := Message["Index"].(float64)
@@ -160,6 +188,12 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 			if !Ok { return }
 
 			Guild.Queue.Jump(int(Index))
+			
+			if Guild.Queue.Current != nil {
+
+				SendWebOperationMessageWithSong(Guild, "Web.Operations.Jump.Title", "Web.Operations.Jump.Description", Locale, Guild.Queue.Current.Title)
+
+			}
 
 		case OperationRemove:
 
@@ -168,6 +202,8 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 			if !Ok { return }
 
 			Guild.Queue.Remove(int(Index))
+
+			SendWebOperationMessage(Guild, "Web.Operations.Remove.Title", "Web.Operations.Remove.Description", Locale)
 
 		case OperationMove:
 
@@ -178,6 +214,8 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 
 			Guild.Queue.Move(int(FromIndex), int(ToIndex))
 
+			SendWebOperationMessage(Guild, "Web.Operations.Move.Title", "Web.Operations.Move.Description", Locale)
+
 		case OperationReplay:
 
 			Index, Ok := Message["Index"].(float64)
@@ -185,7 +223,63 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 			if !Ok { return }
 
 			Guild.Queue.Replay(int(Index))
+			
+			if Guild.Queue.Current != nil {
+
+				SendWebOperationMessageWithSong(Guild, "Web.Operations.Replay.Title", "Web.Operations.Replay.Description", Locale, Guild.Queue.Current.Title)
+
+			}
 
 	}
+
+}
+
+// SendWebOperationMessage sends a notification to Discord for web operations
+func SendWebOperationMessage(Guild *Structs.Guild, TitleKey string, DescKey string, Locale string) {
+
+	if Guild.Channels.Text == 0 {
+
+		return // No text channel set
+
+	}
+
+	go func() {
+
+		_, _ = Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get(TitleKey, Locale),
+				Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
+				Description: Localizations.Get(DescKey, Locale),
+
+			})).
+			Build())
+
+	}()
+
+}
+
+// SendWebOperationMessageWithSong sends a notification with song name
+func SendWebOperationMessageWithSong(Guild *Structs.Guild, TitleKey string, DescKey string, Locale string, SongTitle string) {
+
+	if Guild.Channels.Text == 0 {
+
+		return // No text channel set
+
+	}
+
+	go func() {
+
+		_, _ = Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get(TitleKey, Locale),
+				Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
+				Description: Localizations.GetFormat(DescKey, Locale, SongTitle),
+
+			})).
+			Build())
+
+	}()
 
 }

@@ -16,8 +16,11 @@ type Song struct {
 	YouTubeID string `json:"youtube_id"`
 
 	Title   string   `json:"title"`
+	
 	Artists []string `json:"artists"`
+
 	Album   string   `json:"album"`
+	AlbumID string   `json:"album_id"`
 
 	Duration Duration `json:"duration"`
 

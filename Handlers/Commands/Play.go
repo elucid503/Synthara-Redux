@@ -137,9 +137,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	SongFound, Pos, ErrorHandling := Guild.HandleURI(URI, Event.User().Mention())
 
-	// Reset inactivity timer on activity
-	Guild.ResetInactivityTimer()
-
 	if ErrorHandling != nil {
 
 		Event.CreateMessage(discord.MessageCreate{
@@ -158,6 +155,26 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 		return
 
 	}
+
+	// Saves to user's recent searches in MongoDB
+
+	go func() {
+
+		User, UserError := Structs.GetUser(Event.User().ID.String())
+
+		if UserError == nil {
+
+			if (User.FirstUse) {
+
+				User.SetFirstUse(false)
+
+			}
+			
+			User.AddRecentSearch(SongFound.Title, URI)
+
+		}
+
+	}()
 
 	// Send response with current song info
 

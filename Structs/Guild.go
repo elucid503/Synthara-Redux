@@ -51,6 +51,8 @@ const (
 
 	Event_ProgressUpdate = "PROGRESS_UPDATE"
 
+	Event_Error = "ERROR"
+
 )
 
 type Channels struct {
@@ -65,6 +67,7 @@ type Features struct {
 	Repeat int `json:"repeat"`
 	Shuffle bool `json:"shuffle"`
 	Autoplay bool `json:"autoplay"`
+	Locked bool `json:"locked"`
 
 }
 
@@ -118,6 +121,7 @@ func NewGuild(ID snowflake.ID, Locale discord.Locale) *Guild {
 			Repeat:   RepeatOff,
 			Shuffle:  false,
 			Autoplay: false,
+			Locked:   false,
 
 		},
 
@@ -743,7 +747,39 @@ func (G *Guild) Play(Song *Innertube.Song) error {
 
 	}
 
-	Playback, ErrorCreatingPlayback := Audio.Play(Segments, SegmentDur, OnFinished, G.Queue.SendToWebsockets)
+	OnStreamingError := func() {
+
+		Utils.Logger.Error(fmt.Sprintf("Streaming error for song: %s, disconnecting guild", Song.Title))
+
+		Locale := G.Locale.Code()
+
+		go func() {
+
+			_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
+				AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+					Title:       Localizations.Get("Embeds.Notifications.StreamingError.Title", Locale),
+					Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+					Description: Localizations.Get("Embeds.Notifications.StreamingError.Description", Locale),
+					Color:       0xFF0000,
+
+				})).
+				Build())
+
+			if ErrorSending != nil {
+
+				Utils.Logger.Error(fmt.Sprintf("Error sending streaming error message to guild %s: %s", G.ID.String(), ErrorSending.Error()))
+
+			}
+
+		}()
+
+		// Disconnect and clean up
+		G.Disconnect(true)
+
+	}
+
+	Playback, ErrorCreatingPlayback := Audio.Play(Segments, SegmentDur, OnFinished, G.Queue.SendToWebsockets, OnStreamingError)
 
 	if ErrorCreatingPlayback != nil {
 

@@ -43,6 +43,17 @@ func main() {
 
 	Utils.Logger.Info("Icons loaded.")
 
+	MongoErr := Globals.InitMongoDB()
+
+	if MongoErr != nil {
+
+		Utils.Logger.Error(fmt.Sprintf("Failed to initialize MongoDB: %s", MongoErr.Error()))
+		os.Exit(1)
+
+	}
+
+	Utils.Logger.Info("Connected to MongoDB.")
+
 	InitErr := Globals.InitDiscordClient()
 
 	if InitErr != nil {

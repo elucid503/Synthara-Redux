@@ -99,6 +99,20 @@ func InitializeHandlers() {
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.ApplicationCommandInteractionCreate) {
 
 		go func ()  {
+			
+			Guild := Structs.GetGuild(*Event.GuildID(), false)
+
+			if Guild != nil {
+
+				// Reset inactivity timer on activity
+
+				Guild.ResetInactivityTimer()
+
+			}
+
+		}()
+
+		go func ()  {
 
 			// Switching for each command; not really a better way to do this
 			
@@ -128,6 +142,22 @@ func InitializeHandlers() {
 
 					Commands.Last(Event)
 
+				case "jump":
+
+					Commands.Jump(Event)
+
+				case "replay":
+
+					Commands.Replay(Event)
+
+				case "repeat":
+
+					Commands.Repeat(Event)
+
+				case "shuffle":
+
+					Commands.Shuffle(Event)
+
 				case "lyrics":
 
 					Commands.Lyrics(Event)
@@ -140,9 +170,27 @@ func InitializeHandlers() {
 
 					Commands.Queue(Event)
 
-			}
+				case "move":
 
-			Utils.Logger.Info("Received and handled command: " + Event.Data.CommandName());
+					Commands.Move(Event)
+
+				case "lock":
+
+					Commands.Lock(Event)
+
+				case "unlock":
+
+					Commands.Unlock(Event)
+
+				case "stats":
+
+					Commands.Stats(Event)
+
+				case "album":
+
+					Commands.Album(Event)
+
+			}
 
 		}()
 					
@@ -157,6 +205,18 @@ func InitializeHandlers() {
 				case "play":
 
 					Autocomplete.PlayAutocomplete(Event)
+
+				case "jump":
+
+					Autocomplete.JumpAutocomplete(Event)
+
+				case "replay":
+
+					Autocomplete.ReplayAutocomplete(Event)
+
+				case "move":
+
+					Autocomplete.MoveAutocomplete(Event)
 
 			}
 
@@ -226,6 +286,14 @@ func InitializeHandlers() {
 				case "AutoPlay":
 
 					Components.Autoplay(Event)
+
+				case "AlbumEnqueue":
+
+					Components.AlbumEnqueue(Event)
+
+				case "AlbumPlay":
+
+					Components.AlbumPlay(Event)
 
 			}
 

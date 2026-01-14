@@ -181,9 +181,24 @@ func SearchForSongs(Query string) []Song {
 
 	}
 
-	ShelfContentsVal, ShelfContentsExists = Utils.GetNestedValue(SectionContentsVal[0], "musicShelfRenderer", "contents")
+	// Finds the musicShelfRenderer (skips itemSectionRenderer if present, e.g., "showing results for...")
+	
+	var MusicShelfRendererFound bool
 
-	if !ShelfContentsExists {
+	for _, Section := range SectionContentsVal {
+
+		ShelfContentsVal, ShelfContentsExists = Utils.GetNestedValue(Section, "musicShelfRenderer", "contents")
+
+		if ShelfContentsExists {
+
+			MusicShelfRendererFound = true
+			break
+
+		}
+
+	}
+
+	if !MusicShelfRendererFound {
 
 		return Results
 
@@ -770,7 +785,7 @@ func GetAlbumSongs(AlbumID string) ([]Song, error) {
 
 		}
 
-		ParsedSong, ParseError := ParseAlbumSongItem(Renderer, AlbumName, AlbumArtists, AlbumCover)
+		ParsedSong, ParseError := ParseAlbumSongItem(Renderer, AlbumName, AlbumArtists, AlbumCover, AlbumID)
 
 		if ParseError != nil {
 
