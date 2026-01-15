@@ -43,6 +43,14 @@ func Autoplay(Event *events.ComponentInteractionCreate) {
 
 		StatusKey = "Commands.AutoPlay.Enabled"
 
+		// Generate initial suggestions when enabling autoplay
+
+		if len(Guild.Queue.Suggestions) == 0 {
+
+			go Guild.Queue.RegenerateSuggestions()
+
+		}
+
 	} else {
 
 		StatusKey = "Commands.AutoPlay.Disabled"

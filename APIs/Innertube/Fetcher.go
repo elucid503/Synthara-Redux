@@ -467,6 +467,132 @@ func GetSearchSuggestions(Query string) []SearchSuggestion {
 
 }
 
+func GetSimilarSongs(YouTubeID string) ([]Song, error) {
+
+	Results := []Song{}
+
+	RequestContext, RequestCancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer RequestCancel()
+
+	PlaylistID := fmt.Sprintf("RDAMVM%s", YouTubeID)
+	Params := "wAEB";
+
+	RelatedResponse, RelatedResponseError := InnerTubeClient.Call(RequestContext, "NEXT", map[string]string{}, map[string]interface{}{
+
+		"videoId": YouTubeID,
+		"params":  Params,
+		"playlistId": PlaylistID,
+		"enablePersistentPlaylistPanel": true,
+		"isAudioOnly": true,
+		"tunerSettingValue": "AUTOMIX_SETTING_NORMAL",
+
+	})
+
+	if RelatedResponseError != nil {
+
+		Utils.Logger.Error("Error fetching related songs: " + RelatedResponseError.Error())
+		return Results, RelatedResponseError
+
+	}
+	
+	// Extract the playlist panel contents
+
+	ContentsVal, ContentsExists := Utils.GetNestedValue(RelatedResponse, "contents", "singleColumnMusicWatchNextResultsRenderer", "tabbedRenderer", "watchNextTabbedResultsRenderer", "tabs")
+
+	if !ContentsExists {
+
+		return Results, errors.New("related songs tabs not found")
+
+	}
+
+	Tabs, TabsValid := ContentsVal.([]interface{})
+
+	if !TabsValid || len(Tabs) == 0 {
+
+		return Results, errors.New("invalid tabs structure")
+
+	}
+
+	// Get the first tab (Up next)
+
+	PlaylistContentsVal, PlaylistContentsExists := Utils.GetNestedValue(Tabs[0], "tabRenderer", "content", "musicQueueRenderer", "content", "playlistPanelRenderer", "contents")
+
+	if !PlaylistContentsExists {
+
+		return Results, errors.New("playlist panel contents not found")
+
+	}
+
+	PlaylistContents, PlaylistContentsValid := PlaylistContentsVal.([]interface{})
+
+	if !PlaylistContentsValid {
+
+		return Results, errors.New("invalid playlist contents structure")
+
+	}
+
+	// Parse each item, skip the first one (same song) and filter by musicVideoType
+
+	for Index, Item := range PlaylistContents {
+
+		if Index == 0 {
+
+			continue // Skip first item (same song as input)
+
+		}
+
+		ItemMap, ItemMapValid := Item.(map[string]interface{})
+
+		if !ItemMapValid {
+
+			continue
+
+		}
+
+		Renderer, RendererExists := ItemMap["playlistPanelVideoRenderer"].(map[string]interface{})
+
+		if !RendererExists {
+
+			continue
+
+		}
+
+		// Check musicVideoType
+
+		MusicVideoTypeVal, MusicVideoTypeExists := Utils.GetNestedValue(Renderer, "navigationEndpoint", "watchEndpoint", "watchEndpointMusicSupportedConfigs", "watchEndpointMusicConfig", "musicVideoType")
+
+		if !MusicVideoTypeExists {
+
+			continue
+
+		}
+
+		MusicVideoType, MusicVideoTypeValid := MusicVideoTypeVal.(string)
+
+		if !MusicVideoTypeValid || MusicVideoType != "MUSIC_VIDEO_TYPE_ATV" {
+
+			continue
+
+		}
+
+		// Parse the song using existing parser
+
+		ParsedSong, ParseError := ParseSongPanel(Renderer)
+
+		if ParseError != nil {
+
+			continue
+
+		}
+
+		Results = append(Results, ParsedSong)
+
+	}
+
+	return Results, nil
+	
+}
+
 func GetPlaylistSongs(PlaylistID string) ([]Song, error) {
 
 	Results := []Song{}

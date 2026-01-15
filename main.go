@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Synthara-Redux/APIs/Apple"
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/APIs/Spotify"
 	"Synthara-Redux/Globals"
@@ -100,10 +101,16 @@ func main() {
 
 	}
 
+	// Other API initializations
+
 	Spotify.Initialize(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
 	
 	Utils.Logger.Info("Spotify client initialized.")
 
+	Apple.Initialize(os.Getenv("APPLE_JWT"))
+	
+	Utils.Logger.Info("Apple Music client initialized.")
+	
 	Utils.Hang()
 
 }

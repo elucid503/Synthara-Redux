@@ -42,6 +42,8 @@ type Queue struct {
 	Current  *Innertube.Song   `json:"current"`
 	Upcoming []*Innertube.Song `json:"next"`
 
+	Suggestions []*Innertube.Song `json:"suggestions"`
+
 	Functions      QueueFunctions  `json:"-"`
 	
 	PlaybackSession *Audio.Playback `json:"-"`
@@ -239,6 +241,7 @@ func QueueUpdatedHandler(Queue *Queue) {
 		"Current": Queue.Current,
 		"Previous": Queue.Previous,
 		"Upcoming": Queue.Upcoming,
+		"Suggestions": Queue.Suggestions,
 		
 	})
 
@@ -273,6 +276,35 @@ func (Q *Queue) SetState(NewState int) {
 
 // Next moves forward by one song in the upcoming queue; returns false when none exist.
 func (Q *Queue) Next() bool {
+
+	Guild := GetGuild(Q.ParentID, false)
+
+	// Check if we need to use AutoPlay when upcoming is empty
+
+	if Guild != nil && len(Q.Upcoming) == 0 && Guild.Features.Autoplay {
+
+		// Regenerate suggestions if none exist
+
+		if len(Q.Suggestions) == 0 {
+
+			Q.RegenerateSuggestions()
+
+		}
+
+		// Pull from suggestions if available
+
+		if len(Q.Suggestions) > 0 {
+
+			NextSuggestion := Q.Suggestions[0]
+			Q.Suggestions = Q.Suggestions[1:]
+
+			Q.Upcoming = append(Q.Upcoming, NextSuggestion)
+
+			Utils.Logger.Info(fmt.Sprintf("AutoPlay: Added suggestion to Queue %s: %s", Q.ParentID.String(), NextSuggestion.Title))
+
+		}
+
+	}
 
 	return Q.moveTo(1, true)
 
@@ -406,6 +438,20 @@ func (Q *Queue) Add(Song *Innertube.Song, Requestor string) int {
 
 		Q.Upcoming = append(Q.Upcoming, Song)
 		Pos++ // Position in UPCOMING queue is 1-based
+
+	}
+
+	// Check if user is interrupting autoplay (user adds non-suggested song)
+
+	Guild := GetGuild(Q.ParentID, false)
+
+	if Guild != nil && Guild.Features.Autoplay && !Song.Internal.Suggested {
+
+		// User interrupted autoplay with their own song - regenerate suggestions
+
+		Utils.Logger.Info(fmt.Sprintf("User interrupted AutoPlay for Queue %s - regenerating suggestions", Q.ParentID.String()))
+
+		go Q.RegenerateSuggestions()
 
 	}
 
@@ -570,6 +616,18 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 
 	Q.Upcoming = Remaining
 
+	// Check if we need to regenerate suggestions (running low or out)
+
+	if Guild != nil && Guild.Features.Autoplay {
+
+		if len(Q.Suggestions) <= 1 && len(Q.Upcoming) == 0 {
+
+			go Q.RegenerateSuggestions()
+
+		}
+
+	}
+
 	if Guild != nil && Guild.Features.Shuffle {
 
 		Q.shuffleUpcoming()
@@ -587,5 +645,75 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 	go Q.Play() // same reason for goroutine as above
 	
 	return true
+
+}
+
+// RegenerateSuggestions fetches new song suggestions based on the last played song
+func (Q *Queue) RegenerateSuggestions() {
+
+	Guild := GetGuild(Q.ParentID, false)
+
+	if Guild == nil || !Guild.Features.Autoplay {
+
+		return
+
+	}
+
+	// Determine seed song (last in Previous queue)
+
+	var SeedSong *Innertube.Song
+
+	if len(Q.Previous) > 0 {
+
+		SeedSong = Q.Previous[len(Q.Previous)-1]
+
+	} else if Q.Current != nil {
+
+		SeedSong = Q.Current
+
+	} else {
+
+		return // No seed available
+
+	}
+
+	Utils.Logger.Info(fmt.Sprintf("Regenerating suggestions for Queue %s using seed: %s", Q.ParentID.String(), SeedSong.Title))
+
+	// Fetch similar songs
+
+	SimilarSongs, ErrorFetching := Innertube.GetSimilarSongs(SeedSong.YouTubeID)
+
+	if ErrorFetching != nil {
+
+		Utils.Logger.Error(fmt.Sprintf("Error fetching similar songs for Queue %s: %s", Q.ParentID.String(), ErrorFetching.Error()))
+		return
+
+	}
+
+	// Take top 5 suggestions
+
+	MaxSuggestions := 5
+
+	if len(SimilarSongs) > MaxSuggestions {
+
+		SimilarSongs = SimilarSongs[:MaxSuggestions]
+
+	}
+
+	// Convert to pointers and mark as suggested
+
+	Q.Suggestions = make([]*Innertube.Song, 0, len(SimilarSongs))
+
+	for i := range SimilarSongs {
+
+		Song := &SimilarSongs[i]
+		Song.Internal.Suggested = true
+		Song.Internal.Requestor = Globals.DiscordClient.ApplicationID.String()
+
+		Q.Suggestions = append(Q.Suggestions, Song)
+
+	}
+
+	Utils.Logger.Info(fmt.Sprintf("Generated %d suggestions for Queue %s", len(Q.Suggestions), Q.ParentID.String()))
 
 }

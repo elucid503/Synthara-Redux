@@ -55,6 +55,8 @@ type SongInternal struct {
 
 	Requestor string `json:"requestor"`
 
+	Suggested bool `json:"suggested"`
+
 	Playlist PlaylistMeta `json:"playlist"`
 
 }
@@ -125,6 +127,12 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 
 		Description += "\n" + Localizations.GetFormat("Embeds.NowPlaying.DescriptionInPlaylist", Locale, S.Internal.Playlist.Index + 1, S.Internal.Playlist.Total, S.Internal.Playlist.Name)
 		
+	}
+
+	if S.Internal.Suggested {
+
+		Description += "\n" + Localizations.Get("Embeds.NowPlaying.SuggestedSong", Locale)
+
 	}
 
 	Embed.SetDescription(Description)

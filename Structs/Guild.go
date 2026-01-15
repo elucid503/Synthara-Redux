@@ -2,6 +2,7 @@ package Structs
 
 import (
 	"Synthara-Redux/APIs"
+	"Synthara-Redux/APIs/Apple"
 	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/APIs/Spotify"
 	"Synthara-Redux/Audio"
@@ -97,6 +98,8 @@ func NewGuild(ID snowflake.ID, Locale discord.Locale) *Guild {
 			Previous: []*Innertube.Song{},
 			Current:  nil,
 			Upcoming: []*Innertube.Song{},
+
+			Suggestions: []*Innertube.Song{},
 
 			Functions: QueueFunctions{
 
@@ -297,6 +300,7 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 	G.Queue.Current = nil
 	G.Queue.Previous = nil
 	G.Queue.Upcoming = nil
+	G.Queue.Suggestions = nil
 
 	// Closes voice connection if requested
 
@@ -684,6 +688,107 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 					AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 						Title:       Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Title", G.Locale.Code(), SpotifyPlaylist.Name),
+						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
+						Description: Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Description", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code())),
+
+					})).Build())
+
+			}()
+
+		case APIs.URITypeAMSong:
+
+			ResolvedSong, _, AppleMusicFetchErr := Apple.AppleMusicIDToSong(ID)
+
+			if AppleMusicFetchErr != nil {
+
+				return nil, -1, AppleMusicFetchErr
+
+			}
+
+			SongFound = &ResolvedSong
+
+			PosAdded = G.Queue.Add(SongFound, Requestor)
+
+		case APIs.URITypeAMAlbum:
+
+			FirstSong, AppleMusicAlbum, FirstSongError := Apple.AppleMusicAlbumToFirstSong(ID)
+
+			if FirstSongError != nil {
+
+				return nil, -1, FirstSongError
+
+			}
+
+			SongFound = &FirstSong
+
+			PosAdded = G.Queue.Add(&FirstSong, Requestor)
+
+			go func() {
+
+				// Add rest
+
+				AllOtherSongs, _, OtherFetchError := Apple.AppleMusicAlbumToAllSongs(AppleMusicAlbum, true) // ignores first
+
+				if OtherFetchError != nil {
+
+					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of Apple Music album songs: %s", OtherFetchError.Error()))
+					return
+
+				}
+
+				for _, Song := range AllOtherSongs {
+
+					G.Queue.Add(&Song, Requestor)
+
+				}
+
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+					Title:       Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Title", G.Locale.Code(), AppleMusicAlbum.Attributes.Name),
+					Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
+					Description: Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Description", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code())),
+
+				})).Build())
+
+			}()
+
+		case APIs.URITypeAMPlaylist:
+
+			FirstSong, AppleMusicPlaylist, FirstSongError := Apple.AppleMusicPlaylistToFirstSong(ID)
+
+			if FirstSongError != nil {
+
+				return nil, -1, FirstSongError
+
+			}
+
+			SongFound = &FirstSong
+
+			PosAdded = G.Queue.Add(&FirstSong, Requestor)
+
+			go func() {
+
+				// Add rest
+
+				AllOtherSongs, _, OtherFetchError := Apple.AppleMusicPlaylistToAllSongs(AppleMusicPlaylist, true) // ignores first
+
+				if OtherFetchError != nil {
+
+					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of Apple Music playlist songs: %s", OtherFetchError.Error()))
+					return
+
+				}
+
+				for _, Song := range AllOtherSongs {
+
+					G.Queue.Add(&Song, Requestor)
+
+				}
+
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
+					AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+						Title:       Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Title", G.Locale.Code(), AppleMusicPlaylist.Attributes.Name),
 						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 						Description: Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Description", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code())),
 
