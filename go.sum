@@ -26,6 +26,8 @@ github.com/disgoorg/snowflake/v2 v2.0.3 h1:3B+PpFjr7j4ad7oeJu4RlQ+nYOTadsKapJIzg
 github.com/disgoorg/snowflake/v2 v2.0.3/go.mod h1:W6r7NUA7DwfZLwr00km6G4UnZ0zcoLBRufhkFWgAc4c=
 github.com/elucid503/Overture-Play v0.0.0-20251212025804-2ae9b050a440 h1:Ib4zna1nENl3CzzbpZgmy9nnLoIFQL5zxQMy5YAq6qI=
 github.com/elucid503/Overture-Play v0.0.0-20251212025804-2ae9b050a440/go.mod h1:HLgKD0bME2J3zKHGwScqoaNpckVCtuCoE1QIWrw4rxQ=
+github.com/elucid503/Overture-Play v0.0.0-20260115050259-2f335f894729 h1:98aM2vYhijgjvrXqfAkNzZM3p48rr2veaTVjKIPaZCw=
+github.com/elucid503/Overture-Play v0.0.0-20260115050259-2f335f894729/go.mod h1:HLgKD0bME2J3zKHGwScqoaNpckVCtuCoE1QIWrw4rxQ=
 github.com/gabriel-vasile/mimetype v1.4.12 h1:e9hWvmLYvtp846tLHam2o++qitpguFiYCKbn0w9jyqw=
 github.com/gabriel-vasile/mimetype v1.4.12/go.mod h1:d+9Oxyo1wTzWdyVUPMmXFvp4F9tea18J8ufA774AB3s=
 github.com/gin-contrib/sse v1.1.0 h1:n0w2GMuUpWDVp7qSpvze6fAu9iRxJY4Hmj6AmBOU05w=

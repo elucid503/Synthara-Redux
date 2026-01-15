@@ -6,7 +6,7 @@ require (
 	github.com/asticode/go-astits v1.14.0
 	github.com/disgoorg/disgo v0.19.0-rc.13
 	github.com/disgoorg/snowflake/v2 v2.0.3
-	github.com/elucid503/Overture-Play v0.0.0-20251212025804-2ae9b050a440
+	github.com/elucid503/Overture-Play v0.0.0-20260115050259-2f335f894729
 	github.com/gin-gonic/gin v1.11.0
 	github.com/joho/godotenv v1.5.1
 	github.com/nareix/joy4 v0.0.0-20200507095837-05a4ffbb5369

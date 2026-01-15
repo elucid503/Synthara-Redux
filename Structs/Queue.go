@@ -120,27 +120,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 			}
 
-			// Handle Shuffle - pick random song from upcoming queue
-			if Guild.Features.Shuffle && len(Queue.Upcoming) > 0 {
-
-				Utils.Logger.Info(fmt.Sprintf("Queue %s shuffling to random song", Queue.ParentID.String()))
-
-				RandomIndex := rand.Intn(len(Queue.Upcoming))
-
-				if RandomIndex > 0 {
-
-					Queue.Jump(RandomIndex + 1)
-
-				} else {
-
-					Queue.Next()
-
-				}
-
-				return
-
-			}
-
 			Advanced := Queue.Next()
 
 			if Advanced {
@@ -183,34 +162,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 				}
 
 			} else {
-
-				// Handle Repeat All - move all previous songs back to upcoming queue
-				if Guild.Features.Repeat == RepeatAll && len(Queue.Previous) > 0 {
-
-					Utils.Logger.Info(fmt.Sprintf("Queue %s repeating all songs", Queue.ParentID.String()))
-
-					// Move all previous songs to upcoming in reverse order
-					for i := len(Queue.Previous) - 1; i >= 0; i-- {
-
-						Queue.Upcoming = append(Queue.Upcoming, Queue.Previous[i])
-
-					}
-
-					Queue.Previous = []*Innertube.Song{}
-
-					// Move current song to previous
-					if Queue.Current != nil {
-
-						Queue.Previous = append(Queue.Previous, Queue.Current)
-
-					}
-
-					// Advance to first song
-					Queue.Next()
-
-					return
-
-				}
 
 				Utils.Logger.Info(fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
 
@@ -301,7 +252,7 @@ func QueueUpdatedHandler(Queue *Queue) {
 
 	// Pre-caches HLS manifest for next song
 	
-	_, ErrorGettingManifest := Innertube.GetSongManifestURL(NextSong.YouTubeID)
+	_, ErrorGettingManifest := Innertube.GetSongInfo(NextSong.YouTubeID)
 
 	if ErrorGettingManifest != nil {
 
@@ -494,6 +445,25 @@ func (Q *Queue) Play() bool {
 
 }
 
+// shuffleUpcoming uses Fisher-Yates algorithm to shuffle the upcoming queue in-place
+func (Q *Queue) shuffleUpcoming() {
+
+	if len(Q.Upcoming) <= 1 {
+
+		return
+
+	}
+
+	// Fisher-Yates shuffle
+	for i := len(Q.Upcoming) - 1; i > 0; i-- {
+
+		j := rand.Intn(i + 1)
+		Q.Upcoming[i], Q.Upcoming[j] = Q.Upcoming[j], Q.Upcoming[i]
+
+	}
+
+}
+
 // moveTo performs the queue movement; optionally starts playback when ShouldPlay is true. Positive indices navigate upcoming songs (1-indexed), negative indices navigate previous songs (-1 is most recent).
 func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 
@@ -573,25 +543,38 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 
 	}
 
+	// Checking features
+
+	Guild := GetGuild(Q.ParentID, false)
+
 	if Q.Current != nil {
 
 		Q.Previous = append(Q.Previous, Q.Current)
 
+		// Handles Repeat All - re-enqueue the current song after it's moved to previous
+
+		if Guild != nil && Guild.Features.Repeat == RepeatAll {
+
+			Q.Upcoming = append(Q.Upcoming, Q.Current)
+
+		}
+
 	}
 
-	if Index > 1 {
-
-		Skipped := make([]*Innertube.Song, Index-1)
-		copy(Skipped, Q.Upcoming[:Index-1])
-		Q.Previous = append(Q.Previous, Skipped...)
-
-	}
+	// Sets new current song
 
 	Q.Current = Q.Upcoming[Index-1]
-	Remaining := make([]*Innertube.Song, len(Q.Upcoming[Index:]))
+	Remaining := make([]*Innertube.Song, len(Q.Upcoming[Index:])) // shift by Index-1
+
 	copy(Remaining, Q.Upcoming[Index:])
 
 	Q.Upcoming = Remaining
+
+	if Guild != nil && Guild.Features.Shuffle {
+
+		Q.shuffleUpcoming()
+
+	}
 
 	if !ShouldPlay {
 
@@ -602,6 +585,7 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 	Q.Functions.Updated(Q)
 
 	go Q.Play() // same reason for goroutine as above
+	
 	return true
 
 }

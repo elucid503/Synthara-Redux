@@ -1843,16 +1843,16 @@
 					"ja": "キューが終了しました"
 				},
 				"Description": {
-					"en-US": "The playback Queue has finished. New Songs may be added at any time.",
-					"en-GB": "The playback Queue has finished. New Songs may be added at any time.",
-					"es-ES": "La cola de reproducción ha terminado. Se pueden agregar nuevas canciones en cualquier momento.",
-					"es-419": "La cola de reproducción ha terminado. Se pueden agregar nuevas canciones en cualquier momento.",
+					"en-US": "The playback Queue has finished.\nNew Songs may be added at any time.",
+					"en-GB": "The playback Queue has finished.\nNew Songs may be added at any time.",
+					"es-ES": "La cola de reproducción ha terminado.\nSe pueden agregar nuevas canciones en cualquier momento.",
+					"es-419": "La cola de reproducción ha terminado.\nSe pueden agregar nuevas canciones en cualquier momento.",
 					"zh-CN": "播放队列已结束。可以随时添加新歌曲。",
-					"fr": "La file d'attente de lecture est terminée. De nouvelles chansons peuvent être ajoutées à tout moment.",
-					"it": "La coda di riproduzione è terminata. Nuove canzoni possono essere aggiunte in qualsiasi momento.",
-					"de": "Die Wiedergabe-Warteschlange ist beendet. Neue Lieder können jederzeit hinzugefügt werden.",
-					"pl": "Kolejka odtwarzania została zakończona. Nowe utwory można dodać w każdej chwili.",
-					"ru": "Очередь воспроизведения завершена. Новые песни можно добавить в любое время.",
+					"fr": "La file d'attente de lecture est terminée.\nDe nouvelles chansons peuvent être ajoutées à tout moment.",
+					"it": "La coda di riproduzione è terminata.\nNuove canzoni possono essere aggiunte in qualsiasi momento.",
+					"de": "Die Wiedergabe-Warteschlange ist beendet.\nNeue Lieder können jederzeit hinzugefügt werden.",
+					"pl": "Kolejka odtwarzania została zakończona.\nNowe utwory można dodać w każdej chwili.",
+					"ru": "Очередь воспроизведения завершена.\nНовые песни можно добавить в любое время.",
 					"ja": "再生キューが終了しました。新しい曲はいつでも追加できます。"
 				}
 			},
@@ -1899,17 +1899,17 @@
 					"ja": "ストリーミングの問題が検出されました"
 				},
 				"Description": {
-					"en-US": "This song could not be played.\n\nThis may be indicative of other problems. Please remain patient.",
-					"en-GB": "This song could not be played.\n\nThis may be indicative of other problems. Please remain patient.",
-					"es-ES": "Esta canción no se pudo transmitir.\n\nEsto puede indicar otros problemas. Por favor, ten paciencia.",
-					"es-419": "Esta canción no se pudo transmitir.\n\nEsto puede indicar otros problemas. Por favor, ten paciencia.",
-					"zh-CN": "无法播放此歌曲。\n\n这可能表明存在其他问题。请耐心等待。",
-					"fr": "Cette chanson n'a pas pu être diffusée.\n\nCela peut indiquer d'autres problèmes. Veuillez patienter.",
-					"it": "Questa canzone non può essere trasmessa.\n\nCiò potrebbe indicare altri problemi. Si prega di attendere.",
-					"de": "Dieses Lied konnte nicht gestreamt werden.\n\nDies kann auf andere Probleme hinweisen. Bitte haben Sie Geduld.",
-					"pl": "Nie udało się przesłać tego utworu.\n\nMoże to wskazywać na inne problemy. Prosimy o cierpliwość.",
-					"ru": "Эта песня не может быть воспроизведена.\n\nЭто может указывать на другие проблемы. Пожалуйста, наберитесь терпения.",
-					"ja": "この曲をストリーミングできませんでした。\n\nこれは他の問題を示している可能性があります。しばらくお待ちください。"
+					"en-US": "This song could not be played.\nThis may be indicative of other problems. Please remain patient.",
+					"en-GB": "This song could not be played.\nThis may be indicative of other problems. Please remain patient.",
+					"es-ES": "Esta canción no se pudo transmitir.\nEsto puede indicar otros problemas. Por favor, ten paciencia.",
+					"es-419": "Esta canción no se pudo transmitir.\nEsto puede indicar otros problemas. Por favor, ten paciencia.",
+					"zh-CN": "无法播放此歌曲。\n这可能表明存在其他问题。请耐心等待。",
+					"fr": "Cette chanson n'a pas pu être diffusée.\nCela peut indiquer d'autres problèmes. Veuillez patienter.",
+					"it": "Questa canzone non può essere trasmessa.\nCiò potrebbe indicare altri problemi. Si prega di attendere.",
+					"de": "Dieses Lied konnte nicht gestreamt werden.\nDies kann auf andere Probleme hinweisen. Bitte haben Sie Geduld.",
+					"pl": "Nie udało się przesłać tego utworu.\nMoże to wskazywać na inne problemy. Prosimy o cierpliwość.",
+					"ru": "Эта песня не может быть воспроизведена.\nЭто может указывать на другие проблемы. Пожалуйста, наберитесь терпения.",
+					"ja": "この曲をストリーミングできませんでした。\nこれは他の問題を示している可能性があります。しばらくお待ちください。"
 				}
 			},
 			"AddedToQueue": {

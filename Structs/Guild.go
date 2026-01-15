@@ -362,7 +362,7 @@ func (G *Guild) StartInactivityTimer() {
 		// Send notification message before disconnecting
 		go func() {
 
-			DisconnectButton := discord.NewButton(discord.ButtonStyleDanger, Localizations.Get("Buttons.Reconnect", Locale), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
+			DisconnectButton := discord.NewButton(discord.ButtonStylePrimary, Localizations.Get("Buttons.Reconnect", Locale), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
 
 				ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
 
@@ -761,7 +761,7 @@ func (G *Guild) Play(Song *Innertube.Song) error {
 					Title:       Localizations.Get("Embeds.Notifications.StreamingError.Title", Locale),
 					Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 					Description: Localizations.Get("Embeds.Notifications.StreamingError.Description", Locale),
-					Color:       0xFF0000,
+					Color:       0xFFB3BA,
 
 				})).
 				Build())

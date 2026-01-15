@@ -6,11 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/elucid503/Overture-Play/POToken"
 	OverturePlay "github.com/elucid503/Overture-Play/Public"
 	OverturePlayStructs "github.com/elucid503/Overture-Play/Structs"
 	innertubego "github.com/nezbut/innertube-go"
@@ -39,6 +39,7 @@ type SearchSuggestion struct {
 // Variables 
 
 var InnerTubeClient *innertubego.InnerTube;
+var POTokenGenerator *POToken.BgUtilGenerator;
 
 // Functions
 
@@ -54,6 +55,25 @@ func InitClient() error {
 	}
 
 	InnerTubeClient = InitializedClient;
+
+	Generator := POToken.NewGenerator(nil) // Uses default settings (localhost:4416)
+
+	// Checks if bgutil server is available
+
+	PingResp, PingErr := Generator.Ping()
+
+	if PingErr != nil {
+
+		Utils.Logger.Warn("PO-token server not available; expect streaming problems")
+		POTokenGenerator = nil;
+
+		
+	} else {
+
+		Utils.Logger.Info(fmt.Sprintf("PO-token server available; version %s", PingResp.Version))
+		POTokenGenerator = Generator;
+
+	}
 
 	Utils.Logger.Info("InnerTube client initialized successfully.")
 	return nil;
@@ -246,71 +266,79 @@ func SearchForSongs(Query string) []Song {
 
 }
 
-func GetSongManifestURL(YouTubeID string) (string, error) {
+func GetSongInfo(YouTubeID string) (*OverturePlayStructs.YoutubeVideo, error) {
 	
-	Cookie := os.Getenv("YOUTUBE_COOKIE")
+	VideosCache := Globals.GetOrCreateCache("Videos")
 
-	var HLSManifestURL string
+	FoundVideo, FoundVideoExists := VideosCache.Get(YouTubeID)
 
-	ManifestCache := Globals.GetOrCreateCache("Manifests")
+	if FoundVideoExists {
 
-	FoundManifest, FoundManifestExists := ManifestCache.Get(YouTubeID)
-
-	if FoundManifestExists {
-
-		HLSManifestURL = FoundManifest.(string)
-
-	} else {
-
-		Utils.Logger.Info(fmt.Sprintf("Fetching HLS manifest URL for song ID: %s", YouTubeID))
-
-		Video, ErrorFetchingVideo := OverturePlay.Info(YouTubeID, &OverturePlay.InfoOptions{
-
-			GetHLSFormats: true,
-
-		}, nil, &Cookie)
-
-		if ErrorFetchingVideo != nil {
-
-			return "", ErrorFetchingVideo
-
-		}
-
-		if (len(Video.HLSFormats) == 0) {	
-
-			return "", errors.New("no HLS formats available for this video")
-
-		}
-
-		// Ideal HLS format is lowest res, so we sort ascending by width
-
-		slices.SortFunc(Video.HLSFormats, func(a, b OverturePlayStructs.Format) int {
-
-			return *a.Width - *b.Width
-
-		})
-
-		HLSManifestURL = Video.HLSFormats[0].URL // 0 being lowest res
-
-		ManifestCache.Set(YouTubeID, HLSManifestURL, 1 * time.Hour) // 1 Hour TTL
+		return FoundVideo.(*OverturePlayStructs.YoutubeVideo), nil
 
 	}
 
-	return HLSManifestURL, nil
+	Utils.Logger.Info(fmt.Sprintf("Fetching HLS manifest URL for song ID: %s", YouTubeID))
+
+	Video, ErrorFetchingVideo := OverturePlay.Info(YouTubeID, &OverturePlay.InfoOptions{
+
+		GetHLSFormats: true,
+
+	}, nil, nil)
+
+	if ErrorFetchingVideo != nil {
+
+		return nil, ErrorFetchingVideo
+
+	}
+
+	if (len(Video.HLSFormats) == 0) {	
+
+		return nil, errors.New("no HLS formats available for this video")
+
+		}
+
+	// Ideal HLS format is lowest res, so we sort ascending by width
+
+	slices.SortFunc(Video.HLSFormats, func(a, b OverturePlayStructs.Format) int {
+
+		return *a.Width - *b.Width
+
+	})
+
+	VideosCache.Set(YouTubeID, Video, 1 * time.Hour) // 1 Hour TTL
+
+	return Video, nil
 
 }
 
 func GetSongAudioSegments(YouTubeID string) ([]OverturePlayStructs.HLSSegment, int, error) {
 
-	HLSManifestURL, ErrorGettingManifestURL := GetSongManifestURL(YouTubeID)
+	Video, ErrorGettingVideo := GetSongInfo(YouTubeID)
 
-	if ErrorGettingManifestURL != nil {
+	if ErrorGettingVideo != nil {
 
-		return nil, 0, ErrorGettingManifestURL
+		return nil, 0, ErrorGettingVideo
 
 	}
 
-	Manifest, ErrorFetchingManifest := OverturePlay.GetHLSManifest(HLSManifestURL, nil) // 0 being lowest res
+	if len(Video.HLSFormats) == 0 {
+
+		return nil, 0, errors.New("no HLS formats available for this video")
+
+	}
+
+	HLSManifestURL := Video.HLSFormats[0].URL
+
+	Options := &OverturePlay.HLSOptions{ 
+		
+		IsAuthenticated: false,
+		Generator: POTokenGenerator,
+		VisitorData: Video.VisitorData,
+
+	}
+
+	Manifest, ErrorFetchingManifest := OverturePlay.GetHLSManifest(HLSManifestURL, Options) // 0 being lowest res
 
 	if ErrorFetchingManifest != nil {
 
@@ -324,7 +352,7 @@ func GetSongAudioSegments(YouTubeID string) ([]OverturePlayStructs.HLSSegment, i
 
 	}
 
-	Playlist, ErrorFetchingPlaylist := OverturePlay.GetHLSPlaylist(Manifest.Playlists[0].URI, &OverturePlay.HLSOptions{})
+	Playlist, ErrorFetchingPlaylist := OverturePlay.GetHLSPlaylist(Manifest.Playlists[0].URI, Options)
 
 	if ErrorFetchingPlaylist != nil {
 
@@ -338,7 +366,11 @@ func GetSongAudioSegments(YouTubeID string) ([]OverturePlayStructs.HLSSegment, i
 
 func GetAudioSegmentBytes(Segment OverturePlayStructs.HLSSegment) ([]byte, error) {
 
-	return OverturePlay.GetHLSSegment(Segment.URI, &OverturePlay.HLSOptions{ })
+	return OverturePlay.GetHLSSegment(Segment.URI, &OverturePlay.HLSOptions{ 
+		
+		IsAuthenticated: false,
+	
+	})
 	
 }
 
