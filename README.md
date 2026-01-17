@@ -24,15 +24,15 @@ Synthara-Redux provides seamless music streaming in Discord voice channels with 
 
 ### Audio Quality
 - Native AAC decoding via FDK-AAC (no FFMPEG dependency)
-- Real-time sample rate conversion (44.1kHz → 48kHz)
+- Real-time sample rate conversion (44.1kHz to 48kHz)
 - Opus encoding at 128kbps for Discord streaming
 - Low-latency HLS segment buffering
 
 ## Audio Processing Pipeline
 
-The bot uses a custom audio transcoding pipeline optimized for Tidal's MP4 streams:
+The bot uses a custom audio transcoding pipeline optimized for MP4 streams:
 
-1. **Stream Acquisition**: Fetches MP4 audio streams from Tidal API
+1. **Stream Acquisition**: Fetches MP4 audio streams from an API
 2. **MP4 Parsing**: Extracts AAC frames from MP4 containers
 3. **AAC Decoding**: Decodes to PCM via FDK-AAC (CGO bindings) with automatic resampling
 4. **Opus Encoding**: Encodes to Opus at 128kbps/48kHz for Discord
