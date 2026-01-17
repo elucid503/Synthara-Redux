@@ -4,12 +4,12 @@ A high-performance Discord music bot written in Go, featuring real-time audio tr
 
 ## Overview
 
-Synthara-Redux provides seamless music streaming in Discord voice channels with native transcoding. The bot supports YouTube, Spotify, and Apple Music URLs, includes full Queue management, lyrics display, and a React-based web dashboard for remote control.
+Synthara-Redux provides seamless music streaming in Discord voice channels with native transcoding. The bot supports YouTube, Spotify, Apple Music, and Tidal URLs, includes full Queue management, lyrics display, and a React-based web dashboard for remote control.
 
 ## Features
 
 ### Music Playback
-- **Multi-Platform Support**: YouTube, Spotify, and Apple Music URLs
+- **Multi-Platform Support**: YouTube, Spotify, Apple Music, and Tidal URLs
 - **Search Integration**: Natural language search via InnerTube (YouTube Music)
 - **Queue Management**: Add, move, remove, jump, and shuffle songs
 - **Playback Controls**: Play, pause, resume, next, previous, repeat modes, and seek
@@ -30,10 +30,10 @@ Synthara-Redux provides seamless music streaming in Discord voice channels with 
 
 ## Audio Processing Pipeline
 
-The bot uses a custom audio transcoding pipeline:
+The bot uses a custom audio transcoding pipeline optimized for Tidal's MP4 streams:
 
-1. **Stream Acquisition**: Fetches HLS manifests from YouTube/InnerTube API and downloads MPEG-TS segments
-2. **Demuxing**: Extracts AAC frames from transport stream using `astits`
+1. **Stream Acquisition**: Fetches MP4 audio streams from Tidal API
+2. **MP4 Parsing**: Extracts AAC frames from MP4 containers
 3. **AAC Decoding**: Decodes to PCM via FDK-AAC (CGO bindings) with automatic resampling
 4. **Opus Encoding**: Encodes to Opus at 128kbps/48kHz for Discord
 5. **Streaming**: Direct packet transmission to Discord voice gateway
@@ -43,11 +43,18 @@ The bot uses a custom audio transcoding pipeline:
 Create a `.env` file in the project root with the following variables:
 
 ```env
+
+# Required: TIDAL JWT
+TIDAL_JWT=your_tidal_jwt_here
+
+# Required: Streaming API Endpoint
+HIFI_API_ENDPOINT=secret_sauce_here
+
 # Required: Discord bot token from Discord Developer Portal
 DISCORD_TOKEN=your_discord_bot_token_here
 
-# Optional: YouTube cookie string from authenticated YouTube session
-YOUTUBE_COOKIE=your_youtube_cookie_here
+# Required: MongoDB connection string
+MONGO_URI=your_mongodb_connection_string_here
 
 # Optional: Force application-command registration on startup (set to "true" to refresh)
 REFRESH_COMMANDS=false
@@ -75,14 +82,6 @@ SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
 **Web**
 - Node.js 18+
 - Bun or Deno
-
-**Docker**
-- Docker Engine 20+
-
-Run the PO Token server using Docker:
-```bash
-sudo docker run -d -p 4416:4416 brainicism/bgutil-ytdlp-pot-provider
-```
 
 ### System Dependencies
 
@@ -143,6 +142,8 @@ The bot will initialize Discord gateway, register commands, and start the web se
 - `/forget` - Clear your listening history
 - `/leave` - Disconnect from voice channel
 
+... and most likely more not documented here!
+
 ## Technical Stack
 
 **Bot**
@@ -150,7 +151,7 @@ The bot will initialize Discord gateway, register commands, and start the web se
 - disgoorg/disgo (Discord library)
 - FDK-AAC (AAC decoding via CGO)
 - gopus (Opus encoding)
-- innertube-go + custom scrapers
+- MongoDB (user data and history)
 
 **Web**
 - React 19
