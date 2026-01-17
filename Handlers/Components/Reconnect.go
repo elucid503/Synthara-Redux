@@ -8,6 +8,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
+	"github.com/disgoorg/snowflake/v2"
 )
 
 func Reconnect(Event *events.ComponentInteractionCreate) {
@@ -41,31 +42,44 @@ func Reconnect(Event *events.ComponentInteractionCreate) {
 	// Get the user's voice state to find which channel they're in
 	VoiceState, VoiceStateExists := Event.Client().Caches.VoiceState(*Event.GuildID(), Event.User().ID)
 
-	if !VoiceStateExists || VoiceState.ChannelID == nil {
+	var ChannelID *snowflake.ID
 
-		Event.CreateMessage(discord.MessageCreate{
+	if VoiceStateExists && VoiceState.ChannelID != nil {
 
-			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+		ChannelID = VoiceState.ChannelID
 
-				Title:       Localizations.Get("Embeds.Categories.Error", Locale),
-				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
-				Description: Localizations.Get("Commands.Play.Error.VoiceChannel.Description", Locale),
-				Color:       0xFFB3BA,
+	} else {
 
-			})},
+		RestVoiceState, RestError := Event.Client().Rest.GetUserVoiceState(*Event.GuildID(), Event.User().ID)
 
-			Flags: discord.MessageFlagEphemeral,
+		if RestError != nil || RestVoiceState == nil || RestVoiceState.ChannelID == nil {
 
-		})
+			Event.CreateMessage(discord.MessageCreate{
 
-		return
+				Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+					Title:       Localizations.Get("Embeds.Categories.Error", Locale),
+					Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+					Description: Localizations.Get("Commands.Play.Error.VoiceChannel.Description", Locale),
+					Color:       0xFFB3BA,
+
+				})},
+
+				Flags: discord.MessageFlagEphemeral,
+
+			})
+
+			return
+		}
+
+		ChannelID = RestVoiceState.ChannelID
 
 	}
 
-	Guild.Channels.Voice = *VoiceState.ChannelID
+	Guild.Channels.Voice = *ChannelID
 	Guild.Channels.Text = Event.Channel().ID()
 
-	ErrorConnecting := Event.Client().UpdateVoiceState(context.Background(), *Event.GuildID(), VoiceState.ChannelID, false, false)
+	ErrorConnecting := Event.Client().UpdateVoiceState(context.Background(), *Event.GuildID(), ChannelID, false, false)
 
 	if ErrorConnecting != nil {
 
@@ -88,14 +102,26 @@ func Reconnect(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().
-		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+	Channel, RestError := Event.Client().Rest.GetChannel(*ChannelID)
 
-			Title:       Localizations.Get("Embeds.Categories.Playback", Locale),
-			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
-			Description: Localizations.Get("Embeds.Notifications.Reconnect.Description", Locale),
+	var ChannelName string
 
-		})).
-		Build())
+	if RestError == nil && Channel != nil {
+
+		ChannelName = Channel.Name()
+
+	} else {
+
+		ChannelName = "voice channel"
+
+	}
+
+	Event.CreateMessage(discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+		Title:       Localizations.Get("Embeds.Notifications.Reconnect.Title", Locale),
+		Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
+		Description: Localizations.GetFormat("Embeds.Notifications.Reconnect.Description", Locale, ChannelName),
+
+	})).Build())
 
 }

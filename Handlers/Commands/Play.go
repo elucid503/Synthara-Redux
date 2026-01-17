@@ -13,6 +13,15 @@ import (
 
 func Play(Event *events.ApplicationCommandInteractionCreate) {
 
+	DeferDone := make(chan struct{})
+
+	go func() {
+
+		Event.DeferCreateMessage(false)
+		close(DeferDone)
+
+	}()
+
 	Locale := Event.Locale().Code()
 
 	// Get the search query from command options
@@ -22,9 +31,10 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Query == "" {
 
-		Event.CreateMessage(discord.MessageCreate{
+		Utils.WaitFor(DeferDone)
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
-			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+			Embeds: &[]discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       Localizations.Get("Commands.Play.Error.NoQuery.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
@@ -32,8 +42,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
-
-			Flags: discord.MessageFlagEphemeral,
 
 		})
 
@@ -45,9 +53,10 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Event.Member() == nil {
 
-		Event.CreateMessage(discord.MessageCreate{
+		Utils.WaitFor(DeferDone)
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
-			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+			Embeds: &[]discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       Localizations.Get("Commands.Play.Error.NotInGuild.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
@@ -55,8 +64,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
-
-			Flags: discord.MessageFlagEphemeral,
 
 		})
 
@@ -70,9 +77,10 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	if !VoiceStateExists {
 
-		Event.CreateMessage(discord.MessageCreate{
+		Utils.WaitFor(DeferDone)
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
-			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+			Embeds: &[]discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
@@ -80,8 +88,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
-
-			Flags: discord.MessageFlagEphemeral,
 
 		})
 
@@ -99,9 +105,10 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	if ErrorConnecting != nil {
 
-		Event.CreateMessage(discord.MessageCreate{
+		Utils.WaitFor(DeferDone)
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
-			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+			Embeds: &[]discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       Localizations.Get("Commands.Play.Error.FailedToConnect.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
@@ -109,8 +116,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
-
-			Flags: discord.MessageFlagEphemeral,
 
 		})
 
@@ -124,9 +129,10 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	if ErrorRouting != nil {
 
-		Event.CreateMessage(discord.MessageCreate{
+		Utils.WaitFor(DeferDone)
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
-			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+			Embeds: &[]discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       Localizations.Get("Commands.Play.Error.InvalidInput.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
@@ -134,8 +140,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
-
-			Flags: discord.MessageFlagEphemeral,
 
 		})
 
@@ -149,9 +153,10 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	if ErrorHandling != nil {
 
-		Event.CreateMessage(discord.MessageCreate{
+		Utils.WaitFor(DeferDone)
+		Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.MessageUpdate{
 
-			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+			Embeds: &[]discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       Localizations.Get("Commands.Play.Error.FailedToHandle.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
@@ -159,8 +164,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       0xFFB3BA,
 
 			})},
-
-			Flags: discord.MessageFlagEphemeral,
 
 		})
 
@@ -205,6 +208,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().AddEmbeds(SongFound.Embed(State)).AddActionRow(SongFound.Buttons(State)...).Build())
+	Utils.WaitFor(DeferDone)
+	Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.NewMessageUpdateBuilder().AddEmbeds(SongFound.Embed(State)).AddActionRow(SongFound.Buttons(State)...).Build())
 
 }

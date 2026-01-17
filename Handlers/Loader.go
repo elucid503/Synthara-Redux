@@ -166,13 +166,17 @@ func InitializeHandlers() {
 
 					Commands.Shuffle(Event)
 
+				case "autoplay":
+
+					Commands.Autoplay(Event)
+
 				case "lyrics":
 
 					Commands.Lyrics(Event)
 
 				case "controls":
 
-					Commands.Conrols(Event)
+					Commands.Controls(Event)
 
 				case "queue":
 

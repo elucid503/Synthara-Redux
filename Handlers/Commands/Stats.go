@@ -5,6 +5,7 @@ import (
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
 	"fmt"
+	"runtime"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -62,7 +63,7 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 
 	EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.Status", Locale), StatusValue, true)
 
-	// Field 2: Streaming Progress
+	// Field 2: Data Streamed
 
 	if Guild.Queue.PlaybackSession != nil && Guild.Queue.PlaybackSession.Streamer != nil {
 
@@ -72,9 +73,9 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 		// Convert bytes to KB/MB for display
 		ProgressValue := ""
 		if BytesStreamed > 1024*1024 {
-			ProgressValue = fmt.Sprintf("%.2f MB streamed", float64(BytesStreamed)/(1024*1024))
+			ProgressValue = fmt.Sprintf("%.2f MB", float64(BytesStreamed)/(1024*1024))
 		} else {
-			ProgressValue = fmt.Sprintf("%.2f KB streamed", float64(BytesStreamed)/1024)
+			ProgressValue = fmt.Sprintf("%.2f KB", float64(BytesStreamed)/1024)
 		}
 
 		EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.Progress", Locale), ProgressValue, true)
@@ -85,82 +86,50 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	// Field 3: Queue Status
+	// Field 3: Goroutines
 
-	UpcomingCount := len(Guild.Queue.Upcoming)
-	PreviousCount := len(Guild.Queue.Previous)
+	GoroutinesValue := fmt.Sprintf("%d", runtime.NumGoroutine())
 
-	var QueueValue string
+	EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.ActiveGoroutines", Locale), GoroutinesValue, true)
 
-	if UpcomingCount == 1 {
+	// Field 4: Current Bitrate
 
-		QueueValue = fmt.Sprintf(Localizations.Get("Commands.Stats.Queue.Singular", Locale), UpcomingCount)
+	if Guild.Queue.PlaybackSession != nil && Guild.Queue.PlaybackSession.Streamer != nil {
 
-	} else {
+		Streamer := Guild.Queue.PlaybackSession.Streamer
+		ProgressMS := Streamer.Progress
 
-		QueueValue = fmt.Sprintf(Localizations.Get("Commands.Stats.Queue.Plural", Locale), UpcomingCount)
+		if ProgressMS > 0 {
 
-	}
+			Bitrate := (Streamer.BytesStreamed * 8 * 1000) / ProgressMS
+			BitrateValue := fmt.Sprintf("%d kbps", Bitrate)
 
-	if PreviousCount > 0 {
+			EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.CurrentBitrate", Locale), BitrateValue, true)
 
-		if PreviousCount == 1 {
-
-			QueueValue += "\n" + fmt.Sprintf(Localizations.Get("Commands.Stats.Queue.PreviousSingular", Locale), PreviousCount)
-
-		} else {
-
-			QueueValue += "\n" + fmt.Sprintf(Localizations.Get("Commands.Stats.Queue.PreviousPlural", Locale), PreviousCount)
 		}
+
 	}
 
-	EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.Queue", Locale), QueueValue, true)
-
-	// Field 4: Buffer Status
+	// Field 5: Frame Buffer
 
 	if Guild.Queue.PlaybackSession != nil && Guild.Queue.PlaybackSession.Streamer != nil {
 
 		BufferSize := len(Guild.Queue.PlaybackSession.Streamer.OpusFrameChan)
 		BufferCapacity := cap(Guild.Queue.PlaybackSession.Streamer.OpusFrameChan)
-		BufferPercent := (BufferSize * 100) / BufferCapacity
 
-		var BufferValue string
+		BufferValue := fmt.Sprintf("%d / %d", BufferSize, BufferCapacity)
 
-		if BufferSize == 1 {
-
-			BufferValue = fmt.Sprintf(Localizations.Get("Commands.Stats.Buffer.Singular", Locale), BufferSize, BufferCapacity, BufferPercent)
-
-		} else {
-
-			BufferValue = fmt.Sprintf(Localizations.Get("Commands.Stats.Buffer.Plural", Locale), BufferSize, BufferCapacity, BufferPercent)
-
-		}
-
-		EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.Buffer", Locale), BufferValue, true)
-
-	} else {
-
-		EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.Buffer", Locale), Localizations.Get("Commands.Stats.Buffer.NoData", Locale), true)
+		EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.FrameBuffer", Locale), BufferValue, true)
 
 	}
 
-	// Field 5: Playback Duration
+	// Field 6: Memory Usage
 
-	if Guild.Queue.PlaybackSession != nil && Guild.Queue.PlaybackSession.Streamer != nil {
+	var MemStats runtime.MemStats
+	runtime.ReadMemStats(&MemStats)
+	MemoryValue := fmt.Sprintf("%.2f MB", float64(MemStats.Alloc)/(1024*1024))
 
-		ProgressMS := Guild.Queue.PlaybackSession.Streamer.Progress
-		TotalSeconds := ProgressMS / 1000
-		Minutes := TotalSeconds / 60
-		Seconds := TotalSeconds % 60
-
-		DurationValue := fmt.Sprintf(Localizations.Get("Commands.Stats.Duration.Format", Locale), Minutes, Seconds)
-
-		EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.Duration", Locale), DurationValue, true)
-
-	} else {
-
-		EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.Duration", Locale), Localizations.Get("Commands.Stats.Duration.NoData", Locale), true)
-	}
+	EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.MemoryUsage", Locale), MemoryValue, true)
 
 	Event.CreateMessage(discord.MessageCreate{
 

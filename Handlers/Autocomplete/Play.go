@@ -18,6 +18,7 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 	Input := Event.Data.String("query");
 
 	// Get user's recent searches from MongoDB
+
 	RecentlyPlayedChoices := []discord.AutocompleteChoice{}
 
 	User, UserError := Structs.GetUser(Event.User().ID.String())
@@ -129,21 +130,52 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 
 	}
 
-	AutocompleteTextResults := []discord.AutocompleteChoice{};
-	AutocompleteMetadataResults := []discord.AutocompleteChoice{};
+	// Group metadata suggestions by type so we can order and cap them
+
+	AutocompleteTextResults := []discord.AutocompleteChoice{}
+
+	// per-type buckets
+
+	Songs := []discord.AutocompleteChoice{}
+	Albums := []discord.AutocompleteChoice{}
+	Artists := []discord.AutocompleteChoice{}
+	Others := []discord.AutocompleteChoice{}
 
 	SeenText := make(map[string]bool)
 
 	for _, Suggestion := range Suggestions {
 
-		if (Suggestion.Metadata.Title != "" && Suggestion.Metadata.Subtitle != "") {
+		if Suggestion.Metadata.Title != "" && Suggestion.Metadata.Subtitle != "" {
 
-			AutocompleteMetadataResults = append(AutocompleteMetadataResults, discord.AutocompleteChoiceString{
+			Entry := discord.AutocompleteChoiceString{
 
-				Name: fmt.Sprintf("%s • %s • %s", Suggestion.Metadata.Type, Suggestion.Metadata.Title, Suggestion.Metadata.Subtitle),
+				Name:  fmt.Sprintf("%s • %s • %s", Suggestion.Metadata.Type, Suggestion.Metadata.Title, Suggestion.Metadata.Subtitle),
 				Value: Utils.GetURI(Suggestion.Metadata.Type, Suggestion.Metadata.ID),
+			}
 
-			})
+			TypeLower := strings.ToLower(Suggestion.Metadata.Type)
+
+			switch {
+
+				case strings.Contains(TypeLower, "song") || strings.Contains(TypeLower, "track"):
+
+					Songs = append(Songs, Entry)
+
+				case strings.Contains(TypeLower, "album"):
+
+					Albums = append(Albums, Entry)
+
+				case strings.Contains(TypeLower, "artist"):
+
+					Artists = append(Artists, Entry)
+
+				default:
+
+					Others = append(Others, Entry)
+					
+			}
+
+			// avoid showing duplicate plain-text entries later
 
 			SeenText[strings.ToLower(Suggestion.Metadata.Title)] = true
 
@@ -151,9 +183,11 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 
 	}
 
+	// collects plain-text suggestions (deduplicated)
+
 	for _, Suggestion := range Suggestions {
 
-		if (Suggestion.Metadata.Title != "" && Suggestion.Metadata.Subtitle != "") {
+		if Suggestion.Metadata.Title != "" && Suggestion.Metadata.Subtitle != "" {
 
 			continue
 
@@ -164,7 +198,7 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 		if SeenText[LowerText] {
 
 			continue
-
+			
 		}
 
 		AutocompleteTextResults = append(AutocompleteTextResults, discord.AutocompleteChoiceString{
@@ -178,15 +212,73 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 
 	}
 
-	AllResults := AutocompleteMetadataResults
-	AllResults = append(AllResults, AutocompleteTextResults...)
+	// Limits (tuned: more songs than other types)
 
-	// Limit to 25 results
+	const (
 
-	if len(AllResults) > 25 {
+		SongLimit   = 5
+		AlbumLimit  = 3
+		ArtistLimit = 3
+		OtherLimit  = 2
+		TextLimit   = 5
+		MaxTotal    = 25
 
-		AllResults = AllResults[:25]
+	)
 
+	// Songs -> Albums -> Artists -> Other -> Plain text
+
+	AllResults := []discord.AutocompleteChoice{}
+
+	AppendUpTo := func(Choices []discord.AutocompleteChoice, Source []discord.AutocompleteChoice, n int) []discord.AutocompleteChoice {
+		
+		if n <= 0 || len(Source) == 0 {
+
+			return Choices
+
+		}
+
+		if len(Source) > n {
+
+			Choices = append(Choices, Source[:n]...)
+
+		} else {
+
+			Choices = append(Choices, Source...)
+
+		}
+
+		return Choices
+
+	}
+
+	AllResults = AppendUpTo(AllResults, Songs, SongLimit)
+	AllResults = AppendUpTo(AllResults, Albums, AlbumLimit)
+	AllResults = AppendUpTo(AllResults, Artists, ArtistLimit)
+	AllResults = AppendUpTo(AllResults, Others, OtherLimit)
+	AllResults = AppendUpTo(AllResults, AutocompleteTextResults, TextLimit)
+
+	// Fallback
+
+	if len(AllResults) == 0 {
+
+		Event.AutocompleteResult([]discord.AutocompleteChoice{
+
+			discord.AutocompleteChoiceString{
+
+				Name:  Localizations.Get("Autocomplete.Play.NoSuggestions", Locale),
+				Value: Localizations.Get("Autocomplete.Play.Placeholder", Locale),
+			},
+
+		})
+
+		return
+
+	}
+
+	if len(AllResults) > MaxTotal {
+
+		AllResults = AllResults[:MaxTotal]
+		
 	}
 
 	Event.AutocompleteResult(AllResults)

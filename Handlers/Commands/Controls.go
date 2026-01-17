@@ -11,7 +11,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func Conrols(Event *events.ApplicationCommandInteractionCreate) {
+func Controls(Event *events.ApplicationCommandInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 	GuildID := Event.GuildID()
@@ -25,6 +25,7 @@ func Conrols(Event *events.ApplicationCommandInteractionCreate) {
 			Title:       Localizations.Get("Commands.Controls.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Controls", Locale),
 			Description: Localizations.GetFormat("Commands.Controls.Description", Locale, Page),
+			
 			URL:         Page,
 
 		})},

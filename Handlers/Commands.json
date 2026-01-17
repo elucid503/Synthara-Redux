@@ -526,6 +526,70 @@
 		]
 	},
 	{
+		"name": "autoplay",
+		"name_localizations": {
+			"en-US": "autoplay",
+			"en-GB": "autoplay",
+			"es-ES": "autoreproducción",
+			"es-419": "autoreproducción",
+			"zh-CN": "自动播放",
+			"fr": "lecture-automatique",
+			"it": "riproduzione-automatica",
+			"de": "automatische-wiedergabe",
+			"pl": "autoodtwarzanie",
+			"ru": "автовоспроизведение",
+			"ja": "オートプレイ"
+		},
+		"description": "Use this command to toggle autoplay mode for the Queue.",
+		"description_localizations": {
+			"en-US": "Use this command to toggle autoplay mode for the Queue.",
+			"en-GB": "Use this command to toggle autoplay mode for the Queue.",
+			"es-ES": "Usa este comando para alternar el modo de reproducción automática para la cola.",
+			"es-419": "Usa este comando para alternar el modo de reproducción automática para la cola.",
+			"zh-CN": "使用此命令切换队列的自动播放模式。",
+			"fr": "Activer/désactiver le mode de lecture automatique pour la file d'attente.",
+			"it": "Usa questo comando per attivare/disattivare la modalità di riproduzione automatica per la coda.",
+			"de": "Verwende diesen Befehl, um den automatischen Wiedergabemodus für die Warteschlange umzuschalten.",
+			"pl": "Użyj tej komendy, aby przełączyć tryb autoodtwarzania dla kolejki.",
+			"ru": "Используйте эту команду для переключения режима автопроигрывания для очереди.",
+			"ja": "このコマンドを使用して、キューのオートプレイモードを切り替えます。"
+		},
+		"options": [
+			{
+				"type": 5,
+				"name": "enabled",
+				"name_localizations": {
+					"en-US": "enabled",
+					"en-GB": "enabled",
+					"es-ES": "activado",
+					"es-419": "activado",
+					"zh-CN": "启用",
+					"fr": "activé",
+					"it": "abilitato",
+					"de": "aktiviert",
+					"pl": "włączony",
+					"ru": "включено",
+					"ja": "有効"
+				},
+				"description": "Use this option to enable or disable autoplay mode.",
+				"description_localizations": {
+					"en-US": "Use this option to enable or disable autoplay mode.",
+					"en-GB": "Use this option to enable or disable autoplay mode.",
+					"es-ES": "Usa esta opción para activar o desactivar el modo de reproducción automática.",
+					"es-419": "Usa esta opción para activar o desactivar el modo de reproducción automática.",
+					"zh-CN": "使用此选项启用或禁用自动播放模式。",
+					"fr": "Utilisez cette option pour activer ou désactiver le mode de lecture automatique.",
+					"it": "Usa questa opzione per abilitare o disabilitare la modalità di riproduzione automatica.",
+					"de": "Verwende diese Option, um den automatischen Wiedergabemodus zu aktivieren oder zu deaktivieren.",
+					"pl": "Użyj tej opcji, aby włączyć lub wyłączyć tryb autoodtwarzania.",
+					"ru": "Используйте эту опцию для включения или отключения режима автопроигрывания.",
+					"ja": "このオプションを使用して、オートプレイモードを有効または無効にします。"
+				},
+				"required": true
+			}
+		]
+	},
+	{
 		"name": "lyrics",
 		"name_localizations": {
 			"en-US": "lyrics",

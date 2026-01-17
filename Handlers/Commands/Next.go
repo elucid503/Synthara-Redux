@@ -40,7 +40,7 @@ func Next(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	Success := Guild.Queue.Next()
+	Success := Guild.Queue.Next(true)
 
 	if !Success {
 

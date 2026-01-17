@@ -159,8 +159,8 @@
 				"ja": "自動再生"
 			},
 			"Enabled": {
-				"en-US": "AutoPlay enabled. Songs will automatically Queue when the current Queue ends.",
-				"en-GB": "AutoPlay enabled. Songs will automatically Queue when the current Queue ends.",
+				"en-US": "AutoPlay enabled.\nSongs will automatically play when the current Queue ends.",
+				"en-GB": "AutoPlay enabled.\nSongs will automatically play when the current Queue ends.",
 				"es-ES": "Reproducción automática activada. Las canciones se añadirán automáticamente cuando termine la cola actual.",
 				"es-419": "Reproducción automática activada. Las canciones se añadirán automáticamente cuando termine la cola actual.",
 				"zh-CN": "自动播放已启用。当前队列结束时将自动添加歌曲。",
@@ -255,17 +255,17 @@
 					"ja": "ステータス"
 				},
 				"Progress": {
-					"en-US": "Segment Progress",
-					"en-GB": "Segment Progress",
-					"es-ES": "Progreso de Segmento",
-					"es-419": "Progreso de Segmento",
-					"zh-CN": "段进度",
-					"fr": "Progression du Segment",
-					"it": "Progresso del Segmento",
-					"de": "Segmentfortschritt",
-					"pl": "Postęp Segmentu",
-					"ru": "Прогресс Сегмента",
-					"ja": "セグメント進行状況"
+					"en-US": "Data Streamed",
+					"en-GB": "Data Streamed",
+					"es-ES": "Datos Transmitidos",
+					"es-419": "Datos Transmitidos",
+					"zh-CN": "已传输数据",
+					"fr": "Données Transmises",
+					"it": "Dati Trasmessi",
+					"de": "Übertragene Daten",
+					"pl": "Przesłane Dane",
+					"ru": "Переданные Данные",
+					"ja": "送信データ"
 				},
 				"Codec": {
 					"en-US": "Audio Codec",
@@ -293,7 +293,33 @@
 					"ru": "Очередь",
 					"ja": "キュー"
 				},
-				"Buffer": {
+				"ActiveGoroutines": {
+					"en-US": "Goroutines",
+					"en-GB": "Goroutines",
+					"es-ES": "Goroutines",
+					"es-419": "Goroutines",
+					"zh-CN": "协程",
+					"fr": "Goroutines",
+					"it": "Goroutine",
+					"de": "Goroutinen",
+					"pl": "Gorutyny",
+					"ru": "Горутины",
+					"ja": "ゴルーチン"
+				},
+				"CurrentBitrate": {
+					"en-US": "Current Bitrate",
+					"en-GB": "Current Bitrate",
+					"es-ES": "Tasa de Bits Actual",
+					"es-419": "Tasa de Bits Actual",
+					"zh-CN": "当前比特率",
+					"fr": "Débit Binaire Actuel",
+					"it": "Bitrate Attuale",
+					"de": "Aktuelle Bitrate",
+					"pl": "Aktualna Szybkość Przesyłania",
+					"ru": "Текущий Битрейт",
+					"ja": "現在のビットレート"
+				},
+				"FrameBuffer": {
 					"en-US": "Frame Buffer",
 					"en-GB": "Frame Buffer",
 					"es-ES": "Búfer de Fotogramas",
@@ -305,6 +331,19 @@
 					"pl": "Bufor Klatek",
 					"ru": "Буфер Кадров",
 					"ja": "フレームバッファ"
+				},
+				"MemoryUsage": {
+					"en-US": "Memory Usage",
+					"en-GB": "Memory Usage",
+					"es-ES": "Uso de Memoria",
+					"es-419": "Uso de Memoria",
+					"zh-CN": "内存使用",
+					"fr": "Utilisation Mémoire",
+					"it": "Utilizzo Memoria",
+					"de": "Speichernutzung",
+					"pl": "Użycie Pamięci",
+					"ru": "Использование Памяти",
+					"ja": "メモリ使用量"
 				},
 				"Duration": {
 					"en-US": "Playback Time",
@@ -415,47 +454,6 @@
 					"pl": "%d utworów w historii",
 					"ru": "%d песен в истории",
 					"ja": "%d 曲が履歴にあります"
-				}
-			},
-			"Buffer": {
-				"Singular": {
-					"en-US": "%d frame / %d (%d%%)",
-					"en-GB": "%d frame / %d (%d%%)",
-					"es-ES": "%d fotograma / %d (%d%%)",
-					"es-419": "%d fotograma / %d (%d%%)",
-					"zh-CN": "%d 帧 / %d (%d%%)",
-					"fr": "%d trame / %d (%d%%)",
-					"it": "%d fotogramma / %d (%d%%)",
-					"de": "%d Frame / %d (%d%%)",
-					"pl": "%d klatka / %d (%d%%)",
-					"ru": "%d кадр / %d (%d%%)",
-					"ja": "%d フレーム / %d (%d%%)"
-				},
-				"Plural": {
-					"en-US": "%d frames / %d (%d%%)",
-					"en-GB": "%d frames / %d (%d%%)",
-					"es-ES": "%d fotogramas / %d (%d%%)",
-					"es-419": "%d fotogramas / %d (%d%%)",
-					"zh-CN": "%d 帧 / %d (%d%%)",
-					"fr": "%d trames / %d (%d%%)",
-					"it": "%d fotogrammi / %d (%d%%)",
-					"de": "%d Frames / %d (%d%%)",
-					"pl": "%d klatek / %d (%d%%)",
-					"ru": "%d кадров / %d (%d%%)",
-					"ja": "%d フレーム / %d (%d%%)"
-				},
-				"NoData": {
-					"en-US": "No data available",
-					"en-GB": "No data available",
-					"es-ES": "No hay datos disponibles",
-					"es-419": "No hay datos disponibles",
-					"zh-CN": "无可用数据",
-					"fr": "Aucune donnée disponible",
-					"it": "Nessun dato disponibile",
-					"de": "Keine Daten verfügbar",
-					"pl": "Brak dostępnych danych",
-					"ru": "Нет доступных данных",
-					"ja": "データがありません"
 				}
 			},
 			"Duration": {
@@ -1952,18 +1950,31 @@
 				}
 			},
 			"Reconnect": {
+				"Title": {
+					"en-US": "Reconnected",
+					"en-GB": "Reconnected",
+					"es-ES": "Reconectado",
+					"es-419": "Reconectado",
+					"zh-CN": "已重新连接",
+					"fr": "Reconnecté",
+					"it": "Riconnesso",
+					"de": "Wiederverbunden",
+					"pl": "Ponownie Połączono",
+					"ru": "Переподключено",
+					"ja": "再接続しました"
+				},
 				"Description": {
-					"en-US": "Reconnected to voice channel.",
-					"en-GB": "Reconnected to voice channel.",
-					"es-ES": "Reconectado al canal de voz.",
-					"es-419": "Reconectado al canal de voz.",
-					"zh-CN": "已重新连接到语音频道。",
-					"fr": "Reconnecté au canal vocal.",
-					"it": "Riconnesso al canale vocale.",
-					"de": "Mit Sprachkanal wiederverbunden.",
-					"pl": "Ponownie połączono z kanałem głosowym.",
-					"ru": "Переподключено к голосовому каналу.",
-					"ja": "ボイスチャンネルに再接続しました。"
+					"en-US": "Reconnected to **%s**.",
+					"en-GB": "Reconnected to **%s**.",
+					"es-ES": "Reconectado a **%s**.",
+					"es-419": "Reconectado a **%s**.",
+					"zh-CN": "已重新连接到 **%s**。",
+					"fr": "Reconnecté à **%s**.",
+					"it": "Riconnesso a **%s**.",
+					"de": "Mit **%s** wiederverbunden.",
+					"pl": "Ponownie połączono z **%s**.",
+					"ru": "Переподключено к **%s**.",
+					"ja": "**%s** に再接続しました。"
 				}
 			},
 			"InactivityDisconnect": {
@@ -2777,6 +2788,19 @@
 					"pl": "Dodano %d utworów do kolejki.",
 					"ru": "Добавлено %d песен в очередь.",
 					"ja": "キューに %d 曲追加しました。"
+				},
+				"DescriptionAfterCurrent": {
+					"en-US": "Added %d songs after %s.",
+					"en-GB": "Added %d songs after %s.",
+					"es-ES": "Se añadieron %d canciones después de %s.",
+					"es-419": "Se añadieron %d canciones después de %s.",
+					"zh-CN": "已在 %s 之后添加 %d 首歌曲。",
+					"fr": "%d chansons ajoutées après %s.",
+					"it": "%d canzoni aggiunte dopo %s.",
+					"de": "%d Lieder nach %s hinzugefügt.",
+					"pl": "Dodano %d utworów po %s.",
+					"ru": "Добавлено %d песен после %s.",
+					"ja": "%s の後に %d 曲を追加しました。"
 				}
 			},
 			"Playing": {

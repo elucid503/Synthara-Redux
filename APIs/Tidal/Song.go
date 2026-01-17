@@ -89,29 +89,45 @@ func FormatDuration(Seconds int) string {
 func TrackToSong(Track Track) Song {
 
 	Artists := make([]string, 0, len(Track.Artists))
+
 	for _, Artist := range Track.Artists {
+
 		Artists = append(Artists, Artist.Name)
+		
 	}
 
 	Cover := ""
+
 	if Track.Album.Cover != "" {
-		Cover = fmt.Sprintf("https://resources.tidal.com/images/%s/640x640.jpg", 
-			ReplaceHyphens(Track.Album.Cover))
+
+		Cover = fmt.Sprintf("https://resources.tidal.com/images/%s/640x640.jpg",ReplaceHyphens(Track.Album.Cover))
+
 	}
 
 	return Song{
+
 		TidalID:  Track.ID,
+
 		Title:    Track.Title,
+
 		Artists:  Artists,
+
 		Album:    Track.Album.Title,
 		AlbumID:  Track.Album.ID,
+
 		Cover:    Cover,
+
 		MixID:    Track.Mixes.TrackMix,
+
 		Duration: SongDuration{
+
 			Seconds:   Track.Duration,
 			Formatted: FormatDuration(Track.Duration),
+
 		},
+
 	}
+
 }
 
 // InfoToSong converts a Tidal Info to a Song

@@ -967,6 +967,15 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 	}
 
+	G.StreamerMutex.Lock()
+	defer G.StreamerMutex.Unlock()
+
+	if G.VoiceConnection == nil {
+
+		return fmt.Errorf("voice connection closed")
+		
+	}
+
 	if G.Queue.PlaybackSession != nil {
 
 		G.Queue.PlaybackSession.Stop()
@@ -977,6 +986,11 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	OnFinished := func() {
 
 		Utils.Logger.Info(fmt.Sprintf("Playback finished for song: %s", Song.Title))
+
+		G.StreamerMutex.Lock()
+		defer G.StreamerMutex.Unlock()
+
+		if G.VoiceConnection == nil { return }
 
 		G.VoiceConnection.SetOpusFrameProvider(nil)
 		G.Queue.PlaybackSession = nil

@@ -1,4 +1,4 @@
-package Components
+package Commands
 
 import (
 	"Synthara-Redux/Globals/Localizations"
@@ -10,14 +10,13 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func Autoplay(Event *events.ComponentInteractionCreate) {
+func Autoplay(Event *events.ApplicationCommandInteractionCreate) {
 
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
 
 	Guild := Structs.GetGuild(GuildID, false)
 
-	// Validate guild session
 	if Guild == nil {
 
 		ErrorEmbed := Validation.GuildSessionError(Locale)
@@ -26,7 +25,6 @@ func Autoplay(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	// Validate user is in voice
 	if ErrorEmbed := Validation.VoiceStateError(GuildID, Event.User().ID, Locale); ErrorEmbed != nil {
 
 		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{*ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
@@ -34,49 +32,50 @@ func Autoplay(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	// Toggle autoplay
-	Guild.Features.Autoplay = !Guild.Features.Autoplay
+	Data := Event.SlashCommandInteractionData()
+	Enabled := Data.Bool("enabled")
 
-	var StatusKey string
+	Guild.Features.Autoplay = Enabled
 
-	if Guild.Features.Autoplay {
+	var Title, Description string
 
-		StatusKey = "Commands.AutoPlay.Enabled"
+	if Enabled {
+
+		Title = Localizations.Get("Commands.AutoPlay.Title", Locale)
+		Description = Localizations.Get("Commands.AutoPlay.Enabled", Locale)
 
 		// Generate initial suggestions when enabling autoplay
 
 		if len(Guild.Queue.Suggestions) == 0 {
-
 			Guild.Queue.RegenerateSuggestions()
-
 		}
-		
-		// Check if playback should start from suggestions
+
+		// If queue is empty, start playback from suggestions
 
 		if Guild.Queue.Current == nil && len(Guild.Queue.Upcoming) == 0 && len(Guild.Queue.Suggestions) > 0 {
 
-			Utils.Logger.Info("AutoPlay: Queue is empty, starting playback from suggestions")
-			
-			// Take first suggestion and start playing
-			
 			Guild.Queue.Next(true)
 
 		}
 
 	} else {
 
-		StatusKey = "Commands.AutoPlay.Disabled"
+		Title = Localizations.Get("Commands.AutoPlay.Title", Locale)
+		Description = Localizations.Get("Commands.AutoPlay.Disabled", Locale)
 
 	}
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().
-		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+	Event.CreateMessage(discord.MessageCreate{
 
-			Title:       Localizations.Get("Commands.AutoPlay.Title", Locale),
+		Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+			Title:       Title,
 			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
-			Description: Localizations.Get(StatusKey, Locale),
+			Description: Description,
+			Color:       0xB3D9FF,
 
-		})).
-		Build())
+		})},
+
+	})
 
 }

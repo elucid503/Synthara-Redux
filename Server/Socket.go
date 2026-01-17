@@ -176,7 +176,7 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 
 		case OperationNext:
 
-			Guild.Queue.Next()
+			Guild.Queue.Next(true)
 
 		case OperationLast:
 

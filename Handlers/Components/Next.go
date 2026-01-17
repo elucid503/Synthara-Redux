@@ -37,7 +37,7 @@ func Next(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	Success := Guild.Queue.Next()
+	Success := Guild.Queue.Next(true)
 
 	if !Success {
 

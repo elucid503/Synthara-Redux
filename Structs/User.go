@@ -101,7 +101,7 @@ func (U *User) AddRecentSearch(Title string, URI string) error {
 
 	for _, Search := range U.RecentSearches {
 
-		if Search.URI != URI {
+		if Search.URI != URI && Search.Title != Title {
 
 			FilteredSearches = append(FilteredSearches, Search)
 			

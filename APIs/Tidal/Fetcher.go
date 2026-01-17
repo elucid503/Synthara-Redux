@@ -1,6 +1,7 @@
 package Tidal
 
 import (
+	"Synthara-Redux/Globals"
 	"Synthara-Redux/Utils"
 	"compress/gzip"
 	"encoding/base64"
@@ -24,6 +25,8 @@ var BaseAPIURL string
 var BearerToken string
 var HTTPClient = &http.Client{Timeout: 10 * time.Second}
 
+const albumCacheTTL = 15 * time.Minute
+
 // Token caching
 
 var TokenMutex sync.RWMutex
@@ -41,11 +44,16 @@ const (
 // TokenResponse represents the OAuth token response from Tidal
 
 type TokenResponse struct {
-	Scope       string `json:"scope"`
+
 	ClientName  string `json:"clientName"`
+
+	Scope       string `json:"scope"`
 	TokenType   string `json:"token_type"`
+
 	AccessToken string `json:"access_token"`
+
 	ExpiresIn   int    `json:"expires_in"`
+
 }
 
 var DefaultHeaders = map[string]string{
@@ -112,6 +120,7 @@ func GetBearerToken() (string, error) {
 	// Create URL-encoded form request
 
 	FormData := url.Values{}
+	
 	FormData.Set("client_id", TidalClientID)
 	FormData.Set("client_secret", TidalClientSecret)
 	FormData.Set("grant_type", "client_credentials")
@@ -254,6 +263,8 @@ func Search(Query string, SearchType string) (*SearchResult, error) {
 }
 
 func FetchStreaming(ID int64, Quality string) (*Streaming, error) {
+
+	Utils.Logger.Info(fmt.Sprintf("Fetching streaming info for track %d", ID))
 
 	Endpoint := fmt.Sprintf("%s/track/?id=%d&quality=%s", BaseAPIURL, ID, Quality)
 
@@ -490,6 +501,23 @@ func FetchLyrics(ID int64) ([]Lyrics, error) { // not really good
 // FetchAlbumTracks fetches all tracks in an album
 func FetchAlbumTracks(AlbumID int64) ([]Song, error) {
 
+	Cache := Globals.GetOrCreateCache("TidalAlbumTracks")
+	Key := fmt.Sprintf("%d", AlbumID)
+
+	if Cached, Exists := Cache.Get(Key); Exists {
+
+		if Songs, Ok := Cached.([]Song); Ok {
+
+			Copy := make([]Song, len(Songs))
+			copy(Copy, Songs)
+
+			return Copy, nil
+
+		}
+
+	}
+
+
 	// Get bearer token
 
 	Token, Err := GetBearerToken()
@@ -501,66 +529,82 @@ func FetchAlbumTracks(AlbumID int64) ([]Song, error) {
 
 	}
 	
-	ItemsEndpoint := fmt.Sprintf("https://api.tidal.com/v1/albums/%d/items?countryCode=US", AlbumID)
-	
-	Request, Err := http.NewRequest("GET", ItemsEndpoint, nil)
+	Songs := make([]Song, 0)
+	Limit := 100
+	Offset := 0
 
-	if Err != nil {
+	for {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to create album items request: %s", Err.Error()))
-		return nil, Err
+		ItemsEndpoint := fmt.Sprintf("https://api.tidal.com/v1/albums/%d/items?countryCode=US&limit=%d&offset=%d", AlbumID, Limit, Offset)
+
+		Request, Err := http.NewRequest("GET", ItemsEndpoint, nil)
+
+		if Err != nil {
+
+			Utils.Logger.Error(fmt.Sprintf("Failed to create album items request: %s", Err.Error()))
+			return nil, Err
+
+		}
+
+		// Set headers
+
+		Request.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0")
+		Request.Header.Set("Accept", "application/json")
+		Request.Header.Set("Accept-Language", "en-US,en;q=0.9")
+		Request.Header.Set("Authorization", "Bearer "+Token)
+
+		ItemsResp, ItemsErr := HTTPClient.Do(Request)
+
+		if ItemsErr != nil {
+
+			Utils.Logger.Error(fmt.Sprintf("Failed to fetch album items for ID %d: %s", AlbumID, ItemsErr.Error()))
+			return nil, ItemsErr
+
+		}
+
+		defer ItemsResp.Body.Close()
+
+		if ItemsResp.StatusCode != 200 {
+
+			Utils.Logger.Error(fmt.Sprintf("Album items request returned HTTP %d for ID %d", ItemsResp.StatusCode, AlbumID))
+			return nil, fmt.Errorf("HTTP %d fetching album items", ItemsResp.StatusCode)
+
+		}
+
+		var ItemsData AlbumItems
+
+		if Err := json.NewDecoder(ItemsResp.Body).Decode(&ItemsData); Err != nil {
+
+			Utils.Logger.Error(fmt.Sprintf("Failed to decode album items for ID %d: %s", AlbumID, Err.Error()))
+			return nil, Err
+
+		}
+
+		if len(ItemsData.Items) == 0 {
+
+			Utils.Logger.Warn(fmt.Sprintf("Album %d has no items", AlbumID))
+			return nil, fmt.Errorf("album has no tracks")
+
+		}
+
+		for _, Item := range ItemsData.Items {
+
+			Song := TrackToSong(Item.Item)
+			Songs = append(Songs, Song)
+
+		}
+
+		Offset += len(ItemsData.Items)
+
+		if len(ItemsData.Items) < Limit || Offset >= ItemsData.TotalNumberOfItems {
+
+			break
+
+		}
 
 	}
 
-	// Set headers
-
-	Request.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0")
-	Request.Header.Set("Accept", "application/json")
-	Request.Header.Set("Accept-Language", "en-US,en;q=0.9")
-	Request.Header.Set("Authorization", "Bearer " + Token)
-
-	ItemsResp, ItemsErr := HTTPClient.Do(Request)
-
-	if ItemsErr != nil {
-
-		Utils.Logger.Error(fmt.Sprintf("Failed to fetch album items for ID %d: %s", AlbumID, ItemsErr.Error()))
-		return nil, ItemsErr
-
-	}
-
-	defer ItemsResp.Body.Close()
-
-	if ItemsResp.StatusCode != 200 {
-
-		Utils.Logger.Error(fmt.Sprintf("Album items request returned HTTP %d for ID %d", ItemsResp.StatusCode, AlbumID))
-		return nil, fmt.Errorf("HTTP %d fetching album items", ItemsResp.StatusCode)
-
-	}
-
-	var ItemsData AlbumItems
-
-	if Err := json.NewDecoder(ItemsResp.Body).Decode(&ItemsData); Err != nil {
-
-		Utils.Logger.Error(fmt.Sprintf("Failed to decode album items for ID %d: %s", AlbumID, Err.Error()))
-		return nil, Err
-
-	}
-
-	if len(ItemsData.Items) == 0 {
-
-		Utils.Logger.Warn(fmt.Sprintf("Album %d has no items", AlbumID))
-		return nil, fmt.Errorf("album has no tracks")
-
-	}
-
-	Songs := make([]Song, 0, len(ItemsData.Items))
-
-	for _, Item := range ItemsData.Items {
-
-		Song := TrackToSong(Item.Item)
-		Songs = append(Songs, Song)
-
-	}
+	Cache.Set(Key, Songs, albumCacheTTL)
 
 	Utils.Logger.Info(fmt.Sprintf("Fetched %d tracks from album %d", len(Songs), AlbumID))
 
@@ -674,7 +718,9 @@ func FetchTrackMix(TrackID int64) (string, error) {
 	if Err != nil { return "", Err }
 
 	if Info.Mixes.TrackMix != "" {
+
 		return Info.Mixes.TrackMix, nil
+
 	}
 
 	return "", fmt.Errorf("no mix available for track %d", TrackID)
@@ -683,50 +729,59 @@ func FetchTrackMix(TrackID int64) (string, error) {
 // FetchMixItems fetches all tracks in a mix (for AutoPlay)
 func FetchMixItems(MixID string) ([]Song, error) {
 
-	// Get bearer token
+	// We need bearer token
+
 	Token, Err := GetBearerToken()
+
 	if Err != nil {
+
 		Utils.Logger.Error(fmt.Sprintf("Failed to get bearer token: %s", Err.Error()))
 		return nil, Err
+
 	}
 
-	// Use official Tidal API endpoint
 	Endpoint := fmt.Sprintf("https://api.tidal.com/v1/mixes/%s/items?countryCode=US", MixID)
-	
-	Utils.Logger.Info(fmt.Sprintf("Fetching mix items from: %s", Endpoint))
-	
+
 	Request, Err := http.NewRequest("GET", Endpoint, nil)
+
 	if Err != nil {
+
 		Utils.Logger.Error(fmt.Sprintf("Failed to create mix items request: %s", Err.Error()))
 		return nil, Err
+
 	}
 
-	// Set headers
 	Request.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0")
 	Request.Header.Set("Accept", "application/json")
 	Request.Header.Set("Accept-Language", "en-US,en;q=0.9")
 	Request.Header.Set("Authorization", "Bearer " + Token)
 
 	Resp, Err := HTTPClient.Do(Request)
+
 	if Err != nil { 
+
 		Utils.Logger.Error(fmt.Sprintf("Failed to fetch mix items: %s", Err.Error()))
 		return nil, Err 
+
 	}
 
 	defer Resp.Body.Close()
 
 	if Resp.StatusCode != 200 {
+
 		Utils.Logger.Error(fmt.Sprintf("Mix items request failed with HTTP %d", Resp.StatusCode))
 		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode)
+
 	}
 
 	var Wrapper MixItems
+
 	if Err := json.NewDecoder(Resp.Body).Decode(&Wrapper); Err != nil {
+
 		Utils.Logger.Error(fmt.Sprintf("Failed to decode mix items response: %s", Err.Error()))
 		return nil, Err
-	}
 
-	Utils.Logger.Info(fmt.Sprintf("Mix API returned %d items", len(Wrapper.Items)))
+	}
 
 	Songs := make([]Song, 0, len(Wrapper.Items))
 	
@@ -737,9 +792,8 @@ func FetchMixItems(MixID string) ([]Song, error) {
 
 	}
 
-	Utils.Logger.Info(fmt.Sprintf("Converted %d tracks to songs from mix", len(Songs)))
-
 	return Songs, nil
+
 }
 
 // SearchSongs searches for songs and returns Song structs
@@ -784,6 +838,18 @@ func GetSong(TrackID int64) (Song, error) {
 // GetStreamURL fetches the direct streaming URL for a track
 func GetStreamURL(TrackID int64) (string, error) {
 
+	Cache := Globals.GetOrCreateCache("TidalStreamURLs")
+
+	if Cached, Exists := Cache.Get(fmt.Sprintf("%d", TrackID)); Exists {
+
+		if URL, Ok := Cached.(string); Ok {
+
+			return URL, nil
+
+		}
+
+	}
+
 	Streaming, Err := FetchStreaming(TrackID, QualityLow)
 
 	if Err != nil {
@@ -805,6 +871,8 @@ func GetStreamURL(TrackID int64) (string, error) {
 		return "", fmt.Errorf("no direct URL available for track %d", TrackID)
 
 	}
+
+	Cache.Set(fmt.Sprintf("%d", TrackID), DirectURL, 1 * time.Hour) // 1 hour TTL
 
 	return DirectURL, nil
 

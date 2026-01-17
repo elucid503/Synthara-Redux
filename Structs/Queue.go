@@ -124,11 +124,13 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 			// Move current song to Previous before calling Next(), for AutoPlay seed
 			if Queue.Current != nil {
+
 				Queue.Previous = append(Queue.Previous, Queue.Current)
 				Queue.Current = nil
+
 			}
 
-			Advanced := Queue.Next()
+			Advanced := Queue.Next(false) // Notified below
 
 			if Advanced {
 
@@ -268,7 +270,7 @@ func (Q *Queue) SetState(NewState int) {
 }
 
 // Next moves forward by one song in the upcoming queue; returns false when none exist.
-func (Q *Queue) Next() bool {
+func (Q *Queue) Next(Notify bool) bool {
 
 	Guild := GetGuild(Q.ParentID, false)
 
@@ -280,7 +282,6 @@ func (Q *Queue) Next() bool {
 
 		if len(Q.Suggestions) == 0 {
 
-			Utils.Logger.Info(fmt.Sprintf("AutoPlay: No suggestions available, regenerating for Queue %s", Q.ParentID.String()))
 			Q.RegenerateSuggestions()
 
 		}
@@ -294,8 +295,6 @@ func (Q *Queue) Next() bool {
 
 			Q.Upcoming = append(Q.Upcoming, NextSuggestion)
 
-			Utils.Logger.Info(fmt.Sprintf("AutoPlay: Added suggestion to Queue %s: %s", Q.ParentID.String(), NextSuggestion.Title))
-
 		} else {
 
 			Utils.Logger.Warn(fmt.Sprintf("AutoPlay: Failed to generate suggestions for Queue %s", Q.ParentID.String()))
@@ -304,21 +303,45 @@ func (Q *Queue) Next() bool {
 
 	}
 
-	return Q.moveTo(1, true)
+	Resp := Q.moveTo(1, true)
+
+	if (Notify && Q.Current != nil) {
+
+		Q.SendNowPlayingMessage()
+
+	}
+
+	return Resp
 
 }
 
 // Previous moves to the most recently played song; returns false when there is no history.
 func (Q *Queue) Last() bool {
 
-	return Q.moveTo(-1, true)
+	Success := Q.moveTo(-1, true)
+
+	if Success {
+
+		Q.SendNowPlayingMessage()
+
+	}
+
+	return Success
 
 }
 
 // Jump moves to the 1-indexed position within the upcoming queue; returns false for invalid positions.
 func (Q *Queue) Jump(Index int) bool {
 
-	return Q.moveTo(Index, true)
+	Success := Q.moveTo(Index, true)
+
+	if Success {
+
+		Q.SendNowPlayingMessage()
+
+	}
+
+	return Success
 
 }
 
@@ -404,6 +427,8 @@ func (Q *Queue) Replay(Index int) bool {
 
 	Q.Functions.Updated(Q)
 
+	Q.SendNowPlayingMessage()
+
 	go Q.Play()
 	return true
 
@@ -439,7 +464,7 @@ func (Q *Queue) Add(Song *Tidal.Song, Requestor string) int {
 
 	}
 
-	Q.Functions.Updated(Q)
+	go Q.Functions.Updated(Q)
 
 	return Pos
 	
@@ -475,7 +500,7 @@ func (Q *Queue) Play() bool {
 
 }
 
-// sendNowPlayingMessage sends a "now playing" embed to the guild's text channel
+// SendNowPlayingMessage sends a "now playing" embed to the guild's text channel
 func (Q *Queue) SendNowPlayingMessage() {
 
 	if Q.Current == nil {
@@ -608,8 +633,6 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 
 		Q.Functions.Updated(Q)
 
-		Q.SendNowPlayingMessage()
-
 		go Q.Play()
 		return true
 
@@ -664,10 +687,6 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 
 	Q.Functions.Updated(Q)
 
-	// Send now playing message
-	
-	Q.SendNowPlayingMessage()
-
 	go Q.Play() // same reason for goroutine as above
 	
 	return true
@@ -720,7 +739,6 @@ func (Q *Queue) RegenerateSuggestions() {
 	
 	if MixID == "" {
 
-		Utils.Logger.Info(fmt.Sprintf("AutoPlay: MixID not cached for song %s, fetching from Tidal", SeedSong.Title))
 		var Err error
 
 		MixID, Err = Tidal.FetchTrackMix(SeedSong.TidalID)
@@ -731,12 +749,6 @@ func (Q *Queue) RegenerateSuggestions() {
 			return
 
 		}
-
-		Utils.Logger.Info(fmt.Sprintf("AutoPlay: Fetched MixID: %s", MixID))
-
-	} else {
-
-		Utils.Logger.Info(fmt.Sprintf("AutoPlay: Using cached MixID: %s", MixID))
 
 	}
 
@@ -750,8 +762,6 @@ func (Q *Queue) RegenerateSuggestions() {
 		return
 
 	}
-
-	Utils.Logger.Info(fmt.Sprintf("AutoPlay: Fetched %d similar songs from mix", len(SimilarSongs)))
 
 	// Filter out the seed song
 
@@ -785,8 +795,6 @@ func (Q *Queue) RegenerateSuggestions() {
 		Filtered = Filtered[:MaxSuggestions]
 
 	}
-
-	Utils.Logger.Info(fmt.Sprintf("AutoPlay: Selected %d randomized suggestions (excluded seed song)", len(Filtered)))
 
 	// Convert to pointers and mark as suggested
 

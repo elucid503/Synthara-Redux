@@ -93,3 +93,9 @@ func Pluralize(Word string, Count int) string {
 	return Word + "s"
 
 }
+
+func WaitFor(Done <-chan struct{}) {
+
+	<-Done
+
+}
