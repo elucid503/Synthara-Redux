@@ -18,8 +18,9 @@ type RecentSearch struct {
 
 type User struct {
 
-	DiscordID      string         `bson:"_id"` // Primary key
-	FirstUse       bool           `bson:"first_use"`
+	DiscordID            string         `bson:"_id"` // Primary key
+	FirstUse             bool           `bson:"first_use"`
+	LastNotificationSeen string         `bson:"last_notification_seen,omitempty"` // ID of last seen notification
 
 	RecentSearches []RecentSearch `bson:"recent_searches"`
 
@@ -88,7 +89,31 @@ func (U *User) SetFirstUse(FirstUse bool) error {
 	return UpdateError
 
 }
+// SetLastNotificationSeen updates the user's last seen notification ID
+func (U *User) SetLastNotificationSeen(NotificationID string) error {
 
+	Collection := Globals.Database.Collection("Users")
+
+	Context, Cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer Cancel()
+
+	U.LastNotificationSeen = NotificationID
+
+	Update := bson.M{
+
+		"$set": bson.M{
+
+			"last_notification_seen": NotificationID,
+
+		},
+
+	}
+
+	_, UpdateError := Collection.UpdateOne(Context, bson.M{"_id": U.DiscordID}, Update, options.Update().SetUpsert(true))
+
+	return UpdateError
+
+}
 // AddRecentSearch adds a song to the user's recent searches (max 5, FIFO)
 func (U *User) AddRecentSearch(Title string, URI string) error {
 

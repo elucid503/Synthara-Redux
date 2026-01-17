@@ -31,6 +31,8 @@ type CommandEntry struct {
 	
 	Options []discord.UnmarshalApplicationCommandOption `json:"options,omitempty"`
 
+	Contexts []discord.InteractionContextType `json:"contexts,omitempty"`
+
 }
 
 func InitializeCommands() {
@@ -74,6 +76,7 @@ func InitializeCommands() {
 			Description:              Command.Description,
 			DescriptionLocalizations: Command.DescriptionLocalizations,
 			Options:                  Options,
+			Contexts:                 Command.Contexts,
 
 		}
 
@@ -88,7 +91,7 @@ func InitializeCommands() {
 
 	}
 
-	Utils.Logger.Info("Slash commands initialized.")
+	Utils.Logger.Info("Slash commands updated.")
 
 }
 
@@ -206,10 +209,17 @@ func InitializeHandlers() {
 
 					Commands.Leave(Event)
 
+			case "notify":
+
+				Commands.Notify(Event)
+
 			}
 
+			// Check for unseen notifications after command execution
+			CheckAndDisplayNotification(Event, Event.User().ID)
+
 		}()
-					
+
 	}))
 
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.AutocompleteInteractionCreate) {
@@ -284,8 +294,11 @@ func InitializeHandlers() {
 					if len(Parts) > 1 {
 
 						TidalID, ParseErr := strconv.ParseInt(Parts[1], 10, 64)
+
 						if ParseErr == nil {
+
 							Components.RemoveSong(Event, TidalID)
+
 						}
 
 					}
@@ -295,8 +308,11 @@ func InitializeHandlers() {
 					if len(Parts) > 1 {
 
 						TidalID, ParseErr := strconv.ParseInt(Parts[1], 10, 64)
+
 						if ParseErr == nil {
+
 							Components.JumpToSong(Event, TidalID)
+
 						}
 
 					}
@@ -379,5 +395,45 @@ func InitializeHandlers() {
 	}))
 
 	Utils.Logger.Info("Event handlers initialized.")
+
+}
+
+func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCreate, UserID snowflake.ID) {
+
+	User, UserError := Structs.GetUser(UserID.String())
+
+	if UserError != nil {
+
+		return
+
+	}
+
+	LatestNotification, NotifError := Structs.GetLatestNotification()
+
+	if NotifError != nil { return } // No notifications found, probably
+	
+	if User.LastNotificationSeen == LatestNotification.ID { return }
+
+	// Mark as seen
+
+	User.SetLastNotificationSeen(LatestNotification.ID)
+
+	// Create notification embed
+
+	NotificationEmbed := Utils.CreateEmbed(Utils.EmbedOptions{
+
+		Title:       LatestNotification.Title,
+		Description: LatestNotification.Description,
+		Color:       0xFFA500, // Orange color for notifications
+
+	})
+
+	// Sends as follow-up
+
+	Event.Client().Rest.CreateFollowupMessage(Event.ApplicationID(), Event.Token(), discord.MessageCreate{
+
+		Embeds: []discord.Embed{NotificationEmbed},
+
+	})
 
 }

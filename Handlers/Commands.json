@@ -956,5 +956,136 @@
 			"ru": "Используйте эту команду, чтобы отключить бота от голосового канала.",
 			"ja": "このコマンドを使用して、ボットをボイスチャンネルから切断します。"
 		}
+	},
+	{
+		"name": "notify",
+		"name_localizations": {
+			"en-US": "notify",
+			"en-GB": "notify",
+			"es-ES": "notificar",
+			"es-419": "notificar",
+			"zh-CN": "通知",
+			"fr": "notifier",
+			"it": "notifica",
+			"de": "benachrichtigen",
+			"pl": "powiadom",
+			"ru": "уведомить",
+			"ja": "通知"
+		},
+		"description": "Developer Only: Create a global notification for all users.",
+		"description_localizations": {
+			"en-US": "Developer Only: Create a global notification for all users.",
+			"en-GB": "Developer Only: Create a global notification for all users.",
+			"es-ES": "Solo desarrolladores: Crear una notificación global para todos los usuarios.",
+			"es-419": "Solo desarrolladores: Crear una notificación global para todos los usuarios.",
+			"zh-CN": "仅限开发者：为所有用户创建全局通知。",
+			"fr": "Développeurs uniquement : Créer une notification globale pour tous les utilisateurs.",
+			"it": "Solo sviluppatori: Crea una notifica globale per tutti gli utenti.",
+			"de": "Nur Entwickler: Erstelle eine globale Benachrichtigung für alle Benutzer.",
+			"pl": "Tylko programiści: Utwórz globalne powiadomienie dla wszystkich użytkowników.",
+			"ru": "Только разработчики: Создать глобальное уведомление для всех пользователей.",
+			"ja": "開発者のみ：すべてのユーザーに対してグローバル通知を作成します。"
+		},
+		"options": [
+			{
+				"type": 3,
+				"name": "title",
+				"name_localizations": {
+					"en-US": "title",
+					"en-GB": "title",
+					"es-ES": "título",
+					"es-419": "título",
+					"zh-CN": "标题",
+					"fr": "titre",
+					"it": "titolo",
+					"de": "titel",
+					"pl": "tytuł",
+					"ru": "заголовок",
+					"ja": "タイトル"
+				},
+				"description": "Use this option to specify the notification title.",
+				"description_localizations": {
+					"en-US": "Use this option to specify the notification title.",
+					"en-GB": "Use this option to specify the notification title.",
+					"es-ES": "Usa esta opción para especificar el título de la notificación.",
+					"es-419": "Usa esta opción para especificar el título de la notificación.",
+					"zh-CN": "使用此选项指定通知标题。",
+					"fr": "Utilisez cette option pour spécifier le titre de la notification.",
+					"it": "Usa questa opzione per specificare il titolo della notifica.",
+					"de": "Verwende diese Option, um den Benachrichtigungstitel anzugeben.",
+					"pl": "Użyj tej opcji, aby określić tytuł powiadomienia.",
+					"ru": "Используйте эту опцию, чтобы указать заголовок уведомления.",
+					"ja": "このオプションを使用して、通知のタイトルを指定します。"
+				},
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "description",
+				"name_localizations": {
+					"en-US": "description",
+					"en-GB": "description",
+					"es-ES": "descripción",
+					"es-419": "descripción",
+					"zh-CN": "描述",
+					"fr": "description",
+					"it": "descrizione",
+					"de": "beschreibung",
+					"pl": "opis",
+					"ru": "описание",
+					"ja": "説明"
+				},
+				"description": "Use this option to specify the notification description.",
+				"description_localizations": {
+					"en-US": "Use this option to specify the notification description.",
+					"en-GB": "Use this option to specify the notification description.",
+					"es-ES": "Usa esta opción para especificar la descripción de la notificación.",
+					"es-419": "Usa esta opción para especificar la descripción de la notificación.",
+					"zh-CN": "使用此选项指定通知描述。",
+					"fr": "Utilisez cette option pour spécifier la description de la notification.",
+					"it": "Usa questa opzione per specificare la descrizione della notifica.",
+					"de": "Verwende diese Option, um die Benachrichtigungsbeschreibung anzugeben.",
+					"pl": "Użyj tej opcji, aby określić opis powiadomienia.",
+					"ru": "Используйте эту опцию, чтобы указать описание уведомления.",
+					"ja": "このオプションを使用して、通知の説明を指定します。"
+				},
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "expiry",
+				"name_localizations": {
+					"en-US": "expiry",
+					"en-GB": "expiry",
+					"es-ES": "expiración",
+					"es-419": "expiración",
+					"zh-CN": "到期",
+					"fr": "expiration",
+					"it": "scadenza",
+					"de": "ablauf",
+					"pl": "wygaśnięcie",
+					"ru": "истечение",
+					"ja": "有効期限"
+				},
+				"description": "Use this option to specify an expiry date.",
+				"description_localizations": {
+					"en-US": "Use this option to specify an expiry date.",
+					"en-GB": "Use this option to specify an expiry date.",
+					"es-ES": "Usa esta opción para especificar una fecha de expiración.",
+					"es-419": "Usa esta opción para especificar una fecha de expiración.",
+					"zh-CN": "使用此选项指定到期日期。",
+					"fr": "Utilisez cette option pour spécifier une date d'expiration.",
+					"it": "Usa questa opzione per specificare una data di scadenza.",
+					"de": "Verwende diese Option, um ein Ablaufdatum anzugeben.",
+					"pl": "Użyj tej opcji, aby określić datę wygaśnięcia).",
+					"ru": "Используйте эту опцию, чтобы указать дату истечения.",
+					"ja": "このオプションを使用して、有効期限を指定します。"
+				},
+				"required": false
+			}
+		],
+		"contexts": [
+			1
+		]
 	}
 ]

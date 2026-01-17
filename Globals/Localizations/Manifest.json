@@ -2702,6 +2702,146 @@
 			"pl": "**Z Sieci:**",
 			"ru": "**Из Веб:**",
 			"ja": "**Webから：**"
+		},
+		"CreateNotification": {
+			"Unauthorized": {
+				"Title": {
+					"en-US": "Unauthorized Access",
+					"en-GB": "Unauthorised Access",
+					"es-ES": "Acceso No Autorizado",
+					"es-419": "Acceso No Autorizado",
+					"zh-CN": "未授权访问",
+					"fr": "Accès Non Autorisé",
+					"it": "Accesso Non Autorizzato",
+					"de": "Unbefugter Zugriff",
+					"pl": "Nieautoryzowany Dostęp",
+					"ru": "Несанкционированный Доступ",
+					"ja": "不正アクセス"
+				},
+				"Description": {
+					"en-US": "You do not have permission to use this command.",
+					"en-GB": "You do not have permission to use this command.",
+					"es-ES": "No tienes permiso para usar este comando.",
+					"es-419": "No tienes permiso para usar este comando.",
+					"zh-CN": "您没有使用此命令的权限。",
+					"fr": "Vous n'avez pas la permission d'utiliser cette commande.",
+					"it": "Non hai il permesso di usare questo comando.",
+					"de": "Sie haben keine Berechtigung, diesen Befehl zu verwenden.",
+					"pl": "Nie masz uprawnień do użycia tej komendy.",
+					"ru": "У вас нет разрешения на использование этой команды.",
+					"ja": "このコマンドを使用する権限がありません。"
+				}
+			},
+			"InvalidDate": {
+				"Title": {
+					"en-US": "Invalid Date Format",
+					"en-GB": "Invalid Date Format",
+					"es-ES": "Formato de Fecha Inválido",
+					"es-419": "Formato de Fecha Inválido",
+					"zh-CN": "日期格式无效",
+					"fr": "Format de Date Invalide",
+					"it": "Formato Data Non Valido",
+					"de": "Ungültiges Datumsformat",
+					"pl": "Nieprawidłowy Format Daty",
+					"ru": "Неверный Формат Даты",
+					"ja": "無効な日付形式"
+				},
+				"Description": {
+					"en-US": "Please use the format: 2006-01-02 or 2006-01-02T15:04:05Z",
+					"en-GB": "Please use the format: 2006-01-02 or 2006-01-02T15:04:05Z",
+					"es-ES": "Por favor usa el formato: 2006-01-02 o 2006-01-02T15:04:05Z",
+					"es-419": "Por favor usa el formato: 2006-01-02 o 2006-01-02T15:04:05Z",
+					"zh-CN": "请使用格式：2006-01-02 或 2006-01-02T15:04:05Z",
+					"fr": "Veuillez utiliser le format : 2006-01-02 ou 2006-01-02T15:04:05Z",
+					"it": "Utilizza il formato: 2006-01-02 o 2006-01-02T15:04:05Z",
+					"de": "Bitte verwenden Sie das Format: 2006-01-02 oder 2006-01-02T15:04:05Z",
+					"pl": "Proszę użyć formatu: 2006-01-02 lub 2006-01-02T15:04:05Z",
+					"ru": "Пожалуйста, используйте формат: 2006-01-02 или 2006-01-02T15:04:05Z",
+					"ja": "形式を使用してください：2006-01-02 または 2006-01-02T15:04:05Z"
+				}
+			},
+			"Error": {
+				"Title": {
+					"en-US": "Notification Creation Failed",
+					"en-GB": "Notification Creation Failed",
+					"es-ES": "Creación de Notificación Fallida",
+					"es-419": "Creación de Notificación Fallida",
+					"zh-CN": "通知创建失败",
+					"fr": "Échec de la Création de Notification",
+					"it": "Creazione Notifica Fallita",
+					"de": "Benachrichtigungserstellung Fehlgeschlagen",
+					"pl": "Tworzenie Powiadomienia Nie Powiodło Się",
+					"ru": "Не Удалось Создать Уведомление",
+					"ja": "通知の作成に失敗しました"
+				},
+				"Description": {
+					"en-US": "An error occurred while creating the notification.",
+					"en-GB": "An error occurred whilst creating the notification.",
+					"es-ES": "Ocurrió un error al crear la notificación.",
+					"es-419": "Ocurrió un error al crear la notificación.",
+					"zh-CN": "创建通知时发生错误。",
+					"fr": "Une erreur s'est produite lors de la création de la notification.",
+					"it": "Si è verificato un errore durante la creazione della notifica.",
+					"de": "Beim Erstellen der Benachrichtigung ist ein Fehler aufgetreten.",
+					"pl": "Wystąpił błąd podczas tworzenia powiadomienia.",
+					"ru": "Произошла ошибка при создании уведомления.",
+					"ja": "通知の作成中にエラーが発生しました。"
+				}
+			},
+			"Success": {
+				"Title": {
+					"en-US": "Notification Created",
+					"en-GB": "Notification Created",
+					"es-ES": "Notificación Creada",
+					"es-419": "Notificación Creada",
+					"zh-CN": "通知已创建",
+					"fr": "Notification Créée",
+					"it": "Notifica Creata",
+					"de": "Benachrichtigung Erstellt",
+					"pl": "Powiadomienie Utworzone",
+					"ru": "Уведомление Создано",
+					"ja": "通知が作成されました"
+				},
+				"Description": {
+					"en-US": "The notification has been created successfully.",
+					"en-GB": "The notification has been created successfully.",
+					"es-ES": "La notificación ha sido creada exitosamente.",
+					"es-419": "La notificación ha sido creada exitosamente.",
+					"zh-CN": "通知已成功创建。",
+					"fr": "La notification a été créée avec succès.",
+					"it": "La notifica è stata creata con successo.",
+					"de": "Die Benachrichtigung wurde erfolgreich erstellt.",
+					"pl": "Powiadomienie zostało pomyślnie utworzone.",
+					"ru": "Уведомление успешно создано.",
+					"ja": "通知が正常に作成されました。"
+				},
+				"Expiry": {
+					"en-US": "Expires on:",
+					"en-GB": "Expires on:",
+					"es-ES": "Expira el:",
+					"es-419": "Expira el:",
+					"zh-CN": "到期日期：",
+					"fr": "Expire le :",
+					"it": "Scade il:",
+					"de": "Läuft ab am:",
+					"pl": "Wygasa:",
+					"ru": "Истекает:",
+					"ja": "有効期限："
+				},
+				"ID": {
+					"en-US": "Notification ID:",
+					"en-GB": "Notification ID:",
+					"es-ES": "ID de Notificación:",
+					"es-419": "ID de Notificación:",
+					"zh-CN": "通知 ID：",
+					"fr": "ID de Notification :",
+					"it": "ID Notifica:",
+					"de": "Benachrichtigungs-ID:",
+					"pl": "ID Powiadomienia:",
+					"ru": "ID Уведомления:",
+					"ja": "通知ID："
+				}
+			}
 		}
 	},
 	"Components": {
