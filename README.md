@@ -10,7 +10,7 @@ Synthara-Redux provides seamless music streaming in Discord voice channels with 
 
 ### Music Playback
 - **Multi-Platform Support**: YouTube, Spotify, Apple Music, and Tidal URLs
-- **Search Integration**: Natural language search via InnerTube (YouTube Music)
+- **Search Integration**: Natural language search
 - **Queue Management**: Add, move, remove, jump, and shuffle songs
 - **Playback Controls**: Play, pause, resume, next, previous, repeat modes, and seek
 - **Album Playback**: Queue entire albums with a single command
