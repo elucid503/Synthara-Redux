@@ -25,8 +25,6 @@ var BaseAPIURL string
 var BearerToken string
 var HTTPClient = &http.Client{Timeout: 10 * time.Second}
 
-const albumCacheTTL = 15 * time.Minute
-
 // Token caching
 
 var TokenMutex sync.RWMutex
@@ -604,7 +602,7 @@ func FetchAlbumTracks(AlbumID int64) ([]Song, error) {
 
 	}
 
-	Cache.Set(Key, Songs, albumCacheTTL)
+	Cache.Set(Key, Songs, 1 * time.Hour) // 1 hour TTL
 
 	Utils.Logger.Info(fmt.Sprintf("Fetched %d tracks from album %d", len(Songs), AlbumID))
 
