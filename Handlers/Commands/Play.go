@@ -2,7 +2,7 @@ package Commands
 
 import (
 	"Synthara-Redux/APIs"
-	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/APIs/Tidal"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
@@ -190,7 +190,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	// Send response with current song info
 
-	State := Innertube.QueueInfo{
+	State := Tidal.QueueInfo{
 
 		Playing: true, // Forced here
 

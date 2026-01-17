@@ -1,7 +1,7 @@
 package Components
 
 import (
-	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/APIs/Tidal"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
@@ -40,7 +40,7 @@ func Resume(Event *events.ComponentInteractionCreate) {
 	// Update the original message with the new pause/play button
 	if Guild.Queue.Current != nil {
 
-		State := Innertube.QueueInfo{
+		State := Tidal.QueueInfo{
 
 			Playing: true, // Now playing
 

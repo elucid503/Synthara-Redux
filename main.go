@@ -2,8 +2,9 @@ package main
 
 import (
 	"Synthara-Redux/APIs/Apple"
-	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/APIs/Spotify"
+	"Synthara-Redux/APIs/Tidal"
+	"Synthara-Redux/APIs/YouTube"
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Globals/Icons"
 	"Synthara-Redux/Globals/Localizations"
@@ -92,25 +93,32 @@ func main() {
 
 	Utils.Logger.Info(fmt.Sprintf("Web server running on port %s", os.Getenv("PORT")))
 
-	InnerTubeError := Innertube.InitClient();
+	// Tidal Initialization
 
-	if InnerTubeError != nil {
+	Tidal.Init()
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to initialize Innertube client: %s", InnerTubeError.Error()))
-		os.Exit(1);
+	Utils.Logger.Info("Tidal client initialized.")
 
-	}
-
-	// Other API initializations
+	// Spotify Initialization
 
 	Spotify.Initialize(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
 	
 	Utils.Logger.Info("Spotify client initialized.")
 
+	// Apple Music Initialization
+
 	Apple.Initialize(os.Getenv("APPLE_JWT"))
-	
+
 	Utils.Logger.Info("Apple Music client initialized.")
+
+	// YT Initialization
+
+	YouTube.Init()
 	
+	Utils.Logger.Info("YouTube client initialized.")
+	
+	// Done with setup; now we wait for events
+
 	Utils.Hang()
 
 }

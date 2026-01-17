@@ -76,6 +76,14 @@ SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
 - Node.js 18+
 - Bun or Deno
 
+**Docker**
+- Docker Engine 20+
+
+Run the PO Token server using Docker:
+```bash
+sudo docker run -d -p 4416:4416 brainicism/bgutil-ytdlp-pot-provider
+```
+
 ### System Dependencies
 
 **Linux (Debian/Ubuntu)**

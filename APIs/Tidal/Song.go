@@ -1,4 +1,4 @@
-package Innertube
+package Tidal
 
 import (
 	"Synthara-Redux/Globals/Icons"
@@ -13,24 +13,26 @@ import (
 
 type Song struct {
 
-	YouTubeID string `json:"youtube_id"`
+	TidalID int64 `json:"tidal_id"`
 
 	Title   string   `json:"title"`
 	
 	Artists []string `json:"artists"`
 
-	Album   string   `json:"album"`
-	AlbumID string   `json:"album_id"`
+	Album   string `json:"album"`
+	AlbumID int64  `json:"album_id"`
 
-	Duration Duration `json:"duration"`
+	Duration SongDuration `json:"duration"`
 
 	Cover string `json:"cover"`
+
+	MixID string `json:"mix_id"` // For AutoPlay (TRACK_MIX)
 
 	Internal SongInternal `json:"-"`
 		
 }
 
-type Duration struct {
+type SongDuration struct {
 
 	Seconds   int    `json:"seconds"`
 	Formatted string `json:"formatted"`
@@ -69,7 +71,113 @@ type PlaylistMeta struct {
 	Total int `json:"total"`
 
 	Name string `json:"name"`
-	ID  string `json:"id"`
+	ID   string `json:"id"`
+
+}
+
+// FormatDuration converts seconds to "M:SS" format
+func FormatDuration(Seconds int) string {
+
+	Minutes := Seconds / 60
+	Secs := Seconds % 60
+
+	return fmt.Sprintf("%d:%02d", Minutes, Secs)
+
+}
+
+// TrackToSong converts a Tidal Track to a Song
+func TrackToSong(Track Track) Song {
+
+	Artists := make([]string, 0, len(Track.Artists))
+	for _, Artist := range Track.Artists {
+		Artists = append(Artists, Artist.Name)
+	}
+
+	Cover := ""
+	if Track.Album.Cover != "" {
+		Cover = fmt.Sprintf("https://resources.tidal.com/images/%s/640x640.jpg", 
+			ReplaceHyphens(Track.Album.Cover))
+	}
+
+	return Song{
+		TidalID:  Track.ID,
+		Title:    Track.Title,
+		Artists:  Artists,
+		Album:    Track.Album.Title,
+		AlbumID:  Track.Album.ID,
+		Cover:    Cover,
+		MixID:    Track.Mixes.TrackMix,
+		Duration: SongDuration{
+			Seconds:   Track.Duration,
+			Formatted: FormatDuration(Track.Duration),
+		},
+	}
+}
+
+// InfoToSong converts a Tidal Info to a Song
+func InfoToSong(Info Info) Song {
+
+	Artists := make([]string, 0, len(Info.Artists))
+
+	for _, Artist := range Info.Artists {
+
+		Artists = append(Artists, Artist.Name)
+		
+	}
+
+	Cover := ""
+
+	if Info.Album.Cover != "" {
+
+		Cover = fmt.Sprintf("https://resources.tidal.com/images/%s/640x640.jpg", ReplaceHyphens(Info.Album.Cover))
+
+	}
+
+	return Song{
+
+		TidalID:  Info.ID,
+		
+		Title:    Info.Title,
+		
+		Artists:  Artists,
+
+		Album:    Info.Album.Title,
+		AlbumID:  Info.Album.ID,
+
+		Cover:    Cover,
+
+		MixID:    Info.Mixes.TrackMix,
+
+		Duration: SongDuration{
+
+			Seconds:   Info.Duration,
+			Formatted: FormatDuration(Info.Duration),
+			
+		},
+
+	}
+
+}
+
+func ReplaceHyphens(s string) string {
+
+	result := ""
+
+	for _, c := range s {
+
+		if c == '-' {
+
+			result += "/"
+
+		} else {
+
+			result += string(c)
+
+		}
+
+	}
+	
+	return result
 
 }
 
@@ -221,7 +329,7 @@ func (S *Song) Buttons(State QueueInfo) []discord.InteractiveComponent {
 
 		// Queued song buttons
 
-		RemoveButton := discord.NewButton(discord.ButtonStyleDanger, Localizations.Get("Buttons.RemoveSong", State.Locale), fmt.Sprintf("RemoveSong:%s", S.YouTubeID), "", 0).WithEmoji(discord.ComponentEmoji{
+		RemoveButton := discord.NewButton(discord.ButtonStyleDanger, Localizations.Get("Buttons.RemoveSong", State.Locale), fmt.Sprintf("RemoveSong:%d", S.TidalID), "", 0).WithEmoji(discord.ComponentEmoji{
 
 			ID: snowflake.MustParse(Icons.GetID(Icons.Trash)),
 
@@ -229,7 +337,7 @@ func (S *Song) Buttons(State QueueInfo) []discord.InteractiveComponent {
 
 		Buttons = append(Buttons, RemoveButton)
 
-		JumpToButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.JumpToSong", State.Locale), fmt.Sprintf("JumpToSong:%s", S.YouTubeID), "", 0).WithEmoji(discord.ComponentEmoji{
+		JumpToButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.JumpToSong", State.Locale), fmt.Sprintf("JumpToSong:%d", S.TidalID), "", 0).WithEmoji(discord.ComponentEmoji{
 
 			ID: snowflake.MustParse(Icons.GetID(Icons.Play)),
 

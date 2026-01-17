@@ -1,7 +1,7 @@
 package Structs
 
 import (
-	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/APIs/Tidal"
 	"Synthara-Redux/Audio"
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Globals/Icons"
@@ -38,15 +38,15 @@ type Queue struct {
 
 	State int `json:"state"`
 
-	Previous []*Innertube.Song `json:"previous"`
-	Current  *Innertube.Song   `json:"current"`
-	Upcoming []*Innertube.Song `json:"next"`
+	Previous []*Tidal.Song `json:"previous"`
+	Current  *Tidal.Song   `json:"current"`
+	Upcoming []*Tidal.Song `json:"next"`
 
-	Suggestions []*Innertube.Song `json:"suggestions"`
+	Suggestions []*Tidal.Song `json:"suggestions"`
 
 	Functions      QueueFunctions  `json:"-"`
 	
-	PlaybackSession *Audio.Playback `json:"-"`
+	PlaybackSession *Audio.MP4Playback `json:"-"`
 
 	WebSockets      map[*websocket.Conn]bool `json:"-"`
 	SocketMutex     sync.Mutex               `json:"-"`
@@ -122,38 +122,19 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 			}
 
+			// Move current song to Previous before calling Next(), for AutoPlay seed
+			if Queue.Current != nil {
+				Queue.Previous = append(Queue.Previous, Queue.Current)
+				Queue.Current = nil
+			}
+
 			Advanced := Queue.Next()
 
 			if Advanced {
 
 				Utils.Logger.Info(fmt.Sprintf("Queue %s advanced to next song: %s", Queue.ParentID.String(), Queue.Current.Title))
 
-				State := Innertube.QueueInfo{
-
-					Playing: true, // Forced here
-
-					GuildID: Queue.ParentID,
-
-					SongPosition: 0,
-
-					TotalPrevious: len(Guild.Queue.Previous),
-					TotalUpcoming: len(Guild.Queue.Upcoming),
-
-					Locale: Guild.Locale.Code(),
-
-				}
-
-				go func() { // we don't need to wait for this...
-
-					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Queue.Current.Embed(State)).AddActionRow(Queue.Current.Buttons(State)...).Build())
-
-					if ErrorSending != nil {
-
-						Utils.Logger.Error(fmt.Sprintf("Error sending message to channel %s for Queue %s: %s", Guild.Channels.Text, Queue.ParentID.String(), ErrorSending.Error()))
-
-					}
-
-				}()
+				Queue.SendNowPlayingMessage()
 
 				ErrorPlaying := Guild.Play(Queue.Current)
 
@@ -210,8 +191,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 				// Start inactivity timer instead of immediate cleanup
 				Guild.StartInactivityTimer()
 
-				Queue.Current = nil;
-
 			}
 
 		case StatePaused:
@@ -244,6 +223,20 @@ func QueueUpdatedHandler(Queue *Queue) {
 		"Suggestions": Queue.Suggestions,
 		
 	})
+	
+	Guild := GetGuild(Queue.ParentID, false)
+
+	if Guild != nil && Guild.Features.Autoplay {
+
+		// Regenerate if we're running low on suggestions (fewer than 2) and queue is not empty
+
+		if len(Queue.Suggestions) < 2 && (Queue.Current != nil || len(Queue.Previous) > 0) {
+
+			go Queue.RegenerateSuggestions()
+
+		}
+
+	}
 
 	if len(Queue.Upcoming) == 0 {
 
@@ -253,13 +246,13 @@ func QueueUpdatedHandler(Queue *Queue) {
 
 	NextSong := Queue.Upcoming[0]
 
-	// Pre-caches HLS manifest for next song
+	// Pre-cache streaming URL for next song
 	
-	_, ErrorGettingManifest := Innertube.GetSongInfo(NextSong.YouTubeID)
+	_, ErrorGettingStream := Tidal.GetStreamURL(NextSong.TidalID)
 
-	if ErrorGettingManifest != nil {
+	if ErrorGettingStream != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Error caching HLS manifest for song %s: %s", NextSong.Title, ErrorGettingManifest.Error()))
+		Utils.Logger.Error(fmt.Sprintf("Error caching stream URL for song %s: %s", NextSong.Title, ErrorGettingStream.Error()))
 
 	}
 	
@@ -287,6 +280,7 @@ func (Q *Queue) Next() bool {
 
 		if len(Q.Suggestions) == 0 {
 
+			Utils.Logger.Info(fmt.Sprintf("AutoPlay: No suggestions available, regenerating for Queue %s", Q.ParentID.String()))
 			Q.RegenerateSuggestions()
 
 		}
@@ -301,6 +295,10 @@ func (Q *Queue) Next() bool {
 			Q.Upcoming = append(Q.Upcoming, NextSuggestion)
 
 			Utils.Logger.Info(fmt.Sprintf("AutoPlay: Added suggestion to Queue %s: %s", Q.ParentID.String(), NextSuggestion.Title))
+
+		} else {
+
+			Utils.Logger.Warn(fmt.Sprintf("AutoPlay: Failed to generate suggestions for Queue %s", Q.ParentID.String()))
 
 		}
 
@@ -364,7 +362,7 @@ func (Q *Queue) Move(FromIndex int, ToIndex int) bool {
 
 	}
 
-	Q.Upcoming = append(Q.Upcoming[:ToIndex], append([]*Innertube.Song{Song}, Q.Upcoming[ToIndex:]...)...)
+	Q.Upcoming = append(Q.Upcoming[:ToIndex], append([]*Tidal.Song{Song}, Q.Upcoming[ToIndex:]...)...)
 	Q.Functions.Updated(Q)
 
 	return true
@@ -384,7 +382,7 @@ func (Q *Queue) Replay(Index int) bool {
 
 	if Q.Current != nil {
 
-		Q.Upcoming = append([]*Innertube.Song{Q.Current}, Q.Upcoming...)
+		Q.Upcoming = append([]*Tidal.Song{Q.Current}, Q.Upcoming...)
 
 	}
 
@@ -392,7 +390,7 @@ func (Q *Queue) Replay(Index int) bool {
 
 	for i := len(Q.Previous) - 1; i > Index; i-- {
 
-		Q.Upcoming = append([]*Innertube.Song{Q.Previous[i]}, Q.Upcoming...)
+		Q.Upcoming = append([]*Tidal.Song{Q.Previous[i]}, Q.Upcoming...)
 
 	}
 
@@ -416,15 +414,15 @@ func (Q *Queue) Clear() {
 
 	Q.Current = nil
 
-	Q.Previous = []*Innertube.Song{}
-	Q.Upcoming = []*Innertube.Song{}
+	Q.Previous = []*Tidal.Song{}
+	Q.Upcoming = []*Tidal.Song{}
 
 	Q.Functions.Updated(Q)
 
 }
 
 // Add appends a song to the end of the queue OR current
-func (Q *Queue) Add(Song *Innertube.Song, Requestor string) int {
+func (Q *Queue) Add(Song *Tidal.Song, Requestor string) int {
 
 	Song.Internal.Requestor = Requestor
 
@@ -438,20 +436,6 @@ func (Q *Queue) Add(Song *Innertube.Song, Requestor string) int {
 
 		Q.Upcoming = append(Q.Upcoming, Song)
 		Pos++ // Position in UPCOMING queue is 1-based
-
-	}
-
-	// Check if user is interrupting autoplay (user adds non-suggested song)
-
-	Guild := GetGuild(Q.ParentID, false)
-
-	if Guild != nil && Guild.Features.Autoplay && !Song.Internal.Suggested {
-
-		// User interrupted autoplay with their own song - regenerate suggestions
-
-		Utils.Logger.Info(fmt.Sprintf("User interrupted AutoPlay for Queue %s - regenerating suggestions", Q.ParentID.String()))
-
-		go Q.RegenerateSuggestions()
 
 	}
 
@@ -491,8 +475,56 @@ func (Q *Queue) Play() bool {
 
 }
 
+// sendNowPlayingMessage sends a "now playing" embed to the guild's text channel
+func (Q *Queue) SendNowPlayingMessage() {
+
+	if Q.Current == nil {
+
+		return
+
+	}
+
+	Guild := GetGuild(Q.ParentID, false)
+
+	if Guild == nil {
+
+		return
+
+	}
+
+	State := Tidal.QueueInfo{
+
+		Playing: true,
+
+		GuildID: Q.ParentID,
+		SongPosition: 0,
+
+		TotalPrevious: len(Q.Previous),
+		TotalUpcoming: len(Q.Upcoming),
+
+		Locale: Guild.Locale.Code(),
+		
+	}
+
+	go func() {
+
+		_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+			AddEmbeds(Q.Current.Embed(State)).
+			AddActionRow(Q.Current.Buttons(State)...).
+			Build())
+
+		if ErrorSending != nil {
+
+			Utils.Logger.Error(fmt.Sprintf("Error sending now playing message to channel %s for Queue %s: %s", Guild.Channels.Text, Q.ParentID.String(), ErrorSending.Error()))
+		
+		}
+
+	}()
+
+}
+
 // shuffleUpcoming uses Fisher-Yates algorithm to shuffle the upcoming queue in-place
-func (Q *Queue) shuffleUpcoming() {
+func (Q *Queue) ShuffleUpcoming() {
 
 	if len(Q.Upcoming) <= 1 {
 
@@ -539,7 +571,7 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 
 		if Q.Current != nil {
 
-			Q.Upcoming = append([]*Innertube.Song{Q.Current}, Q.Upcoming...)
+			Q.Upcoming = append([]*Tidal.Song{Q.Current}, Q.Upcoming...)
 
 		}
 
@@ -547,14 +579,14 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 
 		if AbsIndex > 1 {
 
-			MovedSongs := make([]*Innertube.Song, AbsIndex-1)
+			MovedSongs := make([]*Tidal.Song, AbsIndex-1)
 			copy(MovedSongs, Q.Previous[TargetIndex+1:])
 
 			// Reverse order since we're moving backwards
 
 			for i := len(MovedSongs) - 1; i >= 0; i-- {
 
-				Q.Upcoming = append([]*Innertube.Song{MovedSongs[i]}, Q.Upcoming...)
+				Q.Upcoming = append([]*Tidal.Song{MovedSongs[i]}, Q.Upcoming...)
 
 			}
 
@@ -575,6 +607,8 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 		}
 
 		Q.Functions.Updated(Q)
+
+		Q.SendNowPlayingMessage()
 
 		go Q.Play()
 		return true
@@ -610,27 +644,15 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 	// Sets new current song
 
 	Q.Current = Q.Upcoming[Index-1]
-	Remaining := make([]*Innertube.Song, len(Q.Upcoming[Index:])) // shift by Index-1
+	Remaining := make([]*Tidal.Song, len(Q.Upcoming[Index:])) // shift by Index-1
 
 	copy(Remaining, Q.Upcoming[Index:])
 
 	Q.Upcoming = Remaining
 
-	// Check if we need to regenerate suggestions (running low or out)
-
-	if Guild != nil && Guild.Features.Autoplay {
-
-		if len(Q.Suggestions) <= 1 && len(Q.Upcoming) == 0 {
-
-			go Q.RegenerateSuggestions()
-
-		}
-
-	}
-
 	if Guild != nil && Guild.Features.Shuffle {
 
-		Q.shuffleUpcoming()
+		Q.ShuffleUpcoming()
 
 	}
 
@@ -642,26 +664,38 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 
 	Q.Functions.Updated(Q)
 
+	// Send now playing message
+	
+	Q.SendNowPlayingMessage()
+
 	go Q.Play() // same reason for goroutine as above
 	
 	return true
 
 }
 
-// RegenerateSuggestions fetches new song suggestions based on the last played song
+// RegenerateSuggestions fetches new song suggestions based on the last played song using Tidal mix
 func (Q *Queue) RegenerateSuggestions() {
 
 	Guild := GetGuild(Q.ParentID, false)
 
-	if Guild == nil || !Guild.Features.Autoplay {
+	if Guild == nil {
 
+		Utils.Logger.Warn(fmt.Sprintf("AutoPlay: RegenerateSuggestions called but Guild is nil for Queue %s", Q.ParentID.String()))
 		return
 
 	}
 
-	// Determine seed song (last in Previous queue)
+	if !Guild.Features.Autoplay {
 
-	var SeedSong *Innertube.Song
+		Utils.Logger.Warn(fmt.Sprintf("AutoPlay: RegenerateSuggestions called but AutoPlay is disabled for Queue %s", Q.ParentID.String()))
+		return
+		
+	}
+
+	// Determine seed song (last in Previous queue, then Current)
+
+	var SeedSong *Tidal.Song
 
 	if len(Q.Previous) > 0 {
 
@@ -673,42 +707,96 @@ func (Q *Queue) RegenerateSuggestions() {
 
 	} else {
 
+		Utils.Logger.Warn(fmt.Sprintf("AutoPlay: No seed song available for Queue %s (Previous: %d, Current: %v)", Q.ParentID.String(), len(Q.Previous), Q.Current != nil))
 		return // No seed available
 
 	}
 
 	Utils.Logger.Info(fmt.Sprintf("Regenerating suggestions for Queue %s using seed: %s", Q.ParentID.String(), SeedSong.Title))
 
-	// Fetch similar songs
+	// Get mix ID from current song if available, otherwise fetch it
 
-	SimilarSongs, ErrorFetching := Innertube.GetSimilarSongs(SeedSong.YouTubeID)
+	MixID := SeedSong.MixID
+	
+	if MixID == "" {
+
+		Utils.Logger.Info(fmt.Sprintf("AutoPlay: MixID not cached for song %s, fetching from Tidal", SeedSong.Title))
+		var Err error
+
+		MixID, Err = Tidal.FetchTrackMix(SeedSong.TidalID)
+
+		if Err != nil {
+
+			Utils.Logger.Error(fmt.Sprintf("Error fetching track mix for Queue %s: %s", Q.ParentID.String(), Err.Error()))
+			return
+
+		}
+
+		Utils.Logger.Info(fmt.Sprintf("AutoPlay: Fetched MixID: %s", MixID))
+
+	} else {
+
+		Utils.Logger.Info(fmt.Sprintf("AutoPlay: Using cached MixID: %s", MixID))
+
+	}
+
+	// Fetch mix items (similar songs)
+
+	SimilarSongs, ErrorFetching := Tidal.FetchMixItems(MixID)
 
 	if ErrorFetching != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Error fetching similar songs for Queue %s: %s", Q.ParentID.String(), ErrorFetching.Error()))
+		Utils.Logger.Error(fmt.Sprintf("Error fetching mix items for Queue %s: %s", Q.ParentID.String(), ErrorFetching.Error()))
 		return
 
 	}
 
-	// Take top 5 suggestions
+	Utils.Logger.Info(fmt.Sprintf("AutoPlay: Fetched %d similar songs from mix", len(SimilarSongs)))
 
-	MaxSuggestions := 5
+	// Filter out the seed song
 
-	if len(SimilarSongs) > MaxSuggestions {
+	Filtered := make([]Tidal.Song, 0, len(SimilarSongs))
 
-		SimilarSongs = SimilarSongs[:MaxSuggestions]
+	for _, Song := range SimilarSongs {
+
+		if Song.TidalID != SeedSong.TidalID {
+
+			Filtered = append(Filtered, Song)
+
+		}
 
 	}
 
+	// Randomize and take up to 5 suggestions
+
+	MaxSuggestions := 5
+	
+	if len(Filtered) > MaxSuggestions {
+
+		// Shuffle using Fisher-Yates and take first MaxSuggestions
+
+		for i := len(Filtered) - 1; i > 0; i-- {
+
+			j := rand.Intn(i + 1)
+			Filtered[i], Filtered[j] = Filtered[j], Filtered[i]
+			
+		}
+
+		Filtered = Filtered[:MaxSuggestions]
+
+	}
+
+	Utils.Logger.Info(fmt.Sprintf("AutoPlay: Selected %d randomized suggestions (excluded seed song)", len(Filtered)))
+
 	// Convert to pointers and mark as suggested
 
-	Q.Suggestions = make([]*Innertube.Song, 0, len(SimilarSongs))
+	Q.Suggestions = make([]*Tidal.Song, 0, len(Filtered))
 
-	for i := range SimilarSongs {
+	for i := range Filtered {
 
-		Song := &SimilarSongs[i]
+		Song := &Filtered[i]
 		Song.Internal.Suggested = true
-		Song.Internal.Requestor = Globals.DiscordClient.ApplicationID.String()
+		Song.Internal.Requestor = "AutoPlay"
 
 		Q.Suggestions = append(Q.Suggestions, Song)
 

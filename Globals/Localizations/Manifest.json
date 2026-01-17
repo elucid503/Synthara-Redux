@@ -144,6 +144,47 @@
 				}
 			}
 		},
+		"AutoPlay": {
+			"Title": {
+				"en-US": "AutoPlay",
+				"en-GB": "AutoPlay",
+				"es-ES": "Reproducción Automática",
+				"es-419": "Reproducción Automática",
+				"zh-CN": "自动播放",
+				"fr": "Lecture Automatique",
+				"it": "Riproduzione Automatica",
+				"de": "Automatische Wiedergabe",
+				"pl": "Autoodtwarzanie",
+				"ru": "Автовоспроизведение",
+				"ja": "自動再生"
+			},
+			"Enabled": {
+				"en-US": "AutoPlay enabled. Songs will automatically Queue when the current Queue ends.",
+				"en-GB": "AutoPlay enabled. Songs will automatically Queue when the current Queue ends.",
+				"es-ES": "Reproducción automática activada. Las canciones se añadirán automáticamente cuando termine la cola actual.",
+				"es-419": "Reproducción automática activada. Las canciones se añadirán automáticamente cuando termine la cola actual.",
+				"zh-CN": "自动播放已启用。当前队列结束时将自动添加歌曲。",
+				"fr": "Lecture automatique activée. Les chansons seront automatiquement ajoutées lorsque la file d'attente se termine.",
+				"it": "Riproduzione automatica attivata. Le canzoni verranno aggiunte automaticamente quando la coda finisce.",
+				"de": "Automatische Wiedergabe aktiviert. Lieder werden automatisch hinzugefügt, wenn die Warteschlange endet.",
+				"pl": "Autoodtwarzanie włączone. Utwory będą automatycznie dodawane po zakończeniu kolejki.",
+				"ru": "Автовоспроизведение включено. Песни будут автоматически добавляться, когда текущая очередь закончится.",
+				"ja": "自動再生が有効になりました。現在のキューが終了すると、曲が自動的に追加されます。"
+			},
+			"Disabled": {
+				"en-US": "AutoPlay disabled.",
+				"en-GB": "AutoPlay disabled.",
+				"es-ES": "Reproducción automática desactivada.",
+				"es-419": "Reproducción automática desactivada.",
+				"zh-CN": "自动播放已禁用。",
+				"fr": "Lecture automatique désactivée.",
+				"it": "Riproduzione automatica disattivata.",
+				"de": "Automatische Wiedergabe deaktiviert.",
+				"pl": "Autoodtwarzanie wyłączone.",
+				"ru": "Автовоспроизведение отключено.",
+				"ja": "自動再生が無効になりました。"
+			}
+		},
 		"Stats": {
 			"Title": {
 				"en-US": "Playback Statistics",
@@ -590,6 +631,21 @@
 						"ja": "音楽を再生するにはボイスチャンネルにいる必要があります。"
 					}
 				},
+				"VoiceChannel": {
+					"Description": {
+						"en-US": "You must be in a Voice Channel to use this feature.",
+						"en-GB": "You must be in a Voice Channel to use this feature.",
+						"es-ES": "Debes estar en un canal de voz para usar esta función.",
+						"es-419": "Debes estar en un canal de voz para usar esta función.",
+						"zh-CN": "您必须在语音频道中才能使用此功能。",
+						"fr": "Vous devez être dans un canal vocal pour utiliser cette fonctionnalité.",
+						"it": "Devi essere in un canale vocale per utilizzare questa funzione.",
+						"de": "Du musst in einem Sprachkanal sein, um diese Funktion zu verwenden.",
+						"pl": "Musisz być na kanale głosowym, aby użyć tej funkcji.",
+						"ru": "Вы должны находиться в голосовом канале, чтобы использовать эту функцию.",
+						"ja": "この機能を使用するにはボイスチャンネルにいる必要があります。"
+					}
+				},
 				"FailedToConnect": {
 					"Title": {
 						"en-US": "Connection Failed",
@@ -871,6 +927,32 @@
 						"ru": "В очереди нет следующей песни.",
 						"ja": "キューに次の曲がありません。"
 					}
+				},
+				"Title": {
+					"en-US": "Unable to Skip",
+					"en-GB": "Unable to Skip",
+					"es-ES": "No Se Puede Saltar",
+					"es-419": "No Se Puede Saltar",
+					"zh-CN": "无法跳过",
+					"fr": "Impossible de Passer",
+					"it": "Impossibile Saltare",
+					"de": "Überspringen Nicht Möglich",
+					"pl": "Nie Można Pominąć",
+					"ru": "Невозможно Пропустить",
+					"ja": "スキップできません"
+				},
+				"Description": {
+					"en-US": "Unable to skip to the next song. The Queue may be empty.",
+					"en-GB": "Unable to skip to the next song. The Queue may be empty.",
+					"es-ES": "No se puede saltar a la siguiente canción. La cola puede estar vacía.",
+					"es-419": "No se puede saltar a la siguiente canción. La cola puede estar vacía.",
+					"zh-CN": "无法跳至下一首歌曲。队列可能为空。",
+					"fr": "Impossible de passer à la chanson suivante. La file d'attente peut être vide.",
+					"it": "Impossibile saltare alla canzone successiva. La coda potrebbe essere vuota.",
+					"de": "Überspringen zum nächsten Lied nicht möglich. Die Warteschlange ist möglicherweise leer.",
+					"pl": "Nie można pominąć do następnego utworu. Kolejka może być pusta.",
+					"ru": "Невозможно перейти к следующей песне. Очередь может быть пустой.",
+					"ja": "次の曲にスキップできません。キューが空である可能性があります。"
 				}
 			}
 		},
@@ -1797,6 +1879,19 @@
 				"pl": "Sterowanie",
 				"ru": "Управление",
 				"ja": "コントロール"
+			},
+			"Success": {
+				"en-US": "Success",
+				"en-GB": "Success",
+				"es-ES": "Éxito",
+				"es-419": "Éxito",
+				"zh-CN": "成功",
+				"fr": "Succès",
+				"it": "Successo",
+				"de": "Erfolg",
+				"pl": "Sukces",
+				"ru": "Успех",
+				"ja": "成功"
 			}
 		},
 		"Notifications": {
@@ -1854,6 +1949,21 @@
 					"pl": "Kolejka odtwarzania została zakończona.\nNowe utwory można dodać w każdej chwili.",
 					"ru": "Очередь воспроизведения завершена.\nНовые песни можно добавить в любое время.",
 					"ja": "再生キューが終了しました。新しい曲はいつでも追加できます。"
+				}
+			},
+			"Reconnect": {
+				"Description": {
+					"en-US": "Reconnected to voice channel.",
+					"en-GB": "Reconnected to voice channel.",
+					"es-ES": "Reconectado al canal de voz.",
+					"es-419": "Reconectado al canal de voz.",
+					"zh-CN": "已重新连接到语音频道。",
+					"fr": "Reconnecté au canal vocal.",
+					"it": "Riconnesso al canale vocale.",
+					"de": "Mit Sprachkanal wiederverbunden.",
+					"pl": "Ponownie połączono z kanałem głosowym.",
+					"ru": "Переподключено к голосовому каналу.",
+					"ja": "ボイスチャンネルに再接続しました。"
 				}
 			},
 			"InactivityDisconnect": {

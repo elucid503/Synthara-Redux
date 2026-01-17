@@ -10,7 +10,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 )
 
-func RemoveSong(Event *events.ComponentInteractionCreate, YouTubeID string) {
+func RemoveSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
@@ -34,11 +34,11 @@ func RemoveSong(Event *events.ComponentInteractionCreate, YouTubeID string) {
 
 	}
 
-	// Find the song in the upcoming queue by YouTube ID
+	// Find the song in the upcoming queue by Tidal ID
 	SongIndex := -1
 	for Index, Song := range Guild.Queue.Upcoming {
 
-		if Song.YouTubeID == YouTubeID {
+		if Song.TidalID == TidalID {
 
 			SongIndex = Index
 			break

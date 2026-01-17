@@ -91,7 +91,7 @@ function App() {
     const [LyricsLoading, SetLyricsLoading] = useState(false);
     const [LyricsError, SetLyricsError] = useState(false);
 
-    const CurrentTimeBuffer = 1000; // 1 second buffer for progress updates
+    const CurrentTimeBuffer = 2000; // 2000ms buffer for progress updates
     
     const FetchLyricsAndSetState = async (Song: Song) => {
 

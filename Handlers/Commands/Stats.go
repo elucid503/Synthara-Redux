@@ -38,7 +38,7 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 	
 	EmbedBuilder := discord.NewEmbedBuilder()
 	EmbedBuilder.SetTitle(Localizations.Get("Commands.Stats.Title", Locale))
-	EmbedBuilder.SetColor(0x5865F2)
+	EmbedBuilder.SetColor(0xFFFFFF)
 
 	// Field 1: Playback Status
 
@@ -62,23 +62,20 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 
 	EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.Status", Locale), StatusValue, true)
 
-	// Field 2: Segment Progress
+	// Field 2: Streaming Progress
 
 	if Guild.Queue.PlaybackSession != nil && Guild.Queue.PlaybackSession.Streamer != nil {
 
 		Streamer := Guild.Queue.PlaybackSession.Streamer
-		CurrentSegment := Streamer.CurrentIndex
-		TotalSegments := Streamer.TotalSegments
+		BytesStreamed := Streamer.BytesStreamed
 
-		Percentage := 0
-		
-		if TotalSegments > 0 {
-
-			Percentage = (CurrentSegment * 100) / TotalSegments
-
+		// Convert bytes to KB/MB for display
+		ProgressValue := ""
+		if BytesStreamed > 1024*1024 {
+			ProgressValue = fmt.Sprintf("%.2f MB streamed", float64(BytesStreamed)/(1024*1024))
+		} else {
+			ProgressValue = fmt.Sprintf("%.2f KB streamed", float64(BytesStreamed)/1024)
 		}
-
-		ProgressValue := fmt.Sprintf(Localizations.Get("Commands.Stats.Progress.Format", Locale), CurrentSegment, TotalSegments, Percentage)
 
 		EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.Progress", Locale), ProgressValue, true)
 

@@ -1,7 +1,7 @@
 package Autocomplete
 
 import (
-	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/APIs/Tidal"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
@@ -110,7 +110,7 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 
 	}
 
-	Suggestions := Innertube.GetSearchSuggestions(Input);
+	Suggestions := Tidal.GetSearchSuggestions(Input);
 
 	if len(Suggestions) == 0 {
 
@@ -178,13 +178,15 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 
 	}
 
-	// Combine results: Recently Played + Metadata + Text
-	AllResults := append(RecentlyPlayedChoices, AutocompleteMetadataResults...)
+	AllResults := AutocompleteMetadataResults
 	AllResults = append(AllResults, AutocompleteTextResults...)
 
-	// Limit to 25 results (Discord limit)
+	// Limit to 25 results
+
 	if len(AllResults) > 25 {
+
 		AllResults = AllResults[:25]
+
 	}
 
 	Event.AutocompleteResult(AllResults)

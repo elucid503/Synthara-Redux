@@ -1,6 +1,8 @@
 package Components
 
 import (
+	"Synthara-Redux/APIs/Tidal"
+	"Synthara-Redux/Globals"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
@@ -47,7 +49,36 @@ func Autoplay(Event *events.ComponentInteractionCreate) {
 
 		if len(Guild.Queue.Suggestions) == 0 {
 
-			go Guild.Queue.RegenerateSuggestions()
+			Guild.Queue.RegenerateSuggestions()
+
+		}
+
+		// If queue is empty or idle, start playing from suggestions
+		if Guild.Queue.Current == nil && len(Guild.Queue.Upcoming) == 0 && len(Guild.Queue.Suggestions) > 0 {
+
+			Utils.Logger.Info("AutoPlay: Queue is empty, starting playback from suggestions")
+			
+			// Take first suggestion and start playing
+			if Guild.Queue.Next() {
+				Utils.Logger.Info("AutoPlay: Started playing first suggestion")
+				
+				// Send now playing message
+				go func() {
+					State := Tidal.QueueInfo{
+						Playing: true,
+						GuildID: GuildID,
+						SongPosition: 0,
+						TotalPrevious: len(Guild.Queue.Previous),
+						TotalUpcoming: len(Guild.Queue.Upcoming),
+						Locale: Locale,
+					}
+					
+					_, _ = Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+						AddEmbeds(Guild.Queue.Current.Embed(State)).
+						AddActionRow(Guild.Queue.Current.Buttons(State)...).
+						Build())
+				}()
+			}
 
 		}
 

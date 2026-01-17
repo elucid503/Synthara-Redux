@@ -1,12 +1,13 @@
 package Components
 
 import (
-	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/APIs/Tidal"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
 	"Synthara-Redux/Validation"
 
+	"strconv"
 	"strings"
 
 	"github.com/disgoorg/disgo/discord"
@@ -14,6 +15,9 @@ import (
 )
 
 func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
+
+	// Defer response since fetching album tracks may take time
+	Event.DeferCreateMessage(false)
 
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
@@ -54,9 +58,31 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	AlbumID := Parts[1]
+	AlbumIDStr := Parts[1]
+	AlbumID, ParseErr := strconv.ParseInt(AlbumIDStr, 10, 64)
 
-	AlbumSongs, ErrorFetching := Innertube.GetAlbumSongs(AlbumID)
+	if ParseErr != nil {
+
+		Event.CreateMessage(discord.MessageCreate{
+
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Components.Album.InvalidID.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Components.Album.InvalidID.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})},
+
+			Flags: discord.MessageFlagEphemeral,
+			
+		})
+
+		return
+
+	}
+
+	AlbumSongs, ErrorFetching := Tidal.FetchAlbumTracks(AlbumID)
 
 	if ErrorFetching != nil || len(AlbumSongs) == 0 {
 
@@ -85,23 +111,23 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 		Guild.Queue.Add(&SongCopy, Event.User().ID.String())
 
 	}
-	
-	Event.CreateMessage(discord.MessageCreate{
-
-		Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+		
+	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
+		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Components.Album.Enqueued.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Success", Locale),
 			Description: Localizations.GetFormat("Components.Album.Enqueued.Description", Locale, len(AlbumSongs)),
 			Color:       0xB3FFBA,
 
-		})},
-		
-	})
+		})).Build())
 
 }
 
 func AlbumPlay(Event *events.ComponentInteractionCreate) {
+
+	// Defer response since fetching album tracks may take time
+	Event.DeferCreateMessage(false)
 
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
@@ -141,11 +167,33 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	AlbumID := Parts[1]
+	AlbumIDStr := Parts[1]
+	AlbumID, ParseErr := strconv.ParseInt(AlbumIDStr, 10, 64)
 
-	// Fetch album songs
+	if ParseErr != nil {
 
-	AlbumSongs, ErrorFetching := Innertube.GetAlbumSongs(AlbumID)
+		Event.CreateMessage(discord.MessageCreate{
+
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Components.Album.InvalidID.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Components.Album.InvalidID.Description", Locale),
+				Color:       0xFFB3BA,
+
+			})},
+
+			Flags: discord.MessageFlagEphemeral,
+			
+		})
+
+		return
+
+	}
+
+	// Fetch album songs from Tidal
+
+	AlbumSongs, ErrorFetching := Tidal.FetchAlbumTracks(AlbumID)
 
 	if ErrorFetching != nil || len(AlbumSongs) == 0 {
 
@@ -183,17 +231,14 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	Event.CreateMessage(discord.MessageCreate{
-
-		Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
+		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Components.Album.Playing.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Success", Locale),
 			Description: Localizations.GetFormat("Components.Album.Playing.Description", Locale, len(AlbumSongs)),
 			Color:       0xB3FFBA,
 
-		})},
-		
-	})
+		})).Build())
 
 }

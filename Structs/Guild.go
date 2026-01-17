@@ -3,8 +3,9 @@ package Structs
 import (
 	"Synthara-Redux/APIs"
 	"Synthara-Redux/APIs/Apple"
-	"Synthara-Redux/APIs/Innertube"
 	"Synthara-Redux/APIs/Spotify"
+	"Synthara-Redux/APIs/Tidal"
+	"Synthara-Redux/APIs/YouTube"
 	"Synthara-Redux/Audio"
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Globals/Icons"
@@ -13,6 +14,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
@@ -95,11 +97,11 @@ func NewGuild(ID snowflake.ID, Locale discord.Locale) *Guild {
 
 			State:   StateIdle,
 
-			Previous: []*Innertube.Song{},
+			Previous: []*Tidal.Song{},
 			Current:  nil,
-			Upcoming: []*Innertube.Song{},
+			Upcoming: []*Tidal.Song{},
 
-			Suggestions: []*Innertube.Song{},
+			Suggestions: []*Tidal.Song{},
 
 			Functions: QueueFunctions{
 
@@ -442,7 +444,7 @@ func (G *Guild) StopInactivityTimer() {
 }
 
 // RouteURI takes a Synthara-Redux URI string and handles adding/playing the content. Returns the song, its position in the queue, and any error
-func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, error) {
+func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error) {
 
 	Type, ID, ErrorParsing := APIs.ParseURI(URI)
 
@@ -453,17 +455,17 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 	}
 
 	var PosAdded int
-	var SongFound *Innertube.Song
+	var SongFound *Tidal.Song
 
 	switch Type {
 
+		// Plain-text search
+
 		case APIs.URITypeNone:
 
-			// Search for songs using the query
+			SearchResults, SearchErr := Tidal.SearchSongs(ID)
 
-			SearchResults := Innertube.SearchForSongs(ID)
-
-			if len(SearchResults) == 0 {
+			if SearchErr != nil || len(SearchResults) == 0 {
 
 				return nil, -1, errors.New("no search results found")
 
@@ -473,127 +475,258 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 
 			PosAdded = G.Queue.Add(SongFound, Requestor)
 
+		// Tidal (Default)
 
-		case APIs.URITypeSong:
+		case APIs.URITypeTidalSong:
 
-			Song, SongFetchErr := Innertube.GetSong(ID)
+			// Internal Tidal song ID - fetch directly by ID
 
-			if SongFetchErr != nil {
+			TidalID, ParseErr := strconv.ParseInt(ID, 10, 64)
+			
+			if ParseErr != nil {
 
-				return nil, -1, SongFetchErr
+				return nil, -1, fmt.Errorf("invalid Tidal ID: %s", ID)
 
 			}
 
-			SongFound = &Song
+			FetchedSong, FetchErr := Tidal.GetSong(TidalID)
+			
+			if FetchErr != nil {
+
+				return nil, -1, FetchErr
+
+			}
+
+			SongFound = &FetchedSong
+			PosAdded = G.Queue.Add(SongFound, Requestor)
+
+		case APIs.URITypeTidalAlbum:
+
+			// Tidal album - fetch all tracks
+
+			AlbumID, ParseErr := strconv.ParseInt(ID, 10, 64)
+			
+			if ParseErr != nil {
+
+				return nil, -1, fmt.Errorf("invalid Tidal album ID: %s", ID)
+
+			}
+
+			AlbumTracks, FetchErr := Tidal.FetchAlbumTracks(AlbumID)
+			
+			if FetchErr != nil || len(AlbumTracks) == 0 {
+
+				return nil, -1, errors.New("could not fetch album tracks")
+
+			}
+
+			SongFound = &AlbumTracks[0]
+			PosAdded = G.Queue.Add(SongFound, Requestor)
+
+			// Add rest of tracks in background
+
+			if len(AlbumTracks) > 1 {
+
+				go func() {
+
+					for _, Song := range AlbumTracks[1:] {
+
+						SongCopy := Song
+						G.Queue.Add(&SongCopy, Requestor)
+
+					}
+
+				}()
+				
+			}
+
+		case APIs.URITypeTidalPlaylist:
+
+			// Tidal playlist - fetch all tracks
+
+			PlaylistID, ParseErr := strconv.ParseInt(ID, 10, 64)
+
+			if ParseErr != nil {
+
+				return nil, -1, fmt.Errorf("invalid Tidal playlist ID: %s", ID)
+
+			}
+
+			PlaylistTracks, FetchErr := Tidal.FetchPlaylistTracks(PlaylistID)
+
+			if FetchErr != nil || len(PlaylistTracks) == 0 {
+
+				return nil, -1, errors.New("could not fetch playlist tracks")
+
+			}
+
+			SongFound = &PlaylistTracks[0]
+			PosAdded = G.Queue.Add(SongFound, Requestor)
+
+			// Add rest of tracks in background
+
+			if len(PlaylistTracks) > 1 {
+
+				go func() {
+
+					for _, Song := range PlaylistTracks[1:] {
+
+						SongCopy := Song
+
+						G.Queue.Add(&SongCopy, Requestor)
+
+					}
+
+				}()
+
+			}
+
+		// YouTube
+
+		case APIs.URITypeYouTubeVideo:
+
+			ResolvedSong, _, YouTubeFetchErr := YouTube.VideoIDToSong(ID)
+
+			if YouTubeFetchErr != nil {
+
+				return nil, -1, YouTubeFetchErr
+
+			}
+
+			SongFound = &ResolvedSong
 
 			PosAdded = G.Queue.Add(SongFound, Requestor)
 
-		case APIs.URITypeVideo:
+		case APIs.URITypeYouTubePlaylist:
 
-			// Can do the same thing as a song probably
+			FirstSong, YouTubePlaylist, FirstSongError := YouTube.PlaylistIDToFirstSong(ID)
 
-			Song, SongFetchErr := Innertube.GetSong(ID)
+			if FirstSongError != nil {
 
-			if SongFetchErr != nil {
-
-				return nil, -1, SongFetchErr
+				return nil, -1, FirstSongError
 
 			}
 
-			SongFound = &Song
+			SongFound = &FirstSong
 
-			PosAdded = G.Queue.Add(SongFound, Requestor)
+			PosAdded = G.Queue.Add(&FirstSong, Requestor)
 
-		case APIs.URITypeAlbum:
+			go func() {
 
-			AlbumSongs, AlbumFetchErr := Innertube.GetAlbumSongs(ID)
+				// Add rest of playlist
 
-			if AlbumFetchErr != nil {
+				AllOtherSongs, _, OtherFetchError := YouTube.PlaylistIDToAllSongs(YouTubePlaylist, true) // ignores first
 
-				return nil, -1, AlbumFetchErr
+				if OtherFetchError != nil {
 
-			}
-
-			if len(AlbumSongs) == 0 {
-
-				return nil, -1, errors.New("album contains no songs")
-
-			}
-
-			SongFound = &AlbumSongs[0]
-
-			for i, Song := range AlbumSongs {
-
-				Pos := G.Queue.Add(&Song, Requestor)
-
-				if i == 0 {
-
-					PosAdded = Pos // records Pos of first song added
+					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of YouTube playlist songs: %s", OtherFetchError.Error()))
+					return
 
 				}
 
+				for _, Song := range AllOtherSongs {
+
+					G.Queue.Add(&Song, Requestor)
+
+				}
+
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+					Title:       Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Title", G.Locale.Code(), YouTubePlaylist.Title),
+					Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
+					Description: Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Description", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code())),
+
+				})).Build())
+
+			}()
+
+		
+		// YouTube Music
+
+		case APIs.URITypeYTMusicAlbum:
+
+			FirstSong, YouTubeMusicAlbum, FirstSongError := YouTube.MusicAlbumIDToFirstSong(ID)
+
+			if FirstSongError != nil {
+
+				return nil, -1, FirstSongError
+
 			}
 
-		case APIs.URITypeArtist:
+			SongFound = &FirstSong
 
-			ArtistSongs, ArtistFetchErr := Innertube.GetArtistSongs(ID)
+			PosAdded = G.Queue.Add(&FirstSong, Requestor)
 
-			if ArtistFetchErr != nil {
+			go func() {
 
-				return nil, -1, ArtistFetchErr
+				// Add rest of album
 
-			}
+				AllOtherSongs, _, OtherFetchError := YouTube.MusicAlbumIDToAllSongs(YouTubeMusicAlbum, true) // ignores first
 
-			if len(ArtistSongs) == 0 {
+				if OtherFetchError != nil {
 
-				return nil, -1, errors.New("artist contains no songs")
+					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of YouTube Music album songs: %s", OtherFetchError.Error()))
+					return
+
+				}
+
+				for _, Song := range AllOtherSongs {
+
+					G.Queue.Add(&Song, Requestor)
+
+				}
+
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+					Title:       Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Title", G.Locale.Code(), YouTubeMusicAlbum.Title),
+					Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
+					Description: Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Description", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code())),
+
+				})).Build())
+
+			}()
+
+		case APIs.URITypeYTMusicArtist:
+
+			ArtistSongs, ArtistFetchErr := YouTube.MusicArtistIDToSongs(ID)
+
+			if ArtistFetchErr != nil || len(ArtistSongs) == 0 {
+
+				return nil, -1, errors.New("could not fetch artist songs")
 
 			}
 
 			SongFound = &ArtistSongs[0]
 
-			for i, Song := range ArtistSongs {
+			PosAdded = G.Queue.Add(SongFound, Requestor)
 
-				Pos := G.Queue.Add(&Song, Requestor)
+			// Add rest of artist songs in background
 
-				if i == 0 {
+			if len(ArtistSongs) > 1 {
 
-					PosAdded = Pos 
-					
-				}
+				go func() {
 
-			}
+					for _, Song := range ArtistSongs[1:] {
 
-		case APIs.URITypePlaylist:
+						SongCopy := Song
+						G.Queue.Add(&SongCopy, Requestor)
 
-			PlaylistSongs, PlaylistFetchErr := Innertube.GetPlaylistSongs(ID)
+					}
 
-			if PlaylistFetchErr != nil {
+					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
-				return nil, -1, PlaylistFetchErr
+						Title:       Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Title", G.Locale.Code(), "Artist Songs"),
+						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
+						Description: Localizations.GetFormat("Embeds.Notifications.AddedToQueue.Description", G.Locale.Code(), len(ArtistSongs), Localizations.Pluralize("Song", len(ArtistSongs), G.Locale.Code())),
 
-			}
+					})).Build())
 
-			if len(PlaylistSongs) == 0 {
-
-				return nil, -1, errors.New("playlist contains no songs")
-
-			}
-
-			SongFound = &PlaylistSongs[0]
-
-			for i, Song := range PlaylistSongs {
-
-				Pos := G.Queue.Add(&Song, Requestor)
-
-				if i == 0 {
-
-					PosAdded = Pos
-
-				}
+				}()
 
 			}
-
+		
+		// Spotify
+		
 		case APIs.URITypeSPSong:
 
 			ResolvedSong, _, SpotifyFetchErr := Spotify.SpotifyIDToSong(ID)
@@ -694,6 +827,8 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 					})).Build())
 
 			}()
+
+		// Apple Music
 
 		case APIs.URITypeAMSong:
 
@@ -797,6 +932,8 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 			}()
 
 	}
+
+	// Auto-plays if first in queue and not already playing
 		
 	if (PosAdded == 0 && G.Queue.State != StatePlaying) {
 
@@ -818,14 +955,15 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Innertube.Song, int, e
 
 }
 
-// Play starts playing the song
-func (G *Guild) Play(Song *Innertube.Song) error {
+// Play starts playing the song using Tidal streaming
+func (G *Guild) Play(Song *Tidal.Song) error {
 
-	Segments, SegmentDur, ErrorFetchingSegments := Innertube.GetSongAudioSegments(Song.YouTubeID)
+	// Get stream URL from Tidal
+	StreamURL, ErrorFetchingStream := Tidal.GetStreamURL(Song.TidalID)
 
-	if ErrorFetchingSegments != nil {
+	if ErrorFetchingStream != nil {
 
-		return ErrorFetchingSegments
+		return ErrorFetchingStream
 
 	}
 
@@ -884,7 +1022,7 @@ func (G *Guild) Play(Song *Innertube.Song) error {
 
 	}
 
-	Playback, ErrorCreatingPlayback := Audio.Play(Segments, SegmentDur, OnFinished, G.Queue.SendToWebsockets, OnStreamingError)
+	Playback, ErrorCreatingPlayback := Audio.PlayMP4(StreamURL, OnFinished, G.Queue.SendToWebsockets, OnStreamingError)
 
 	if ErrorCreatingPlayback != nil {
 
@@ -892,7 +1030,7 @@ func (G *Guild) Play(Song *Innertube.Song) error {
 
 	}
 
-	Provider := &Audio.OpusProvider{
+	Provider := &Audio.MP4OpusProvider{
 
 		Streamer: Playback.Streamer,
 

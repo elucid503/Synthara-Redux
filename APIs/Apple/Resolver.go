@@ -1,53 +1,53 @@
 package Apple
 
 import (
-	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/APIs/Tidal"
 	"fmt"
 	"slices"
 	"sync"
 )
 
-func AppleMusicIDToSong(AppleMusicID string) (Innertube.Song, *Song, error) {
+func AppleMusicIDToSong(AppleMusicID string) (Tidal.Song, *Song, error) {
 
 	AppleMusicSong, ErrorFetching := Client.GetSong(AppleMusicID)
 
 	if ErrorFetching != nil {
 
-		return Innertube.Song{}, nil, ErrorFetching
+		return Tidal.Song{}, nil, ErrorFetching
 
 	}
 
-	// We need a YouTube ID, so we must backfill via a search
+	// Search on Tidal for the same song
 
 	SearchQuery := fmt.Sprintf("%s %s", AppleMusicSong.Attributes.Name, AppleMusicSong.Attributes.ArtistName)
 
-	YouTubeResults := Innertube.SearchForSongs(SearchQuery)
+	TidalResults, SearchErr := Tidal.SearchSongs(SearchQuery)
 
-	if len(YouTubeResults) == 0 {
+	if SearchErr != nil || len(TidalResults) == 0 {
 
-		return Innertube.Song{}, nil, fmt.Errorf("no YouTube results found for Apple Music track: %s", AppleMusicID)
+		return Tidal.Song{}, nil, fmt.Errorf("no Tidal results found for Apple Music track: %s", AppleMusicID)
 
 	}
 
-	// Return the first YouTube result as the best match
+	// Return the first Tidal result as the best match
 
-	return YouTubeResults[0], AppleMusicSong, nil
+	return TidalResults[0], AppleMusicSong, nil
 
 }
 
-func AppleMusicAlbumToFirstSong(AppleMusicAlbumID string) (Innertube.Song, *Album, error) {
+func AppleMusicAlbumToFirstSong(AppleMusicAlbumID string) (Tidal.Song, *Album, error) {
 
 	AppleMusicAlbum, ErrorFetching := Client.GetAlbum(AppleMusicAlbumID)
 
 	if ErrorFetching != nil {
 
-		return Innertube.Song{}, nil, ErrorFetching
+		return Tidal.Song{}, nil, ErrorFetching
 
 	}
 
 	if len(AppleMusicAlbum.Relationships.Tracks.Data) == 0 {
 
-		return Innertube.Song{}, nil, fmt.Errorf("Apple Music album has no tracks: %s", AppleMusicAlbumID)
+		return Tidal.Song{}, nil, fmt.Errorf("Apple Music album has no tracks: %s", AppleMusicAlbumID)
 
 	}
 
@@ -55,11 +55,11 @@ func AppleMusicAlbumToFirstSong(AppleMusicAlbumID string) (Innertube.Song, *Albu
 
 	if FirstSongError != nil {
 
-		return Innertube.Song{}, nil, FirstSongError
+		return Tidal.Song{}, nil, FirstSongError
 
 	}
 
-	FirstSong.Internal.Playlist = Innertube.PlaylistMeta{
+	FirstSong.Internal.Playlist = Tidal.PlaylistMeta{
 
 		Platform: "Apple Music",
 
@@ -75,7 +75,7 @@ func AppleMusicAlbumToFirstSong(AppleMusicAlbumID string) (Innertube.Song, *Albu
 
 }
 
-func AppleMusicPlaylistToFirstSong(AppleMusicPlaylistID string) (Innertube.Song, *Playlist, error) {
+func AppleMusicPlaylistToFirstSong(AppleMusicPlaylistID string) (Tidal.Song, *Playlist, error) {
 
 	// Gets only the first song from the playlist
 
@@ -83,13 +83,13 @@ func AppleMusicPlaylistToFirstSong(AppleMusicPlaylistID string) (Innertube.Song,
 
 	if ErrorFetching != nil {
 
-		return Innertube.Song{}, nil, ErrorFetching
+		return Tidal.Song{}, nil, ErrorFetching
 
 	}
 
 	if len(AppleMusicPlaylist.Relationships.Tracks.Data) == 0 {
 
-		return Innertube.Song{}, nil, fmt.Errorf("Apple Music playlist is empty: %s", AppleMusicPlaylistID)
+		return Tidal.Song{}, nil, fmt.Errorf("Apple Music playlist is empty: %s", AppleMusicPlaylistID)
 
 	}
 
@@ -97,11 +97,11 @@ func AppleMusicPlaylistToFirstSong(AppleMusicPlaylistID string) (Innertube.Song,
 
 	if FirstSongError != nil {
 
-		return Innertube.Song{}, nil, FirstSongError
+		return Tidal.Song{}, nil, FirstSongError
 
 	}
 
-	FirstSong.Internal.Playlist = Innertube.PlaylistMeta{
+	FirstSong.Internal.Playlist = Tidal.PlaylistMeta{
 
 		Platform: "Apple Music",
 		
@@ -117,13 +117,13 @@ func AppleMusicPlaylistToFirstSong(AppleMusicPlaylistID string) (Innertube.Song,
 
 }
 
-func AppleMusicAlbumToAllSongs(AppleMusicAlbum *Album, IgnoreFirst bool) ([]Innertube.Song, *Album, error) {
+func AppleMusicAlbumToAllSongs(AppleMusicAlbum *Album, IgnoreFirst bool) ([]Tidal.Song, *Album, error) {
 
 	AllAlbumItems, ErrorFetchingTracks := AppleMusicAlbum.GetAllItems()
 
 	if (len(AllAlbumItems) < 1 || (IgnoreFirst && len(AllAlbumItems) < 2)) {
 
-		return []Innertube.Song{}, AppleMusicAlbum, fmt.Errorf("Apple Music album has no tracks to process")
+		return []Tidal.Song{}, AppleMusicAlbum, fmt.Errorf("Apple Music album has no tracks to process")
 
 	}
 
@@ -135,13 +135,13 @@ func AppleMusicAlbumToAllSongs(AppleMusicAlbum *Album, IgnoreFirst bool) ([]Inne
 
 	if ErrorFetchingTracks != nil {
 
-		return []Innertube.Song{}, AppleMusicAlbum, ErrorFetchingTracks
+		return []Tidal.Song{}, AppleMusicAlbum, ErrorFetchingTracks
 
 	}
 
-	// We now will, in parallel, convert all Apple Music tracks to Innertube songs
+	// We now will, in parallel, convert all Apple Music tracks to Tidal songs
 
-	InnertubeSongs := make([]Innertube.Song, 0, len(AllAlbumItems))
+	TidalSongs := make([]Tidal.Song, 0, len(AllAlbumItems))
 
 	var WriteMutex sync.Mutex
 	var WaitGroup sync.WaitGroup
@@ -160,7 +160,7 @@ func AppleMusicAlbumToAllSongs(AppleMusicAlbum *Album, IgnoreFirst bool) ([]Inne
 
 			if ErrorConverting == nil {
 
-				ConvertedSong.Internal.Playlist = Innertube.PlaylistMeta{
+				ConvertedSong.Internal.Playlist = Tidal.PlaylistMeta{
 
 					Platform: "Apple Music",
 					
@@ -174,7 +174,7 @@ func AppleMusicAlbumToAllSongs(AppleMusicAlbum *Album, IgnoreFirst bool) ([]Inne
 				}
 
 				WriteMutex.Lock()
-				InnertubeSongs = append(InnertubeSongs, ConvertedSong)
+				TidalSongs = append(TidalSongs, ConvertedSong)
 				WriteMutex.Unlock()
 
 			}
@@ -185,25 +185,25 @@ func AppleMusicAlbumToAllSongs(AppleMusicAlbum *Album, IgnoreFirst bool) ([]Inne
 
 	WaitGroup.Wait() // we will wait for all goroutines to finish
 
-	// We must now sort the InnertubeSongs by their Playlist.Index to maintain order
+	// We must now sort the TidalSongs by their Playlist.Index to maintain order
 
-	slices.SortFunc(InnertubeSongs, func(a, b Innertube.Song) int {
+	slices.SortFunc(TidalSongs, func(a, b Tidal.Song) int {
 
 		return a.Internal.Playlist.Index - b.Internal.Playlist.Index
 
 	})
 
-	return InnertubeSongs, AppleMusicAlbum, nil
+	return TidalSongs, AppleMusicAlbum, nil
 
 }
 
-func AppleMusicPlaylistToAllSongs(AppleMusicPlaylist *Playlist, IgnoreFirst bool) ([]Innertube.Song, *Playlist, error) {
+func AppleMusicPlaylistToAllSongs(AppleMusicPlaylist *Playlist, IgnoreFirst bool) ([]Tidal.Song, *Playlist, error) {
 
 	AllPlaylistItems, ErrorFetchingTracks := AppleMusicPlaylist.GetAllItems()
 
 	if (len(AllPlaylistItems) < 1 || (IgnoreFirst && len(AllPlaylistItems) < 2)) {
 
-		return []Innertube.Song{}, AppleMusicPlaylist, fmt.Errorf("Apple Music playlist has no tracks to process")
+		return []Tidal.Song{}, AppleMusicPlaylist, fmt.Errorf("Apple Music playlist has no tracks to process")
 
 	}
 
@@ -215,13 +215,13 @@ func AppleMusicPlaylistToAllSongs(AppleMusicPlaylist *Playlist, IgnoreFirst bool
 
 	if ErrorFetchingTracks != nil {
 
-		return []Innertube.Song{}, AppleMusicPlaylist, ErrorFetchingTracks
+		return []Tidal.Song{}, AppleMusicPlaylist, ErrorFetchingTracks
 
 	}
 
-	// We now will, in parallel, convert all Apple Music tracks to Innertube songs
+	// We now will, in parallel, convert all Apple Music tracks to Tidal songs
 
-	InnertubeSongs := make([]Innertube.Song, 0, len(AllPlaylistItems))
+	TidalSongs := make([]Tidal.Song, 0, len(AllPlaylistItems))
 
 	var WriteMutex sync.Mutex
 	var WaitGroup sync.WaitGroup
@@ -240,7 +240,7 @@ func AppleMusicPlaylistToAllSongs(AppleMusicPlaylist *Playlist, IgnoreFirst bool
 
 			if ErrorConverting == nil {
 
-				ConvertedSong.Internal.Playlist = Innertube.PlaylistMeta{
+				ConvertedSong.Internal.Playlist = Tidal.PlaylistMeta{
 
 					Platform: "Apple Music",
 
@@ -253,7 +253,7 @@ func AppleMusicPlaylistToAllSongs(AppleMusicPlaylist *Playlist, IgnoreFirst bool
 				}
 
 				WriteMutex.Lock()
-				InnertubeSongs = append(InnertubeSongs, ConvertedSong)
+				TidalSongs = append(TidalSongs, ConvertedSong)
 				WriteMutex.Unlock()
 
 			}
@@ -263,14 +263,14 @@ func AppleMusicPlaylistToAllSongs(AppleMusicPlaylist *Playlist, IgnoreFirst bool
 
 	WaitGroup.Wait() // we will wait for all goroutines to finish
 
-	// We must now sort the InnertubeSongs by their Playlist.Index to maintain order
+	// We must now sort the TidalSongs by their Playlist.Index to maintain order
 
-	slices.SortFunc(InnertubeSongs, func(a, b Innertube.Song) int {
+	slices.SortFunc(TidalSongs, func(a, b Tidal.Song) int {
 
 		return a.Internal.Playlist.Index - b.Internal.Playlist.Index
 
 	})
 
-	return InnertubeSongs, AppleMusicPlaylist, nil
+	return TidalSongs, AppleMusicPlaylist, nil
 
 }

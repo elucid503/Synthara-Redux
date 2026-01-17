@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/disgoorg/disgo/bot"
@@ -278,7 +279,10 @@ func InitializeHandlers() {
 
 					if len(Parts) > 1 {
 
-						Components.RemoveSong(Event, Parts[1])
+						TidalID, ParseErr := strconv.ParseInt(Parts[1], 10, 64)
+						if ParseErr == nil {
+							Components.RemoveSong(Event, TidalID)
+						}
 
 					}
 
@@ -286,7 +290,10 @@ func InitializeHandlers() {
 
 					if len(Parts) > 1 {
 
-						Components.JumpToSong(Event, Parts[1])
+						TidalID, ParseErr := strconv.ParseInt(Parts[1], 10, 64)
+						if ParseErr == nil {
+							Components.JumpToSong(Event, TidalID)
+						}
 
 					}
 

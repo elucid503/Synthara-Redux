@@ -87,6 +87,13 @@ func HandleWSConnections(Context *gin.Context) {
 
 	// Send initial state
 
+	Progress := int64(0)
+	if Guild.Queue.PlaybackSession != nil && Guild.Queue.PlaybackSession.Streamer != nil {
+
+		Progress = Guild.Queue.PlaybackSession.Streamer.Progress
+
+	}
+
 	InitialState := map[string]interface{}{
 
 		"Event": Structs.Event_Initial,
@@ -96,9 +103,9 @@ func HandleWSConnections(Context *gin.Context) {
 			"Current": Guild.Queue.Current,
 			"Previous": Guild.Queue.Previous,
 			"Upcoming": Guild.Queue.Upcoming,
-			
+
 			"State": Guild.Queue.State,
-			"Progress": (Guild.Queue.PlaybackSession.Streamer.Progress),
+			"Progress": Progress,
 
 		},
 

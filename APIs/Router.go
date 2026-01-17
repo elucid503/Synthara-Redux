@@ -8,13 +8,21 @@ import (
 
 const (
 
-	// Youtube Music
+	// Tidal (native platform)
 
-	URITypeSong = "Song"
-	URITypeVideo = "Video"
-	URITypeAlbum = "Album"
-	URITypeArtist = "Artist"
-	URITypePlaylist = "Playlist"
+	URITypeTidalSong = "Song"
+	URITypeTidalAlbum = "Album"
+	URITypeTidalPlaylist = "Playlist"
+
+	// YouTube (regular platform)
+	
+	URITypeYouTubeVideo = "YTVideo"
+	URITypeYouTubePlaylist = "YTPlaylist"
+
+	// YouTube Music (native platform)
+
+	URITypeYTMusicAlbum = "YTMAlbum"
+	URITypeYTMusicArtist = "YTMArtist"
 
 	// Spotify 
 
@@ -132,17 +140,7 @@ func Route(Input string) (string, error) {
 	
 	if Match := YTVideoRegex.FindStringSubmatch(URL); Match != nil {
 
-		return "Synthara-Redux:" + URITypeVideo + ":" + Match[1], nil
-
-	}
-
-	// YouTube Music - Song
-
-	YTMSongRegex := regexp.MustCompile(`(?i)(?:https?://)?music\.youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})`)
-	
-	if Match := YTMSongRegex.FindStringSubmatch(URL); Match != nil {
-
-		return "Synthara-Redux:" + URITypeSong + ":" + Match[1], nil
+		return "Synthara-Redux:" + URITypeYouTubeVideo + ":" + Match[1], nil
 
 	}
 
@@ -152,26 +150,27 @@ func Route(Input string) (string, error) {
 	
 	if Match := YTMAlbumRegex.FindStringSubmatch(URL); Match != nil {
 
-		return "Synthara-Redux:" + URITypeAlbum + ":" + Match[1], nil
-
-	}
-
-	// YouTube Music - Playlist
-
-	YTMPlaylistRegex := regexp.MustCompile(`(?i)(?:https?://)?music\.youtube\.com/playlist\?list=([a-zA-Z0-9_-]+)`)
-	
-	if Match := YTMPlaylistRegex.FindStringSubmatch(URL); Match != nil {
-
-		return "Synthara-Redux:" + URITypePlaylist + ":" + Match[1], nil
+		return "Synthara-Redux:" + URITypeYTMusicAlbum + ":" + Match[1], nil
 
 	}
 
 	// YouTube Music - Artist/Channel
+
 	YTMArtistRegex := regexp.MustCompile(`(?i)(?:https?://)?music\.youtube\.com/channel/([a-zA-Z0-9_-]+)`)
 
 	if Match := YTMArtistRegex.FindStringSubmatch(URL); Match != nil {
 
-		return "Synthara-Redux:" + URITypeArtist + ":" + Match[1], nil
+		return "Synthara-Redux:" + URITypeYTMusicArtist + ":" + Match[1], nil
+
+	}
+
+	// YouTube - Playlist
+
+	YTPlaylistRegex := regexp.MustCompile(`(?i)(?:https?://)?(?:www\.)?youtube\.com/playlist\?list=([a-zA-Z0-9_-]+)`)
+	
+	if Match := YTPlaylistRegex.FindStringSubmatch(URL); Match != nil {
+
+		return "Synthara-Redux:" + URITypeYouTubePlaylist + ":" + Match[1], nil
 
 	}
 
@@ -230,6 +229,36 @@ func Route(Input string) (string, error) {
 	if Match := ApplePlaylistRegex.FindStringSubmatch(URL); Match != nil {
 
 		return "Synthara-Redux:" + URITypeAMPlaylist + ":" + Match[1], nil
+
+	}
+
+	// Tidal - Track
+
+	TidalTrackRegex := regexp.MustCompile(`(?i)(?:https?://)?(?:listen\.)?tidal\.com/(?:browse/)?track/(\d+)`)
+	
+	if Match := TidalTrackRegex.FindStringSubmatch(URL); Match != nil {
+
+		return "Synthara-Redux:" + URITypeTidalSong + ":" + Match[1], nil
+
+	}
+
+	// Tidal - Album
+
+	TidalAlbumRegex := regexp.MustCompile(`(?i)(?:https?://)?(?:listen\.)?tidal\.com/(?:browse/)?album/(\d+)`)
+	
+	if Match := TidalAlbumRegex.FindStringSubmatch(URL); Match != nil {
+
+		return "Synthara-Redux:" + URITypeTidalAlbum + ":" + Match[1], nil
+
+	}
+
+	// Tidal - Playlist
+
+	TidalPlaylistRegex := regexp.MustCompile(`(?i)(?:https?://)?(?:listen\.)?tidal\.com/(?:browse/)?playlist/([a-zA-Z0-9-]+)`)
+	
+	if Match := TidalPlaylistRegex.FindStringSubmatch(URL); Match != nil {
+
+		return "Synthara-Redux:" + URITypeTidalPlaylist + ":" + Match[1], nil
 
 	}
 

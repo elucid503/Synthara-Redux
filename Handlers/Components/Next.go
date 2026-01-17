@@ -6,6 +6,7 @@ import (
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
 	"Synthara-Redux/Validation"
+	"fmt"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -90,7 +91,7 @@ func Next(Event *events.ComponentInteractionCreate) {
 
 			Title:       Localizations.Get("Commands.Next.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
-			Description: Localizations.Get("Commands.Next.Description", Locale),
+			Description: fmt.Sprintf(Localizations.Get("Commands.Next.Description", Locale), Guild.Queue.Current.Title),
 
 		})).
 		AddActionRow(Buttons...).

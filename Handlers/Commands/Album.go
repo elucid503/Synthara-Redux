@@ -1,7 +1,7 @@
 package Commands
 
 import (
-	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/APIs/Tidal"
 	"Synthara-Redux/Globals/Icons"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
@@ -45,7 +45,7 @@ func Album(Event *events.ApplicationCommandInteractionCreate) {
 
 	CurrentSong := Guild.Queue.Current
 
-	if CurrentSong.AlbumID == "" {
+	if CurrentSong.AlbumID == 0 {
 
 		Event.CreateMessage(discord.MessageCreate{
 
@@ -66,8 +66,8 @@ func Album(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	// Fetch album songs
-	AlbumSongs, ErrorFetching := Innertube.GetAlbumSongs(CurrentSong.AlbumID)
+	// Fetch album songs from Tidal
+	AlbumSongs, ErrorFetching := Tidal.FetchAlbumTracks(CurrentSong.AlbumID)
 
 	if ErrorFetching != nil || len(AlbumSongs) == 0 {
 
@@ -150,13 +150,13 @@ func Album(Event *events.ApplicationCommandInteractionCreate) {
 
 	Embed.SetDescription(Body.String())
 
-	// Build buttons
+	// Build buttons - use int64 AlbumID
 
-	EnqueueButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Embeds.Album.EnqueueAll", Locale), fmt.Sprintf("AlbumEnqueue:%s", CurrentSong.AlbumID), "", 0).WithEmoji(discord.ComponentEmoji{
+	EnqueueButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Embeds.Album.EnqueueAll", Locale), fmt.Sprintf("AlbumEnqueue:%d", CurrentSong.AlbumID), "", 0).WithEmoji(discord.ComponentEmoji{
 		ID: snowflake.MustParse(Icons.GetID(Icons.Albums)),
 	})
 
-	PlayButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Embeds.Album.PlayAll", Locale), fmt.Sprintf("AlbumPlay:%s", CurrentSong.AlbumID), "", 0).WithEmoji(discord.ComponentEmoji{
+	PlayButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Embeds.Album.PlayAll", Locale), fmt.Sprintf("AlbumPlay:%d", CurrentSong.AlbumID), "", 0).WithEmoji(discord.ComponentEmoji{
 		ID: snowflake.MustParse(Icons.GetID(Icons.Play)),
 	})
 

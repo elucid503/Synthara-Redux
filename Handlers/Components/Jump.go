@@ -12,7 +12,7 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 )
 
-func JumpToSong(Event *events.ComponentInteractionCreate, YouTubeID string) {
+func JumpToSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 
 	Locale := Event.Locale().Code()
 	GuildID := *Event.GuildID()
@@ -36,11 +36,11 @@ func JumpToSong(Event *events.ComponentInteractionCreate, YouTubeID string) {
 
 	}
 
-	// Find the song in the upcoming queue by YouTube ID
+	// Find the song in the upcoming queue by Tidal ID
 	SongIndex := -1
 	for Index, Song := range Guild.Queue.Upcoming {
 
-		if Song.YouTubeID == YouTubeID {
+		if Song.TidalID == TidalID {
 
 			SongIndex = Index + 1 // Jump expects 1-indexed position
 			break

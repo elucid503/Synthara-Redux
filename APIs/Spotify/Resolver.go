@@ -1,53 +1,53 @@
 package Spotify
 
 import (
-	"Synthara-Redux/APIs/Innertube"
+	"Synthara-Redux/APIs/Tidal"
 	"fmt"
 	"slices"
 	"sync"
 )
 
-func SpotifyIDToSong(SpotifyID string) (Innertube.Song, *Track, error) {
+func SpotifyIDToSong(SpotifyID string) (Tidal.Song, *Track, error) {
 
 	SpotifyTrack, ErrorFetching := Client.GetTrack(SpotifyID)
 
 	if ErrorFetching != nil {
 
-		return Innertube.Song{}, nil, ErrorFetching
+		return Tidal.Song{}, nil, ErrorFetching
 
 	}
 
-	// We need a YouTube ID, so we must backfill via a search
+	// Search on Tidal for the same song
 
 	SearchQuery := fmt.Sprintf("%s %s", SpotifyTrack.Name, SpotifyTrack.Artists[0].Name)
 
-	YouTubeResults := Innertube.SearchForSongs(SearchQuery)
+	TidalResults, SearchErr := Tidal.SearchSongs(SearchQuery)
 
-	if len(YouTubeResults) == 0 {
+	if SearchErr != nil || len(TidalResults) == 0 {
 
-		return Innertube.Song{}, nil, fmt.Errorf("no YouTube results found for Spotify track: %s", SpotifyID)
+		return Tidal.Song{}, nil, fmt.Errorf("no Tidal results found for Spotify track: %s", SpotifyID)
 
 	}
 
-	// Return the first YouTube result as the best match
+	// Return the first Tidal result as the best match
 
-	return YouTubeResults[0], SpotifyTrack, nil
+	return TidalResults[0], SpotifyTrack, nil
 
 }
 
-func SpotifyAlbumToFirstSong(SpotifyAlbumID string) (Innertube.Song, *Album, error) {
+func SpotifyAlbumToFirstSong(SpotifyAlbumID string) (Tidal.Song, *Album, error) {
 
 	SpotifyAlbum, ErrorFetching := Client.GetAlbum(SpotifyAlbumID)
 
 	if ErrorFetching != nil {
 
-		return Innertube.Song{}, nil, ErrorFetching
+		return Tidal.Song{}, nil, ErrorFetching
 
 	}
 
 	if len(SpotifyAlbum.Tracks.Items) == 0 {
 
-		return Innertube.Song{}, nil, fmt.Errorf("Spotify album has no tracks: %s", SpotifyAlbumID)
+		return Tidal.Song{}, nil, fmt.Errorf("Spotify album has no tracks: %s", SpotifyAlbumID)
 
 	}
 
@@ -55,11 +55,11 @@ func SpotifyAlbumToFirstSong(SpotifyAlbumID string) (Innertube.Song, *Album, err
 
 	if FirstSongError != nil {
 
-		return Innertube.Song{}, nil, FirstSongError
+		return Tidal.Song{}, nil, FirstSongError
 
 	}
 
-	FirstSong.Internal.Playlist = Innertube.PlaylistMeta{
+	FirstSong.Internal.Playlist = Tidal.PlaylistMeta{
 
 		Platform: "Spotify",
 
@@ -75,7 +75,7 @@ func SpotifyAlbumToFirstSong(SpotifyAlbumID string) (Innertube.Song, *Album, err
 
 }
 
-func SpotifyPlaylistToFirstSong(SpotifyPlaylistID string) (Innertube.Song, *Playlist, error) {
+func SpotifyPlaylistToFirstSong(SpotifyPlaylistID string) (Tidal.Song, *Playlist, error) {
 
 	// Gets only the first song from the playlist
 
@@ -83,13 +83,13 @@ func SpotifyPlaylistToFirstSong(SpotifyPlaylistID string) (Innertube.Song, *Play
 
 	if ErrorFetching != nil {
 
-		return Innertube.Song{}, nil, ErrorFetching
+		return Tidal.Song{}, nil, ErrorFetching
 
 	}
 
 	if len(SpotifyPlaylist.Tracks.Items) == 0 {
 
-		return Innertube.Song{}, nil, fmt.Errorf("Spotify playlist is empty: %s", SpotifyPlaylistID)
+		return Tidal.Song{}, nil, fmt.Errorf("Spotify playlist is empty: %s", SpotifyPlaylistID)
 
 	}
 
@@ -97,11 +97,11 @@ func SpotifyPlaylistToFirstSong(SpotifyPlaylistID string) (Innertube.Song, *Play
 
 	if FirstSongError != nil {
 
-		return Innertube.Song{}, nil, FirstSongError
+		return Tidal.Song{}, nil, FirstSongError
 
 	}
 
-	FirstSong.Internal.Playlist = Innertube.PlaylistMeta{
+	FirstSong.Internal.Playlist = Tidal.PlaylistMeta{
 
 		Platform: "Spotify",
 		
@@ -117,13 +117,13 @@ func SpotifyPlaylistToFirstSong(SpotifyPlaylistID string) (Innertube.Song, *Play
 
 }
 
-func SpotifyAlbumToAllSongs(SpotifyAlbum *Album, IgnoreFirst bool) ([]Innertube.Song, *Album, error) {
+func SpotifyAlbumToAllSongs(SpotifyAlbum *Album, IgnoreFirst bool) ([]Tidal.Song, *Album, error) {
 
 	AllAlbumItems, ErrorFetchingTracks := SpotifyAlbum.GetAllItems()
 
 	if (len(AllAlbumItems) < 1 || (IgnoreFirst && len(AllAlbumItems) < 2)) {
 
-		return []Innertube.Song{}, SpotifyAlbum, fmt.Errorf("Spotify album has no tracks to process")
+		return []Tidal.Song{}, SpotifyAlbum, fmt.Errorf("Spotify album has no tracks to process")
 
 	}
 
@@ -135,13 +135,13 @@ func SpotifyAlbumToAllSongs(SpotifyAlbum *Album, IgnoreFirst bool) ([]Innertube.
 
 	if ErrorFetchingTracks != nil {
 
-		return []Innertube.Song{}, SpotifyAlbum, ErrorFetchingTracks
+		return []Tidal.Song{}, SpotifyAlbum, ErrorFetchingTracks
 
 	}
 
-	// We now will, in parallel, convert all Spotify tracks to Innertube songs
+	// We now will, in parallel, convert all Spotify tracks to Tidal songs
 
-	InnertubeSongs := make([]Innertube.Song, 0, len(AllAlbumItems))
+	TidalSongs := make([]Tidal.Song, 0, len(AllAlbumItems))
 
 	var WriteMutex sync.Mutex
 	var WaitGroup sync.WaitGroup
@@ -160,7 +160,7 @@ func SpotifyAlbumToAllSongs(SpotifyAlbum *Album, IgnoreFirst bool) ([]Innertube.
 
 			if ErrorConverting == nil {
 
-				ConvertedSong.Internal.Playlist = Innertube.PlaylistMeta{
+				ConvertedSong.Internal.Playlist = Tidal.PlaylistMeta{
 
 					Platform: "Spotify",
 					
@@ -174,7 +174,7 @@ func SpotifyAlbumToAllSongs(SpotifyAlbum *Album, IgnoreFirst bool) ([]Innertube.
 				}
 
 				WriteMutex.Lock()
-				InnertubeSongs = append(InnertubeSongs, ConvertedSong)
+				TidalSongs = append(TidalSongs, ConvertedSong)
 				WriteMutex.Unlock()
 
 			}
@@ -185,25 +185,25 @@ func SpotifyAlbumToAllSongs(SpotifyAlbum *Album, IgnoreFirst bool) ([]Innertube.
 
 	WaitGroup.Wait() // we will wait for all goroutines to finish
 
-	// We must now sort the InnertubeSongs by their Playlist.Index to maintain order
+	// We must now sort the TidalSongs by their Playlist.Index to maintain order
 
-	slices.SortFunc(InnertubeSongs, func(a, b Innertube.Song) int {
+	slices.SortFunc(TidalSongs, func(a, b Tidal.Song) int {
 
 		return a.Internal.Playlist.Index - b.Internal.Playlist.Index
 
 	})
 
-	return InnertubeSongs, SpotifyAlbum, nil
+	return TidalSongs, SpotifyAlbum, nil
 
 }
 
-func SpotifyPlaylistToAllSongs(SpotifyPlaylist *Playlist, IgnoreFirst bool) ([]Innertube.Song, *Playlist, error) {
+func SpotifyPlaylistToAllSongs(SpotifyPlaylist *Playlist, IgnoreFirst bool) ([]Tidal.Song, *Playlist, error) {
 
 	AllPlaylistItems, ErrorFetchingTracks := SpotifyPlaylist.GetAllItems()
 
 	if (len(AllPlaylistItems) < 1 || (IgnoreFirst && len(AllPlaylistItems) < 2)) {
 
-		return []Innertube.Song{}, SpotifyPlaylist, fmt.Errorf("Spotify playlist has no tracks to process")
+		return []Tidal.Song{}, SpotifyPlaylist, fmt.Errorf("Spotify playlist has no tracks to process")
 
 	}
 
@@ -215,13 +215,13 @@ func SpotifyPlaylistToAllSongs(SpotifyPlaylist *Playlist, IgnoreFirst bool) ([]I
 
 	if ErrorFetchingTracks != nil {
 
-		return []Innertube.Song{}, SpotifyPlaylist, ErrorFetchingTracks
+		return []Tidal.Song{}, SpotifyPlaylist, ErrorFetchingTracks
 
 	}
 
-	// We now will, in parallel, convert all Spotify tracks to Innertube songs
+	// We now will, in parallel, convert all Spotify tracks to Tidal songs
 
-	InnertubeSongs := make([]Innertube.Song, 0, len(AllPlaylistItems))
+	TidalSongs := make([]Tidal.Song, 0, len(AllPlaylistItems))
 
 	var WriteMutex sync.Mutex
 	var WaitGroup sync.WaitGroup
@@ -240,7 +240,7 @@ func SpotifyPlaylistToAllSongs(SpotifyPlaylist *Playlist, IgnoreFirst bool) ([]I
 
 			if ErrorConverting == nil {
 
-				ConvertedSong.Internal.Playlist = Innertube.PlaylistMeta{
+				ConvertedSong.Internal.Playlist = Tidal.PlaylistMeta{
 
 					Platform: "Spotify",
 
@@ -253,7 +253,7 @@ func SpotifyPlaylistToAllSongs(SpotifyPlaylist *Playlist, IgnoreFirst bool) ([]I
 				}
 
 				WriteMutex.Lock()
-				InnertubeSongs = append(InnertubeSongs, ConvertedSong)
+				TidalSongs = append(TidalSongs, ConvertedSong)
 				WriteMutex.Unlock()
 
 			}
@@ -263,14 +263,14 @@ func SpotifyPlaylistToAllSongs(SpotifyPlaylist *Playlist, IgnoreFirst bool) ([]I
 
 	WaitGroup.Wait() // we will wait for all goroutines to finish
 
-	// We must now sort the InnertubeSongs by their Playlist.Index to maintain order
+	// We must now sort the TidalSongs by their Playlist.Index to maintain order
 
-	slices.SortFunc(InnertubeSongs, func(a, b Innertube.Song) int {
+	slices.SortFunc(TidalSongs, func(a, b Tidal.Song) int {
 
 		return a.Internal.Playlist.Index - b.Internal.Playlist.Index
 
 	})
 
-	return InnertubeSongs, SpotifyPlaylist, nil
+	return TidalSongs, SpotifyPlaylist, nil
 
 }
