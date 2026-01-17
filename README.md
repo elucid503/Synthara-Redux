@@ -48,7 +48,7 @@ Create a `.env` file in the project root with the following variables:
 TIDAL_JWT=your_tidal_jwt_here
 
 # Required: Streaming API Endpoint
-HIFI_API_ENDPOINT=secret_sauce_here
+STREAMING_API_ENDPOINT=secret_sauce_here
 
 # Required: Discord bot token from Discord Developer Portal
 DISCORD_TOKEN=your_discord_bot_token_here

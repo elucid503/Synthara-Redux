@@ -65,7 +65,7 @@ var DefaultHeaders = map[string]string{
 
 func Init() {
 
-	BaseAPIURL = strings.TrimSpace(os.Getenv("HIFI_API_ENDPOINT"))
+	BaseAPIURL = strings.TrimSpace(os.Getenv("STREAMING_API_ENDPOINT"))
 
 	if !strings.HasPrefix(BaseAPIURL, "http://") && !strings.HasPrefix(BaseAPIURL, "https://") {
 
