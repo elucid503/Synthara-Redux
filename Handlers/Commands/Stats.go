@@ -71,10 +71,15 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 		BytesStreamed := Streamer.BytesStreamed
 
 		// Convert bytes to KB/MB for display
+
 		ProgressValue := ""
+
 		if BytesStreamed > 1024*1024 {
+
 			ProgressValue = fmt.Sprintf("%.2f MB", float64(BytesStreamed)/(1024*1024))
+			
 		} else {
+
 			ProgressValue = fmt.Sprintf("%.2f KB", float64(BytesStreamed)/1024)
 		}
 
@@ -102,7 +107,7 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 		if ProgressMS > 0 {
 
 			Bitrate := (Streamer.BytesStreamed * 8 * 1000) / ProgressMS
-			BitrateValue := fmt.Sprintf("%d kbps", Bitrate)
+			BitrateValue := fmt.Sprintf("%d kb/s", Bitrate)
 
 			EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.CurrentBitrate", Locale), BitrateValue, true)
 

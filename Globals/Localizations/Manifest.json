@@ -404,8 +404,8 @@
 			},
 			"Queue": {
 				"Singular": {
-					"en-US": "%d song upcoming",
-					"en-GB": "%d song upcoming",
+					"en-US": "%d Song upcoming",
+					"en-GB": "%d Song upcoming",
 					"es-ES": "%d canción próxima",
 					"es-419": "%d canción próxima",
 					"zh-CN": "%d 首即将播放",
@@ -430,8 +430,8 @@
 					"ja": "%d 曲が次に再生されます"
 				},
 				"PreviousSingular": {
-					"en-US": "%d song in history",
-					"en-GB": "%d song in history",
+					"en-US": "%d Song in history",
+					"en-GB": "%d Song in history",
 					"es-ES": "%d canción en historial",
 					"es-419": "%d canción en historial",
 					"zh-CN": "%d 首历史记录",
@@ -940,8 +940,8 @@
 					"ja": "スキップできません"
 				},
 				"Description": {
-					"en-US": "Unable to skip to the next song. The Queue may be empty.",
-					"en-GB": "Unable to skip to the next song. The Queue may be empty.",
+					"en-US": "Unable to skip to the next Song. The Queue may be empty.",
+					"en-GB": "Unable to skip to the next Song. The Queue may be empty.",
 					"es-ES": "No se puede saltar a la siguiente canción. La cola puede estar vacía.",
 					"es-419": "No se puede saltar a la siguiente canción. La cola puede estar vacía.",
 					"zh-CN": "无法跳至下一首歌曲。队列可能为空。",
@@ -1729,6 +1729,342 @@
 				"ru": "Откройте интерфейс управления воспроизведением [здесь](%s).",
 				"ja": "再生コントロールインターフェースを[こちら](%s)で開く。"
 			}
+		},
+		"CreateNotification": {
+			"Unauthorized": {
+				"Title": {
+					"en-US": "Unauthorized Access",
+					"en-GB": "Unauthorised Access",
+					"es-ES": "Acceso No Autorizado",
+					"es-419": "Acceso No Autorizado",
+					"zh-CN": "未授权访问",
+					"fr": "Accès Non Autorisé",
+					"it": "Accesso Non Autorizzato",
+					"de": "Unbefugter Zugriff",
+					"pl": "Nieautoryzowany Dostęp",
+					"ru": "Несанкционированный Доступ",
+					"ja": "不正アクセス"
+				},
+				"Description": {
+					"en-US": "You do not have permission to use this command.",
+					"en-GB": "You do not have permission to use this command.",
+					"es-ES": "No tienes permiso para usar este comando.",
+					"es-419": "No tienes permiso para usar este comando.",
+					"zh-CN": "您没有使用此命令的权限。",
+					"fr": "Vous n'avez pas la permission d'utiliser cette commande.",
+					"it": "Non hai il permesso di usare questo comando.",
+					"de": "Sie haben keine Berechtigung, diesen Befehl zu verwenden.",
+					"pl": "Nie masz uprawnień do użycia tej komendy.",
+					"ru": "У вас нет разрешения на использование этой команды.",
+					"ja": "このコマンドを使用する権限がありません。"
+				}
+			},
+			"InvalidDate": {
+				"Title": {
+					"en-US": "Invalid Date Format",
+					"en-GB": "Invalid Date Format",
+					"es-ES": "Formato de Fecha Inválido",
+					"es-419": "Formato de Fecha Inválido",
+					"zh-CN": "日期格式无效",
+					"fr": "Format de Date Invalide",
+					"it": "Formato Data Non Valido",
+					"de": "Ungültiges Datumsformat",
+					"pl": "Nieprawidłowy Format Daty",
+					"ru": "Неверный Формат Даты",
+					"ja": "無効な日付形式"
+				},
+				"Description": {
+					"en-US": "Please use the format: 2006-01-02 or 2006-01-02T15:04:05Z",
+					"en-GB": "Please use the format: 2006-01-02 or 2006-01-02T15:04:05Z",
+					"es-ES": "Por favor usa el formato: 2006-01-02 o 2006-01-02T15:04:05Z",
+					"es-419": "Por favor usa el formato: 2006-01-02 o 2006-01-02T15:04:05Z",
+					"zh-CN": "请使用格式：2006-01-02 或 2006-01-02T15:04:05Z",
+					"fr": "Veuillez utiliser le format : 2006-01-02 ou 2006-01-02T15:04:05Z",
+					"it": "Utilizza il formato: 2006-01-02 o 2006-01-02T15:04:05Z",
+					"de": "Bitte verwenden Sie das Format: 2006-01-02 oder 2006-01-02T15:04:05Z",
+					"pl": "Proszę użyć formatu: 2006-01-02 lub 2006-01-02T15:04:05Z",
+					"ru": "Пожалуйста, используйте формат: 2006-01-02 или 2006-01-02T15:04:05Z",
+					"ja": "形式を使用してください：2006-01-02 または 2006-01-02T15:04:05Z"
+				}
+			},
+			"Error": {
+				"Title": {
+					"en-US": "Notification Creation Failed",
+					"en-GB": "Notification Creation Failed",
+					"es-ES": "Creación de Notificación Fallida",
+					"es-419": "Creación de Notificación Fallida",
+					"zh-CN": "通知创建失败",
+					"fr": "Échec de la Création de Notification",
+					"it": "Creazione Notifica Fallita",
+					"de": "Benachrichtigungserstellung Fehlgeschlagen",
+					"pl": "Tworzenie Powiadomienia Nie Powiodło Się",
+					"ru": "Не Удалось Создать Уведомление",
+					"ja": "通知の作成に失敗しました"
+				},
+				"Description": {
+					"en-US": "An error occurred while creating the notification.",
+					"en-GB": "An error occurred whilst creating the notification.",
+					"es-ES": "Ocurrió un error al crear la notificación.",
+					"es-419": "Ocurrió un error al crear la notificación.",
+					"zh-CN": "创建通知时发生错误。",
+					"fr": "Une erreur s'est produite lors de la création de la notification.",
+					"it": "Si è verificato un errore durante la creazione della notifica.",
+					"de": "Beim Erstellen der Benachrichtigung ist ein Fehler aufgetreten.",
+					"pl": "Wystąpił błąd podczas tworzenia powiadomienia.",
+					"ru": "Произошла ошибка при создании уведомления.",
+					"ja": "通知の作成中にエラーが発生しました。"
+				}
+			},
+			"Success": {
+				"Title": {
+					"en-US": "Notification Created",
+					"en-GB": "Notification Created",
+					"es-ES": "Notificación Creada",
+					"es-419": "Notificación Creada",
+					"zh-CN": "通知已创建",
+					"fr": "Notification Créée",
+					"it": "Notifica Creata",
+					"de": "Benachrichtigung Erstellt",
+					"pl": "Powiadomienie Utworzone",
+					"ru": "Уведомление Создано",
+					"ja": "通知が作成されました"
+				},
+				"Description": {
+					"en-US": "The notification has been created successfully.",
+					"en-GB": "The notification has been created successfully.",
+					"es-ES": "La notificación ha sido creada exitosamente.",
+					"es-419": "La notificación ha sido creada exitosamente.",
+					"zh-CN": "通知已成功创建。",
+					"fr": "La notification a été créée avec succès.",
+					"it": "La notifica è stata creata con successo.",
+					"de": "Die Benachrichtigung wurde erfolgreich erstellt.",
+					"pl": "Powiadomienie zostało pomyślnie utworzone.",
+					"ru": "Уведомление успешно создано.",
+					"ja": "通知が正常に作成されました。"
+				},
+				"Expiry": {
+					"en-US": "Expires on:",
+					"en-GB": "Expires on:",
+					"es-ES": "Expira el:",
+					"es-419": "Expira el:",
+					"zh-CN": "到期日期：",
+					"fr": "Expire le :",
+					"it": "Scade il:",
+					"de": "Läuft ab am:",
+					"pl": "Wygasa:",
+					"ru": "Истекает:",
+					"ja": "有効期限："
+				},
+				"ID": {
+					"en-US": "Notification ID:",
+					"en-GB": "Notification ID:",
+					"es-ES": "ID de Notificación:",
+					"es-419": "ID de Notificación:",
+					"zh-CN": "通知 ID：",
+					"fr": "ID de Notification :",
+					"it": "ID Notifica:",
+					"de": "Benachrichtigungs-ID:",
+					"pl": "ID Powiadomienia:",
+					"ru": "ID Уведомления:",
+					"ja": "通知ID："
+				}
+			}
+		},
+		"Inspect": {
+			"Unauthorized": {
+				"Title": {
+					"en-US": "Unauthorized Access",
+					"en-GB": "Unauthorised Access",
+					"es-ES": "Acceso No Autorizado",
+					"es-419": "Acceso No Autorizado",
+					"zh-CN": "未授权访问",
+					"fr": "Accès Non Autorisé",
+					"it": "Accesso Non Autorizzato",
+					"de": "Unbefugter Zugriff",
+					"pl": "Nieautoryzowany Dostęp",
+					"ru": "Несанкционированный Доступ",
+					"ja": "不正アクセス"
+				},
+				"Description": {
+					"en-US": "You do not have permission to use this command.",
+					"en-GB": "You do not have permission to use this command.",
+					"es-ES": "No tienes permiso para usar este comando.",
+					"es-419": "No tienes permiso para usar este comando.",
+					"zh-CN": "您没有使用此命令的权限。",
+					"fr": "Vous n'avez pas la permission d'utiliser cette commande.",
+					"it": "Non hai il permesso di usare questo comando.",
+					"de": "Sie haben keine Berechtigung, diesen Befehl zu verwenden.",
+					"pl": "Nie masz uprawnień do użycia tej komendy.",
+					"ru": "У вас нет разрешения на использование этой команды.",
+					"ja": "このコマンドを使用する権限がありません。"
+				}
+			},
+			"Overview": {
+				"Title": {
+					"en-US": "Active Guilds Overview",
+					"en-GB": "Active Guilds Overview",
+					"es-ES": "Resumen de Servidores Activos",
+					"es-419": "Resumen de Servidores Activos",
+					"zh-CN": "活动服务器概述",
+					"fr": "Aperçu des Serveurs Actifs",
+					"it": "Panoramica dei Server Attivi",
+					"de": "Übersicht Aktiver Server",
+					"pl": "Przegląd Aktywnych Serwerów",
+					"ru": "Обзор Активных Серверов",
+					"ja": "アクティブサーバー概要"
+				},
+				"SystemStats": {
+					"en-US": "%d %s • %d Goroutines • %.2f MB Memory Used",
+					"en-GB": "%d %s • %d Goroutines • %.2f MB Memory Used",
+					"es-ES": "%d %s • %d Goroutines • %.2f MB Memoria Usada",
+					"es-419": "%d %s • %d Goroutines • %.2f MB Memoria Usada",
+					"zh-CN": "%d 个%s • %d 个协程 • %.2f MB 内存使用",
+					"fr": "%d %s • %d Goroutines • %.2f MB Mémoire Utilisée",
+					"it": "%d %s • %d Goroutine • %.2f MB Memoria Utilizzata",
+					"de": "%d %s • %d Goroutinen • %.2f MB Speichernutzung",
+					"pl": "%d %s • %d Gorutyn • %.2f MB Użycia Pamięci",
+					"ru": "%d %s • %d Горутин • %.2f МБ Использования Памяти",
+					"ja": "%d %s • %d ゴルーチン • %.2f MB メモリ使用量"
+				},
+				"GuildField": {
+					"en-US": "> **Status:** %s\n> **Current:** %s\n> **Upcoming:** %d Song%s\n> **WebSockets:** %d %s",
+					"en-GB": "> **Status:** %s\n> **Current:** %s\n> **Upcoming:** %d Song%s\n> **WebSockets:** %d %s",
+					"es-ES": "> **Estado:** %s\n> **Actual:** %s\n> **Próximas:** %d canción/canciones\n> **Clientes Web:** %d %s",
+					"es-419": "> **Estado:** %s\n> **Actual:** %s\n> **Próximas:** %d canción/canciones\n> **Clientes Web:** %d %s",
+					"zh-CN": "> **状态：** %s\n> **当前：** %s\n> **即将播放：** %d 首歌曲\n> **网页客户端：** %d %s",
+					"fr": "> **Statut :** %s\n> **Actuel :** %s\n> **À venir :** %d chanson%s\n> **Clients Web :** %d %s",
+					"it": "> **Stato:** %s\n> **Corrente:** %s\n> **In coda:** %d canzone/canzoni\n> **Client Web:** %d %s",
+					"de": "> **Status:** %s\n> **Aktuell:** %s\n> **Warteschlange:** %d Song%s\n> **Web-Clients:** %d %s",
+					"pl": "> **Status:** %s\n> **Bieżący:** %s\n> **Kolejka:** %d utwór/utworów\n> **Klienty Web:** %d %s",
+					"ru": "> **Статус:** %s\n> **Текущий:** %s\n> **Очередь:** %d песня/песен\n> **Веб-Клиенты:** %d %s",
+					"ja": "> **ステータス：** %s\n> **現在：** %s\n> **キュー：** %d 曲\n> **Webクライアント：** %d %s"
+				},
+				"NoSong": {
+					"en-US": "None",
+					"en-GB": "None",
+					"es-ES": "Ninguna",
+					"es-419": "Ninguna",
+					"zh-CN": "无",
+					"fr": "Aucune",
+					"it": "Nessuna",
+					"de": "Keine",
+					"pl": "Brak",
+					"ru": "Нет",
+					"ja": "なし"
+				},
+				"MoreGuilds": {
+					"en-US": "...and %d more guilds (use /inspect with guild option for details)",
+					"en-GB": "...and %d more guilds (use /inspect with guild option for details)",
+					"es-ES": "...y %d servidores más (usa /inspect con la opción de servidor para detalles)",
+					"es-419": "...y %d servidores más (usa /inspect con la opción de servidor para detalles)",
+					"zh-CN": "...还有 %d 个服务器（使用 /inspect 带服务器选项查看详情）",
+					"fr": "...et %d serveurs de plus (utilisez /inspect avec l'option serveur pour plus de détails)",
+					"it": "...e altri %d server (usa /inspect con l'opzione server per i dettagli)",
+					"de": "...und %d weitere Server (verwenden Sie /inspect mit der Server-Option für Details)",
+					"pl": "...i %d więcej serwerów (użyj /inspect z opcją serwera dla szczegółów)",
+					"ru": "...и ещё %d серверов (используйте /inspect с опцией сервера для подробностей)",
+					"ja": "...さらに %d サーバー（詳細は /inspect とサーバーオプションを使用）"
+				},
+				"NoGuilds": {
+					"Title": {
+						"en-US": "No Active Guilds",
+						"en-GB": "No Active Guilds",
+						"es-ES": "No Hay Servidores Activos",
+						"es-419": "No Hay Servidores Activos",
+						"zh-CN": "没有活动服务器",
+						"fr": "Aucun Serveur Actif",
+						"it": "Nessun Server Attivo",
+						"de": "Keine Aktiven Server",
+						"pl": "Brak Aktywnych Serwerów",
+						"ru": "Нет Активных Серверов",
+						"ja": "アクティブなサーバーがありません"
+					},
+					"Description": {
+						"en-US": "There are currently no active playback sessions.",
+						"en-GB": "There are currently no active playback sessions.",
+						"es-ES": "Actualmente no hay sesiones de reproducción activas.",
+						"es-419": "Actualmente no hay sesiones de reproducción activas.",
+						"zh-CN": "当前没有活动的播放会话。",
+						"fr": "Il n'y a actuellement aucune session de lecture active.",
+						"it": "Attualmente non ci sono sessioni di riproduzione attive.",
+						"de": "Es gibt derzeit keine aktiven Wiedergabesitzungen.",
+						"pl": "Obecnie nie ma aktywnych sesji odtwarzania.",
+						"ru": "В настоящее время нет активных сеансов воспроизведения.",
+						"ja": "現在、アクティブな再生セッションはありません。"
+					}
+				}
+			},
+			"Details": {
+				"Title": {
+					"en-US": "%s",
+					"en-GB": "%s",
+					"es-ES": "%s",
+					"es-419": "%s",
+					"zh-CN": "%s",
+					"fr": "%s",
+					"it": "%s",
+					"de": "%s",
+					"pl": "%s",
+					"ru": "%s",
+					"ja": "%s"
+				},
+				"InvalidGuildID": {
+					"Title": {
+						"en-US": "Invalid Guild ID",
+						"en-GB": "Invalid Guild ID",
+						"es-ES": "ID de Servidor Inválido",
+						"es-419": "ID de Servidor Inválido",
+						"zh-CN": "无效的服务器ID",
+						"fr": "ID de Serveur Invalide",
+						"it": "ID Server Non Valido",
+						"de": "Ungültige Server-ID",
+						"pl": "Nieprawidłowy ID Serwera",
+						"ru": "Неверный ID Сервера",
+						"ja": "無効なサーバーID"
+					},
+					"Description": {
+						"en-US": "The provided guild ID is not valid.",
+						"en-GB": "The provided guild ID is not valid.",
+						"es-ES": "El ID de servidor proporcionado no es válido.",
+						"es-419": "El ID de servidor proporcionado no es válido.",
+						"zh-CN": "提供的服务器ID无效。",
+						"fr": "L'ID de serveur fourni n'est pas valide.",
+						"it": "L'ID del server fornito non è valido.",
+						"de": "Die angegebene Server-ID ist ungültig.",
+						"pl": "Podany ID serwera jest nieprawidłowy.",
+						"ru": "Указанный ID сервера недействителен.",
+						"ja": "提供されたサーバーIDは無効です。"
+					}
+				},
+				"GuildNotFound": {
+					"Title": {
+						"en-US": "Guild Not Found",
+						"en-GB": "Guild Not Found",
+						"es-ES": "Servidor No Encontrado",
+						"es-419": "Servidor No Encontrado",
+						"zh-CN": "未找到服务器",
+						"fr": "Serveur Non Trouvé",
+						"it": "Server Non Trovato",
+						"de": "Server Nicht Gefunden",
+						"pl": "Nie Znaleziono Serwera",
+						"ru": "Сервер Не Найден",
+						"ja": "サーバーが見つかりません"
+					},
+					"Description": {
+						"en-US": "The specified guild does not have an active session.",
+						"en-GB": "The specified guild does not have an active session.",
+						"es-ES": "El servidor especificado no tiene una sesión activa.",
+						"es-419": "El servidor especificado no tiene una sesión activa.",
+						"zh-CN": "指定的服务器没有活动会话。",
+						"fr": "Le serveur spécifié n'a pas de session active.",
+						"it": "Il server specificato non ha una sessione attiva.",
+						"de": "Der angegebene Server hat keine aktive Sitzung.",
+						"pl": "Określony serwer nie ma aktywnej sesji.",
+						"ru": "Указанный сервер не имеет активного сеанса.",
+						"ja": "指定されたサーバーにアクティブなセッションがありません。"
+					}
+				}
+			}
 		}
 	},
 	"Buttons": {
@@ -2020,8 +2356,8 @@
 					"ja": "ストリーミングの問題が検出されました"
 				},
 				"Description": {
-					"en-US": "This song could not be played.\nThis may be indicative of other problems. Please remain patient.",
-					"en-GB": "This song could not be played.\nThis may be indicative of other problems. Please remain patient.",
+					"en-US": "This Song could not be played.\nThis may be indicative of other problems. Please remain patient.",
+					"en-GB": "This Song could not be played.\nThis may be indicative of other problems. Please remain patient.",
 					"es-ES": "Esta canción no se pudo transmitir.\nEsto puede indicar otros problemas. Por favor, ten paciencia.",
 					"es-419": "Esta canción no se pudo transmitir.\nEsto puede indicar otros problemas. Por favor, ten paciencia.",
 					"zh-CN": "无法播放此歌曲。\n这可能表明存在其他问题。请耐心等待。",
@@ -2573,6 +2909,21 @@
 				"ru": "В истории воспроизведения песни не найдены.",
 				"ja": "再生履歴に曲が見つかりません。"
 			}
+		},
+		"Inspect": {
+			"NoActiveGuilds": {
+				"en-US": "No active guilds.",
+				"en-GB": "No active guilds.",
+				"es-ES": "No hay servidores activos.",
+				"es-419": "No hay servidores activos.",
+				"zh-CN": "没有活动服务器。",
+				"fr": "Aucun serveur actif.",
+				"it": "Nessun server attivo.",
+				"de": "Keine aktiven Server.",
+				"pl": "Brak aktywnych serwerów.",
+				"ru": "Нет активных серверов.",
+				"ja": "アクティブなサーバーがありません。"
+			}
 		}
 	},
 	"Web": {
@@ -2702,146 +3053,6 @@
 			"pl": "**Z Sieci:**",
 			"ru": "**Из Веб:**",
 			"ja": "**Webから：**"
-		},
-		"CreateNotification": {
-			"Unauthorized": {
-				"Title": {
-					"en-US": "Unauthorized Access",
-					"en-GB": "Unauthorised Access",
-					"es-ES": "Acceso No Autorizado",
-					"es-419": "Acceso No Autorizado",
-					"zh-CN": "未授权访问",
-					"fr": "Accès Non Autorisé",
-					"it": "Accesso Non Autorizzato",
-					"de": "Unbefugter Zugriff",
-					"pl": "Nieautoryzowany Dostęp",
-					"ru": "Несанкционированный Доступ",
-					"ja": "不正アクセス"
-				},
-				"Description": {
-					"en-US": "You do not have permission to use this command.",
-					"en-GB": "You do not have permission to use this command.",
-					"es-ES": "No tienes permiso para usar este comando.",
-					"es-419": "No tienes permiso para usar este comando.",
-					"zh-CN": "您没有使用此命令的权限。",
-					"fr": "Vous n'avez pas la permission d'utiliser cette commande.",
-					"it": "Non hai il permesso di usare questo comando.",
-					"de": "Sie haben keine Berechtigung, diesen Befehl zu verwenden.",
-					"pl": "Nie masz uprawnień do użycia tej komendy.",
-					"ru": "У вас нет разрешения на использование этой команды.",
-					"ja": "このコマンドを使用する権限がありません。"
-				}
-			},
-			"InvalidDate": {
-				"Title": {
-					"en-US": "Invalid Date Format",
-					"en-GB": "Invalid Date Format",
-					"es-ES": "Formato de Fecha Inválido",
-					"es-419": "Formato de Fecha Inválido",
-					"zh-CN": "日期格式无效",
-					"fr": "Format de Date Invalide",
-					"it": "Formato Data Non Valido",
-					"de": "Ungültiges Datumsformat",
-					"pl": "Nieprawidłowy Format Daty",
-					"ru": "Неверный Формат Даты",
-					"ja": "無効な日付形式"
-				},
-				"Description": {
-					"en-US": "Please use the format: 2006-01-02 or 2006-01-02T15:04:05Z",
-					"en-GB": "Please use the format: 2006-01-02 or 2006-01-02T15:04:05Z",
-					"es-ES": "Por favor usa el formato: 2006-01-02 o 2006-01-02T15:04:05Z",
-					"es-419": "Por favor usa el formato: 2006-01-02 o 2006-01-02T15:04:05Z",
-					"zh-CN": "请使用格式：2006-01-02 或 2006-01-02T15:04:05Z",
-					"fr": "Veuillez utiliser le format : 2006-01-02 ou 2006-01-02T15:04:05Z",
-					"it": "Utilizza il formato: 2006-01-02 o 2006-01-02T15:04:05Z",
-					"de": "Bitte verwenden Sie das Format: 2006-01-02 oder 2006-01-02T15:04:05Z",
-					"pl": "Proszę użyć formatu: 2006-01-02 lub 2006-01-02T15:04:05Z",
-					"ru": "Пожалуйста, используйте формат: 2006-01-02 или 2006-01-02T15:04:05Z",
-					"ja": "形式を使用してください：2006-01-02 または 2006-01-02T15:04:05Z"
-				}
-			},
-			"Error": {
-				"Title": {
-					"en-US": "Notification Creation Failed",
-					"en-GB": "Notification Creation Failed",
-					"es-ES": "Creación de Notificación Fallida",
-					"es-419": "Creación de Notificación Fallida",
-					"zh-CN": "通知创建失败",
-					"fr": "Échec de la Création de Notification",
-					"it": "Creazione Notifica Fallita",
-					"de": "Benachrichtigungserstellung Fehlgeschlagen",
-					"pl": "Tworzenie Powiadomienia Nie Powiodło Się",
-					"ru": "Не Удалось Создать Уведомление",
-					"ja": "通知の作成に失敗しました"
-				},
-				"Description": {
-					"en-US": "An error occurred while creating the notification.",
-					"en-GB": "An error occurred whilst creating the notification.",
-					"es-ES": "Ocurrió un error al crear la notificación.",
-					"es-419": "Ocurrió un error al crear la notificación.",
-					"zh-CN": "创建通知时发生错误。",
-					"fr": "Une erreur s'est produite lors de la création de la notification.",
-					"it": "Si è verificato un errore durante la creazione della notifica.",
-					"de": "Beim Erstellen der Benachrichtigung ist ein Fehler aufgetreten.",
-					"pl": "Wystąpił błąd podczas tworzenia powiadomienia.",
-					"ru": "Произошла ошибка при создании уведомления.",
-					"ja": "通知の作成中にエラーが発生しました。"
-				}
-			},
-			"Success": {
-				"Title": {
-					"en-US": "Notification Created",
-					"en-GB": "Notification Created",
-					"es-ES": "Notificación Creada",
-					"es-419": "Notificación Creada",
-					"zh-CN": "通知已创建",
-					"fr": "Notification Créée",
-					"it": "Notifica Creata",
-					"de": "Benachrichtigung Erstellt",
-					"pl": "Powiadomienie Utworzone",
-					"ru": "Уведомление Создано",
-					"ja": "通知が作成されました"
-				},
-				"Description": {
-					"en-US": "The notification has been created successfully.",
-					"en-GB": "The notification has been created successfully.",
-					"es-ES": "La notificación ha sido creada exitosamente.",
-					"es-419": "La notificación ha sido creada exitosamente.",
-					"zh-CN": "通知已成功创建。",
-					"fr": "La notification a été créée avec succès.",
-					"it": "La notifica è stata creata con successo.",
-					"de": "Die Benachrichtigung wurde erfolgreich erstellt.",
-					"pl": "Powiadomienie zostało pomyślnie utworzone.",
-					"ru": "Уведомление успешно создано.",
-					"ja": "通知が正常に作成されました。"
-				},
-				"Expiry": {
-					"en-US": "Expires on:",
-					"en-GB": "Expires on:",
-					"es-ES": "Expira el:",
-					"es-419": "Expira el:",
-					"zh-CN": "到期日期：",
-					"fr": "Expire le :",
-					"it": "Scade il:",
-					"de": "Läuft ab am:",
-					"pl": "Wygasa:",
-					"ru": "Истекает:",
-					"ja": "有効期限："
-				},
-				"ID": {
-					"en-US": "Notification ID:",
-					"en-GB": "Notification ID:",
-					"es-ES": "ID de Notificación:",
-					"es-419": "ID de Notificación:",
-					"zh-CN": "通知 ID：",
-					"fr": "ID de Notification :",
-					"it": "ID Notifica:",
-					"de": "Benachrichtigungs-ID:",
-					"pl": "ID Powiadomienia:",
-					"ru": "ID Уведомления:",
-					"ja": "通知ID："
-				}
-			}
 		}
 	},
 	"Components": {
@@ -2999,6 +3210,58 @@
 			"pl": "Utwory",
 			"ru": "Песни",
 			"ja": "曲"
+		},
+		"Guild": {
+			"en-US": "Guild",
+			"en-GB": "Guild",
+			"es-ES": "Servidor",
+			"es-419": "Servidor",
+			"zh-CN": "服务器",
+			"fr": "Serveur",
+			"it": "Server",
+			"de": "Server",
+			"pl": "Serwer",
+			"ru": "Сервер",
+			"ja": "サーバー"
+		},
+		"Guilds": {
+			"en-US": "Guilds",
+			"en-GB": "Guilds",
+			"es-ES": "Servidores",
+			"es-419": "Servidores",
+			"zh-CN": "服务器",
+			"fr": "Serveurs",
+			"it": "Server",
+			"de": "Server",
+			"pl": "Serwery",
+			"ru": "Серверы",
+			"ja": "サーバー"
+		},
+		"Client": {
+			"en-US": "Client",
+			"en-GB": "Client",
+			"es-ES": "Cliente",
+			"es-419": "Cliente",
+			"zh-CN": "客户端",
+			"fr": "Client",
+			"it": "Client",
+			"de": "Client",
+			"pl": "Klient",
+			"ru": "Клиент",
+			"ja": "クライアント"
+		},
+		"Clients": {
+			"en-US": "Clients",
+			"en-GB": "Clients",
+			"es-ES": "Clientes",
+			"es-419": "Clientes",
+			"zh-CN": "客户端",
+			"fr": "Clients",
+			"it": "Client",
+			"de": "Clients",
+			"pl": "Klienci",
+			"ru": "Клиенты",
+			"ja": "クライアント"
 		},
 		"Contributor": {
 			"en-US": "Contributor",

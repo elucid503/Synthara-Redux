@@ -261,7 +261,7 @@ function App() {
 
     }, []);
 
-    // Updates background & lyrics when song changes
+    // Updates background when song changes
 
     useEffect(() => {
 
@@ -269,8 +269,6 @@ function App() {
 
             CurrentSongIdRef.current = CurrentSong.youtube_id;
             SetBackgroundImage(NormalizeCoverURL(CurrentSong.cover));
-            
-            ActiveView == 'Lyrics' && FetchLyricsAndSetState(CurrentSong);
 
         } else {
 
@@ -278,7 +276,7 @@ function App() {
 
         }
 
-    }, [CurrentSong, ActiveView]);
+    }, [CurrentSong]);
 
     useEffect(() => {
 
@@ -312,11 +310,11 @@ function App() {
 
     }, [PlayerStateValue]);
 
-    // Fetch lyrics when switching to Lyrics view
+    // Fetch lyrics when switching to Lyrics view or when song changes while on Lyrics view
 
     useEffect(() => {
 
-        if (ActiveView == 'Lyrics' && CurrentSong && !Lyrics && !LyricsLoading) {
+        if (ActiveView == 'Lyrics' && CurrentSong) {
 
             FetchLyricsAndSetState(CurrentSong);
 

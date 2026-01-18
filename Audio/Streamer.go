@@ -353,7 +353,7 @@ func NewMP4Processor() (*MP4Processor, error) {
 
 	}
 
-	OpusEncoder.SetBitrate(128000) // 128 kbps
+	OpusEncoder.SetBitrate(128000) // 128 kb/s
 
 	return &MP4Processor{
 

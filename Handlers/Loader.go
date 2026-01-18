@@ -110,20 +110,24 @@ func InitializeHandlers() {
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.ApplicationCommandInteractionCreate) {
 
 		go func ()  {
-			
-			Guild := Structs.GetGuild(*Event.GuildID(), false)
 
-			if Guild != nil {
+			if Event.Data.GuildID() != nil {
+				
+				Guild := Structs.GetGuild(*Event.GuildID(), false)
 
-				// Reset inactivity timer on activity
+				if Guild != nil {
 
-				Guild.ResetInactivityTimer()
+					// Reset inactivity timer on activity
+
+					Guild.ResetInactivityTimer()
+
+				}
 
 			}
 
 		}()
 
-		go func ()  {
+		go func() {
 
 			// Switching for each command; not really a better way to do this
 			
@@ -209,18 +213,21 @@ func InitializeHandlers() {
 
 					Commands.Leave(Event)
 
-			case "notify":
+				case "notify":
 
-				Commands.Notify(Event)
+					Commands.Notify(Event)
+
+				case "inspect":
+
+					Commands.Inspect(Event)
 
 			}
-
-			// Check for unseen notifications after command execution
-			CheckAndDisplayNotification(Event, Event.User().ID)
 
 		}()
 
 	}))
+
+	// Autocomplete Interactions
 
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.AutocompleteInteractionCreate) {
 
@@ -243,6 +250,10 @@ func InitializeHandlers() {
 				case "move":
 
 					Autocomplete.MoveAutocomplete(Event)
+
+				case "inspect":
+
+					Autocomplete.InspectAutocomplete(Event)
 
 			}
 
@@ -333,6 +344,10 @@ func InitializeHandlers() {
 
 					Components.AlbumPlay(Event)
 
+				case "Disconnect":
+
+					Components.Disconnect(Event)
+
 			}
 
 		}()
@@ -414,17 +429,15 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 	
 	if User.LastNotificationSeen == LatestNotification.ID { return }
 
-	// Mark as seen
-
-	User.SetLastNotificationSeen(LatestNotification.ID)
-
 	// Create notification embed
 
 	NotificationEmbed := Utils.CreateEmbed(Utils.EmbedOptions{
 
 		Title:       LatestNotification.Title,
 		Description: LatestNotification.Description,
-		Color:       0xFFA500, // Orange color for notifications
+		Author: Localizations.Get("Embeds.Categories.Notifications", Event.Locale().Code()),
+
+		Color:       0xe6de8b, // Orange/yellow-ish color
 
 	})
 
@@ -435,5 +448,9 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 		Embeds: []discord.Embed{NotificationEmbed},
 
 	})
+
+	// Mark as seen (after displaying the notification)
+
+	User.SetLastNotificationSeen(LatestNotification.ID)
 
 }

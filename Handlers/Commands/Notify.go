@@ -44,6 +44,11 @@ func Notify(Event *events.ApplicationCommandInteractionCreate) {
 	Title := Data.String("title")
 	Description := Data.String("description")
 
+	// Replaces literal escape sequences with actual newlines so Discord preserves line breaks in embeds.
+	
+	Description = strings.ReplaceAll(Description, "\\r\\n", "\n")
+	Description = strings.ReplaceAll(Description, "\\n", "\n")
+
 	var Expiry time.Time
 	var HasExpiry bool
 

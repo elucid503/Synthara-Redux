@@ -1087,5 +1087,73 @@
 		"contexts": [
 			1
 		]
+	},
+	{
+		"name": "inspect",
+		"name_localizations": {
+			"en-US": "inspect",
+			"en-GB": "inspect",
+			"es-ES": "inspeccionar",
+			"es-419": "inspeccionar",
+			"zh-CN": "检查",
+			"fr": "inspecter",
+			"it": "ispeziona",
+			"de": "inspizieren",
+			"pl": "sprawdź",
+			"ru": "проверить",
+			"ja": "検査"
+		},
+		"description": "Developer Only: Inspect active guilds and queue diagnostics.",
+		"description_localizations": {
+			"en-US": "Developer Only: Inspect active guilds and queue diagnostics.",
+			"en-GB": "Developer Only: Inspect active guilds and queue diagnostics.",
+			"es-ES": "Solo desarrolladores: Inspeccionar servidores activos y diagnósticos de cola.",
+			"es-419": "Solo desarrolladores: Inspeccionar servidores activos y diagnósticos de cola.",
+			"zh-CN": "仅限开发者：检查活动服务器和队列诊断。",
+			"fr": "Développeurs uniquement : Inspecter les serveurs actifs et les diagnostics de file d'attente.",
+			"it": "Solo sviluppatori: Ispeziona i server attivi e la diagnostica della coda.",
+			"de": "Nur Entwickler: Aktive Server und Warteschlangendiagnose überprüfen.",
+			"pl": "Tylko programiści: Sprawdź aktywne serwery i diagnostykę kolejki.",
+			"ru": "Только разработчики: Проверить активные серверы и диагностику очереди.",
+			"ja": "開発者のみ：アクティブなサーバーとキュー診断を検査します。"
+		},
+		"options": [
+			{
+				"type": 3,
+				"name": "guild",
+				"name_localizations": {
+					"en-US": "guild",
+					"en-GB": "guild",
+					"es-ES": "servidor",
+					"es-419": "servidor",
+					"zh-CN": "服务器",
+					"fr": "serveur",
+					"it": "server",
+					"de": "server",
+					"pl": "serwer",
+					"ru": "сервер",
+					"ja": "サーバー"
+				},
+				"description": "Use this option to inspect a specific guild. Leave empty for overview.",
+				"description_localizations": {
+					"en-US": "Use this option to inspect a specific guild. Leave empty for overview.",
+					"en-GB": "Use this option to inspect a specific guild. Leave empty for overview.",
+					"es-ES": "Usa esta opción para inspeccionar un servidor específico. Deja vacío para una vista general.",
+					"es-419": "Usa esta opción para inspeccionar un servidor específico. Deja vacío para una vista general.",
+					"zh-CN": "使用此选项检查特定服务器。留空以查看概述。",
+					"fr": "Utilisez cette option pour inspecter un serveur spécifique. Laissez vide pour un aperçu.",
+					"it": "Usa questa opzione per ispezionare un server specifico. Lascia vuoto per una panoramica.",
+					"de": "Verwende diese Option, um einen bestimmten Server zu überprüfen. Leer lassen für Übersicht.",
+					"pl": "Użyj tej opcji, aby sprawdzić określony serwer. Zostaw puste dla przeglądu.",
+					"ru": "Используйте эту опцию для проверки конкретного сервера. Оставьте пустым для обзора.",
+					"ja": "このオプションを使用して特定のサーバーを検査します。空のままで概要。"
+				},
+				"required": false,
+				"autocomplete": true
+			}
+		],
+		"contexts": [
+			1
+		]
 	}
 ]
