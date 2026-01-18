@@ -420,57 +420,63 @@ func InitializeHandlers() {
 
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.GuildVoiceStateUpdate) {
 
-		if (Event.VoiceState.UserID != Globals.DiscordClient.ApplicationID) {
-
-			return; // Not our bot
-
-		}
-
-		Guild := Structs.GetGuild(Event.VoiceState.GuildID, false) // does not create if not found
-
-		if (Guild == nil) {
-
-			return; // No active guild session
-
-		}
-
-		if (Event.VoiceState.ChannelID == nil && !Guild.Internal.Disconnecting) { // we do not want to call this if Cleanup() was already called...
-
-			// Disconnected from voice channel
-
-			Guild.Cleanup(false)
-
-			go func() { 
-
-				ReconnectButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.Reconnect", Guild.Locale.Code()), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
-
-					ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
-
-				})
-
-			_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
-				AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
-
-					Title:       Localizations.Get("Embeds.Notifications.ManualDisconnect.Title", Guild.Locale.Code()),
-					Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
-					Description: Localizations.Get("Embeds.Notifications.ManualDisconnect.Description", Guild.Locale.Code()),
-
-				})).
-				AddActionRow(ReconnectButton).
-				Build())
-
-			if ErrorSending != nil {
-
-				Utils.Logger.Error(fmt.Sprintf("Error sending manual disconnect message to guild %s: %s", Guild.ID, ErrorSending.Error()))
+		go func () {
 			
+			if (Event.VoiceState.UserID != Globals.DiscordClient.ApplicationID) {
+
+				return; // Not our bot
+
+			}
+
+			Guild := Structs.GetGuild(Event.VoiceState.GuildID, false) // does not create if not found
+
+			if (Guild == nil) {
+
+				return; // No active guild session
+
+			}
+
+			fmt.Println("Voice State Update detected for guild")
+			fmt.Println(Event.VoiceState)
+
+			if (Event.VoiceState.ChannelID == nil && !Guild.Internal.Disconnecting) { // we do not want to call this if Cleanup() was already called...
+
+				go func() {
+
+					Utils.Logger.Info(fmt.Sprintf("VoiceStateUpdate: Detected disconnect for guild %s, calling Cleanup", Guild.ID.String()))
+					Guild.Cleanup(false)
+
+					ReconnectButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.Reconnect", Guild.Locale.Code()), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
+
+						ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
+
+					})
+
+					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+						AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+							Title:       Localizations.Get("Embeds.Notifications.ManualDisconnect.Title", Guild.Locale.Code()),
+							Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
+							Description: Localizations.Get("Embeds.Notifications.ManualDisconnect.Description", Guild.Locale.Code()),
+
+						})).
+						AddActionRow(ReconnectButton).
+						Build())
+
+					if ErrorSending != nil {
+
+						Utils.Logger.Error(fmt.Sprintf("Error sending manual disconnect message to guild %s: %s", Guild.ID, ErrorSending.Error()))
+					
+					}
+
+				}()
+
 			}
 
 		}()
 
-		}
-		
 	}))
-
+		
 	Utils.Logger.Info("Event handlers initialized.")
 
 }

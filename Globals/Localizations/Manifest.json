@@ -857,8 +857,8 @@
 				"ja": "次の曲にスキップしました"
 			},
 			"Description": {
-				"en-US": "Now playing: %s",
-				"en-GB": "Now playing: %s",
+				"en-US": "**Now Playing:** %s",
+				"en-GB": "**Now Playing:** %s",
 				"es-ES": "Ahora reproduciendo: %s",
 				"es-419": "Ahora reproduciendo: %s",
 				"zh-CN": "正在播放：%s",
@@ -969,8 +969,8 @@
 				"ja": "前の曲を再生中"
 			},
 			"Description": {
-				"en-US": "Now playing: %s",
-				"en-GB": "Now playing: %s",
+				"en-US": "**Now Playing:** %s",
+				"en-GB": "**Now Playing:** %s",
 				"es-ES": "Ahora reproduciendo: %s",
 				"es-419": "Ahora reproduciendo: %s",
 				"zh-CN": "正在播放：%s",
@@ -1025,8 +1025,8 @@
 				"ja": "曲にジャンプしました"
 			},
 			"Description": {
-				"en-US": "Now playing: %s",
-				"en-GB": "Now playing: %s",
+				"en-US": "**Now Playing:** %s",
+				"en-GB": "**Now Playing:** %s",
 				"es-ES": "Ahora reproduciendo: %s",
 				"es-419": "Ahora reproduciendo: %s",
 				"zh-CN": "正在播放：%s",
@@ -2667,6 +2667,88 @@
 					"ru": "%d %s добавлено в очередь.",
 					"ja": "%d %sをキューに追加しました。"
 				}
+			},
+			"AddedAdditionalSongs": {
+				"Title": {
+					"en-US": "Added Additional Songs",
+					"en-GB": "Added Additional Songs",
+					"es-ES": "Se Agregaron Canciones Adicionales",
+					"es-419": "Se Agregaron Canciones Adicionales",
+					"zh-CN": "已添加附加歌曲",
+					"fr": "Chansons Supplémentaires Ajoutées",
+					"it": "Aggiunte Canzoni Aggiuntive",
+					"de": "Zusätzliche Lieder Hinzugefügt",
+					"pl": "Dodano Dodatkowe Utwory",
+					"ru": "Добавлены Дополнительные Песни",
+					"ja": "追加の曲を追加しました"
+				},
+				"FromPlaylist": {
+					"en-US": "Added %d %s from **%s** to Queue.",
+					"en-GB": "Added %d %s from **%s** to Queue.",
+					"es-ES": "Se agregaron %d %s de **%s** a la cola.",
+					"es-419": "Se agregaron %d %s de **%s** a la cola.",
+					"zh-CN": "已将 %d %s从 **%s** 添加到队列。",
+					"fr": "%d %s de **%s** ajoutées à la file d'attente.",
+					"it": "%d %s da **%s** aggiunte alla coda.",
+					"de": "%d %s von **%s** zur Warteschlange hinzugefügt.",
+					"pl": "Dodano %d %s z **%s** do kolejki.",
+					"ru": "%d %s из **%s** добавлено в очередь.",
+					"ja": "**%s** から %d %sをキューに追加しました。"
+				},
+				"FromAlbum": {
+					"en-US": "Added %d %s from **%s** to Queue.",
+					"en-GB": "Added %d %s from **%s** to Queue.",
+					"es-ES": "Se agregaron %d %s de **%s** a la cola.",
+					"es-419": "Se agregaron %d %s de **%s** a la cola.",
+					"zh-CN": "已将 %d %s从 **%s** 添加到队列。",
+					"fr": "%d %s de **%s** ajoutées à la file d'attente.",
+					"it": "%d %s da **%s** aggiunte alla coda.",
+					"de": "%d %s von **%s** zur Warteschlange hinzugefügt.",
+					"pl": "Dodano %d %s z **%s** do kolejki.",
+					"ru": "%d %s из **%s** добавлено в очередь.",
+					"ja": "**%s** から %d %sをキューに追加しました。"
+				},
+				"FromArtist": {
+					"en-US": "Added %d %s from **%s** to Queue.",
+					"en-GB": "Added %d %s from **%s** to Queue.",
+					"es-ES": "Se agregaron %d %s de **%s** a la cola.",
+					"es-419": "Se agregaron %d %s de **%s** a la cola.",
+					"zh-CN": "已将 %d %s从 **%s** 添加到队列。",
+					"fr": "%d %s de **%s** ajoutées à la file d'attente.",
+					"it": "%d %s da **%s** aggiunte alla coda.",
+					"de": "%d %s von **%s** zur Warteschlange hinzugefügt.",
+					"pl": "Dodano %d %s z **%s** do kolejki.",
+					"ru": "%d %s из **%s** добавлено в очередь。",
+					"ja": "**%s** から %d %sをキューに追加しました。"
+				}
+			},
+			"SomePlaylistSongsFailed": {
+				"Title": {
+					"en-US": "Some Songs Triaged",
+					"en-GB": "Some Songs Triaged",
+					"es-ES": "Algunas Canciones Triadas",
+					"es-419": "Algunas Canciones Triadas",
+					"zh-CN": "部分歌曲已分拣",
+					"fr": "Certaines Chansons Triées",
+					"it": "Alcune Canzoni Triate",
+					"de": "Einige Lieder Triagiert",
+					"pl": "Niektóre Utwory Triowane",
+					"ru": "Некоторые Песни Отобраны",
+					"ja": "一部の曲が選別されました"
+				},
+			"Description": {
+				"en-US": "%d out of %d %s from **%s** could not be found.",
+				"en-GB": "%d out of %d %s from **%s** could not be found.",
+				"es-ES": "%d de %d %s de **%s** no se pudieron encontrar.",
+				"es-419": "%d de %d %s de **%s** no se pudieron encontrar.",
+				"zh-CN": "**%s** 中的 %d/%d %s无法找到。",
+				"fr": "%d sur %d %s de **%s** n'ont pas pu être trouvées.",
+				"it": "%d su %d %s da **%s** non sono state trovate.",
+				"de": "%d von %d %s von **%s** konnten nicht gefunden werden.",
+				"pl": "%d z %d %s z **%s** nie mogło zostać znalezionych.",
+				"ru": "%d из %d %s из **%s** не удалось найти.",
+				"ja": "**%s** の %d/%d %sが見つかりませんでした。"
+				}
 			}
 		},
 		"NowPlaying": {
@@ -3242,8 +3324,8 @@
 					"ja": "曲にジャンプしました"
 				},
 				"Description": {
-					"en-US": "Now playing: %s",
-					"en-GB": "Now playing: %s",
+					"en-US": "**Now Playing:** %s",
+					"en-GB": "**Now Playing:** %s",
 					"es-ES": "Ahora reproduciendo: %s",
 					"es-419": "Ahora reproduciendo: %s",
 					"zh-CN": "正在播放：%s",
@@ -3326,8 +3408,8 @@
 					"ja": "曲をリプレイしています"
 				},
 				"Description": {
-					"en-US": "Now playing: %s",
-					"en-GB": "Now playing: %s",
+					"en-US": "**Now Playing:** %s",
+					"en-GB": "**Now Playing:** %s",
 					"es-ES": "Ahora reproduciendo: %s",
 					"es-419": "Ahora reproduciendo: %s",
 					"zh-CN": "正在播放：%s",
@@ -3509,6 +3591,19 @@
 			"pl": "Utwory",
 			"ru": "Песни",
 			"ja": "曲"
+		},
+		"Playlist": {
+			"en-US": "Playlist",
+			"en-GB": "Playlist",
+			"es-ES": "Lista de Reproducción",
+			"es-419": "Lista de Reproducción",
+			"zh-CN": "播放列表",
+			"fr": "Liste de Lecture",
+			"it": "Playlist",
+			"de": "Wiedergabeliste",
+			"pl": "Playlista",
+			"ru": "Плейлист",
+			"ja": "プレイリスト"
 		},
 		"Guild": {
 			"en-US": "Guild",

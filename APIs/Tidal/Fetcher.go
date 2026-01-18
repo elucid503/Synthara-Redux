@@ -31,6 +31,8 @@ var TokenMutex sync.RWMutex
 var CachedToken string
 var TokenExpiry time.Time
 
+var StreamURLMutexes sync.Map
+
 // Tidal OAuth credentials
 
 const (
@@ -837,8 +839,25 @@ func GetSong(TrackID int64) (Song, error) {
 func GetStreamURL(TrackID int64) (string, error) {
 
 	Cache := Globals.GetOrCreateCache("TidalStreamURLs")
+	Key := fmt.Sprintf("%d", TrackID)
 
-	if Cached, Exists := Cache.Get(fmt.Sprintf("%d", TrackID)); Exists {
+	if Cached, Exists := Cache.Get(Key); Exists {
+
+		if URL, Ok := Cached.(string); Ok {
+
+			return URL, nil
+
+		}
+
+	}
+
+	MutexInterface, _ := StreamURLMutexes.LoadOrStore(Key, &sync.Mutex{})
+	Mutex := MutexInterface.(*sync.Mutex)
+
+	Mutex.Lock()
+	defer Mutex.Unlock()
+
+	if Cached, Exists := Cache.Get(Key); Exists {
 
 		if URL, Ok := Cached.(string); Ok {
 
@@ -870,7 +889,7 @@ func GetStreamURL(TrackID int64) (string, error) {
 
 	}
 
-	Cache.Set(fmt.Sprintf("%d", TrackID), DirectURL, 1 * time.Hour) // 1 hour TTL
+	Cache.Set(Key, DirectURL, 1 * time.Hour) // 1 hour TTL
 
 	return DirectURL, nil
 

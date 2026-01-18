@@ -86,9 +86,10 @@ func PlaylistIDToFirstSong(PlaylistID string) (Tidal.Song, *youtube.Playlist, er
 }
 
 // PlaylistIDToAllSongs fetches all videos from a YouTube playlist and converts to Tidal.Song array
-func PlaylistIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tidal.Song, *youtube.Playlist, error) {
+func PlaylistIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tidal.Song, int, *youtube.Playlist, error) {
 
 	Songs := make([]Tidal.Song, 0)
+	FailedCount := 0
 
 	StartIndex := 0
 
@@ -114,6 +115,7 @@ func PlaylistIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tidal
 		if SearchErr != nil || len(Results) == 0 {
 
 			Utils.Logger.Warn(fmt.Sprintf("No Tidal match found for video: %s", Video.Title))
+			FailedCount++
 			continue
 
 		}
@@ -122,7 +124,7 @@ func PlaylistIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tidal
 
 	}
 
-	return Songs, Playlist, nil
+	return Songs, FailedCount, Playlist, nil
 
 }
 
@@ -166,9 +168,10 @@ func MusicAlbumIDToFirstSong(AlbumID string) (Tidal.Song, *youtube.Playlist, err
 }
 
 // MusicAlbumIDToAllSongs fetches all tracks from YouTube Music album and converts to Tidal.Song array
-func MusicAlbumIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tidal.Song, *youtube.Playlist, error) {
+func MusicAlbumIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tidal.Song, int, *youtube.Playlist, error) {
 
 	Songs := make([]Tidal.Song, 0)
+	FailedCount := 0
 
 	StartIndex := 0
 
@@ -194,6 +197,7 @@ func MusicAlbumIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tid
 		if SearchErr != nil || len(Results) == 0 {
 
 			Utils.Logger.Warn(fmt.Sprintf("No Tidal match found for track: %s", Video.Title))
+			FailedCount++
 			continue
 
 		}
@@ -202,7 +206,7 @@ func MusicAlbumIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tid
 
 	}
 
-	return Songs, Playlist, nil
+	return Songs, FailedCount, Playlist, nil
 	
 }
 

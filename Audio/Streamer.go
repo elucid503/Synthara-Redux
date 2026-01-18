@@ -1452,21 +1452,26 @@ func PlayMP4(URL string, OnFinished func(), SendToWS func(Event string, Data any
 		// Waits for all frames to be consumed
 
 		Streamer.Mutex.Lock()
-		defer Streamer.Mutex.Unlock()
+		
+		func() {
+			defer func() {
 
-		defer func() {
+				if r := recover(); r != nil {
 
-			if r := recover(); r != nil {
+					// noop, channel already closed
 
-				// noop, channel already closed
+				}
 
-			}
+			}()
 
+			close(Streamer.OpusFrameChan)
 		}()
 
-		close(Streamer.OpusFrameChan)
+		ShouldCallFinished := !Playback.Stopped.Load()
 
-		if !Playback.Stopped.Load() {
+		Streamer.Mutex.Unlock()
+
+		if ShouldCallFinished {
 
 			if OnFinished != nil {
 

@@ -27,7 +27,10 @@
 			"pl": "Użyj tej komendy, aby sprawdzić, czy bot jest online i odpowiada.",
 			"ru": "Используйте эту команду, чтобы проверить, онлайн ли бот и отвечает.",
 			"ja": "このコマンドを使用して、ボットがオンラインで応答しているかを確認します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "play",
@@ -92,6 +95,9 @@
 				"required": true,
 				"autocomplete": true
 			}
+		],
+		"contexts": [
+			0
 		]
 	},
 	{
@@ -122,7 +128,10 @@
 			"pl": "Użyj tej komendy, aby wstrzymać odtwarzany utwór.",
 			"ru": "Используйте эту команду, чтобы приостановить текущую песню.",
 			"ja": "このコマンドを使用して、現在再生中の曲を一時停止します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "resume",
@@ -152,7 +161,10 @@
 			"pl": "Użyj tej komendy, aby wznowić wstrzymany utwór.",
 			"ru": "Используйте эту команду, чтобы возобновить приостановленную песню.",
 			"ja": "このコマンドを使用して、一時停止中の曲を再開します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "next",
@@ -182,7 +194,10 @@
 			"pl": "Użyj tej komendy, aby przejść do następnego utworu w kolejce.",
 			"ru": "Используйте эту команду, чтобы перейти к следующей песне в очереди.",
 			"ja": "このコマンドを使用して、キューの次の曲にスキップします。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "last",
@@ -212,7 +227,10 @@
 			"pl": "Użyj tej komendy, aby odtworzyć poprzednio odtwarzany utwór.",
 			"ru": "Используйте эту команду, чтобы воспроизвести предыдущую песню.",
 			"ja": "このコマンドを使用して、前に再生した曲を再生します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "jump",
@@ -277,6 +295,9 @@
 				"required": true,
 				"autocomplete": true
 			}
+		],
+		"contexts": [
+			0
 		]
 	},
 	{
@@ -342,6 +363,9 @@
 				"required": true,
 				"autocomplete": true
 			}
+		],
+		"contexts": [
+			0
 		]
 	},
 	{
@@ -459,6 +483,9 @@
 					}
 				]
 			}
+		],
+		"contexts": [
+			0
 		]
 	},
 	{
@@ -523,6 +550,9 @@
 				},
 				"required": true
 			}
+		],
+		"contexts": [
+			0
 		]
 	},
 	{
@@ -587,6 +617,9 @@
 				},
 				"required": true
 			}
+		],
+		"contexts": [
+			0
 		]
 	},
 	{
@@ -617,7 +650,10 @@
 			"pl": "Użyj tej komendy, aby uzyskać tekst odtwarzanego utworu.",
 			"ru": "Используйте эту команду, чтобы получить текст текущей песни.",
 			"ja": "このコマンドを使用して、現在再生中の曲の歌詞を取得します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "controls",
@@ -647,7 +683,10 @@
 			"pl": "Użyj tej komendy, aby uzyskać link do interfejsu sterowania odtwarzaniem.",
 			"ru": "Используйте эту команду, чтобы получить ссылку на интерфейс управления воспроизведением.",
 			"ja": "このコマンドを使用して、再生コントロールインターフェースへのリンクを取得します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "queue",
@@ -677,7 +716,10 @@
 			"pl": "Użyj tej komendy, aby zobaczyć i edytować bieżącą kolejkę utworów.",
 			"ru": "Используйте эту команду для просмотра и редактирования текущей очереди песен.",
 			"ja": "このコマンドを使用して、現在の曲のキューを表示および編集します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "move",
@@ -775,6 +817,9 @@
 				"required": true,
 				"autocomplete": true
 			}
+		],
+		"contexts": [
+			0
 		]
 	},
 	{
@@ -805,7 +850,10 @@
 			"pl": "Użyj tej komendy, aby wyczyścić swoją ostatnią historię wyszukiwania.",
 			"ru": "Используйте эту команду, чтобы очистить историю последних поисков.",
 			"ja": "このコマンドを使用して、最近の検索履歴をクリアします。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "lock",
@@ -835,7 +883,10 @@
 			"pl": "Użyj tej komendy, aby zablokować kontrolki webowe i zapobiec operacjom z interfejsu webowego.",
 			"ru": "Заблокируй веб-управление и предотврати операции через веб-интерфейс.",
 			"ja": "このコマンドを使用して、Webコントロールをロックし、Webインターフェースからの操作を防ぎます。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "unlock",
@@ -865,7 +916,10 @@
 			"pl": "Użyj tej komendy, aby odblokować kontrolki webowe i pozwolić na operacje z interfejsu webowego.",
 			"ru": "Разблокируй веб-управление и разреши операции через веб-интерфейс.",
 			"ja": "このコマンドを使用して、Webコントロールのロックを解除し、Webインターフェースからの操作を許可します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "stats",
@@ -895,7 +949,10 @@
 			"pl": "Użyj tej komendy, aby uzyskać statystyki dla nerdów.",
 			"ru": "Получи статистику для нердов.",
 			"ja": "このコマンドを使用して、オタク向けの統計を取得します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "album",
@@ -925,7 +982,10 @@
 			"pl": "Użyj tej komendy, aby wyświetlić i odtworzyć album odtwarzanego utworu.",
 			"ru": "Используйте эту команду для просмотра и воспроизведения альбома текущей песни.",
 			"ja": "このコマンドを使用して、現在再生中の曲のアルバムを表示および再生します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "leave",
@@ -955,7 +1015,10 @@
 			"pl": "Użyj tej komendy, aby odłączyć bota od kanału głosowego.",
 			"ru": "Используйте эту команду, чтобы отключить бота от голосового канала.",
 			"ja": "このコマンドを使用して、ボットをボイスチャンネルから切断します。"
-		}
+		},
+		"contexts": [
+			0
+		]
 	},
 	{
 		"name": "notify",

@@ -473,6 +473,28 @@ func (Q *Queue) Add(Song *Tidal.Song, Requestor string) int {
 // Play delegates playback of the current song to the Guild; returns false on failure.
 func (Q *Queue) Play() bool {
 
+	// Protect against panics that might occur in underlying libraries
+	defer func() {
+
+		if r := recover(); r != nil {
+
+			Utils.Logger.Error(fmt.Sprintf("Panic recovered in Queue.Play for Queue %s: %v", Q.ParentID.String(), r))
+
+			// Set state back to idle on panic
+			Guild := GetGuild(Q.ParentID, false)
+
+			if Guild != nil {
+
+				Guild.StreamerMutex.Lock()
+				Guild.Queue.SetState(StateIdle)
+				Guild.StreamerMutex.Unlock()
+
+			}
+
+		}
+
+	}()
+
 	if Q.Current == nil {
 
 		return false
@@ -492,6 +514,12 @@ func (Q *Queue) Play() bool {
 	if ErrorPlaying != nil {
 
 		Utils.Logger.Error(fmt.Sprintf("Error playing song %s for Queue %s: %s", Q.Current.Title, Q.ParentID.String(), ErrorPlaying.Error()))
+		
+		// Set state back to idle on error
+		Guild.StreamerMutex.Lock()
+		Q.SetState(StateIdle)
+		Guild.StreamerMutex.Unlock()
+		
 		return false
 
 	}

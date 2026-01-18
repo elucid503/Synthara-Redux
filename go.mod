@@ -3,11 +3,12 @@ module Synthara-Redux
 go 1.24.1
 
 require (
-	github.com/disgoorg/disgo v0.19.0-rc.13
+	github.com/disgoorg/disgo v0.19.0-rc.15
 	github.com/disgoorg/snowflake/v2 v2.0.3
 	github.com/gin-gonic/gin v1.11.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/joho/godotenv v1.5.1
+	github.com/kkdai/youtube/v2 v2.10.5
 	go.mongodb.org/mongo-driver v1.17.6
 	layeh.com/gopus v0.0.0-20210501142526-1ee02d434e32
 )
@@ -31,7 +32,6 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/pprof v0.0.0-20250208200701-d0013a598941 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/kkdai/youtube/v2 v2.10.5 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
