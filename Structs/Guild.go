@@ -1018,7 +1018,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 					Title:       Localizations.Get("Embeds.Notifications.StreamingError.Title", Locale),
 					Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 					Description: Localizations.Get("Embeds.Notifications.StreamingError.Description", Locale),
-					Color:       0xFFB3BA,
+					Color:       Utils.RED,
 
 				})).
 				Build())

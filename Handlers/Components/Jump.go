@@ -58,7 +58,7 @@ func JumpToSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 				Title:       Localizations.Get("Embeds.Categories.Error", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: "Song not found in queue.",
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -81,7 +81,7 @@ func JumpToSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 				Title:       Localizations.Get("Embeds.Categories.Error", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: "Failed to jump to song.",
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 

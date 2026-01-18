@@ -2,6 +2,12 @@ package Utils
 
 import "github.com/disgoorg/disgo/discord"
 
+// Embed colors
+const (
+	WHITE = 0xFFFFFF
+	RED   = 0xFFB3BA
+)
+
 type EmbedOptions struct {
 
 	Title       string
@@ -50,7 +56,7 @@ func CreateEmbed(Options EmbedOptions) discord.Embed {
 
 	} else {
 
-		EmbedBuilder.SetColor(0xFFFFFF) // Defaults to white
+		EmbedBuilder.SetColor(WHITE) // Defaults to white
 
 	}
 

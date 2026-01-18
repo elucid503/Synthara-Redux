@@ -30,7 +30,7 @@ func Last(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Last.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Last.Error.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 

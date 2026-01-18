@@ -129,6 +129,56 @@ func InitializeHandlers() {
 
 		go func() {
 
+			// Check if service is restricted for non-developers
+										
+			Globals.ServiceRestrictionMutex.RLock()
+
+			IsRestricted := Globals.ServiceRestricted
+			CustomMessage := Globals.ServiceRestrictionMessage
+			
+			Globals.ServiceRestrictionMutex.RUnlock()
+			
+			if IsRestricted {
+				
+				// Check if user is a developer
+				
+				DeveloperIDs := os.Getenv("DEVELOPERS")
+				UserID := Event.User().ID.String()
+				
+				if !strings.Contains(DeveloperIDs, UserID) {
+					
+					// Non-developer trying to use service while restricted
+					
+					Locale := Event.Locale().Code()
+					
+					Description := Localizations.Get("Commands.Restrict.UserBlocked.Description", Locale)
+					
+					if CustomMessage != "" {
+						
+						Description = CustomMessage
+						
+					}
+					
+					Event.CreateMessage(discord.MessageCreate{
+						
+						Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+							
+							Title:       Localizations.Get("Commands.Restrict.UserBlocked.Title", Locale),
+							Description: Description,
+							Color:       Utils.RED,
+							
+						})},
+						
+						Flags: discord.MessageFlagEphemeral,
+						
+					})
+					
+					return
+					
+				}
+				
+			}
+				
 			// Switching for each command; not really a better way to do this
 			
 			switch Event.Data.CommandName() {
@@ -221,6 +271,14 @@ func InitializeHandlers() {
 
 					Commands.Inspect(Event)
 
+				case "delete":
+
+					Commands.Delete(Event)
+
+				case "restrict":
+
+					Commands.Restrict(Event)
+
 			}
 
 		}()
@@ -254,6 +312,10 @@ func InitializeHandlers() {
 				case "inspect":
 
 					Autocomplete.InspectAutocomplete(Event)
+
+				case "delete":
+
+					Autocomplete.DeleteAutocomplete(Event)
 
 			}
 
@@ -437,7 +499,7 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 		Description: LatestNotification.Description,
 		Author: Localizations.Get("Embeds.Categories.Notifications", Event.Locale().Code()),
 
-		Color:       0xe6de8b, // Orange/yellow-ish color
+		Color:       Utils.WHITE,
 
 	})
 

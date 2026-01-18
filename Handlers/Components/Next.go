@@ -48,7 +48,7 @@ func Next(Event *events.ComponentInteractionCreate) {
 				Title:       Localizations.Get("Commands.Next.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Next.Error.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 

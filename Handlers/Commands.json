@@ -1155,5 +1155,204 @@
 		"contexts": [
 			1
 		]
+	},
+	{
+		"name": "delete",
+		"name_localizations": {
+			"en-US": "delete",
+			"en-GB": "delete",
+			"es-ES": "eliminar",
+			"es-419": "eliminar",
+			"zh-CN": "删除",
+			"fr": "supprimer",
+			"it": "elimina",
+			"de": "löschen",
+			"pl": "usuń",
+			"ru": "удалить",
+			"ja": "削除"
+		},
+		"description": "Developer Only: Delete queue(s) and send a message to guild(s).",
+		"description_localizations": {
+			"en-US": "Developer Only: Delete queue(s) and send a message to guild(s).",
+			"en-GB": "Developer Only: Delete queue(s) and send a message to guild(s).",
+			"es-ES": "Solo desarrolladores: Eliminar cola(s) y enviar un mensaje a servidor(es).",
+			"es-419": "Solo desarrolladores: Eliminar cola(s) y enviar un mensaje a servidor(es).",
+			"zh-CN": "仅限开发者：删除队列并向服务器发送消息。",
+			"fr": "Développeurs uniquement: D'attente et envoyer un message au(x) serveur(s).",
+			"it": "Solo sviluppatori: Elimina code e invia un messaggio ai server.",
+			"de": "Nur Entwickler: Warteschlange(n) löschen und Nachricht an Server senden.",
+			"pl": "Tylko programiści: Usuń kolejkę/kolejki i wyślij wiadomość na serwer/serwery.",
+			"ru": "Только разработчики: Удалить очередь(и) и отправить сообщение на сервер(ы).",
+			"ja": "開発者のみ：キューを削除してサーバーにメッセージを送信します。"
+		},
+		"options": [
+			{
+				"type": 3,
+				"name": "guild",
+				"name_localizations": {
+					"en-US": "guild",
+					"en-GB": "guild",
+					"es-ES": "servidor",
+					"es-419": "servidor",
+					"zh-CN": "服务器",
+					"fr": "serveur",
+					"it": "server",
+					"de": "server",
+					"pl": "serwer",
+					"ru": "сервер",
+					"ja": "サーバー"
+				},
+				"description": "Use this option to select a guild or ALL to delete all queues.",
+				"description_localizations": {
+					"en-US": "Use this option to select a guild or ALL to delete all queues.",
+					"en-GB": "Use this option to select a guild or ALL to delete all queues.",
+					"es-ES": "Usa esta opción para seleccionar un servidor o TODOS para eliminar todas las colas.",
+					"es-419": "Usa esta opción para seleccionar un servidor o TODOS para eliminar todas las colas.",
+					"zh-CN": "使用此选项选择服务器或ALL以删除所有队列。",
+					"fr": "Utilisez cette option pour sélectionner un serveur.",
+					"it": "Usa questa opzione per selezionare un server o TUTTI per eliminare tutte le code.",
+					"de": "Verwende diese Option, um einen Server oder ALLE auszuwählen, um alle Warteschlangen zu löschen.",
+					"pl": "Użyj tej opcji, aby wybrać serwer lub WSZYSTKIE, aby usunąć wszystkie kolejki.",
+					"ru": "Используйте эту опцию для выбора сервера или ВСЕ для удаления всех очередей.",
+					"ja": "このオプションを使用してサーバーまたはALLを選択し、すべてのキューを削除します。"
+				},
+				"required": true,
+				"autocomplete": true
+			},
+			{
+				"type": 3,
+				"name": "message",
+				"name_localizations": {
+					"en-US": "message",
+					"en-GB": "message",
+					"es-ES": "mensaje",
+					"es-419": "mensaje",
+					"zh-CN": "消息",
+					"fr": "message",
+					"it": "messaggio",
+					"de": "nachricht",
+					"pl": "wiadomość",
+					"ru": "сообщение",
+					"ja": "メッセージ"
+				},
+				"description": "Use this option to specify the message to send to the guild(s).",
+				"description_localizations": {
+					"en-US": "Use this option to specify the message to send to the guild(s).",
+					"en-GB": "Use this option to specify the message to send to the guild(s).",
+					"es-ES": "Usa esta opción para especificar el mensaje a enviar al/los servidor(es).",
+					"es-419": "Usa esta opción para especificar el mensaje a enviar al/los servidor(es).",
+					"zh-CN": "使用此选项指定要发送到服务器的消息。",
+					"fr": "Utilisez cette option pour spécifier le message à envoyer au(x) serveur(s).",
+					"it": "Usa questa opzione per specificare il messaggio da inviare ai server.",
+					"de": "Verwende diese Option, um die Nachricht anzugeben, die an den/die Server gesendet werden soll.",
+					"pl": "Użyj tej opcji, aby określić wiadomość do wysłania na serwer/serwery.",
+					"ru": "Используйте эту опцию, чтобы указать сообщение для отправки на сервер(ы).",
+					"ja": "このオプションを使用して、サーバーに送信するメッセージを指定します。"
+				},
+				"required": true
+			}
+		],
+		"contexts": [
+			1
+		]
+	},
+	{
+		"name": "restrict",
+		"name_localizations": {
+			"en-US": "restrict",
+			"en-GB": "restrict",
+			"es-ES": "restringir",
+			"es-419": "restringir",
+			"zh-CN": "限制",
+			"fr": "restreindre",
+			"it": "limita",
+			"de": "einschränken",
+			"pl": "ogranicz",
+			"ru": "ограничить",
+			"ja": "制限"
+		},
+		"description": "Developer Only: Toggle service restriction for non-developer users.",
+		"description_localizations": {
+			"en-US": "Developer Only: Toggle service restriction for non-developer users.",
+			"en-GB": "Developer Only: Toggle service restriction for non-developer users.",
+			"es-ES": "Solo desarrolladores: Alternar restricción de servicio para usuarios no desarrolladores.",
+			"es-419": "Solo desarrolladores: Alternar restricción de servicio para usuarios no desarrolladores.",
+			"zh-CN": "仅限开发者：为非开发者用户切换服务限制。",
+			"fr": "Développeurs uniquement : Basculer la restriction de service pour les utilisateurs non développeurs.",
+			"it": "Solo sviluppatori: Attiva/disattiva la restrizione del servizio per gli utenti non sviluppatori.",
+			"de": "Nur Entwickler: Dienstbeschränkung für Nicht-Entwickler-Benutzer umschalten.",
+			"pl": "Tylko programiści: Przełącz ograniczenie usługi dla użytkowników niebędących programistami.",
+			"ru": "Только разработчики: Переключить ограничение сервиса для пользователей.",
+			"ja": "開発者のみ：開発者以外のユーザーのサービス制限を切り替えます。"
+		},
+		"options": [
+			{
+				"type": 5,
+				"name": "enabled",
+				"name_localizations": {
+					"en-US": "enabled",
+					"en-GB": "enabled",
+					"es-ES": "activado",
+					"es-419": "activado",
+					"zh-CN": "启用",
+					"fr": "activé",
+					"it": "abilitato",
+					"de": "aktiviert",
+					"pl": "włączony",
+					"ru": "включено",
+					"ja": "有効"
+				},
+				"description": "Use this option to enable or disable service restriction.",
+				"description_localizations": {
+					"en-US": "Use this option to enable or disable service restriction.",
+					"en-GB": "Use this option to enable or disable service restriction.",
+					"es-ES": "Usa esta opción para activar o desactivar la restricción de servicio.",
+					"es-419": "Usa esta opción para activar o desactivar la restricción de servicio.",
+					"zh-CN": "使用此选项启用或禁用服务限制。",
+					"fr": "Utilisez cette option pour activer ou désactiver la restriction de service.",
+					"it": "Usa questa opzione per abilitare o disabilitare la restrizione del servizio.",
+					"de": "Verwende diese Option, um die Dienstbeschränkung zu aktivieren oder zu deaktivieren.",
+					"pl": "Użyj tej opcji, aby włączyć lub wyłączyć ograniczenie usługi.",
+					"ru": "Используйте эту опцию для включения или отключения ограничения сервиса.",
+					"ja": "このオプションを使用してサービス制限を有効または無効にします。"
+				},
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "message",
+				"name_localizations": {
+					"en-US": "message",
+					"en-GB": "message",
+					"es-ES": "mensaje",
+					"es-419": "mensaje",
+					"zh-CN": "消息",
+					"fr": "message",
+					"it": "messaggio",
+					"de": "nachricht",
+					"pl": "wiadomość",
+					"ru": "сообщение",
+					"ja": "メッセージ"
+				},
+				"description": "Use this option to specify a custom restriction message (optional).",
+				"description_localizations": {
+					"en-US": "Use this option to specify a custom restriction message (optional).",
+					"en-GB": "Use this option to specify a custom restriction message (optional).",
+					"es-ES": "Usa esta opción para especificar un mensaje de restricción personalizado (opcional).",
+					"es-419": "Usa esta opción para especificar un mensaje de restricción personalizado (opcional).",
+					"zh-CN": "使用此选项指定自定义限制消息（可选）。",
+					"fr": "Utilisez cette option pour spécifier un message de restriction personnalisé (facultatif).",
+					"it": "Usa questa opzione per specificare un messaggio di restrizione personalizzato (facoltativo).",
+					"de": "Verwende diese Option, um eine benutzerdefinierte Einschränkungsnachricht anzugeben (optional).",
+					"pl": "Użyj tej opcji, aby określić niestandardową wiadomość ograniczenia (opcjonalnie).",
+					"ru": "Используйте эту опцию, чтобы указать пользовательское сообщение об ограничении (необязательно).",
+					"ja": "このオプションを使用してカスタム制限メッセージを指定します（オプション）。"
+				},
+				"required": false
+			}
+		],
+		"contexts": [
+			1
+		]
 	}
 ]

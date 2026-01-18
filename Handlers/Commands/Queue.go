@@ -166,15 +166,17 @@ func BuildQueueResponse(GuildID snowflake.ID, Locale string) (*QueueResponse, er
 
 	} else {
 
-		Embed.SetColor(0xFFFFFF)
+		Embed.SetColor(Utils.WHITE)
 
 	}
 
 	Embed.SetDescription(Body.String())
 
 	return &QueueResponse{
+		
 		Embeds: []discord.Embed{Embed.Build()},
 		Buttons: []discord.InteractiveComponent{discord.NewButton(discord.ButtonStyleLink, Localizations.Get("Embeds.Queue.View", Locale), "", Page, snowflake.ID(0))},
+	
 	}, nil
 
 }
@@ -195,7 +197,7 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Queue.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Queue.Error.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 

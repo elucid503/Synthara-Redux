@@ -25,7 +25,7 @@ func Leave(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Leave.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Leave.Error.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -46,7 +46,7 @@ func Leave(Event *events.ApplicationCommandInteractionCreate) {
 			Title:       Localizations.Get("Commands.Leave.Success.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
 			Description: Localizations.Get("Commands.Leave.Success.Description", Locale),
-			Color:       0xB3FFBA,
+			Color:       Utils.WHITE,
 
 		})},
 

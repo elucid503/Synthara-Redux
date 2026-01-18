@@ -2065,6 +2065,277 @@
 					}
 				}
 			}
+		},
+		"Delete": {
+			"Unauthorized": {
+				"Title": {
+					"en-US": "Unauthorized Access",
+					"en-GB": "Unauthorised Access",
+					"es-ES": "Acceso No Autorizado",
+					"es-419": "Acceso No Autorizado",
+					"zh-CN": "未授权访问",
+					"fr": "Accès Non Autorisé",
+					"it": "Accesso Non Autorizzato",
+					"de": "Unbefugter Zugriff",
+					"pl": "Nieautoryzowany Dostęp",
+					"ru": "Несанкционированный Доступ",
+					"ja": "不正アクセス"
+				},
+				"Description": {
+					"en-US": "You do not have permission to use this command.",
+					"en-GB": "You do not have permission to use this command.",
+					"es-ES": "No tienes permiso para usar este comando.",
+					"es-419": "No tienes permiso para usar este comando.",
+					"zh-CN": "您没有使用此命令的权限。",
+					"fr": "Vous n'avez pas la permission d'utiliser cette commande.",
+					"it": "Non hai il permesso di usare questo comando.",
+					"de": "Sie haben keine Berechtigung, diesen Befehl zu verwenden.",
+					"pl": "Nie masz uprawnień do użycia tej komendy.",
+					"ru": "У вас нет разрешения на использование этой команды.",
+					"ja": "このコマンドを使用する権限がありません。"
+				}
+			},
+			"Message": {
+				"Title": {
+					"en-US": "Queue Deletion Notice",
+					"en-GB": "Queue Deletion Notice",
+					"es-ES": "Aviso de Eliminación de Cola",
+					"es-419": "Aviso de Eliminación de Cola",
+					"zh-CN": "队列删除通知",
+					"fr": "Avis de Suppression de File d'Attente",
+					"it": "Avviso di Eliminazione Coda",
+					"de": "Warteschlangenlöschungshinweis",
+					"pl": "Powiadomienie o Usunięciu Kolejki",
+					"ru": "Уведомление об Удалении Очереди",
+					"ja": "キュー削除通知"
+				}
+			},
+			"Success": {
+				"Title": {
+					"en-US": "Queue Deleted",
+					"en-GB": "Queue Deleted",
+					"es-ES": "Cola Eliminada",
+					"es-419": "Cola Eliminada",
+					"zh-CN": "队列已删除",
+					"fr": "File d'Attente Supprimée",
+					"it": "Coda Eliminata",
+					"de": "Warteschlange Gelöscht",
+					"pl": "Kolejka Usunięta",
+					"ru": "Очередь Удалена",
+					"ja": "キューが削除されました"
+				},
+				"Description": {
+					"en-US": "Successfully deleted queue for **%s**.",
+					"en-GB": "Successfully deleted queue for **%s**.",
+					"es-ES": "Se eliminó correctamente la cola para **%s**.",
+					"es-419": "Se eliminó correctamente la cola para **%s**.",
+					"zh-CN": "成功删除 **%s** 的队列。",
+					"fr": "File d'attente supprimée avec succès pour **%s**.",
+					"it": "Coda eliminata con successo per **%s**.",
+					"de": "Warteschlange für **%s** erfolgreich gelöscht.",
+					"pl": "Pomyślnie usunięto kolejkę dla **%s**.",
+					"ru": "Очередь для **%s** успешно удалена.",
+					"ja": "**%s** のキューを正常に削除しました。"
+				},
+				"AllTitle": {
+					"en-US": "All Queues Deleted",
+					"en-GB": "All Queues Deleted",
+					"es-ES": "Todas las Colas Eliminadas",
+					"es-419": "Todas las Colas Eliminadas",
+					"zh-CN": "所有队列已删除",
+					"fr": "Toutes les Files d'Attente Supprimées",
+					"it": "Tutte le Code Eliminate",
+					"de": "Alle Warteschlangen Gelöscht",
+					"pl": "Wszystkie Kolejki Usunięte",
+					"ru": "Все Очереди Удалены",
+					"ja": "すべてのキューが削除されました"
+				},
+				"AllDescription": {
+					"en-US": "Successfully deleted %d queues and sent notifications.",
+					"en-GB": "Successfully deleted %d queues and sent notifications.",
+					"es-ES": "Se eliminaron correctamente %d colas y se enviaron notificaciones.",
+					"es-419": "Se eliminaron correctamente %d colas y se enviaron notificaciones.",
+					"zh-CN": "成功删除 %d 个队列并发送通知。",
+					"fr": "%d files d'attente supprimées avec succès et notifications envoyées.",
+					"it": "%d code eliminate con successo e notifiche inviate.",
+					"de": "%d Warteschlangen erfolgreich gelöscht und Benachrichtigungen gesendet.",
+					"pl": "Pomyślnie usunięto %d kolejek i wysłano powiadomienia.",
+					"ru": "Успешно удалено %d очередей и отправлены уведомления.",
+					"ja": "%d 個のキューを正常に削除し、通知を送信しました。"
+				}
+			},
+			"Error": {
+				"InvalidGuild": {
+					"Title": {
+						"en-US": "Invalid Guild ID",
+						"en-GB": "Invalid Guild ID",
+						"es-ES": "ID de Servidor Inválido",
+						"es-419": "ID de Servidor Inválido",
+						"zh-CN": "无效的服务器ID",
+						"fr": "ID de Serveur Invalide",
+						"it": "ID Server Non Valido",
+						"de": "Ungültige Server-ID",
+						"pl": "Nieprawidłowy ID Serwera",
+						"ru": "Неверный ID Сервера",
+						"ja": "無効なサーバーID"
+					},
+					"Description": {
+						"en-US": "The provided guild ID is not valid.",
+						"en-GB": "The provided guild ID is not valid.",
+						"es-ES": "El ID de servidor proporcionado no es válido.",
+						"es-419": "El ID de servidor proporcionado no es válido.",
+						"zh-CN": "提供的服务器ID无效。",
+						"fr": "L'ID de serveur fourni n'est pas valide.",
+						"it": "L'ID del server fornito non è valido.",
+						"de": "Die angegebene Server-ID ist ungültig.",
+						"pl": "Podany ID serwera jest nieprawidłowy.",
+						"ru": "Указанный ID сервера недействителен.",
+						"ja": "提供されたサーバーIDは無効です。"
+					}
+				},
+				"NoGuild": {
+					"Title": {
+						"en-US": "Guild Not Found",
+						"en-GB": "Guild Not Found",
+						"es-ES": "Servidor No Encontrado",
+						"es-419": "Servidor No Encontrado",
+						"zh-CN": "未找到服务器",
+						"fr": "Serveur Non Trouvé",
+						"it": "Server Non Trovato",
+						"de": "Server Nicht Gefunden",
+						"pl": "Nie Znaleziono Serwera",
+						"ru": "Сервер Не Найден",
+						"ja": "サーバーが見つかりません"
+					},
+					"Description": {
+						"en-US": "The specified guild does not have an active session.",
+						"en-GB": "The specified guild does not have an active session.",
+						"es-ES": "El servidor especificado no tiene una sesión activa.",
+						"es-419": "El servidor especificado no tiene una sesión activa.",
+						"zh-CN": "指定的服务器没有活动会话。",
+						"fr": "Le serveur spécifié n'a pas de session active.",
+						"it": "Il server specificato non ha una sessione attiva.",
+						"de": "Der angegebene Server hat keine aktive Sitzung.",
+						"pl": "Określony serwer nie ma aktywnej sesji.",
+						"ru": "Указанный сервер не имеет активного сеанса.",
+						"ja": "指定されたサーバーにアクティブなセッションがありません。"
+					}
+				}
+			}
+		},
+		"Restrict": {
+			"Unauthorized": {
+				"Title": {
+					"en-US": "Unauthorized Access",
+					"en-GB": "Unauthorised Access",
+					"es-ES": "Acceso No Autorizado",
+					"es-419": "Acceso No Autorizado",
+					"zh-CN": "未授权访问",
+					"fr": "Accès Non Autorisé",
+					"it": "Accesso Non Autorizzato",
+					"de": "Unbefugter Zugriff",
+					"pl": "Nieautoryzowany Dostęp",
+					"ru": "Несанкционированный Доступ",
+					"ja": "不正アクセス"
+				},
+				"Description": {
+					"en-US": "You do not have permission to use this command.",
+					"en-GB": "You do not have permission to use this command.",
+					"es-ES": "No tienes permiso para usar este comando.",
+					"es-419": "No tienes permiso para usar este comando.",
+					"zh-CN": "您没有使用此命令的权限。",
+					"fr": "Vous n'avez pas la permission d'utiliser cette commande.",
+					"it": "Non hai il permesso di usare questo comando.",
+					"de": "Sie haben keine Berechtigung, diesen Befehl zu verwenden.",
+					"pl": "Nie masz uprawnień do użycia tej komendy.",
+					"ru": "У вас нет разрешения на использование этой команды.",
+					"ja": "このコマンドを使用する権限がありません。"
+				}
+			},
+			"Enabled": {
+				"Title": {
+					"en-US": "Service Restricted",
+					"en-GB": "Service Restricted",
+					"es-ES": "Servicio Restringido",
+					"es-419": "Servicio Restringido",
+					"zh-CN": "服务受限",
+					"fr": "Service Restreint",
+					"it": "Servizio Limitato",
+					"de": "Dienst Eingeschränkt",
+					"pl": "Usługa Ograniczona",
+					"ru": "Сервис Ограничен",
+					"ja": "サービスが制限されました"
+				},
+				"Description": {
+					"en-US": "Service is now restricted to developers only.",
+					"en-GB": "Service is now restricted to developers only.",
+					"es-ES": "El servicio ahora está restringido solo para desarrolladores.",
+					"es-419": "El servicio ahora está restringido solo para desarrolladores.",
+					"zh-CN": "服务现在仅限开发者使用。",
+					"fr": "Le service est maintenant réservé aux développeurs uniquement.",
+					"it": "Il servizio è ora riservato solo agli sviluppatori.",
+					"de": "Der Dienst ist jetzt nur noch für Entwickler verfügbar.",
+					"pl": "Usługa jest teraz dostępna tylko dla programistów.",
+					"ru": "Сервис теперь доступен только разработчикам.",
+					"ja": "サービスは現在、開発者のみに制限されています。"
+				}
+			},
+			"Disabled": {
+				"Title": {
+					"en-US": "Service Unrestricted",
+					"en-GB": "Service Unrestricted",
+					"es-ES": "Servicio Sin Restricciones",
+					"es-419": "Servicio Sin Restricciones",
+					"zh-CN": "服务不受限制",
+					"fr": "Service Non Restreint",
+					"it": "Servizio Senza Restrizioni",
+					"de": "Dienst Ohne Einschränkungen",
+					"pl": "Usługa Bez Ograniczeń",
+					"ru": "Сервис Без Ограничений",
+					"ja": "サービスの制限が解除されました"
+				},
+				"Description": {
+					"en-US": "Service is now available to all users.",
+					"en-GB": "Service is now available to all users.",
+					"es-ES": "El servicio ahora está disponible para todos los usuarios.",
+					"es-419": "El servicio ahora está disponible para todos los usuarios.",
+					"zh-CN": "服务现在对所有用户可用。",
+					"fr": "Le service est maintenant disponible pour tous les utilisateurs.",
+					"it": "Il servizio è ora disponibile per tutti gli utenti.",
+					"de": "Der Dienst ist jetzt für alle Benutzer verfügbar.",
+					"pl": "Usługa jest teraz dostępna dla wszystkich użytkowników.",
+					"ru": "Сервис теперь доступен всем пользователям.",
+					"ja": "サービスがすべてのユーザーに利用可能になりました。"
+				}
+			},
+			"UserBlocked": {
+				"Title": {
+					"en-US": "Service Currently Restricted",
+					"en-GB": "Service Currently Restricted",
+					"es-ES": "Servicio Actualmente Restringido",
+					"es-419": "Servicio Actualmente Restringido",
+					"zh-CN": "服务当前受限",
+					"fr": "Service Actuellement Restreint",
+					"it": "Servizio Attualmente Limitato",
+					"de": "Dienst Derzeit Eingeschränkt",
+					"pl": "Usługa Obecnie Ograniczona",
+					"ru": "Сервис В Данный Момент Ограничен",
+					"ja": "サービスは現在制限されています"
+				},
+				"Description": {
+					"en-US": "This service is temporarily restricted to developers only.",
+					"en-GB": "This service is temporarily restricted to developers only.",
+					"es-ES": "Este servicio está temporalmente restringido solo para desarrolladores.",
+					"es-419": "Este servicio está temporalmente restringido solo para desarrolladores.",
+					"zh-CN": "此服务暂时仅限开发者使用。",
+					"fr": "Ce service est temporairement réservé aux développeurs uniquement.",
+					"it": "Questo servizio è temporaneamente riservato solo agli sviluppatori.",
+					"de": "Dieser Dienst ist vorübergehend nur für Entwickler verfügbar.",
+					"pl": "Ta usługa jest tymczasowo dostępna tylko dla programistów.",
+					"ru": "Этот сервис временно доступен только разработчикам.",
+					"ja": "このサービスは一時的に開発者のみに制限されています。"
+				}
+			}
 		}
 	},
 	"Buttons": {
@@ -2911,6 +3182,34 @@
 			}
 		},
 		"Inspect": {
+			"NoActiveGuilds": {
+				"en-US": "No active guilds.",
+				"en-GB": "No active guilds.",
+				"es-ES": "No hay servidores activos.",
+				"es-419": "No hay servidores activos.",
+				"zh-CN": "没有活动服务器。",
+				"fr": "Aucun serveur actif.",
+				"it": "Nessun server attivo.",
+				"de": "Keine aktiven Server.",
+				"pl": "Brak aktywnych serwerów.",
+				"ru": "Нет активных серверов.",
+				"ja": "アクティブなサーバーがありません。"
+			}
+		},
+		"Delete": {
+			"All": {
+				"en-US": "All Guilds",
+				"en-GB": "All Guilds",
+				"es-ES": "Todos los Servidores",
+				"es-419": "Todos los Servidores",
+				"zh-CN": "所有服务器",
+				"fr": "Tous les Serveurs",
+				"it": "Tutti i Server",
+				"de": "Alle Server",
+				"pl": "Wszystkie Serwery",
+				"ru": "Все Серверы",
+				"ja": "すべてのサーバー"
+			},
 			"NoActiveGuilds": {
 				"en-US": "No active guilds.",
 				"en-GB": "No active guilds.",

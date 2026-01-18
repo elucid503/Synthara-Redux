@@ -39,7 +39,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.NoQuery.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Play.Error.NoQuery.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -61,7 +61,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.NotInGuild.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Play.Error.NotInGuild.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -85,7 +85,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -113,7 +113,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.FailedToConnect.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.GetFormat("Commands.Play.Error.FailedToConnect.Description", Locale, ErrorConnecting.Error()),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -137,7 +137,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.InvalidInput.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.GetFormat("Commands.Play.Error.InvalidInput.Description", Locale, ErrorRouting.Error()),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -161,7 +161,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.FailedToHandle.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.GetFormat("Commands.Play.Error.FailedToHandle.Description", Locale, ErrorHandling.Error()),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 

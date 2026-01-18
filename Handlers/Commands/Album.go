@@ -31,7 +31,7 @@ func Album(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Album.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Album.Error.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -54,7 +54,7 @@ func Album(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Album.NoAlbum.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Album.NoAlbum.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -78,7 +78,7 @@ func Album(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Album.FetchError.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Album.FetchError.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 

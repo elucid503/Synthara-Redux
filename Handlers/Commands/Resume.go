@@ -27,7 +27,7 @@ func Resume(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Resume.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Resume.Error.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 

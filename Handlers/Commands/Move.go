@@ -50,7 +50,7 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Move.Error.InvalidSong.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Move.Error.InvalidSong.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -81,7 +81,7 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Move.Error.InvalidPosition.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Move.Error.InvalidPosition.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -108,7 +108,7 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Move.Error.SamePosition.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Move.Error.SamePosition.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -131,7 +131,7 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Move.Error.Failed.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Move.Error.Failed.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -150,7 +150,7 @@ func Move(Event *events.ApplicationCommandInteractionCreate) {
 			Title:       Localizations.Get("Commands.Move.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Queue", Locale),
 			Description: fmt.Sprintf(Localizations.Get("Commands.Move.Description", Locale), Song.Title, ToIndex + 1),
-			Color:       0xD4A5FF,
+			Color:       Utils.WHITE,
 
 		})},
 

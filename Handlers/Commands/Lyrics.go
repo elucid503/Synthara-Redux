@@ -331,7 +331,7 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       ErrorTitle,
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: ErrorDesc,
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})).
 			SetFlags(discord.MessageFlagsNone).

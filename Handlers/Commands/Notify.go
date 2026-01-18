@@ -29,7 +29,7 @@ func Notify(Event *events.ApplicationCommandInteractionCreate) {
 
 				Title:       Localizations.Get("Commands.CreateNotification.Unauthorized.Title", Locale),
 				Description: Localizations.Get("Commands.CreateNotification.Unauthorized.Description", Locale),
-				Color:       0xFFB3BA,
+				Color:       Utils.RED,
 
 			})},
 
@@ -74,7 +74,7 @@ func Notify(Event *events.ApplicationCommandInteractionCreate) {
 
 						Title:       Localizations.Get("Commands.CreateNotification.InvalidDate.Title", Locale),
 						Description: Localizations.Get("Commands.CreateNotification.InvalidDate.Description", Locale),
-						Color:       0xFFB3BA,
+						Color:       Utils.RED,
 
 					})},
 
@@ -112,7 +112,7 @@ func Notify(Event *events.ApplicationCommandInteractionCreate) {
 
 				Title:       Localizations.Get("Commands.CreateNotification.Error.Title", Locale),
 				Description: Localizations.Get("Commands.CreateNotification.Error.Description", Locale),
-				Color:       0xFFB3BA, // Red for error
+				Color:       Utils.RED, // Red for error
 
 			})},
 
@@ -138,7 +138,7 @@ func Notify(Event *events.ApplicationCommandInteractionCreate) {
 
 			Title:       Localizations.Get("Commands.CreateNotification.Success.Title", Locale),
 			Description: SuccessDescription,
-			Color:       0xFFFFFF,
+			Color:       Utils.WHITE,
 
 		})},
 

@@ -71,7 +71,7 @@ func Repeat(Event *events.ApplicationCommandInteractionCreate) {
 			Title:       Title,
 			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
 			Description: Description,
-			Color:       0xB3D9FF,
+			Color:       Utils.WHITE,
 
 		})},
 

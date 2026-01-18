@@ -3,6 +3,7 @@ package Globals
 import (
 	"context"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/disgoorg/disgo"
@@ -13,6 +14,12 @@ import (
 
 var DiscordClient *bot.Client
 var WebServer *gin.Engine
+
+// Service restriction state
+
+var ServiceRestricted bool = false
+var ServiceRestrictionMessage string = ""
+var ServiceRestrictionMutex sync.RWMutex
 
 func InitDiscordClient() error {
 
