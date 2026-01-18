@@ -2883,17 +2883,17 @@
 				"ja": "%s 分"
 			},
 			"SuggestedSong": {
-				"en-US": "This Is A Suggested Song",
-				"en-GB": "This Is A Suggested Song",
-				"es-ES": "Esta Es Una Canción Sugerida",
-				"es-419": "Esta Es Una Canción Sugerida",
-				"zh-CN": "这是一首推荐的歌曲",
-				"fr": "Ceci Est Une Chanson Suggérée",
-				"it": "Questa È Una Canzone Suggerita",
-				"de": "Dies Ist Ein Vorgeschlagenes Lied",
-				"pl": "To Jest Sugerowana Piosenka",
-				"ru": "Это Предлагаемая Песня",
-				"ja": "これは提案された曲です"
+				"en-US": "This is a **suggested Song**.",
+				"en-GB": "This is a **suggested Song**.",
+				"es-ES": "Esta es una **canción sugerida**.",
+				"es-419": "Esta es una **canción sugerida**.",
+				"zh-CN": "这是一首**推荐的歌曲**。",
+				"fr": "Ceci est une **chanson suggérée**.",
+				"it": "Questa è una **canzone suggerita**.",
+				"de": "Dies ist ein **vorgeschlagenes Lied**.",
+				"pl": "To jest **sugerowana piosenka**.",
+				"ru": "Это **предлагаемая песня**.",
+				"ja": "これは**提案された曲**です。"
 			}
 		},
 		"Lyrics": {

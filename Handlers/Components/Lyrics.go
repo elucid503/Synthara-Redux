@@ -32,13 +32,14 @@ func Lyrics(Event *events.ComponentInteractionCreate) {
 
 		}
 
-		Event.UpdateMessage(discord.MessageUpdate{
+		Event.CreateMessage(discord.MessageCreate{
 		
-			Embeds: &[]discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
+			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       ErrorTitle,
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: ErrorDesc,
+				
 				Color:       Utils.ERROR,
 
 			})},

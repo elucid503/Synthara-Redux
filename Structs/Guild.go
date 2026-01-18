@@ -1151,9 +1151,12 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	OnFinished := func() {
 
 		defer func() {
+
 			if r := recover(); r != nil {
+
 				Utils.Logger.Error("Playback", fmt.Sprintf("Panic in OnFinished: %v", r))
 			}
+			
 		}()
 
 		Utils.Logger.Info("Playback", fmt.Sprintf("Playback finished for song: %s", Song.Title))

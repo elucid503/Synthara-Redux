@@ -516,6 +516,7 @@ func (Q *Queue) Play() bool {
 		Utils.Logger.Error("Playback", fmt.Sprintf("Error playing song %s for Queue %s: %s", Q.Current.Title, Q.ParentID.String(), ErrorPlaying.Error()))
 		
 		// Set state back to idle on error
+		
 		Guild.StreamerMutex.Lock()
 		Q.SetState(StateIdle)
 		Guild.StreamerMutex.Unlock()

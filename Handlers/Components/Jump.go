@@ -122,8 +122,8 @@ func JumpToSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 	Event.CreateMessage(discord.NewMessageCreateBuilder().
 		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
-			Title:       Localizations.Get("Embeds.Categories.Playback", Locale),
-			Author:      Localizations.Get("Embeds.Categories.JumpedToSong", Locale),
+			Title:       Localizations.Get("Embeds.Categories.JumpedToSong", Locale),
+			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
 			Description: Localizations.GetFormat("Commands.Jump.Description", Locale, Guild.Queue.Current.Title),
 
 		})).
