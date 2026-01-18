@@ -178,7 +178,7 @@ func InitializeHandlers() {
 				}
 				
 			}
-				
+								
 			// Switching for each command; not really a better way to do this
 			
 			switch Event.Data.CommandName() {
@@ -278,8 +278,14 @@ func InitializeHandlers() {
 				case "restrict":
 
 					Commands.Restrict(Event)
+				
+				case "forget":
+
+					Commands.Forget(Event)
 
 			}
+
+			go CheckAndDisplayNotification(Event, Event.User().ID)
 
 		}()
 
@@ -484,6 +490,30 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 	if UserError != nil {
 
 		return
+
+	}
+
+	// Check for first use
+
+	if User.FirstUse {
+
+		Locale := Event.Locale().Code()
+		WelcomeMessage := Localizations.Get("Embeds.Notifications.Welcome.Content", Locale)
+		
+		_, Err := Globals.DiscordClient.Rest.CreateFollowupMessage(Event.ApplicationID(), Event.Token(), discord.MessageCreate{
+
+			Content: WelcomeMessage,
+			Flags:   discord.MessageFlagEphemeral,
+
+		})
+
+		if Err != nil {
+
+			Utils.Logger.Error("Notification", "Failed to send welcome message to user " + UserID.String() + ": " + Err.Error())
+
+		}
+
+		User.SetFirstUse(false)
 
 	}
 

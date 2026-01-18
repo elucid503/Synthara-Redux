@@ -174,7 +174,6 @@ func (U *User) AddRecentSearch(Title string, URI string) error {
 		"$set": bson.M{
 
 			"recent_searches": FilteredSearches,
-			"first_use":       false,
 
 		},
 

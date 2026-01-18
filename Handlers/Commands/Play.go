@@ -180,12 +180,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 		if UserError == nil {
 
-			if (User.FirstUse) {
-
-				User.SetFirstUse(false)
-
-			}
-			
 			User.AddRecentSearch(SongFound.Title, URI)
 
 			// Track Favorites 
