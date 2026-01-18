@@ -421,7 +421,7 @@ func InitializeHandlers() {
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.GuildVoiceStateUpdate) {
 
 		go func () {
-			
+
 			if (Event.VoiceState.UserID != Globals.DiscordClient.ApplicationID) {
 
 				return; // Not our bot
@@ -436,15 +436,11 @@ func InitializeHandlers() {
 
 			}
 
-			fmt.Println("Voice State Update detected for guild")
-			fmt.Println(Event.VoiceState)
-
 			if (Event.VoiceState.ChannelID == nil && !Guild.Internal.Disconnecting) { // we do not want to call this if Cleanup() was already called...
 
 				go func() {
-
-					Utils.Logger.Info(fmt.Sprintf("VoiceStateUpdate: Detected disconnect for guild %s, calling Cleanup", Guild.ID.String()))
-					Guild.Cleanup(false)
+					
+					Guild.Cleanup(true) // important: we must force cleanup to disconnect as we are disconnected remotely
 
 					ReconnectButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.Reconnect", Guild.Locale.Code()), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
 

@@ -240,6 +240,8 @@ func (G *Guild) Disconnect(CloseConn bool) error {
 // Stops playback, closes websockets, and the voice connection
 func (G *Guild) Cleanup(CloseConn bool) error {
 
+	Utils.Logger.Info(fmt.Sprintf("Cleanup requested for guild: %s", G.ID.String()))
+
 	G.StreamerMutex.Lock()
 	defer G.StreamerMutex.Unlock()
 
