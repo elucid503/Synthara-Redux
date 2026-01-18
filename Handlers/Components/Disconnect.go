@@ -32,7 +32,7 @@ func Disconnect(Event *events.ComponentInteractionCreate) {
 			Title:       Localizations.Get("Commands.Leave.Success.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
 			Description: Localizations.Get("Commands.Leave.Success.Description", Locale),
-			Color:       Utils.WHITE,
+			Color:       Utils.PRIMARY,
 
 		})},
 

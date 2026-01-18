@@ -45,7 +45,7 @@ func Jump(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Jump.Error.InvalidPosition.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Jump.Error.InvalidPosition.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -68,7 +68,7 @@ func Jump(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Jump.Error.InvalidPosition.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Jump.Error.InvalidPosition.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -87,7 +87,7 @@ func Jump(Event *events.ApplicationCommandInteractionCreate) {
 			Title:       Localizations.Get("Commands.Jump.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
 			Description: fmt.Sprintf(Localizations.Get("Commands.Jump.Description", Locale), Guild.Queue.Current.Title),
-			Color:       Utils.WHITE,
+			Color:       Utils.PRIMARY,
 
 		})},
 

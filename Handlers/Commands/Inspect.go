@@ -34,7 +34,7 @@ func Inspect(Event *events.ApplicationCommandInteractionCreate) {
 
 				Title:       Localizations.Get("Commands.Inspect.Unauthorized.Title", Locale),
 				Description: Localizations.Get("Commands.Inspect.Unauthorized.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -86,7 +86,7 @@ func ShowGuildOverview(Event *events.ApplicationCommandInteractionCreate, Locale
 
 				Title:       Localizations.Get("Commands.Inspect.Overview.NoGuilds.Title", Locale),
 				Description: Localizations.Get("Commands.Inspect.Overview.NoGuilds.Description", Locale),
-				Color:       Utils.WHITE,
+				Color:       Utils.PRIMARY,
 
 			})},
 
@@ -101,7 +101,7 @@ func ShowGuildOverview(Event *events.ApplicationCommandInteractionCreate, Locale
 	EmbedBuilder := discord.NewEmbedBuilder()
 
 	EmbedBuilder.SetTitle(Localizations.Get("Commands.Inspect.Overview.Title", Locale))
-	EmbedBuilder.SetColor(Utils.WHITE)
+	EmbedBuilder.SetColor(Utils.PRIMARY)
 
 	// System Stats
 
@@ -226,7 +226,7 @@ func ShowGuildDetails(Event *events.ApplicationCommandInteractionCreate, Locale 
 
 				Title:       Localizations.Get("Commands.Inspect.Details.InvalidGuildID.Title", Locale),
 				Description: Localizations.Get("Commands.Inspect.Details.InvalidGuildID.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -250,7 +250,7 @@ func ShowGuildDetails(Event *events.ApplicationCommandInteractionCreate, Locale 
 
 				Title:       Localizations.Get("Commands.Inspect.Details.GuildNotFound.Title", Locale),
 				Description: Localizations.Get("Commands.Inspect.Details.GuildNotFound.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -289,7 +289,7 @@ func ShowGuildDetails(Event *events.ApplicationCommandInteractionCreate, Locale 
 	EmbedBuilder := discord.NewEmbedBuilder()
 
 	EmbedBuilder.SetTitle(GuildName)
-	EmbedBuilder.SetColor(Utils.WHITE)
+	EmbedBuilder.SetColor(Utils.PRIMARY)
 
 	// Locale Field 
 

@@ -31,7 +31,7 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 
 				Title:       Localizations.Get("Commands.Delete.Unauthorized.Title", Locale),
 				Description: Localizations.Get("Commands.Delete.Unauthorized.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -76,14 +76,14 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 						Title:       Localizations.Get("Commands.Delete.Message.Title", Guild.Locale.Code()),
 						Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
 						Description: Message,
-						Color:       Utils.RED,
+						Color:       Utils.ERROR,
 
 					})).
 					Build())
 
 				if ErrorSending != nil {
 
-					Utils.Logger.Error(fmt.Sprintf("Error sending delete message to guild %s: %s", Guild.ID, ErrorSending.Error()))
+					Utils.Logger.Error("Command", fmt.Sprintf("Error sending delete message to guild %s: %s", Guild.ID, ErrorSending.Error()))
 
 				}
 
@@ -107,7 +107,7 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 
 				Title:       Localizations.Get("Commands.Delete.Success.AllTitle", Locale),
 				Description: fmt.Sprintf(Localizations.Get("Commands.Delete.Success.AllDescription", Locale), DeletedCount),
-				Color:       Utils.WHITE,
+				Color:       Utils.PRIMARY,
 
 			})},
 
@@ -131,7 +131,7 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 
 				Title:       Localizations.Get("Commands.Delete.Error.InvalidGuild.Title", Locale),
 				Description: Localizations.Get("Commands.Delete.Error.InvalidGuild.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -153,7 +153,7 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 
 				Title:       Localizations.Get("Commands.Delete.Error.NoGuild.Title", Locale),
 				Description: Localizations.Get("Commands.Delete.Error.NoGuild.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -187,14 +187,14 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Delete.Message.Title", Guild.Locale.Code()),
 				Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
 				Description: Message,
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})).
 			Build())
 
 		if ErrorSending != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Error sending delete message to guild %s: %s", Guild.ID, ErrorSending.Error()))
+			Utils.Logger.Error("Command", fmt.Sprintf("Error sending delete message to guild %s: %s", Guild.ID, ErrorSending.Error()))
 
 		}
 
@@ -214,7 +214,7 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 
 			Title:       Localizations.Get("Commands.Delete.Success.Title", Locale),
 			Description: fmt.Sprintf(Localizations.Get("Commands.Delete.Success.Description", Locale), GuildName),
-			Color:       Utils.WHITE,
+			Color:       Utils.PRIMARY,
 
 		})},
 

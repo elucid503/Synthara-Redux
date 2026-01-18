@@ -28,7 +28,7 @@ func Restrict(Event *events.ApplicationCommandInteractionCreate) {
 
 				Title:       Localizations.Get("Commands.Restrict.Unauthorized.Title", Locale),
 				Description: Localizations.Get("Commands.Restrict.Unauthorized.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -79,7 +79,7 @@ func Restrict(Event *events.ApplicationCommandInteractionCreate) {
 
 			Title:       ResponseTitle,
 			Description: ResponseDescription,
-			Color:       Utils.WHITE,
+			Color:       Utils.PRIMARY,
 
 		})},
 

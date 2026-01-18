@@ -33,7 +33,7 @@ func VideoIDToSong(VideoID string) (Tidal.Song, *youtube.Video, error) {
 
 	SearchQuery := fmt.Sprintf("%s %s", Video.Title, Video.Author)
 
-	Utils.Logger.Info(fmt.Sprintf("Searching Tidal for YouTube video: %s", SearchQuery))
+	Utils.Logger.Info("YouTube Fetch", fmt.Sprintf("Searching Tidal for YouTube video: %s", SearchQuery))
 
 	// Search Tidal for matching song
 
@@ -72,7 +72,7 @@ func PlaylistIDToFirstSong(PlaylistID string) (Tidal.Song, *youtube.Playlist, er
 
 	SearchQuery := fmt.Sprintf("%s %s", FirstVideo.Title, FirstVideo.Author)
 
-	Utils.Logger.Info(fmt.Sprintf("Searching Tidal for first playlist video: %s", SearchQuery))
+	Utils.Logger.Info("YouTube Fetch", fmt.Sprintf("Searching Tidal for first playlist video: %s", SearchQuery))
 
 	Results, SearchErr := Tidal.SearchSongs(SearchQuery)
 
@@ -106,7 +106,7 @@ func PlaylistIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tidal
 		// Build search query
 		SearchQuery := fmt.Sprintf("%s %s", Video.Title, Video.Author)
 
-		Utils.Logger.Info(fmt.Sprintf("Searching Tidal for playlist video %d/%d: %s", i+1, len(Playlist.Videos), SearchQuery))
+		Utils.Logger.Info("YouTube Fetch", fmt.Sprintf("Searching Tidal for playlist video %d/%d: %s", i+1, len(Playlist.Videos), SearchQuery))
 
 		// Search Tidal
 
@@ -114,7 +114,7 @@ func PlaylistIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tidal
 
 		if SearchErr != nil || len(Results) == 0 {
 
-			Utils.Logger.Warn(fmt.Sprintf("No Tidal match found for video: %s", Video.Title))
+			Utils.Logger.Warn("YouTube Fetch", fmt.Sprintf("No Tidal match found for video: %s", Video.Title))
 			FailedCount++
 			continue
 
@@ -153,7 +153,7 @@ func MusicAlbumIDToFirstSong(AlbumID string) (Tidal.Song, *youtube.Playlist, err
 
 	SearchQuery := fmt.Sprintf("%s %s %s", FirstVideo.Title, ArtistName, AlbumInfo)
 
-	Utils.Logger.Info(fmt.Sprintf("Searching Tidal for first album track: %s", SearchQuery))
+	Utils.Logger.Info("YouTube Fetch", fmt.Sprintf("Searching Tidal for first album track: %s", SearchQuery))
 	
 	Results, SearchErr := Tidal.SearchSongs(SearchQuery)
 
@@ -190,13 +190,13 @@ func MusicAlbumIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tid
 
 		SearchQuery := fmt.Sprintf("%s %s %s", Video.Title, ArtistName, AlbumInfo)
 
-		Utils.Logger.Info(fmt.Sprintf("Searching Tidal for album track %d/%d: %s", i+1, len(Playlist.Videos), SearchQuery))
+		Utils.Logger.Info("YouTube Fetch", fmt.Sprintf("Searching Tidal for album track %d/%d: %s", i+1, len(Playlist.Videos), SearchQuery))
 
 		Results, SearchErr := Tidal.SearchSongs(SearchQuery)
 
 		if SearchErr != nil || len(Results) == 0 {
 
-			Utils.Logger.Warn(fmt.Sprintf("No Tidal match found for track: %s", Video.Title))
+			Utils.Logger.Warn("YouTube Fetch", fmt.Sprintf("No Tidal match found for track: %s", Video.Title))
 			FailedCount++
 			continue
 
@@ -251,7 +251,7 @@ func MusicArtistIDToSongs(ArtistID string) ([]Tidal.Song, error) {
 
 		SearchQuery := fmt.Sprintf("%s %s", Video.Title, ArtistName)
 
-		Utils.Logger.Info(fmt.Sprintf("Searching Tidal for artist track %d/%d: %s", i+1, Limit, SearchQuery))
+		Utils.Logger.Info("YouTube Fetch", fmt.Sprintf("Searching Tidal for artist track %d/%d: %s", i+1, Limit, SearchQuery))
 
 		// Search Tidal
 
@@ -259,7 +259,7 @@ func MusicArtistIDToSongs(ArtistID string) ([]Tidal.Song, error) {
 
 		if SearchErr != nil || len(Results) == 0 {
 
-			Utils.Logger.Warn(fmt.Sprintf("No Tidal match found for track: %s", Video.Title))
+			Utils.Logger.Warn("YouTube Fetch", fmt.Sprintf("No Tidal match found for track: %s", Video.Title))
 			continue
 			
 		}

@@ -45,18 +45,48 @@ func PlayAutocomplete(Event *events.AutocompleteInteractionCreate) {
 
 			}
 
-		} else if len(User.RecentSearches) > 0 {
+		} else {
 
-			RecentlyPlayedLabel := Localizations.Get("Autocomplete.Play.RecentlyPlayed", Locale)
+			if len(User.RecentSearches) > 0 {
 
-			for _, Search := range User.RecentSearches {
+				RecentlyPlayedLabel := Localizations.Get("Autocomplete.Play.RecentlyPlayed", Locale)
 
-				RecentlyPlayedChoices = append(RecentlyPlayedChoices, discord.AutocompleteChoiceString{
+				for _, Search := range User.RecentSearches {
 
-					Name:  fmt.Sprintf("%s • %s", RecentlyPlayedLabel, Search.Title),
-					Value: Search.URI,
+					RecentlyPlayedChoices = append(RecentlyPlayedChoices, discord.AutocompleteChoiceString{
 
-				})
+						Name:  fmt.Sprintf("%s • %s", RecentlyPlayedLabel, Search.Title),
+						Value: Search.URI,
+
+					})
+
+				}
+
+			}
+
+			// Add Play Favorites
+
+			if len(User.Favorites) > 0 {
+
+				RecentlyPlayedChoices = append([]discord.AutocompleteChoice{discord.AutocompleteChoiceString{
+
+					Name:  Localizations.Get("Autocomplete.Play.Favorites", Locale),
+					Value: "Synthara-Redux:Favorites:" + User.DiscordID,
+					
+				}}, RecentlyPlayedChoices...)
+
+			}
+
+			// Add Play Suggestions
+
+			if User.MostRecentMix != "" {
+
+				RecentlyPlayedChoices = append([]discord.AutocompleteChoice{discord.AutocompleteChoiceString{
+
+					Name: Localizations.Get("Autocomplete.Play.Suggestions", Locale),
+					Value: "Synthara-Redux:Suggestions:" + User.DiscordID,
+
+				}}, RecentlyPlayedChoices...)
 
 			}
 

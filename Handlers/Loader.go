@@ -41,7 +41,7 @@ func InitializeCommands() {
 
 	if ErrorReading != nil {
 
-		Utils.Logger.Error("Failed to read Commands.json: " + ErrorReading.Error())
+		Utils.Logger.Error("Loader", "Failed to read Commands.json: " + ErrorReading.Error())
 
 	}
 
@@ -51,7 +51,7 @@ func InitializeCommands() {
 
 	if ErrorUnmarshaling != nil {
 
-		Utils.Logger.Error("Failed to unmarshal Commands.json: " + ErrorUnmarshaling.Error())
+		Utils.Logger.Error("Loader", "Failed to unmarshal Commands.json: " + ErrorUnmarshaling.Error())
 
 	}
 
@@ -71,12 +71,12 @@ func InitializeCommands() {
 
 		CommandsToRegister[Index] = discord.SlashCommandCreate{
 
-			Name:                     Command.Name,
-			NameLocalizations:        Command.NameLocalizations,
-			Description:              Command.Description,
+			Name: Command.Name,
+			NameLocalizations: Command.NameLocalizations,
+			Description: Command.Description,
 			DescriptionLocalizations: Command.DescriptionLocalizations,
-			Options:                  Options,
-			Contexts:                 Command.Contexts,
+			Options: Options,
+			Contexts: Command.Contexts,
 
 		}
 
@@ -86,12 +86,12 @@ func InitializeCommands() {
 
 	if ErrorSetting != nil {
 
-		Utils.Logger.Error("Failed to set global slash commands: " + ErrorSetting.Error())
+		Utils.Logger.Error("Loader", "Failed to set global slash commands: " + ErrorSetting.Error())
 		return
 
 	}
 
-	Utils.Logger.Info("Slash commands updated.")
+	Utils.Logger.Info("Loader", "Slash commands updated.")
 
 }
 
@@ -101,7 +101,7 @@ func InitializeHandlers() {
 
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.Ready) {
 
-		Utils.Logger.Info("Discord Client is ready!")
+		Utils.Logger.Info("Discord", "Discord Client is ready!")
 
 	}))
 
@@ -165,7 +165,7 @@ func InitializeHandlers() {
 							
 							Title:       Localizations.Get("Commands.Restrict.UserBlocked.Title", Locale),
 							Description: Description,
-							Color:       Utils.RED,
+							Color:       Utils.ERROR,
 							
 						})},
 						
@@ -461,7 +461,7 @@ func InitializeHandlers() {
 
 					if ErrorSending != nil {
 
-						Utils.Logger.Error(fmt.Sprintf("Error sending manual disconnect message to guild %s: %s", Guild.ID, ErrorSending.Error()))
+						Utils.Logger.Error("Command", fmt.Sprintf("Error sending manual disconnect message to guild %s: %s", Guild.ID, ErrorSending.Error()))
 					
 					}
 
@@ -473,7 +473,7 @@ func InitializeHandlers() {
 
 	}))
 		
-	Utils.Logger.Info("Event handlers initialized.")
+	Utils.Logger.Info("Loader", "Event handlers initialized.")
 
 }
 
@@ -501,7 +501,7 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 		Description: LatestNotification.Description,
 		Author: Localizations.Get("Embeds.Categories.Notifications", Event.Locale().Code()),
 
-		Color:       Utils.WHITE,
+		Color:       Utils.PRIMARY,
 
 	})
 

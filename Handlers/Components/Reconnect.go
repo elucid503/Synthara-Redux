@@ -27,7 +27,7 @@ func Reconnect(Event *events.ComponentInteractionCreate) {
 				Title:       Localizations.Get("Embeds.Categories.Error", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: "Failed to create guild session.",
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -61,7 +61,7 @@ func Reconnect(Event *events.ComponentInteractionCreate) {
 					Title:       Localizations.Get("Embeds.Categories.Error", Locale),
 					Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 					Description: Localizations.Get("Commands.Play.Error.VoiceChannel.Description", Locale),
-					Color:       Utils.RED,
+					Color:       Utils.ERROR,
 
 				})},
 
@@ -90,7 +90,7 @@ func Reconnect(Event *events.ComponentInteractionCreate) {
 				Title:       Localizations.Get("Embeds.Categories.Error", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: "Failed to connect to voice channel.",
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 

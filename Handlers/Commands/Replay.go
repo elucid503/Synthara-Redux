@@ -45,7 +45,7 @@ func Replay(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Replay.Error.InvalidPosition.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Replay.Error.InvalidPosition.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -70,7 +70,7 @@ func Replay(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Replay.Error.InvalidPosition.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Replay.Error.InvalidPosition.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -89,7 +89,7 @@ func Replay(Event *events.ApplicationCommandInteractionCreate) {
 			Title:       Localizations.Get("Commands.Replay.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
 			Description: fmt.Sprintf(Localizations.Get("Commands.Replay.Description", Locale), Guild.Queue.Current.Title),
-			Color:       Utils.WHITE,
+			Color:       Utils.PRIMARY,
 
 		})},
 

@@ -2,7 +2,10 @@ package Utils
 
 import (
 	"fmt"
+	"os"
 	"time"
+
+	"github.com/elucid503/Sprout-API-Go/Logs"
 )
 
 // Logging provides structured logging functionality.
@@ -16,23 +19,26 @@ func (L *Logging) getTimestamp() string {
 }
 
 // Info logs an informational message.
-func (L *Logging) Info(Message string) {
+func (L *Logging) Info(Title string, Message string) {
 
-	fmt.Printf("[INFO] [%s] %s\n", L.getTimestamp(), Message);
+	go Logs.Log(os.Getenv("SERVICE_ID"), Logs.LogLevelInfo, Title, Message);
+	fmt.Printf("[INFO] [%s] %s: %s\n", L.getTimestamp(), Title, Message);
 
 }
 
 // Warn logs a warning message.
-func (L *Logging) Warn(Message string) {
+func (L *Logging) Warn(Title string, Message string) {
 
-	fmt.Printf("[WARN] [%s] %s\n", L.getTimestamp(), Message);
+	go Logs.Log(os.Getenv("SERVICE_ID"), Logs.LogLevelWarning, Title, Message);
+	fmt.Printf("[WARN] [%s] %s: %s\n", L.getTimestamp(), Title, Message);
 
 }
 
 // Error logs an error message.
-func (L *Logging) Error(Message string) {
+func (L *Logging) Error(Title string, Message string) {
 
-	fmt.Printf("[ERROR] [%s] %s\n", L.getTimestamp(), Message);
+	go Logs.Log(os.Getenv("SERVICE_ID"), Logs.LogLevelError, Title, Message);
+	fmt.Printf("[ERROR] [%s] %s: %s\n", L.getTimestamp(), Title, Message);
 
 }
 

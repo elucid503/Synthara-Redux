@@ -25,7 +25,7 @@ func Lock(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Lock.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Lock.Error.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 

@@ -58,7 +58,7 @@ func JumpToSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 				Title:       Localizations.Get("Embeds.Categories.Error", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: "Song not found in queue.",
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -81,7 +81,7 @@ func JumpToSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 				Title:       Localizations.Get("Embeds.Categories.Error", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: "Failed to jump to song.",
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -123,8 +123,8 @@ func JumpToSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Embeds.Categories.Playback", Locale),
-			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
-			Description: "Jumped to song.",
+			Author:      Localizations.Get("Embeds.Categories.JumpedToSong", Locale),
+			Description: Localizations.GetFormat("Commands.Jump.Description", Locale, Guild.Queue.Current.Title),
 
 		})).
 		AddActionRow(Buttons...).

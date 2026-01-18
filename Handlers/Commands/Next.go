@@ -28,7 +28,7 @@ func Next(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Next.Error.NoSession.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Next.Error.NoSession.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -51,7 +51,7 @@ func Next(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Next.Error.NoNextSong.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Next.Error.NoNextSong.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 

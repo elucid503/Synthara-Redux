@@ -24,7 +24,7 @@ func Forget(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Forget.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Forget.Error.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -47,7 +47,7 @@ func Forget(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Forget.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Forget.Error.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 

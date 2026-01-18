@@ -25,7 +25,7 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 
 				Title:       Localizations.Get("Commands.Lock.Error.Title", Locale),
 				Description: Localizations.Get("Commands.Lock.Error.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -39,7 +39,7 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 	
 	EmbedBuilder := discord.NewEmbedBuilder()
 	EmbedBuilder.SetTitle(Localizations.Get("Commands.Stats.Title", Locale))
-	EmbedBuilder.SetColor(Utils.WHITE)
+	EmbedBuilder.SetColor(Utils.PRIMARY)
 
 	// Field 1: Playback Status
 

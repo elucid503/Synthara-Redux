@@ -2472,6 +2472,19 @@
 				"ru": "Воспроизведение",
 				"ja": "再生"
 			},
+			"JumpedToSong": {
+				"en-US": "Jumped to Song",
+				"en-GB": "Jumped to Song",
+				"es-ES": "Saltado a la Canción",
+				"es-419": "Saltado a la Canción",
+				"zh-CN": "跳转到歌曲",
+				"fr": "Sauté à la Chanson",
+				"it": "Saltato alla Canzone",
+				"de": "Zur Lied Gesprungen",
+				"pl": "Przeskoczono do Utworu",
+				"ru": "Перепрыгнул к Песне",
+				"ja": "曲にジャンプ"
+			},
 			"Controls": {
 				"en-US": "Controls",
 				"en-GB": "Controls",
@@ -3177,6 +3190,32 @@
 				"pl": "Brak ostatnich wyszukiwań.",
 				"ru": "Нет недавних поисков.",
 				"ja": "最近の検索はありません。"
+			},
+			"Favorites": {
+				"en-US": "Playlist • Your Favorites",
+				"en-GB": "Playlist • Your Favorites",
+				"es-ES": "Lista de reproducción • Tus favoritos",
+				"es-419": "Lista de reproducción • Tus favoritos",
+				"zh-CN": "播放列表 • 您的收藏",
+				"fr": "Liste de lecture • Vos favoris",
+				"it": "Playlist • I tuoi preferiti",
+				"de": "Wiedergabeliste • Ihre Favoriten",
+				"pl": "Playlista • Twoje ulubione",
+				"ru": "Плейлист • Ваши избранные",
+				"ja": "プレイリスト • お気に入り"
+			},
+			"Suggestions": {
+				"en-US": "Playlist • Suggestions",
+				"en-GB": "Playlist • Suggestions",
+				"es-ES": "Lista de reproducción • Sugerencias",
+				"es-419": "Lista de reproducción • Sugerencias",
+				"zh-CN": "播放列表 • 为您推荐",
+				"fr": "Liste de lecture • Suggestions",
+				"it": "Playlist • Suggerimenti",
+				"de": "Wiedergabeliste • Vorschläge",
+				"pl": "Playlista • Sugestie",
+				"ru": "Плейлист • Предложения",
+				"ja": "プレイリスト • おすすめ"
 			}
 		},
 		"Jump": {

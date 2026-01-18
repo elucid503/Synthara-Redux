@@ -218,6 +218,10 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 
 	if ErrorOpening != nil {
 
+		CloseContext, CloseCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer CloseCancel()
+		VoiceConnection.Close(CloseContext)
+
 		return ErrorOpening
 
 	}
@@ -240,12 +244,12 @@ func (G *Guild) Disconnect(CloseConn bool) error {
 // Stops playback, closes websockets, and the voice connection
 func (G *Guild) Cleanup(CloseConn bool) error {
 
-	Utils.Logger.Info(fmt.Sprintf("Cleanup requested for guild: %s", G.ID.String()))
+	Utils.Logger.Info("Guild", fmt.Sprintf("Cleanup requested for guild: %s", G.ID.String()))
 
 	G.StreamerMutex.Lock()
 	defer G.StreamerMutex.Unlock()
 
-	Utils.Logger.Info(fmt.Sprintf("Cleaning up guild: %s", G.ID.String()))
+	Utils.Logger.Info("Guild", fmt.Sprintf("Cleaning up guild: %s", G.ID.String()))
 
 	G.Internal.Disconnecting = true // Marks as disconnecting early to prevent re-entrancy
 
@@ -348,12 +352,12 @@ func (G *Guild) StartInactivityTimer() {
 
 	}
 
-	Utils.Logger.Info(fmt.Sprintf("Starting inactivity timer for guild %s with duration: %s", G.ID.String(), Duration.String()))
+	Utils.Logger.Info("Guild", fmt.Sprintf("Starting inactivity timer for guild %s with duration: %s", G.ID.String(), Duration.String()))
 
 	// Create new timer
 	G.Internal.InactivityTimer = time.AfterFunc(Duration, func() {
 
-		Utils.Logger.Info(fmt.Sprintf("Inactivity timer expired for guild %s, disconnecting...", G.ID.String()))
+		Utils.Logger.Info("Guild", fmt.Sprintf("Inactivity timer expired for guild %s, disconnecting...", G.ID.String()))
 
 		// Get guild locale for translations
 		Locale := G.Locale.Code()
@@ -389,7 +393,7 @@ func (G *Guild) StartInactivityTimer() {
 
 			if ErrorSending != nil {
 
-				Utils.Logger.Error(fmt.Sprintf("Error sending inactivity disconnect message to guild %s: %s", G.ID.String(), ErrorSending.Error()))
+				Utils.Logger.Error("Command", fmt.Sprintf("Error sending inactivity disconnect message to guild %s: %s", G.ID.String(), ErrorSending.Error()))
 
 			}
 
@@ -409,7 +413,7 @@ func (G *Guild) ResetInactivityTimer() {
 
 	if G.Internal.InactivityTimer != nil {
 
-		Utils.Logger.Info(fmt.Sprintf("Resetting inactivity timer for guild %s", G.ID.String()))
+		Utils.Logger.Info("Guild", fmt.Sprintf("Resetting inactivity timer for guild %s", G.ID.String()))
 
 		G.Internal.InactivityTimer.Stop()
 
@@ -436,7 +440,7 @@ func (G *Guild) StopInactivityTimer() {
 
 	if G.Internal.InactivityTimer != nil {
 
-		Utils.Logger.Info(fmt.Sprintf("Stopping inactivity timer for guild %s", G.ID.String()))
+		Utils.Logger.Info("Guild", fmt.Sprintf("Stopping inactivity timer for guild %s", G.ID.String()))
 
 		G.Internal.InactivityTimer.Stop()
 		G.Internal.InactivityTimer = nil
@@ -550,6 +554,106 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 				
 			}
 
+		case APIs.URITypeFavorites:
+
+			User, UserErr := GetUser(ID) // ID from URI is UserID
+			if UserErr != nil {
+				return nil, -1, UserErr
+			}
+
+			FavURIs := User.GetTopFavorites(10)
+			if len(FavURIs) == 0 {
+				return nil, -1, errors.New("no favorites found")
+			}
+
+			Songs := []Tidal.Song{}
+			for _, favURI := range FavURIs {
+				// Parse and resolve each favorite
+				Type, ResID, pErr := APIs.ParseURI(favURI)
+				if pErr == nil && Type == APIs.URITypeTidalSong {
+					tid, _ := strconv.ParseInt(ResID, 10, 64)
+					if s, err := Tidal.GetSong(tid); err == nil {
+						Songs = append(Songs, s)
+					}
+				}
+			}
+
+			if len(Songs) == 0 {
+				return nil, -1, errors.New("could not resolve favorites")
+			}
+
+			// Set Playlist Metadata
+			PlaylistMeta := Tidal.PlaylistMeta{
+				Name:     "Favorites",
+				Platform: "System",
+				Total:    len(Songs),
+				ID:       "favorites:" + ID,
+			}
+
+			for i := range Songs {
+				Songs[i].Internal.Playlist = PlaylistMeta
+				Songs[i].Internal.Playlist.Index = i
+			}
+
+			SongFound = &Songs[0]
+			PosAdded = G.Queue.Add(SongFound, Requestor)
+
+			if len(Songs) > 1 {
+				go func() {
+					for _, Song := range Songs[1:] {
+						SongCopy := Song
+						G.Queue.Add(&SongCopy, Requestor)
+					}
+					// Optional: Send notification about "Playlist" added
+				}()
+			}
+
+		case APIs.URITypeSuggestions:
+
+			User, UserErr := GetUser(ID)
+			if UserErr != nil {
+				return nil, -1, UserErr
+			}
+
+			if User.MostRecentMix == "" {
+				return nil, -1, errors.New("no recent mix found")
+			}
+
+			Songs, FetchErr := Tidal.FetchMixItems(User.MostRecentMix)
+			if FetchErr != nil || len(Songs) == 0 {
+				return nil, -1, errors.New("could not fetch suggestions")
+			}
+
+			if len(Songs) > 10 {
+				Songs = Songs[:10]
+			}
+
+			// Set Playlist Metadata
+			PlaylistMeta := Tidal.PlaylistMeta{
+				Name:     "Suggestions",
+				Platform: "System",
+				Total:    len(Songs),
+				ID:       "suggestions:" + ID,
+			}
+
+			for i := range Songs {
+				Songs[i].Internal.Playlist = PlaylistMeta
+				Songs[i].Internal.Playlist.Index = i
+			}
+
+			SongFound = &Songs[0]
+			PosAdded = G.Queue.Add(SongFound, Requestor)
+
+			if len(Songs) > 1 {
+				go func() {
+					for _, Song := range Songs[1:] {
+						SongCopy := Song
+						G.Queue.Add(&SongCopy, Requestor)
+					}
+				}()
+			}
+
+
 		case APIs.URITypeTidalPlaylist:
 
 			// Tidal playlist - fetch all tracks
@@ -637,7 +741,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				if OtherFetchError != nil {
 
-					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of YouTube playlist songs: %s", OtherFetchError.Error()))
+					Utils.Logger.Error("YouTube Fetch", fmt.Sprintf("Error fetching rest of YouTube playlist songs: %s", OtherFetchError.Error()))
 					return
 
 				}
@@ -707,7 +811,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				if OtherFetchError != nil {
 
-					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of YouTube Music album songs: %s", OtherFetchError.Error()))
+					Utils.Logger.Error("YouTube Fetch", fmt.Sprintf("Error fetching rest of YouTube Music album songs: %s", OtherFetchError.Error()))
 					return
 
 				}
@@ -822,7 +926,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				if OtherFetchError != nil {
 
-					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of Spotify album songs: %s", OtherFetchError.Error()))
+					Utils.Logger.Error("Spotify Fetch", fmt.Sprintf("Error fetching rest of Spotify album songs: %s", OtherFetchError.Error()))
 					return
 
 				}
@@ -865,7 +969,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				if OtherFetchError != nil {
 
-					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of Spotify playlist songs: %s", OtherFetchError.Error()))
+					Utils.Logger.Error("Spotify Fetch", fmt.Sprintf("Error fetching rest of Spotify playlist songs: %s", OtherFetchError.Error()))
 					return
 
 				}
@@ -925,7 +1029,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				if OtherFetchError != nil {
 
-					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of Apple Music album songs: %s", OtherFetchError.Error()))
+					Utils.Logger.Error("Apple Music Fetch", fmt.Sprintf("Error fetching rest of Apple Music album songs: %s", OtherFetchError.Error()))
 					return
 
 				}
@@ -968,7 +1072,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				if OtherFetchError != nil {
 
-					Utils.Logger.Error(fmt.Sprintf("Error fetching rest of Apple Music playlist songs: %s", OtherFetchError.Error()))
+					Utils.Logger.Error("Apple Music Fetch", fmt.Sprintf("Error fetching rest of Apple Music playlist songs: %s", OtherFetchError.Error()))
 					return
 
 				}
@@ -1002,7 +1106,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 			if PlayError != nil {
 
-				Utils.Logger.Error(fmt.Sprintf("Error playing song: %s", PlayError.Error()))
+				Utils.Logger.Error("Playback", fmt.Sprintf("Error playing song: %s", PlayError.Error()))
 
 			}
 
@@ -1048,11 +1152,11 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 		defer func() {
 			if r := recover(); r != nil {
-				Utils.Logger.Error(fmt.Sprintf("Panic in OnFinished: %v", r))
+				Utils.Logger.Error("Playback", fmt.Sprintf("Panic in OnFinished: %v", r))
 			}
 		}()
 
-		Utils.Logger.Info(fmt.Sprintf("Playback finished for song: %s", Song.Title))
+		Utils.Logger.Info("Playback", fmt.Sprintf("Playback finished for song: %s", Song.Title))
 
 		G.StreamerMutex.Lock()
 
@@ -1093,7 +1197,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 	OnStreamingError := func() {
 
-		Utils.Logger.Error(fmt.Sprintf("Streaming error for song: %s, disconnecting guild", Song.Title))
+		Utils.Logger.Error("Streaming", fmt.Sprintf("Streaming error for song: %s, disconnecting guild", Song.Title))
 
 		Locale := G.Locale.Code()
 
@@ -1105,14 +1209,14 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 					Title:       Localizations.Get("Embeds.Notifications.StreamingError.Title", Locale),
 					Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 					Description: Localizations.Get("Embeds.Notifications.StreamingError.Description", Locale),
-					Color:       Utils.RED,
+					Color:       Utils.ERROR,
 
 				})).
 				Build())
 
 			if ErrorSending != nil {
 
-				Utils.Logger.Error(fmt.Sprintf("Error sending streaming error message to guild %s: %s", G.ID.String(), ErrorSending.Error()))
+				Utils.Logger.Error("Command", fmt.Sprintf("Error sending streaming error message to guild %s: %s", G.ID.String(), ErrorSending.Error()))
 
 			}
 

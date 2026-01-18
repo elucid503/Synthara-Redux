@@ -1435,7 +1435,7 @@ func PlayMP4(URL string, OnFinished func(), SendToWS func(Event string, Data any
 		
 		if Err != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Streaming error: %s", Err.Error()))
+			Utils.Logger.Error("Streaming", fmt.Sprintf("Streaming error: %s", Err.Error()))
 			
 			Playback.Stop()
 			

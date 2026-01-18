@@ -91,7 +91,7 @@ func (Q *Queue) SendToWebsockets(Event string, Data interface{}) {
 
 func QueueStateHandler(Queue *Queue, State int) {
 
-	Utils.Logger.Info(fmt.Sprintf("Queue %s state changed to %d", Queue.ParentID.String(), State))
+	Utils.Logger.Info("Queue", fmt.Sprintf("Queue %s state changed to %d", Queue.ParentID.String(), State))
 	Queue.SendToWebsockets(Event_StateChanged, map[string]interface{}{"State": State})
 
 	// Check Queue state and perform actions
@@ -102,7 +102,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 			// Idle state; move to next song if available
 
-			Utils.Logger.Info(fmt.Sprintf("Queue %s is now idle; moving on...", Queue.ParentID.String()))
+			Utils.Logger.Info("Queue", fmt.Sprintf("Queue %s is now idle; moving on...", Queue.ParentID.String()))
 
 			Guild := GetGuild(Queue.ParentID, false)
 
@@ -115,7 +115,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 			// Handle Repeat One - replay current song
 			if Guild.Features.Repeat == RepeatOne && Queue.Current != nil {
 
-				Utils.Logger.Info(fmt.Sprintf("Queue %s repeating current song: %s", Queue.ParentID.String(), Queue.Current.Title))
+				Utils.Logger.Info("Queue", fmt.Sprintf("Queue %s repeating current song: %s", Queue.ParentID.String(), Queue.Current.Title))
 
 				go Queue.Play()
 				return
@@ -134,7 +134,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 			if Advanced {
 
-				Utils.Logger.Info(fmt.Sprintf("Queue %s advanced to next song: %s", Queue.ParentID.String(), Queue.Current.Title))
+				Utils.Logger.Info("Queue", fmt.Sprintf("Queue %s advanced to next song: %s", Queue.ParentID.String(), Queue.Current.Title))
 
 				Queue.SendNowPlayingMessage()
 
@@ -142,13 +142,13 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				if ErrorPlaying != nil {
 
-					Utils.Logger.Error(fmt.Sprintf("Error playing song %s for Queue %s: %s", Queue.Current.Title, Queue.ParentID.String(), ErrorPlaying.Error()))
+					Utils.Logger.Error("Playback", fmt.Sprintf("Error playing song %s for Queue %s: %s", Queue.Current.Title, Queue.ParentID.String(), ErrorPlaying.Error()))
 
 				}
 
 			} else {
 
-				Utils.Logger.Info(fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
+				Utils.Logger.Info("Queue", fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
 
 				// Send queue update to notify UI that queue has ended
 				Queue.Functions.Updated(Queue)
@@ -184,7 +184,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 					if ErrorSending != nil {
 
-						Utils.Logger.Error(fmt.Sprintf("Error sending queue ended message to channel %s for Queue %s: %s", TextChannelID, Queue.ParentID.String(), ErrorSending.Error()))
+						Utils.Logger.Error("Command", fmt.Sprintf("Error sending queue ended message to channel %s for Queue %s: %s", TextChannelID, Queue.ParentID.String(), ErrorSending.Error()))
 
 					}
 
@@ -254,7 +254,7 @@ func QueueUpdatedHandler(Queue *Queue) {
 
 	if ErrorGettingStream != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Error caching stream URL for song %s: %s", NextSong.Title, ErrorGettingStream.Error()))
+		Utils.Logger.Error("Streaming", fmt.Sprintf("Error caching stream URL for song %s: %s", NextSong.Title, ErrorGettingStream.Error()))
 
 	}
 	
@@ -297,7 +297,7 @@ func (Q *Queue) Next(Notify bool) bool {
 
 		} else {
 
-			Utils.Logger.Warn(fmt.Sprintf("AutoPlay: Failed to generate suggestions for Queue %s", Q.ParentID.String()))
+			Utils.Logger.Warn("AutoPlay", fmt.Sprintf("Failed to generate suggestions for Queue %s", Q.ParentID.String()))
 
 		}
 
@@ -478,7 +478,7 @@ func (Q *Queue) Play() bool {
 
 		if r := recover(); r != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Panic recovered in Queue.Play for Queue %s: %v", Q.ParentID.String(), r))
+			Utils.Logger.Error("Playback", fmt.Sprintf("Panic recovered in Queue.Play for Queue %s: %v", Q.ParentID.String(), r))
 
 			// Set state back to idle on panic
 			Guild := GetGuild(Q.ParentID, false)
@@ -513,7 +513,7 @@ func (Q *Queue) Play() bool {
 
 	if ErrorPlaying != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Error playing song %s for Queue %s: %s", Q.Current.Title, Q.ParentID.String(), ErrorPlaying.Error()))
+		Utils.Logger.Error("Playback", fmt.Sprintf("Error playing song %s for Queue %s: %s", Q.Current.Title, Q.ParentID.String(), ErrorPlaying.Error()))
 		
 		// Set state back to idle on error
 		Guild.StreamerMutex.Lock()
@@ -568,7 +568,7 @@ func (Q *Queue) SendNowPlayingMessage() {
 
 		if ErrorSending != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Error sending now playing message to channel %s for Queue %s: %s", Guild.Channels.Text, Q.ParentID.String(), ErrorSending.Error()))
+			Utils.Logger.Error("Command", fmt.Sprintf("Error sending now playing message to channel %s for Queue %s: %s", Guild.Channels.Text, Q.ParentID.String(), ErrorSending.Error()))
 		
 		}
 
@@ -728,14 +728,14 @@ func (Q *Queue) RegenerateSuggestions() {
 
 	if Guild == nil {
 
-		Utils.Logger.Warn(fmt.Sprintf("AutoPlay: RegenerateSuggestions called but Guild is nil for Queue %s", Q.ParentID.String()))
+		Utils.Logger.Warn("AutoPlay", fmt.Sprintf("RegenerateSuggestions called but Guild is nil for Queue %s", Q.ParentID.String()))
 		return
 
 	}
 
 	if !Guild.Features.Autoplay {
 
-		Utils.Logger.Warn(fmt.Sprintf("AutoPlay: RegenerateSuggestions called but AutoPlay is disabled for Queue %s", Q.ParentID.String()))
+		Utils.Logger.Warn("AutoPlay", fmt.Sprintf("RegenerateSuggestions called but AutoPlay is disabled for Queue %s", Q.ParentID.String()))
 		return
 		
 	}
@@ -754,12 +754,12 @@ func (Q *Queue) RegenerateSuggestions() {
 
 	} else {
 
-		Utils.Logger.Warn(fmt.Sprintf("AutoPlay: No seed song available for Queue %s (Previous: %d, Current: %v)", Q.ParentID.String(), len(Q.Previous), Q.Current != nil))
+		Utils.Logger.Warn("AutoPlay", fmt.Sprintf("No seed song available for Queue %s (Previous: %d, Current: %v)", Q.ParentID.String(), len(Q.Previous), Q.Current != nil))
 		return // No seed available
 
 	}
 
-	Utils.Logger.Info(fmt.Sprintf("Regenerating suggestions for Queue %s using seed: %s", Q.ParentID.String(), SeedSong.Title))
+	Utils.Logger.Info("AutoPlay", fmt.Sprintf("Regenerating suggestions for Queue %s using seed: %s", Q.ParentID.String(), SeedSong.Title))
 
 	// Get mix ID from current song if available, otherwise fetch it
 
@@ -773,7 +773,7 @@ func (Q *Queue) RegenerateSuggestions() {
 
 		if Err != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Error fetching track mix for Queue %s: %s", Q.ParentID.String(), Err.Error()))
+			Utils.Logger.Error("Tidal API", fmt.Sprintf("Error fetching track mix for Queue %s: %s", Q.ParentID.String(), Err.Error()))
 			return
 
 		}
@@ -786,7 +786,7 @@ func (Q *Queue) RegenerateSuggestions() {
 
 	if ErrorFetching != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Error fetching mix items for Queue %s: %s", Q.ParentID.String(), ErrorFetching.Error()))
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Error fetching mix items for Queue %s: %s", Q.ParentID.String(), ErrorFetching.Error()))
 		return
 
 	}
@@ -838,6 +838,6 @@ func (Q *Queue) RegenerateSuggestions() {
 
 	}
 
-	Utils.Logger.Info(fmt.Sprintf("Generated %d suggestions for Queue %s", len(Q.Suggestions), Q.ParentID.String()))
+	Utils.Logger.Info("AutoPlay", fmt.Sprintf("Generated %d suggestions for Queue %s", len(Q.Suggestions), Q.ParentID.String()))
 
 }

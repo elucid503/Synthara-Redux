@@ -6,6 +6,7 @@ import (
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
+	"strconv"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -39,7 +40,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.NoQuery.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Play.Error.NoQuery.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -61,7 +62,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.NotInGuild.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Play.Error.NotInGuild.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -85,7 +86,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -113,7 +114,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.FailedToConnect.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.GetFormat("Commands.Play.Error.FailedToConnect.Description", Locale, ErrorConnecting.Error()),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -137,7 +138,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.InvalidInput.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.GetFormat("Commands.Play.Error.InvalidInput.Description", Locale, ErrorRouting.Error()),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -161,7 +162,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Play.Error.FailedToHandle.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.GetFormat("Commands.Play.Error.FailedToHandle.Description", Locale, ErrorHandling.Error()),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -171,7 +172,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	// Saves to user's recent searches in MongoDB
+	// User persistence updates
 
 	go func() {
 
@@ -186,6 +187,23 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 			}
 			
 			User.AddRecentSearch(SongFound.Title, URI)
+
+			// Track Favorites 
+
+			if SongFound.TidalID != 0 {
+				
+				SongURI := "Synthara-Redux:" + APIs.URITypeTidalSong + ":" + strconv.FormatInt(SongFound.TidalID, 10)
+				User.AddFavorite(SongURI)
+
+			}
+
+			// Track Mix
+
+			if SongFound.MixID != "" {
+
+				User.SetMostRecentMix(SongFound.MixID)
+
+			}
 
 		}
 

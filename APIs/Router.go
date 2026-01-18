@@ -40,6 +40,11 @@ const (
 
 	URITypeNone = "None"
 
+	// User features
+
+	URITypeFavorites = "Favorites"
+	URITypeSuggestions = "Suggestions"
+
 )
 
 const (

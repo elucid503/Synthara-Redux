@@ -56,7 +56,7 @@ func RemoveSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 				Title:       Localizations.Get("Embeds.Categories.Error", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: "Song not found in queue.",
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -79,7 +79,7 @@ func RemoveSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 				Title:       Localizations.Get("Embeds.Categories.Error", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: "Failed to remove song from queue.",
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 

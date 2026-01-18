@@ -21,62 +21,62 @@ func main() {
 
 	godotenv.Load(".env")
 
-	Utils.Logger.Info("Starting Synthara-Redux...")
+	Utils.Logger.Info("Startup", "Starting Synthara-Redux...")
 
 	LocalizationErr := Localizations.Initialize()
 
 	if LocalizationErr != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to initialize/read localizations: %s", LocalizationErr.Error()))
+		Utils.Logger.Error("Initialization", fmt.Sprintf("Failed to initialize/read localizations: %s", LocalizationErr.Error()))
 		os.Exit(1)
 
 	}
 
-	Utils.Logger.Info("Localizations loaded.")
+	Utils.Logger.Info("Initialization", "Localizations loaded.")
 
 	IconsErr := Icons.Initialize()
 
 	if IconsErr != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to initialize/read icons: %s", IconsErr.Error()))
+		Utils.Logger.Error("Initialization", fmt.Sprintf("Failed to initialize/read icons: %s", IconsErr.Error()))
 		os.Exit(1)
 
 	}
 
-	Utils.Logger.Info("Icons loaded.")
+	Utils.Logger.Info("Initialization", "Icons loaded.")
 
 	MongoErr := Globals.InitMongoDB()
 
 	if MongoErr != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to initialize MongoDB: %s", MongoErr.Error()))
+		Utils.Logger.Error("Database", fmt.Sprintf("Failed to initialize MongoDB: %s", MongoErr.Error()))
 		os.Exit(1)
 
 	}
 
-	Utils.Logger.Info("Connected to MongoDB.")
+	Utils.Logger.Info("Database", "Connected to MongoDB.")
 
 	InitErr := Globals.InitDiscordClient()
 
 	if InitErr != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to initialize Discord client: %s", InitErr.Error()))
+		Utils.Logger.Error("Discord", fmt.Sprintf("Failed to initialize Discord client: %s", InitErr.Error()))
 		os.Exit(1)
 
 	}
 
-	Utils.Logger.Info("Connecting to Discord...")
+	Utils.Logger.Info("Discord", "Connecting to Discord...")
 
 	ConnectErr := Globals.ConnectDiscordClient()
 
 	if ConnectErr != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to connect to Discord: %s", ConnectErr.Error()))
+		Utils.Logger.Error("Discord", fmt.Sprintf("Failed to connect to Discord: %s", ConnectErr.Error()))
 		os.Exit(1)
 
 	}
 
-	Utils.Logger.Info("Connected to Discord!")
+	Utils.Logger.Info("Discord", "Connected to Discord!")
 
 	if (os.Getenv("REFRESH_COMMANDS") == "true") {
 
@@ -91,31 +91,31 @@ func main() {
 	
 	go Globals.WebServer.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 
-	Utils.Logger.Info(fmt.Sprintf("Web server running on port %s", os.Getenv("PORT")))
+	Utils.Logger.Info("Web Server", fmt.Sprintf("Web server running on port %s", os.Getenv("PORT")))
 
 	// Tidal Initialization
 
 	Tidal.Init()
 
-	Utils.Logger.Info("Tidal client initialized.")
+	Utils.Logger.Info("API", "Tidal client initialized.")
 
 	// Spotify Initialization
 
 	Spotify.Initialize(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
 	
-	Utils.Logger.Info("Spotify client initialized.")
+	Utils.Logger.Info("API", "Spotify client initialized.")
 
 	// Apple Music Initialization
 
 	Apple.Initialize(os.Getenv("APPLE_JWT"))
 
-	Utils.Logger.Info("Apple Music client initialized.")
+	Utils.Logger.Info("API", "Apple Music client initialized.")
 
 	// YT Initialization
 
 	YouTube.Init()
 	
-	Utils.Logger.Info("YouTube client initialized.")
+	Utils.Logger.Info("API", "YouTube client initialized.")
 	
 	// Done with setup; now we wait for events
 

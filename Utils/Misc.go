@@ -20,7 +20,7 @@ func Hang() {
 
 	<-SignalChan // Blocks until a signal is received
 
-	Logger.Info("Shutting down and disconnecting Discord client...")
+	Logger.Info("Shutdown", "Shutting down and disconnecting Discord client...")
 
 	Globals.DiscordClient.Close(context.TODO())
 	

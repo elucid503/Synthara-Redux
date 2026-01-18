@@ -50,7 +50,7 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 				Title:       Localizations.Get("Components.Album.InvalidID.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Components.Album.InvalidID.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -74,7 +74,7 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 				Title:       Localizations.Get("Components.Album.InvalidID.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Components.Album.InvalidID.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -97,7 +97,7 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 				Title:       Localizations.Get("Components.Album.FetchError.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Components.Album.FetchError.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -212,7 +212,7 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 				Title:       Localizations.Get("Components.Album.InvalidID.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Components.Album.InvalidID.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -236,7 +236,7 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 				Title:       Localizations.Get("Components.Album.InvalidID.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Components.Album.InvalidID.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -261,7 +261,7 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 				Title:       Localizations.Get("Components.Album.FetchError.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Components.Album.FetchError.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 
@@ -294,7 +294,7 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 			Title:       Localizations.Get("Components.Album.Playing.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Success", Locale),
 			Description: Localizations.GetFormat("Components.Album.Playing.Description", Locale, len(AlbumSongs)),
-			Color:       Utils.WHITE,
+			Color:       Utils.PRIMARY,
 
 		})).Build())
 

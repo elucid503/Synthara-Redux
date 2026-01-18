@@ -25,7 +25,7 @@ func Queue(Event *events.ComponentInteractionCreate) {
 				Title:       Localizations.Get("Commands.Queue.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Queue.Error.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 

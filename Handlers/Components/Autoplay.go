@@ -55,7 +55,7 @@ func Autoplay(Event *events.ComponentInteractionCreate) {
 
 		if Guild.Queue.Current == nil && len(Guild.Queue.Upcoming) == 0 && len(Guild.Queue.Suggestions) > 0 {
 
-			Utils.Logger.Info("AutoPlay: Queue is empty, starting playback from suggestions")
+			Utils.Logger.Info("AutoPlay", "Queue is empty, starting playback from suggestions")
 			
 			// Take first suggestion and start playing
 			

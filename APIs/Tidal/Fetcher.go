@@ -81,7 +81,7 @@ func Init() {
 
 	if _, Err := GetBearerToken(); Err != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to fetch initial Tidal token: %s", Err.Error()))
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to fetch initial Tidal token: %s", Err.Error()))
 
 	}
 
@@ -166,7 +166,7 @@ func GetBearerToken() (string, error) {
 	TokenExpiry = time.Now().Add(time.Duration(TokenResp.ExpiresIn-300) * time.Second)
 	BearerToken = CachedToken
 
-	Utils.Logger.Info("Tidal bearer token refreshed.")
+	Utils.Logger.Info("Tidal API", "Tidal bearer token refreshed.")
 
 	return CachedToken, nil
 
@@ -264,7 +264,7 @@ func Search(Query string, SearchType string) (*SearchResult, error) {
 
 func FetchStreaming(ID int64, Quality string) (*Streaming, error) {
 
-	Utils.Logger.Info(fmt.Sprintf("Fetching streaming info for track %d", ID))
+	Utils.Logger.Info("Tidal API", fmt.Sprintf("Fetching streaming info for track %d", ID))
 
 	Endpoint := fmt.Sprintf("%s/track/?id=%d&quality=%s", BaseAPIURL, ID, Quality)
 
@@ -524,7 +524,7 @@ func FetchAlbumTracks(AlbumID int64) ([]Song, error) {
 
 	if Err != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to get bearer token: %s", Err.Error()))
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to get bearer token: %s", Err.Error()))
 		return nil, Err
 
 	}
@@ -541,7 +541,7 @@ func FetchAlbumTracks(AlbumID int64) ([]Song, error) {
 
 		if Err != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Failed to create album items request: %s", Err.Error()))
+			Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to create album items request: %s", Err.Error()))
 			return nil, Err
 
 		}
@@ -557,7 +557,7 @@ func FetchAlbumTracks(AlbumID int64) ([]Song, error) {
 
 		if ItemsErr != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Failed to fetch album items for ID %d: %s", AlbumID, ItemsErr.Error()))
+			Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to fetch album items for ID %d: %s", AlbumID, ItemsErr.Error()))
 			return nil, ItemsErr
 
 		}
@@ -566,7 +566,7 @@ func FetchAlbumTracks(AlbumID int64) ([]Song, error) {
 
 		if ItemsResp.StatusCode != 200 {
 
-			Utils.Logger.Error(fmt.Sprintf("Album items request returned HTTP %d for ID %d", ItemsResp.StatusCode, AlbumID))
+			Utils.Logger.Error("Tidal API", fmt.Sprintf("Album items request returned HTTP %d for ID %d", ItemsResp.StatusCode, AlbumID))
 			return nil, fmt.Errorf("HTTP %d fetching album items", ItemsResp.StatusCode)
 
 		}
@@ -575,14 +575,14 @@ func FetchAlbumTracks(AlbumID int64) ([]Song, error) {
 
 		if Err := json.NewDecoder(ItemsResp.Body).Decode(&ItemsData); Err != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Failed to decode album items for ID %d: %s", AlbumID, Err.Error()))
+			Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to decode album items for ID %d: %s", AlbumID, Err.Error()))
 			return nil, Err
 
 		}
 
 		if len(ItemsData.Items) == 0 {
 
-			Utils.Logger.Warn(fmt.Sprintf("Album %d has no items", AlbumID))
+			Utils.Logger.Warn("Tidal API", fmt.Sprintf("Album %d has no items", AlbumID))
 			return nil, fmt.Errorf("album has no tracks")
 
 		}
@@ -606,7 +606,7 @@ func FetchAlbumTracks(AlbumID int64) ([]Song, error) {
 
 	Cache.Set(Key, Songs, 1 * time.Hour) // 1 hour TTL
 
-	Utils.Logger.Info(fmt.Sprintf("Fetched %d tracks from album %d", len(Songs), AlbumID))
+	Utils.Logger.Info("Tidal API", fmt.Sprintf("Fetched %d tracks from album %d", len(Songs), AlbumID))
 
 	return Songs, nil
 
@@ -619,7 +619,7 @@ func FetchPlaylistTracks(PlaylistID int64) ([]Song, error) {
 
 	if Err != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to get bearer token: %s", Err.Error()))
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to get bearer token: %s", Err.Error()))
 		return nil, Err
 
 	}
@@ -632,13 +632,13 @@ func FetchPlaylistTracks(PlaylistID int64) ([]Song, error) {
 
 		Endpoint := fmt.Sprintf("https://api.tidal.com/v1/playlists/%d/items?countryCode=US&limit=%d&offset=%d", PlaylistID, Limit, Offset)
 
-		Utils.Logger.Info(fmt.Sprintf("Fetching playlist items from: %s", Endpoint))
+		Utils.Logger.Info("Tidal API", fmt.Sprintf("Fetching playlist items from: %s", Endpoint))
 
 		Request, Err := http.NewRequest("GET", Endpoint, nil)
 
 		if Err != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Failed to create playlist items request: %s", Err.Error()))
+			Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to create playlist items request: %s", Err.Error()))
 			return nil, Err
 
 		}
@@ -654,7 +654,7 @@ func FetchPlaylistTracks(PlaylistID int64) ([]Song, error) {
 
 		if Err != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Failed to fetch playlist items for ID %d: %s", PlaylistID, Err.Error()))
+			Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to fetch playlist items for ID %d: %s", PlaylistID, Err.Error()))
 			return nil, Err
 
 		}
@@ -663,7 +663,7 @@ func FetchPlaylistTracks(PlaylistID int64) ([]Song, error) {
 
 		if Resp.StatusCode != 200 {
 
-			Utils.Logger.Error(fmt.Sprintf("Playlist items request returned HTTP %d for ID %d", Resp.StatusCode, PlaylistID))
+			Utils.Logger.Error("Tidal API", fmt.Sprintf("Playlist items request returned HTTP %d for ID %d", Resp.StatusCode, PlaylistID))
 			return nil, fmt.Errorf("HTTP %d fetching playlist items", Resp.StatusCode)
 
 		}
@@ -672,7 +672,7 @@ func FetchPlaylistTracks(PlaylistID int64) ([]Song, error) {
 
 		if Err := json.NewDecoder(Resp.Body).Decode(&Wrapper); Err != nil {
 
-			Utils.Logger.Error(fmt.Sprintf("Failed to decode playlist items for ID %d: %s", PlaylistID, Err.Error()))
+			Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to decode playlist items for ID %d: %s", PlaylistID, Err.Error()))
 			return nil, Err
 
 		}
@@ -698,12 +698,12 @@ func FetchPlaylistTracks(PlaylistID int64) ([]Song, error) {
 
 	if len(Songs) == 0 {
 
-		Utils.Logger.Warn(fmt.Sprintf("Playlist %d has no items", PlaylistID))
+		Utils.Logger.Warn("Tidal API", fmt.Sprintf("Playlist %d has no items", PlaylistID))
 		return nil, fmt.Errorf("playlist has no tracks")
 
 	}
 
-	Utils.Logger.Info(fmt.Sprintf("Fetched %d tracks from playlist %d", len(Songs), PlaylistID))
+	Utils.Logger.Info("Tidal API", fmt.Sprintf("Fetched %d tracks from playlist %d", len(Songs), PlaylistID))
 
 	return Songs, nil
 
@@ -735,7 +735,7 @@ func FetchMixItems(MixID string) ([]Song, error) {
 
 	if Err != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to get bearer token: %s", Err.Error()))
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to get bearer token: %s", Err.Error()))
 		return nil, Err
 
 	}
@@ -746,7 +746,7 @@ func FetchMixItems(MixID string) ([]Song, error) {
 
 	if Err != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to create mix items request: %s", Err.Error()))
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to create mix items request: %s", Err.Error()))
 		return nil, Err
 
 	}
@@ -760,7 +760,7 @@ func FetchMixItems(MixID string) ([]Song, error) {
 
 	if Err != nil { 
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to fetch mix items: %s", Err.Error()))
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to fetch mix items: %s", Err.Error()))
 		return nil, Err 
 
 	}
@@ -769,7 +769,7 @@ func FetchMixItems(MixID string) ([]Song, error) {
 
 	if Resp.StatusCode != 200 {
 
-		Utils.Logger.Error(fmt.Sprintf("Mix items request failed with HTTP %d", Resp.StatusCode))
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Mix items request failed with HTTP %d", Resp.StatusCode))
 		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode)
 
 	}
@@ -778,7 +778,7 @@ func FetchMixItems(MixID string) ([]Song, error) {
 
 	if Err := json.NewDecoder(Resp.Body).Decode(&Wrapper); Err != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to decode mix items response: %s", Err.Error()))
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to decode mix items response: %s", Err.Error()))
 		return nil, Err
 
 	}
@@ -1044,7 +1044,7 @@ func GetSearchSuggestions(Query string) []SearchSuggestion {
 	Token, TokenErr := GetBearerToken()
 	if TokenErr != nil {
 
-		Utils.Logger.Error("Failed to get bearer token: " + TokenErr.Error())
+		Utils.Logger.Error("Tidal API", "Failed to get bearer token: " + TokenErr.Error())
 		return Results
 
 	}
@@ -1057,7 +1057,7 @@ func GetSearchSuggestions(Query string) []SearchSuggestion {
 
 	if Err != nil {
 
-		Utils.Logger.Error("Failed to create suggestions request: " + Err.Error())
+		Utils.Logger.Error("Tidal API", "Failed to create suggestions request: " + Err.Error())
 		return Results
 
 	}
@@ -1073,7 +1073,7 @@ func GetSearchSuggestions(Query string) []SearchSuggestion {
 
 	if Err != nil {
 
-		Utils.Logger.Error("Failed to fetch suggestions: " + Err.Error())
+		Utils.Logger.Error("Tidal API", "Failed to fetch suggestions: " + Err.Error())
 		return Results
 
 	}
@@ -1082,7 +1082,7 @@ func GetSearchSuggestions(Query string) []SearchSuggestion {
 
 	if Response.StatusCode != 200 {
 
-		Utils.Logger.Error(fmt.Sprintf("Suggestions request failed with status %d", Response.StatusCode))
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Suggestions request failed with status %d", Response.StatusCode))
 		return Results
 
 	}
@@ -1096,7 +1096,7 @@ func GetSearchSuggestions(Query string) []SearchSuggestion {
 		GzipReader, Err := gzip.NewReader(Response.Body)
 		if Err != nil {
 
-			Utils.Logger.Error("Failed to create gzip reader: " + Err.Error())
+			Utils.Logger.Error("Tidal API", "Failed to create gzip reader: " + Err.Error())
 			return Results
 
 		}
@@ -1109,7 +1109,7 @@ func GetSearchSuggestions(Query string) []SearchSuggestion {
 
 	if Err != nil {
 
-		Utils.Logger.Error("Failed to read suggestions response: " + Err.Error())
+		Utils.Logger.Error("Tidal API", "Failed to read suggestions response: " + Err.Error())
 		return Results
 
 	}
@@ -1118,7 +1118,7 @@ func GetSearchSuggestions(Query string) []SearchSuggestion {
 
 	if Err := json.Unmarshal(Body, &SuggestionsResp); Err != nil {
 
-		Utils.Logger.Error("Failed to parse suggestions response: " + Err.Error())
+		Utils.Logger.Error("Tidal API", "Failed to parse suggestions response: " + Err.Error())
 		return Results
 
 	}

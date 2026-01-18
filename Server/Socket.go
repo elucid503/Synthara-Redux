@@ -72,7 +72,7 @@ func HandleWSConnections(Context *gin.Context) {
 
 	if ErrorUpgrading != nil {
 
-		Utils.Logger.Error(fmt.Sprintf("Failed to upgrade websocket: %s", ErrorUpgrading.Error()))
+		Utils.Logger.Error("WebSocket", fmt.Sprintf("Failed to upgrade websocket: %s", ErrorUpgrading.Error()))
 		return
 
 	}
@@ -150,7 +150,7 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 
 		Guild.Queue.SendToWebsockets("ERROR", map[string]interface{}{
 
-			"Message": "Web controls are locked. Use <code>/unlock</code> to enable.",
+			"Message": "Web controls are locked. Use /unlock to re-enable.",
 
 		})
 

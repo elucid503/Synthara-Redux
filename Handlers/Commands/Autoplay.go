@@ -72,7 +72,7 @@ func Autoplay(Event *events.ApplicationCommandInteractionCreate) {
 			Title:       Title,
 			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
 			Description: Description,
-			Color:       Utils.WHITE,
+			Color:       Utils.PRIMARY,
 
 		})},
 

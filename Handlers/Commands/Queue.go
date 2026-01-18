@@ -166,7 +166,7 @@ func BuildQueueResponse(GuildID snowflake.ID, Locale string) (*QueueResponse, er
 
 	} else {
 
-		Embed.SetColor(Utils.WHITE)
+		Embed.SetColor(Utils.PRIMARY)
 
 	}
 
@@ -197,7 +197,7 @@ func Queue(Event *events.ApplicationCommandInteractionCreate) {
 				Title:       Localizations.Get("Commands.Queue.Error.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
 				Description: Localizations.Get("Commands.Queue.Error.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			})},
 

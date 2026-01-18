@@ -271,7 +271,7 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 
 	if ColorFetchError != nil {
 
-		Utils.Logger.Warn(fmt.Sprintf("Failed to get dominant color for song embed: %s", ColorFetchError.Error()))
+		Utils.Logger.Warn("Embed", fmt.Sprintf("Failed to get dominant color for song embed: %s", ColorFetchError.Error()))
 		
 	}
 

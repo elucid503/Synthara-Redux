@@ -21,6 +21,7 @@ require (
 	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/dop251/goja v0.0.0-20250125213203-5ef83b82af17 // indirect
+	github.com/elucid503/Sprout-API-Go v1.0.6 // direct
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/gin-contrib/sse v1.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

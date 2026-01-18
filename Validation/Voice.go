@@ -19,7 +19,7 @@ func GuildSessionError(Locale string) discord.Embed {
 		Author:      &discord.EmbedAuthor{Name: Localizations.Get("Embeds.Categories.Error", Locale)},
 		Description: Localizations.Get("Commands.Pause.Error.Description", Locale),
 		
-		Color:       Utils.RED,
+		Color:       Utils.ERROR,
 
 	}
 
@@ -41,7 +41,7 @@ func VoiceStateError(GuildID snowflake.ID, UserID snowflake.ID, Locale string) *
 				Title:       Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Title", Locale),
 				Author:      &discord.EmbedAuthor{Name: Localizations.Get("Embeds.Categories.Error", Locale)},
 				Description: Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Description", Locale),
-				Color:       Utils.RED,
+				Color:       Utils.ERROR,
 
 			}
 
@@ -61,7 +61,7 @@ func PlaybackError(Locale string) discord.Embed {
 		Title:       Localizations.Get("Commands.Lyrics.Error.NoSong.Title", Locale),
 		Author:      &discord.EmbedAuthor{Name: Localizations.Get("Embeds.Categories.Error", Locale)},
 		Description: Localizations.Get("Commands.Lyrics.Error.NoSong.Description", Locale),
-		Color:       Utils.RED,
+		Color:       Utils.ERROR,
 
 	}
 

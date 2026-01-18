@@ -28,6 +28,10 @@ github.com/dlclark/regexp2 v1.11.5 h1:Q/sSnsKerHeCkc/jSTNq1oCm7KiVgUMZRDUoRu0JQZ
 github.com/dlclark/regexp2 v1.11.5/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
 github.com/dop251/goja v0.0.0-20250125213203-5ef83b82af17 h1:spJaibPy2sZNwo6Q0HjBVufq7hBUj5jNFOKRoogCBow=
 github.com/dop251/goja v0.0.0-20250125213203-5ef83b82af17/go.mod h1:MxLav0peU43GgvwVgNbLAj1s/bSGboKkhuULvq/7hx4=
+github.com/elucid503/Sprout-API v0.0.0-20250413023655-45e37045eaff h1:+qIc+lLtmmt41lJ/xGJvJajN79v6j/699vf5+Vifm2s=
+github.com/elucid503/Sprout-API v0.0.0-20250413023655-45e37045eaff/go.mod h1:WsruBQKfCHmm3LXieesUFFGzhYcLbaeItkOcbbRg9pY=
+github.com/elucid503/Sprout-API-Go v1.0.6 h1:2bmDEu7T3YKaqssIHJF8XcjZpITyxCrX5J4OHUgPitE=
+github.com/elucid503/Sprout-API-Go v1.0.6/go.mod h1:hO18W4mE7ju8RtwbVCmFA3ML5Jx2SvRNyEwBsjisWzw=
 github.com/gabriel-vasile/mimetype v1.4.12 h1:e9hWvmLYvtp846tLHam2o++qitpguFiYCKbn0w9jyqw=
 github.com/gabriel-vasile/mimetype v1.4.12/go.mod h1:d+9Oxyo1wTzWdyVUPMmXFvp4F9tea18J8ufA774AB3s=
 github.com/gin-contrib/sse v1.1.0 h1:n0w2GMuUpWDVp7qSpvze6fAu9iRxJY4Hmj6AmBOU05w=
