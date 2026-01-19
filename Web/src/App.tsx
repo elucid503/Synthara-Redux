@@ -422,7 +422,7 @@ function App() {
 
                 <div className="mb-8">
 
-                    {ActiveView == 'Details' && (<DetailsView CurrentSong={CurrentSong} />)}
+                    {ActiveView == 'Details' && (<DetailsView key={CurrentSong?.youtube_id || 'none'} CurrentSong={CurrentSong} />)}
 
                     {/* Lyrics View */}
 

@@ -1332,6 +1332,34 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	G.Queue.SetState(StatePlaying)
 	G.Queue.PlaybackSession = Playback
 
+	// Start progress update ticker
+
+    go func() {
+
+        Ticker := time.NewTicker(5 * time.Second)
+        defer Ticker.Stop()
+
+        for range Ticker.C {
+
+            G.StreamerMutex.Lock()
+
+            if G.Queue.PlaybackSession == nil || G.Queue.PlaybackSession.Stopped.Load() {
+
+                G.StreamerMutex.Unlock()
+                return
+				
+            }
+
+            Progress := G.Queue.PlaybackSession.Streamer.Progress
+
+            G.StreamerMutex.Unlock()
+
+            G.Queue.SendToWebsockets(Event_ProgressUpdate, map[string]any{"Progress": Progress})
+
+        }
+        
+    }()
+
 	// Stop inactivity timer when playback starts (unless autoplay is enabled)
 
 	if !G.Features.Autoplay {
