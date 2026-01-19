@@ -5,6 +5,7 @@ package Audio
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -30,6 +31,8 @@ type MP4Streamer struct {
 	BytesStreamed int64 // Total bytes streamed
 
 	OpusFrameChan chan []byte
+
+	CancelFunc context.CancelFunc
 
 	Mutex sync.Mutex
 
@@ -116,6 +119,13 @@ func (S *MP4Streamer) Stop() {
 	S.Mutex.Lock()
 	defer S.Mutex.Unlock()
 
+	if S.CancelFunc != nil {
+
+		S.CancelFunc()
+		S.CancelFunc = nil
+
+	}
+
 	// Safely close OpusFrameChan
 
 	defer func() {
@@ -140,7 +150,7 @@ func (S *MP4Streamer) Stop() {
 }
 
 // StreamFromURL fetches and processes audio from a direct MP4 URL using chunked streaming
-func (S *MP4Streamer) StreamFromURL(URL string) error {
+func (S *MP4Streamer) StreamFromURL(Ctx context.Context, URL string) error {
 
 	Client := &http.Client{Timeout: 60 * time.Second}
 
@@ -148,6 +158,7 @@ func (S *MP4Streamer) StreamFromURL(URL string) error {
 
 	HeaderSize := int64(1024 * 1024) // 1MB should be enough for moov
 	HeaderReq, Err := http.NewRequest("GET", URL, nil)
+	
 	if Err != nil {
 
 		return fmt.Errorf("failed to create header request: %w", Err)
@@ -197,7 +208,7 @@ func (S *MP4Streamer) StreamFromURL(URL string) error {
 
 	// Now stream the mdat content in chunks
 
-	return S.streamMdatChunked(URL, Info, Client)
+	return S.streamMdatChunked(Ctx, URL, Info, Client)
 
 }
 
@@ -1121,7 +1132,7 @@ func (S *MP4Streamer) parseMP4Header(Data []byte, Info *MP4AudioInfo) {
 }
 
 // streamMdatChunked streams mdat content in chunks and processes incrementally
-func (S *MP4Streamer) streamMdatChunked(URL string, Info *MP4AudioInfo, Client *http.Client) error {
+func (S *MP4Streamer) streamMdatChunked(Ctx context.Context, URL string, Info *MP4AudioInfo, Client *http.Client) error {
 
 	// Create decoder for raw AAC
 
@@ -1217,6 +1228,8 @@ func (S *MP4Streamer) streamMdatChunked(URL string, Info *MP4AudioInfo, Client *
 		}
 
 		Req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", RangeStart, RangeEnd))
+
+		Req = Req.WithContext(Ctx)
 
 		if S.IsStopped() {
 
@@ -1428,6 +1441,9 @@ func PlayMP4(URL string, OnFinished func(), SendToWS func(Event string, Data any
 
 	}
 
+	Ctx, CancelFunc := context.WithCancel(context.Background())
+	Streamer.CancelFunc = CancelFunc
+
 	Playback := &MP4Playback{
 
 		Streamer: Streamer,
@@ -1437,7 +1453,7 @@ func PlayMP4(URL string, OnFinished func(), SendToWS func(Event string, Data any
 	// Fetch and process in background
 	go func() {
 
-		Err := Streamer.StreamFromURL(URL)
+		Err := Streamer.StreamFromURL(Ctx, URL)
 		
 		if Err != nil {
 
