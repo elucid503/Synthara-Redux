@@ -16,8 +16,6 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/disgoorg/disgo v0.19.0-rc.15 h1:x0NsV2gcbdjwuztsg2wYXw76p1Cpc8f6ByDrkPcfQtU=
-github.com/disgoorg/disgo v0.19.0-rc.15/go.mod h1:14mgXzenkJqifkDmsEgU0zI1di6jNXodwX6L8geW33A=
 github.com/disgoorg/json/v2 v2.0.0 h1:U16yy/ARK7/aEpzjjqK1b/KaqqGHozUdeVw/DViEzQI=
 github.com/disgoorg/json/v2 v2.0.0/go.mod h1:jZTBC0nIE1WeetSEI3/Dka8g+qglb4FPVmp5I5HpEfI=
 github.com/disgoorg/omit v1.0.0 h1:y0LkVUOyUHT8ZlnhIAeOZEA22UYykeysK8bLJ0SfT78=
@@ -28,8 +26,6 @@ github.com/dlclark/regexp2 v1.11.5 h1:Q/sSnsKerHeCkc/jSTNq1oCm7KiVgUMZRDUoRu0JQZ
 github.com/dlclark/regexp2 v1.11.5/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
 github.com/dop251/goja v0.0.0-20250125213203-5ef83b82af17 h1:spJaibPy2sZNwo6Q0HjBVufq7hBUj5jNFOKRoogCBow=
 github.com/dop251/goja v0.0.0-20250125213203-5ef83b82af17/go.mod h1:MxLav0peU43GgvwVgNbLAj1s/bSGboKkhuULvq/7hx4=
-github.com/elucid503/Sprout-API v0.0.0-20250413023655-45e37045eaff h1:+qIc+lLtmmt41lJ/xGJvJajN79v6j/699vf5+Vifm2s=
-github.com/elucid503/Sprout-API v0.0.0-20250413023655-45e37045eaff/go.mod h1:WsruBQKfCHmm3LXieesUFFGzhYcLbaeItkOcbbRg9pY=
 github.com/elucid503/Sprout-API-Go v1.0.6 h1:2bmDEu7T3YKaqssIHJF8XcjZpITyxCrX5J4OHUgPitE=
 github.com/elucid503/Sprout-API-Go v1.0.6/go.mod h1:hO18W4mE7ju8RtwbVCmFA3ML5Jx2SvRNyEwBsjisWzw=
 github.com/gabriel-vasile/mimetype v1.4.12 h1:e9hWvmLYvtp846tLHam2o++qitpguFiYCKbn0w9jyqw=

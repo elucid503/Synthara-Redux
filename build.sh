@@ -15,6 +15,26 @@ export CGO_LDFLAGS=""
 
 export CGO_ENABLED=1
 
+# Ensure disgo is patched for segfault fix
+
+if [ ! -d "../disgo" ]; then
+    echo "Cloning disgo repository..."
+    git clone https://github.com/disgoorg/disgo.git ../disgo
+fi
+
+cd ../disgo
+git checkout v0.19.0-rc.15
+sed -i '/func (u \*udpConnImpl) Close() error {/,/}/c\
+func (u *udpConnImpl) Close() error {\
+	u.connMu.Lock()\
+	defer u.connMu.Unlock()\
+	if u.conn == nil {\
+		return nil\
+	}\
+	return u.conn.Close()\
+}' voice/udp_conn.go
+cd ../Synthara-Redux
+
 # Build the project
 
 go build -v -o synthara-redux
