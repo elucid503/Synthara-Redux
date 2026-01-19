@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -21,7 +20,7 @@ import (
 
 // Generic wrapper for API responses
 
-var BaseAPIURL string
+var BaseAPIURLs []string
 var BearerToken string
 var HTTPClient = &http.Client{Timeout: 10 * time.Second}
 
@@ -67,15 +66,54 @@ var DefaultHeaders = map[string]string{
 
 func Init() {
 
-	BaseAPIURL = strings.TrimSpace(os.Getenv("STREAMING_API_ENDPOINT"))
+	APIs := strings.TrimSpace(os.Getenv("STREAMING_APIS"))
 
-	if !strings.HasPrefix(BaseAPIURL, "http://") && !strings.HasPrefix(BaseAPIURL, "https://") {
+	if APIs == "" {
 
-		BaseAPIURL = "http://" + BaseAPIURL
+		// Fallback to old single endpoint
+
+		APIs = strings.TrimSpace(os.Getenv("STREAMING_API_ENDPOINT"))
+
+		if APIs == "" {
+
+			Utils.Logger.Error("Tidal API", "No STREAMING_APIS or STREAMING_API_ENDPOINT configured")
+			return
+
+		}
 
 	}
 
-	BaseAPIURL = strings.TrimRight(BaseAPIURL, "/")
+	APIList := strings.Split(APIs, ",")
+	BaseAPIURLs = make([]string, 0, len(APIList))
+
+	for _, API := range APIList {
+
+		API = strings.TrimSpace(API)
+
+		if API == "" {
+
+			continue
+
+		}
+
+		if !strings.HasPrefix(API, "http://") && !strings.HasPrefix(API, "https://") {
+
+			API = "https://" + API
+
+
+		}
+
+		API = strings.TrimRight(API, "/")
+		BaseAPIURLs = append(BaseAPIURLs, API)
+
+	}
+
+	if len(BaseAPIURLs) == 0 {
+
+		Utils.Logger.Error("Tidal API", "No valid APIs found in STREAMING_APIS")
+		return
+
+	}
 
 	// Fetch initial token
 
@@ -84,6 +122,44 @@ func Init() {
 		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to fetch initial Tidal token: %s", Err.Error()))
 
 	}
+
+}
+
+// TryAPIs makes a request to the first working API endpoint
+func TryAPIs(Path string) (*http.Response, error) {
+
+	for _, BaseURL := range BaseAPIURLs {
+
+		URL := BaseURL + Path
+		Req, Err := http.NewRequest("GET", URL, nil)
+
+		if Err != nil {
+
+			continue
+
+		}
+
+		defer Req.Body.Close()
+
+		AddDefaultHeaders(Req)
+
+		Resp, Err := HTTPClient.Do(Req)
+
+		if Err != nil {
+
+			continue
+
+		}
+
+		if Resp.StatusCode >= 200 && Resp.StatusCode < 300 {
+
+			return Resp, nil
+
+		}
+
+	}
+
+	return nil, fmt.Errorf("all APIs failed for path: %s", Path)
 
 }
 
@@ -172,50 +248,6 @@ func GetBearerToken() (string, error) {
 
 }
 
-func DoGet(Endpoint string) (*http.Response, error) {
-
-	Req, Err := http.NewRequest(http.MethodGet, Endpoint, nil)
-
-	if Err != nil {
-
-		return nil, Err
-
-	}
-
-	AddDefaultHeaders(Req)
-
-	Resp, Err := HTTPClient.Do(Req)
-
-	if Err == nil {
-
-		return Resp, nil
-
-	}
-
-	var URLErr *url.Error
-
-	if strings.HasPrefix(Endpoint, "https://") && errors.As(Err, &URLErr) && strings.Contains(Err.Error(), "first record does not look like a TLS handshake") {
-
-		Fallback := "http://" + strings.TrimPrefix(Endpoint, "https://")
-
-		FallbackReq, FallbackErr := http.NewRequest(http.MethodGet, Fallback, nil)
-
-		if FallbackErr != nil {
-
-			return nil, FallbackErr
-
-		}
-
-		AddDefaultHeaders(FallbackReq)
-
-		return HTTPClient.Do(FallbackReq)
-
-	}
-
-	return nil, Err
-
-}
-
 func AddDefaultHeaders(Req *http.Request) {
 
 	for Key, Value := range DefaultHeaders {
@@ -232,9 +264,9 @@ func Search(Query string, SearchType string) (*SearchResult, error) {
 
 	Params.Set(SearchType, Query)
 
-	Endpoint := fmt.Sprintf("%s/search/?%s", BaseAPIURL, Params.Encode())
+	path := fmt.Sprintf("/search/?%s", Params.Encode())
 
-	Resp, Err := DoGet(Endpoint)
+	Resp, Err := TryAPIs(path)
 
 	if Err != nil {
 
@@ -266,9 +298,9 @@ func FetchStreaming(ID int64, Quality string) (*Streaming, error) {
 
 	Utils.Logger.Info("Tidal API", fmt.Sprintf("Fetching streaming info for track %d", ID))
 
-	Endpoint := fmt.Sprintf("%s/track/?id=%d&quality=%s", BaseAPIURL, ID, Quality)
+	path := fmt.Sprintf("/track/?id=%d&quality=%s", ID, Quality)
 
-	Resp, Err := DoGet(Endpoint)
+	Resp, Err := TryAPIs(path)
 
 	if Err != nil {
 
@@ -298,9 +330,9 @@ func FetchStreaming(ID int64, Quality string) (*Streaming, error) {
 
 func FetchInfo(ID int64) (*Info, error) {
 
-	Endpoint := fmt.Sprintf("%s/info/?id=%d", BaseAPIURL, ID)
+	path := fmt.Sprintf("/info/?id=%d", ID)
 
-	Resp, Err := DoGet(Endpoint)
+	Resp, Err := TryAPIs(path)
 
 	if Err != nil { return nil, Err }
 
@@ -326,8 +358,8 @@ func FetchInfo(ID int64) (*Info, error) {
 
 func FetchDash(ID int64, Quality string) ([]byte, error) {
 
-	Endpoint := fmt.Sprintf("%s/dash/?id=%d&quality=%s", BaseAPIURL, ID, Quality)
-	Resp, Err := DoGet(Endpoint)
+	path := fmt.Sprintf("/dash/?id=%d&quality=%s", ID, Quality)
+	Resp, Err := TryAPIs(path)
 
 	if Err != nil { return nil, Err }
 
@@ -349,8 +381,8 @@ func FetchCover(ID int64, Query string) ([]Cover, error) {
 	if ID != 0 { Params.Set("id", fmt.Sprintf("%d", ID)) }
 	if Query != "" { Params.Set("q", Query) }
 
-	Endpoint := fmt.Sprintf("%s/cover/?%s", BaseAPIURL, Params.Encode())
-	Resp, Err := DoGet(Endpoint)
+	path := fmt.Sprintf("/cover/?%s", Params.Encode())
+	Resp, Err := TryAPIs(path)
 
 	if Err != nil { return nil, Err }
 
@@ -376,8 +408,8 @@ func FetchCover(ID int64, Query string) ([]Cover, error) {
 
 func FetchAlbum(ID int64) (*Album, error) {
 
-	Endpoint := fmt.Sprintf("%s/album/?id=%d", BaseAPIURL, ID)
-	Resp, Err := DoGet(Endpoint)
+	path := fmt.Sprintf("/album/?id=%d", ID)
+	Resp, Err := TryAPIs(path)
 
 	if Err != nil {
 
@@ -407,8 +439,8 @@ func FetchAlbum(ID int64) (*Album, error) {
 
 func FetchPlaylist(ID string) (map[string]interface{}, error) {
 
-	Endpoint := fmt.Sprintf("%s/playlist/?id=%s", BaseAPIURL, ID)
-	Resp, Err := DoGet(Endpoint)
+	path := fmt.Sprintf("/playlist/?id=%s", ID)
+	Resp, Err := TryAPIs(path)
 
 	if Err != nil { return nil, Err }
 
@@ -446,8 +478,8 @@ func FetchArtist(ID int64, Full bool) ([]Artist, error) {
 
 	}
 	
-	Endpoint := fmt.Sprintf("%s/artist/?%s", BaseAPIURL, Params.Encode())
-	Resp, Err := DoGet(Endpoint)
+	path := fmt.Sprintf("/artist/?%s", Params.Encode())
+	Resp, Err := TryAPIs(path)
 
 	if Err != nil { return nil, Err }
 
@@ -473,8 +505,8 @@ func FetchArtist(ID int64, Full bool) ([]Artist, error) {
 
 func FetchLyrics(ID int64) ([]Lyrics, error) { // not really good
 
-	Endpoint := fmt.Sprintf("%s/lyrics/?id=%d", BaseAPIURL, ID)
-	Resp, Err := DoGet(Endpoint)
+	path := fmt.Sprintf("/lyrics/?id=%d", ID)
+	Resp, Err := TryAPIs(path)
 
 	if Err != nil { return nil, Err }
 
