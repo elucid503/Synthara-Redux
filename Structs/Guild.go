@@ -317,12 +317,32 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 		ContextToUse, CancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
 		defer CancelFunc()
 
-		_ = G.VoiceConnection.SetSpeaking(ContextToUse, 0)
-
-		G.VoiceConnection.SetOpusFrameProvider(nil)
-
-		G.VoiceConnection.Close(ContextToUse)
+		// Store reference and nil it immediately to prevent race conditions
+		VoiceConn := G.VoiceConnection
 		G.VoiceConnection = nil
+
+		// Safely close the connection with error recovery
+		_ = VoiceConn.SetSpeaking(ContextToUse, 0)
+
+		VoiceConn.SetOpusFrameProvider(nil)
+
+		// Recover from any panics during close
+
+		func() {
+
+			defer func() {
+
+				if r := recover(); r != nil {
+
+					Utils.Logger.Error("Guild", fmt.Sprintf("Panic during voice connection close for guild %s: %v", G.ID.String(), r))
+
+				}
+
+			}()
+
+			VoiceConn.Close(ContextToUse)
+
+		}()
 
 	}
 
