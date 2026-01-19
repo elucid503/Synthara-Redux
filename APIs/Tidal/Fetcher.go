@@ -139,8 +139,6 @@ func TryAPIs(Path string) (*http.Response, error) {
 
 		}
 
-		defer Req.Body.Close()
-
 		AddDefaultHeaders(Req)
 
 		Resp, Err := HTTPClient.Do(Req)
@@ -154,6 +152,12 @@ func TryAPIs(Path string) (*http.Response, error) {
 		if Resp.StatusCode >= 200 && Resp.StatusCode < 300 {
 
 			return Resp, nil
+
+		}
+
+		if Resp.Body != nil {
+
+			Resp.Body.Close()
 
 		}
 
