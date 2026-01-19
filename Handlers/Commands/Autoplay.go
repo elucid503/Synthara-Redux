@@ -50,6 +50,9 @@ func Autoplay(Event *events.ApplicationCommandInteractionCreate) {
 			Guild.Queue.RegenerateSuggestions()
 		}
 
+		// Start the 3-hour inactivity timer when autoplay is enabled
+		Guild.StartInactivityTimer()
+
 		// If queue is empty, start playback from suggestions
 
 		if Guild.Queue.Current == nil && len(Guild.Queue.Upcoming) == 0 && len(Guild.Queue.Suggestions) > 0 {
@@ -62,6 +65,9 @@ func Autoplay(Event *events.ApplicationCommandInteractionCreate) {
 
 		Title = Localizations.Get("Commands.AutoPlay.Title", Locale)
 		Description = Localizations.Get("Commands.AutoPlay.Disabled", Locale)
+
+		// Reset the inactivity timer to 1 hour when autoplay is disabled
+		Guild.StartInactivityTimer()
 
 	}
 

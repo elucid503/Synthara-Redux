@@ -1296,8 +1296,13 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	G.Queue.SetState(StatePlaying)
 	G.Queue.PlaybackSession = Playback
 
-	// Stop inactivity timer when playback starts
-	G.StopInactivityTimer()
+	// Stop inactivity timer when playback starts (unless autoplay is enabled)
+
+	if !G.Features.Autoplay {
+
+		G.StopInactivityTimer()
+		
+	}
 
 	return nil
 
