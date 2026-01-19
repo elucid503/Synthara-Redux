@@ -83,7 +83,7 @@ function App() {
 
     const [BackgroundImage, SetBackgroundImage] = useState<string>('');
 
-    const CurrentSongIdRef = useRef<string | null>(null);
+    const CurrentSongIdRef = useRef<number | null>(null);
     const ActiveViewRef = useRef<'Details' | 'Queue' | 'Lyrics'>(ActiveView);
     const UpcomingSongsLengthRef = useRef<number>(0);
 
@@ -181,7 +181,7 @@ function App() {
                         SetUpcomingSongs(Message.Data.Upcoming || []);
 
                         const NewSong = Message.Data.Current as Song | null;
-                        const SongChanged = NewSong && NewSong.youtube_id != CurrentSongIdRef.current;
+                        const SongChanged = NewSong && NewSong.tidal_id != CurrentSongIdRef.current;
 
                         if (SongChanged) {
 
@@ -267,7 +267,7 @@ function App() {
 
         if (CurrentSong) {
 
-            CurrentSongIdRef.current = CurrentSong.youtube_id;
+            CurrentSongIdRef.current = CurrentSong.tidal_id;
             SetBackgroundImage(NormalizeCoverURL(CurrentSong.cover));
 
         } else {
@@ -422,7 +422,7 @@ function App() {
 
                 <div className="mb-8">
 
-                    {ActiveView == 'Details' && (<DetailsView key={CurrentSong?.youtube_id || 'none'} CurrentSong={CurrentSong} />)}
+                    {ActiveView == 'Details' && (<DetailsView key={CurrentSong ? CurrentSong.tidal_id.toString() : 'none'} CurrentSong={CurrentSong} />)}
 
                     {/* Lyrics View */}
 
@@ -442,7 +442,7 @@ function App() {
 
                         <div className="min-h-[200px] max-h-[500px] overflow-y-scroll">
 
-                            <QueueView Current={CurrentSong} PreviousSongs={PreviousSongs} UpcomingSongs={UpcomingSongs} ActiveContextMenu={ActiveContextMenu} SetActiveContextMenu={SetActiveContextMenu} OnMove={HandleMove} />
+                            <QueueView key={CurrentSong ? CurrentSong.tidal_id.toString() : 'none'} Current={CurrentSong} PreviousSongs={PreviousSongs} UpcomingSongs={UpcomingSongs} ActiveContextMenu={ActiveContextMenu} SetActiveContextMenu={SetActiveContextMenu} OnMove={HandleMove} />
                             
                         </div>
 

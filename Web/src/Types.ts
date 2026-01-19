@@ -2,7 +2,7 @@
 
 export interface Song {
 
-    youtube_id: string;
+    tidal_id: number;
 
     title: string;
     artists: string[];
