@@ -212,6 +212,12 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 			}
 
+			// Start inactivity timer when paused
+			Guild := GetGuild(Queue.ParentID, false)
+			if Guild != nil {
+				Guild.StartInactivityTimer()
+			}
+
 		case StatePlaying:
 
 			if Queue.PlaybackSession != nil {

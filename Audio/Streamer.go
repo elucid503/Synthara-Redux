@@ -1218,6 +1218,12 @@ func (S *MP4Streamer) streamMdatChunked(URL string, Info *MP4AudioInfo, Client *
 
 		Req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", RangeStart, RangeEnd))
 
+		if S.IsStopped() {
+
+			return nil
+
+		}
+
 		Resp, Err := Client.Do(Req)
 
 		if Err != nil {
