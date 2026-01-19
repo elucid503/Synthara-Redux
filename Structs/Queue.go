@@ -91,6 +91,15 @@ func (Q *Queue) SendToWebsockets(Event string, Data interface{}) {
 
 func QueueStateHandler(Queue *Queue, State int) {
 
+	defer func() {
+
+		if r := recover(); r != nil {
+
+			Utils.Logger.Error("Queue", fmt.Sprintf("Panic in QueueStateHandler for queue %s: %v", Queue.ParentID.String(), r))
+		}
+		
+	}()
+
 	Utils.Logger.Info("Queue", fmt.Sprintf("Queue %s state changed to %d", Queue.ParentID.String(), State))
 	Queue.SendToWebsockets(Event_StateChanged, map[string]interface{}{"State": State})
 
@@ -216,6 +225,15 @@ func QueueStateHandler(Queue *Queue, State int) {
 }
 
 func QueueUpdatedHandler(Queue *Queue) {
+
+	defer func() {
+
+		if r := recover(); r != nil {
+
+			Utils.Logger.Error("Queue", fmt.Sprintf("Panic in QueueUpdatedHandler for queue %s: %v", Queue.ParentID.String(), r))
+		}
+
+	}()
 
 	Queue.SendToWebsockets(Event_QueueUpdated, map[string]interface{}{ 
 

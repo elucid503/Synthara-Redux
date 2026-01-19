@@ -190,6 +190,11 @@ func GetGuild(ID snowflake.ID, Create bool) *Guild {
 
 // Connect Establishes a voice connection to the specified channel. Gateway events are handled.
 func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID) error {
+	defer func() {
+		if r := recover(); r != nil {
+			Utils.Logger.Error("Guild", fmt.Sprintf("Panic in Guild.Connect for guild %s: %v", G.ID.String(), r))
+		}
+	}()
 
 	G.Channels.Voice = VoiceChannelID
 	G.Channels.Text = TextChannelID
@@ -234,6 +239,11 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
  
 // Disconnect Closes the existing voice connection; if none exists, returns an error
 func (G *Guild) Disconnect(CloseConn bool) error {
+	defer func() {
+		if r := recover(); r != nil {
+			Utils.Logger.Error("Guild", fmt.Sprintf("Panic in Guild.Disconnect for guild %s: %v", G.ID.String(), r))
+		}
+	}()
 
 	G.Internal.Disconnecting = true
 
@@ -1140,6 +1150,13 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 // Play starts playing the song using Tidal streaming
 func (G *Guild) Play(Song *Tidal.Song) error {
+	defer func() {
+		if r := recover(); r != nil {
+			Utils.Logger.Error("Playback", fmt.Sprintf("Panic in Guild.Play for song %s: %v", Song.Title, r))
+			G.Queue.SetState(StateIdle)
+			G.Queue.PlaybackSession = nil
+		}
+	}()
 
 	// Get stream URL from Tidal
 	StreamURL, ErrorFetchingStream := Tidal.GetStreamURL(Song.TidalID)
@@ -1301,7 +1318,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	if !G.Features.Autoplay {
 
 		G.StopInactivityTimer()
-		
+
 	}
 
 	return nil
