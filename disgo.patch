@@ -1,0 +1,18 @@
+diff --git a/voice/udp_conn.go b/voice/udp_conn.go
+index 13ed5f15..a05b0607 100644
+--- a/voice/udp_conn.go
++++ b/voice/udp_conn.go
+@@ -345,7 +345,10 @@ func (u *udpConnImpl) ReadPacket() (*Packet, error) {
+ }
+ 
+ func (u *udpConnImpl) Close() error {
+-	u.connMu.Lock()
+-	defer u.connMu.Unlock()
+-	return u.conn.Close()
++u.connMu.Lock()
++defer u.connMu.Unlock()
++if u.conn == nil {
++return nil
++}
++return u.conn.Close()
+ }

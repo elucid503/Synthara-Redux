@@ -18,6 +18,11 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			Utils.Logger.Error("Main", fmt.Sprintf("Panic in main goroutine: %v", r))
+		}
+	}()
 
 	godotenv.Load(".env")
 

@@ -1150,12 +1150,31 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 // Play starts playing the song using Tidal streaming
 func (G *Guild) Play(Song *Tidal.Song) error {
+
+	if Song == nil {
+
+		return fmt.Errorf("cannot play nil song")
+		
+	}
+
 	defer func() {
+
 		if r := recover(); r != nil {
-			Utils.Logger.Error("Playback", fmt.Sprintf("Panic in Guild.Play for song %s: %v", Song.Title, r))
+
+			SongTitle := "unknown"
+
+			if Song != nil {
+
+				SongTitle = Song.Title
+
+			}
+
+			Utils.Logger.Error("Playback", fmt.Sprintf("Panic in Guild.Play for song %s: %v", SongTitle, r))
 			G.Queue.SetState(StateIdle)
 			G.Queue.PlaybackSession = nil
+
 		}
+
 	}()
 
 	// Get stream URL from Tidal

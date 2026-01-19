@@ -24,15 +24,7 @@ fi
 
 cd ../disgo
 git checkout v0.19.0-rc.15
-sed -i '/func (u \*udpConnImpl) Close() error {/,/}/c\
-func (u *udpConnImpl) Close() error {\
-	u.connMu.Lock()\
-	defer u.connMu.Unlock()\
-	if u.conn == nil {\
-		return nil\
-	}\
-	return u.conn.Close()\
-}' voice/udp_conn.go
+git apply ../Synthara-Redux/disgo.patch
 cd ../Synthara-Redux
 
 # Build the project

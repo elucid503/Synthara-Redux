@@ -199,6 +199,20 @@ func ReplaceHyphens(s string) string {
 
 func (S *Song) Embed(State QueueInfo) discord.Embed {
 
+	if S == nil {
+
+		// Return a basic embed if song is nil (shouldn't happen, but safety)
+
+		return discord.Embed{
+
+			Title: "Error: No song data",
+			Description: "Unable to display song information",
+			Color: 0xff0000,
+			
+		}
+
+	}
+
 	Locale := State.Locale
 
 	if Locale == "" {
@@ -282,6 +296,12 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 }
 
 func (S *Song) Buttons(State QueueInfo) []discord.InteractiveComponent {
+
+	if S == nil {
+
+		return []discord.InteractiveComponent{} // Return empty if nil
+
+	}
 
 	// Different buttons for now playing vs queued songs
 

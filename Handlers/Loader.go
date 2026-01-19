@@ -100,6 +100,11 @@ func InitializeHandlers() {
 	// Ready
 
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.Ready) {
+		defer func() {
+			if r := recover(); r != nil {
+				Utils.Logger.Error("Event", fmt.Sprintf("Panic in Ready handler: %v", r))
+			}
+		}()
 
 		Utils.Logger.Info("Discord", "Discord Client is ready!")
 
@@ -108,8 +113,18 @@ func InitializeHandlers() {
 	// Command Interactions
 
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.ApplicationCommandInteractionCreate) {
+		defer func() {
+			if r := recover(); r != nil {
+				Utils.Logger.Error("Event", fmt.Sprintf("Panic in ApplicationCommandInteractionCreate handler: %v", r))
+			}
+		}()
 
 		go func ()  {
+			defer func() {
+				if r := recover(); r != nil {
+					Utils.Logger.Error("Event", fmt.Sprintf("Panic in ApplicationCommandInteractionCreate goroutine: %v", r))
+				}
+			}()
 
 			if Event.Data.GuildID() != nil {
 				
@@ -295,7 +310,26 @@ func InitializeHandlers() {
 
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.AutocompleteInteractionCreate) {
 
+		defer func() {
+
+			if r := recover(); r != nil {
+
+				Utils.Logger.Error("Event", fmt.Sprintf("Panic in AutocompleteInteractionCreate handler: %v", r))
+
+			}
+			
+		}()
+
 		go func() {
+
+			defer func() {
+
+				if r := recover(); r != nil {
+
+					Utils.Logger.Error("Event", fmt.Sprintf("Panic in AutocompleteInteractionCreate goroutine: %v", r))
+				}
+
+			}()
 
 			switch Event.Data.CommandName {
 
@@ -332,8 +366,18 @@ func InitializeHandlers() {
 	// Component Interactions
 
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.ComponentInteractionCreate) {
+		defer func() {
+			if r := recover(); r != nil {
+				Utils.Logger.Error("Event", fmt.Sprintf("Panic in ComponentInteractionCreate handler: %v", r))
+			}
+		}()
 
 		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					Utils.Logger.Error("Event", fmt.Sprintf("Panic in ComponentInteractionCreate goroutine: %v", r))
+				}
+			}()
 
 			CustomID := Event.Data.CustomID()
 
@@ -426,7 +470,26 @@ func InitializeHandlers() {
 
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.GuildVoiceStateUpdate) {
 
+		defer func() {
+
+			if r := recover(); r != nil {
+
+				Utils.Logger.Error("Event", fmt.Sprintf("Panic in GuildVoiceStateUpdate handler: %v", r))
+			}
+
+		}()
+
 		go func () {
+
+			defer func() {
+
+				if r := recover(); r != nil {
+
+					Utils.Logger.Error("Event", fmt.Sprintf("Panic in GuildVoiceStateUpdate goroutine: %v", r))
+
+				}
+
+			}()
 
 			if (Event.VoiceState.UserID != Globals.DiscordClient.ApplicationID) {
 
