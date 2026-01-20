@@ -178,7 +178,7 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 
 		User, UserError := Structs.GetUser(Event.User().ID.String())
 
-		if UserError == nil {
+		if UserError == nil && User != nil && SongFound != nil {
 
 			User.AddRecentSearch(SongFound.Title, URI)
 
