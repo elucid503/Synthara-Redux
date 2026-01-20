@@ -1337,6 +1337,10 @@ func (G *Guild) Play(Song *Tidal.Song) error {
     go func() {
         Playback := G.Queue.PlaybackSession
 
+        if Playback == nil {
+            return
+        }
+
         Ticker := time.NewTicker(5 * time.Second)
         defer Ticker.Stop()
 
@@ -1349,6 +1353,11 @@ func (G *Guild) Play(Song *Tidal.Song) error {
                 G.StreamerMutex.Unlock()
                 return
 				
+            }
+
+            if Playback.Streamer == nil {
+                G.StreamerMutex.Unlock()
+                continue
             }
 
             Progress := Playback.Streamer.Progress
