@@ -1335,7 +1335,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	// Start progress update ticker
 
     go func() {
-        Playback := G.Queue.PlaybackSession
+        Playback := Playback
 
         if Playback == nil {
             return
