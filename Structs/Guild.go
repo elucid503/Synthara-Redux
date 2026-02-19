@@ -14,6 +14,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"runtime"
 	"strconv"
 	"sync"
 	"time"
@@ -1169,7 +1170,13 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 			}
 
-			Utils.Logger.Error("Playback", fmt.Sprintf("Panic in Guild.Play for song %s: %v", SongTitle, r))
+			Utils.Logger.Error("Playback", fmt.Sprintf("Panic in Guild.Play for song %s", SongTitle))
+
+			buf := make([]byte, 1<<16) // 64kb buffer
+			runtime.Stack(buf, true)
+			
+			Utils.Logger.Error("Playback", fmt.Sprintf("Stack trace: %s", string(buf)))
+
 			G.Queue.SetState(StateIdle)
 			G.Queue.PlaybackSession = nil
 
