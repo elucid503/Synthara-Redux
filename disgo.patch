@@ -16,3 +16,42 @@ index 13ed5f15..a05b0607 100644
 +}
 +return u.conn.Close()
  }
+diff --git a/voice/audio_sender.go b/voice/audio_sender.go
+index a3b34e56..b038dd66 100644
+--- a/voice/audio_sender.go
++++ b/voice/audio_sender.go
+@@ -45,8 +45,11 @@ type (
+ 
+ // NewAudioSender creates a new AudioSender sending audio from the given OpusFrameProvider to the given Conn.
+ func NewAudioSender(logger *slog.Logger, opusProvider OpusFrameProvider, conn Conn) AudioSender {
++	ctx, cancel := context.WithCancel(context.Background())
+ 	return &defaultAudioSender{
+ 		logger:       logger,
++		ctx:          ctx,
++		cancelFunc:   cancel,
+ 		opusProvider: opusProvider,
+ 		conn:         conn,
+ 		silentFrames: 5,
+@@ -55,6 +58,7 @@ func NewAudioSender(logger *slog.Logger, opusProvider OpusFrameProvider, conn Co
+ 
+ type defaultAudioSender struct {
+ 	logger       *slog.Logger
++	ctx          context.Context
+ 	cancelFunc   context.CancelFunc
+ 	opusProvider OpusFrameProvider
+ 	conn         Conn
+@@ -71,13 +75,10 @@ func (s *defaultAudioSender) Open() {
+ func (s *defaultAudioSender) open() {
+ 	defer s.logger.Debug("closing audio sender")
+ 	lastFrameSent := time.Now().UnixMilli()
+-	ctx, cancel := context.WithCancel(context.Background())
+-	s.cancelFunc = cancel
+-	defer cancel()
+ loop:
+ 	for {
+ 		select {
+-		case <-ctx.Done():
++		case <-s.ctx.Done():
+ 			break loop
+ 
+ 		default:
