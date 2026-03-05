@@ -255,15 +255,14 @@ func SendWebOperationMessage(Guild *Structs.Guild, TitleKey string, DescKey stri
 		Prefix := Localizations.Get("Web.Prefix", Locale)
 		Description := Prefix + " " + Localizations.Get(DescKey, Locale)
 
-		_, _ = Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+		_, _ = Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreate().
 			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       Localizations.Get(TitleKey, Locale),
 				Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
 				Description: Description,
 
-			})).
-			Build())
+			})))
 
 	}()
 
@@ -283,15 +282,14 @@ func SendWebOperationMessageWithSong(Guild *Structs.Guild, TitleKey string, Desc
 		Prefix := Localizations.Get("Web.Prefix", Locale)
 		Description := Prefix + " " + Localizations.GetFormat(DescKey, Locale, SongTitle)
 
-		_, _ = Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+		_, _ = Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreate().
 			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       Localizations.Get(TitleKey, Locale),
 				Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
 				Description: Description,
 
-			})).
-			Build())
+			})))
 
 	}()
 

@@ -3,7 +3,7 @@ module Synthara-Redux
 go 1.24.1
 
 require (
-	github.com/disgoorg/disgo v0.19.0-rc.15
+	github.com/disgoorg/disgo v0.19.2
 	github.com/disgoorg/snowflake/v2 v2.0.3
 	github.com/gin-gonic/gin v1.11.0
 	github.com/gorilla/websocket v1.5.3
@@ -12,6 +12,8 @@ require (
 	go.mongodb.org/mongo-driver v1.17.6
 	layeh.com/gopus v0.0.0-20210501142526-1ee02d434e32
 )
+
+require github.com/disgoorg/godave v0.0.0-20260211222359-4ef3e359a3af // indirect
 
 require (
 	github.com/bitly/go-simplejson v0.5.1 // indirect
@@ -50,9 +52,9 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.uber.org/mock v0.6.0 // indirect
 	golang.org/x/arch v0.23.0 // indirect
-	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
 
@@ -60,11 +62,9 @@ require (
 	github.com/cenkalti/dominantcolor v1.0.3 // direct
 	github.com/disgoorg/json/v2 v2.0.0 // indirect
 	github.com/disgoorg/omit v1.0.0 // indirect
-	github.com/klauspost/compress v1.18.2 // indirect
+	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/sasha-s/go-csync v0.0.0-20240107134140-fcbab37b09ad // indirect
-	golang.org/x/crypto v0.46.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/image v0.18.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
 )
-
-replace github.com/disgoorg/disgo => ../disgo

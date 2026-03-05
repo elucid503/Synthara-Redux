@@ -45,7 +45,7 @@ type Queue struct {
 	Suggestions []*Tidal.Song `json:"suggestions"`
 
 	Functions      QueueFunctions  `json:"-"`
-	
+
 	PlaybackSession *Audio.MP4Playback `json:"-"`
 
 	WebSockets      map[*websocket.Conn]bool `json:"-"`
@@ -97,7 +97,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 			Utils.Logger.Error("Queue", fmt.Sprintf("Panic in QueueStateHandler for queue %s: %v", Queue.ParentID.String(), r))
 		}
-		
+
 	}()
 
 	Utils.Logger.Info("Queue", fmt.Sprintf("Queue %s state changed to %d", Queue.ParentID.String(), State))
@@ -166,21 +166,21 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				TextChannelID := Guild.Channels.Text
 
-				go func() { 
+				go func() {
 
 					AutoPlayButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.AutoPlay", Guild.Locale.Code()), "AutoPlay", "", 0).WithEmoji(discord.ComponentEmoji{
 
 						ID: snowflake.MustParse(Icons.GetID(Icons.Sparkles)),
 
 					})
-					
+
 					DisconnectButton := discord.NewButton(discord.ButtonStyleDanger, Localizations.Get("Buttons.Disconnect", Guild.Locale.Code()), "Disconnect", "", 0).WithEmoji(discord.ComponentEmoji{
 
 						ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
 
 					})
 
-					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(TextChannelID, discord.NewMessageCreateBuilder().
+					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(TextChannelID, discord.NewMessageCreate().
 						AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 							Title:       Localizations.Get("Embeds.Notifications.QueueEnded.Title", Guild.Locale.Code()),
@@ -188,8 +188,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 							Description: Localizations.Get("Embeds.Notifications.QueueEnded.Description", Guild.Locale.Code()),
 
 						})).
-						AddActionRow(AutoPlayButton, DisconnectButton).
-						Build())
+						AddActionRow(AutoPlayButton, DisconnectButton))
 
 					if ErrorSending != nil {
 
@@ -227,7 +226,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 			}
 
 	}
-	
+
 }
 
 func QueueUpdatedHandler(Queue *Queue) {
@@ -241,15 +240,15 @@ func QueueUpdatedHandler(Queue *Queue) {
 
 	}()
 
-	Queue.SendToWebsockets(Event_QueueUpdated, map[string]interface{}{ 
+	Queue.SendToWebsockets(Event_QueueUpdated, map[string]interface{}{
 
 		"Current": Queue.Current,
 		"Previous": Queue.Previous,
 		"Upcoming": Queue.Upcoming,
 		"Suggestions": Queue.Suggestions,
-		
+
 	})
-	
+
 	Guild := GetGuild(Queue.ParentID, false)
 
 	if Guild != nil && Guild.Features.Autoplay {
@@ -273,7 +272,7 @@ func QueueUpdatedHandler(Queue *Queue) {
 	NextSong := Queue.Upcoming[0]
 
 	// Pre-cache streaming URL for next song
-	
+
 	_, ErrorGettingStream := Tidal.GetStreamURL(NextSong.TidalID)
 
 	if ErrorGettingStream != nil {
@@ -281,12 +280,12 @@ func QueueUpdatedHandler(Queue *Queue) {
 		Utils.Logger.Error("Streaming", fmt.Sprintf("Error caching stream URL for song %s: %s", NextSong.Title, ErrorGettingStream.Error()))
 
 	}
-	
+
 }
 
 // Queue Functions
 
-func (Q *Queue) SetState(NewState int) {	
+func (Q *Queue) SetState(NewState int) {
 
 	Q.State = NewState
 	go Q.Functions.State(Q, NewState) // done parallel since it may block, and we don't need to wait in this case...
@@ -491,7 +490,7 @@ func (Q *Queue) Add(Song *Tidal.Song, Requestor string) int {
 	go Q.Functions.Updated(Q)
 
 	return Pos
-	
+
 }
 
 // Play delegates playback of the current song to the Guild; returns false on failure.
@@ -538,13 +537,13 @@ func (Q *Queue) Play() bool {
 	if ErrorPlaying != nil {
 
 		Utils.Logger.Error("Playback", fmt.Sprintf("Error playing song %s for Queue %s: %s", Q.Current.Title, Q.ParentID.String(), ErrorPlaying.Error()))
-		
+
 		// Set state back to idle on error
-		
+
 		Guild.StreamerMutex.Lock()
 		Q.SetState(StateIdle)
 		Guild.StreamerMutex.Unlock()
-		
+
 		return false
 
 	}
@@ -581,20 +580,19 @@ func (Q *Queue) SendNowPlayingMessage() {
 		TotalUpcoming: len(Q.Upcoming),
 
 		Locale: Guild.Locale.Code(),
-		
+
 	}
 
 	go func() {
 
-		_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+		_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreate().
 			AddEmbeds(Q.Current.Embed(State)).
-			AddActionRow(Q.Current.Buttons(State)...).
-			Build())
+			AddActionRow(Q.Current.Buttons(State)...))
 
 		if ErrorSending != nil {
 
 			Utils.Logger.Error("Command", fmt.Sprintf("Error sending now playing message to channel %s for Queue %s: %s", Guild.Channels.Text, Q.ParentID.String(), ErrorSending.Error()))
-		
+
 		}
 
 	}()
@@ -741,7 +739,7 @@ func (Q *Queue) moveTo(Index int, ShouldPlay bool) bool {
 	Q.Functions.Updated(Q)
 
 	go Q.Play() // same reason for goroutine as above
-	
+
 	return true
 
 }
@@ -762,7 +760,7 @@ func (Q *Queue) RegenerateSuggestions() {
 
 		Utils.Logger.Warn("AutoPlay", fmt.Sprintf("RegenerateSuggestions called but AutoPlay is disabled for Queue %s", Q.ParentID.String()))
 		return
-		
+
 	}
 
 	// Determine seed song (last in Previous queue, then Current)
@@ -789,7 +787,7 @@ func (Q *Queue) RegenerateSuggestions() {
 	// Get mix ID from current song if available, otherwise fetch it
 
 	MixID := SeedSong.MixID
-	
+
 	if MixID == "" {
 
 		var Err error
@@ -833,7 +831,7 @@ func (Q *Queue) RegenerateSuggestions() {
 	// Randomize and take up to 5 suggestions
 
 	MaxSuggestions := 5
-	
+
 	if len(Filtered) > MaxSuggestions {
 
 		// Shuffle using Fisher-Yates and take first MaxSuggestions
@@ -842,7 +840,7 @@ func (Q *Queue) RegenerateSuggestions() {
 
 			j := rand.Intn(i + 1)
 			Filtered[i], Filtered[j] = Filtered[j], Filtered[i]
-			
+
 		}
 
 		Filtered = Filtered[:MaxSuggestions]

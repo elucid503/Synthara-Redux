@@ -69,14 +69,13 @@ func Autoplay(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().
+	Event.CreateMessage(discord.NewMessageCreate().
 		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Commands.AutoPlay.Title", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
 			Description: Localizations.Get(StatusKey, Locale),
 
-		})).
-		Build())
+		})))
 
 }

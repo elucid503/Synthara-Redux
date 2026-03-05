@@ -36,7 +36,7 @@ type Guild struct {
 	Queue Queue `json:"queue"`
 
 	Channels Channels `json:"channels"`
-	
+
 	Features Features `json:"features"`
 
 	VoiceConnection voice.Conn `json:"-"`
@@ -140,7 +140,7 @@ func NewGuild(ID snowflake.ID, Locale discord.Locale) *Guild {
 			InactivityTimer: nil,
 
 		},
-		
+
 	}
 
 	// Store the guild
@@ -162,7 +162,7 @@ func GetGuild(ID snowflake.ID, Create bool) *Guild {
 	if Exists {
 
 		return GuildInstance
-		
+
 	} else if Create {
 
 		GuildInstance, ExistsInCache := Globals.DiscordClient.Caches.GuildCache().Get(ID)
@@ -212,7 +212,7 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 	if G.VoiceConnection != nil {
 
 		return nil; // Already connected, so we're done
-		
+
 	}
 
 	OpenContext, CancelFunc := context.WithTimeout(context.Background(), 10 * time.Second)
@@ -237,7 +237,7 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 	return nil;
 
 }
- 
+
 // Disconnect Closes the existing voice connection; if none exists, returns an error
 func (G *Guild) Disconnect(CloseConn bool) error {
 	defer func() {
@@ -298,7 +298,7 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 					// noop
 
 				}
-				
+
 			}()
 
 			_ = c.Close()
@@ -411,7 +411,7 @@ func (G *Guild) StartInactivityTimer() {
 
 			})
 
-			_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
+			_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().
 				AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 					Title:       Localizations.Get("Embeds.Notifications.InactivityDisconnect.Title", Locale),
@@ -419,8 +419,7 @@ func (G *Guild) StartInactivityTimer() {
 					Description: Localizations.GetFormat("Embeds.Notifications.InactivityDisconnect.Description", Locale, Localizations.Get(DurationKey, Locale)),
 
 				})).
-				AddActionRow(DisconnectButton).
-				Build())
+				AddActionRow(DisconnectButton))
 
 			if ErrorSending != nil {
 
@@ -519,7 +518,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 			// Internal Tidal song ID - fetch directly by ID
 
 			TidalID, ParseErr := strconv.ParseInt(ID, 10, 64)
-			
+
 			if ParseErr != nil {
 
 				return nil, -1, fmt.Errorf("invalid Tidal ID: %s", ID)
@@ -527,7 +526,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 			}
 
 			FetchedSong, FetchErr := Tidal.GetSong(TidalID)
-			
+
 			if FetchErr != nil {
 
 				return nil, -1, FetchErr
@@ -542,7 +541,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 			// Tidal album - fetch all tracks
 
 			AlbumID, ParseErr := strconv.ParseInt(ID, 10, 64)
-			
+
 			if ParseErr != nil {
 
 				return nil, -1, fmt.Errorf("invalid Tidal album ID: %s", ID)
@@ -550,7 +549,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 			}
 
 			AlbumTracks, FetchErr := Tidal.FetchAlbumTracks(AlbumID)
-			
+
 			if FetchErr != nil || len(AlbumTracks) == 0 {
 
 				return nil, -1, errors.New("could not fetch album tracks")
@@ -573,16 +572,16 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 					}
 
-					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 						Title:       Localizations.Get("Embeds.Notifications.AddedAdditionalSongs.Title", G.Locale.Code()),
 						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 						Description: Localizations.GetFormat("Embeds.Notifications.AddedAdditionalSongs.FromAlbum", G.Locale.Code(), len(AlbumTracks), Localizations.Pluralize("Song", len(AlbumTracks), G.Locale.Code()), AlbumTracks[0].Album),
 
-					})).Build())
+					})))
 
 				}()
-				
+
 			}
 
 		case APIs.URITypeFavorites:
@@ -722,13 +721,13 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 					}
 
-					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 						Title:       Localizations.Get("Embeds.Notifications.AddedAdditionalSongs.Title", G.Locale.Code()),
 						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 						Description: Localizations.GetFormat("Embeds.Notifications.AddedAdditionalSongs.FromPlaylist", G.Locale.Code(), len(PlaylistTracks), Localizations.Pluralize("Song", len(PlaylistTracks), G.Locale.Code()), "Playlist"),
 
-					})).Build())
+					})))
 
 				}()
 
@@ -794,30 +793,30 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				}
 
-				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 					Title:       Localizations.Get("Embeds.Notifications.AddedAdditionalSongs.Title", G.Locale.Code()),
 					Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 					Description: Localizations.GetFormat("Embeds.Notifications.AddedAdditionalSongs.FromPlaylist", G.Locale.Code(), SuccessCount, Localizations.Pluralize("Song", SuccessCount, G.Locale.Code()), PlaylistTitle),
 
-				})).Build())
+				})))
 
 				// If some songs failed, send an additional notification
 				if FailedCount > 0 {
 
-					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 						Title:       Localizations.Get("Embeds.Notifications.SomePlaylistSongsFailed.Title", G.Locale.Code()),
 						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 						Description: Localizations.GetFormat("Embeds.Notifications.SomePlaylistSongsFailed.Description", G.Locale.Code(), FailedCount, TotalVideos, Localizations.Pluralize("Song", TotalVideos, G.Locale.Code()), PlaylistTitle),
 
-					})).Build())
+					})))
 
 				}
 
 			}()
 
-		
+
 		// YouTube Music
 
 		case APIs.URITypeYTMusicAlbum:
@@ -857,24 +856,24 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 				TotalVideos := len(YouTubeMusicAlbum.Videos)
 				SuccessCount := len(AllOtherSongs) + 1 // +1 for first song
 
-				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 					Title:       Localizations.Get("Embeds.Notifications.AddedAdditionalSongs.Title", G.Locale.Code()),
 					Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 					Description: Localizations.GetFormat("Embeds.Notifications.AddedAdditionalSongs.FromAlbum", G.Locale.Code(), SuccessCount, Localizations.Pluralize("Song", SuccessCount, G.Locale.Code()), YouTubeMusicAlbum.Title),
 
-				})).Build())
+				})))
 
 				// If some songs failed, send an additional notification
 				if FailedCount > 0 {
 
-					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 						Title:       Localizations.Get("Embeds.Notifications.SomePlaylistSongsFailed.Title", G.Locale.Code()),
 						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 						Description: Localizations.GetFormat("Embeds.Notifications.SomePlaylistSongsFailed.Description", G.Locale.Code(), FailedCount, TotalVideos, Localizations.Pluralize("Song", TotalVideos, G.Locale.Code()), YouTubeMusicAlbum.Title),
 
-					})).Build())
+					})))
 
 				}
 
@@ -907,20 +906,20 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 					}
 
-					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+					Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 						Title:       Localizations.Get("Embeds.Notifications.AddedAdditionalSongs.Title", G.Locale.Code()),
 						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 						Description: Localizations.GetFormat("Embeds.Notifications.AddedAdditionalSongs.FromArtist", G.Locale.Code(), len(ArtistSongs), Localizations.Pluralize("Song", len(ArtistSongs), G.Locale.Code()), ArtistSongs[0].Artists[0]),
 
-					})).Build())
+					})))
 
 				}()
 
 			}
-		
+
 		// Spotify
-		
+
 		case APIs.URITypeSPSong:
 
 			ResolvedSong, _, SpotifyFetchErr := Spotify.SpotifyIDToSong(ID)
@@ -951,7 +950,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 			go func() {
 
-				// Add rest 
+				// Add rest
 
 				AllOtherSongs, _, OtherFetchError := Spotify.SpotifyAlbumToAllSongs(SpotifyAlbum, true) // ignores first
 
@@ -968,13 +967,13 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				}
 
-				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 					Title:       Localizations.Get("Embeds.Notifications.AddedAdditionalSongs.Title", G.Locale.Code()),
 					Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 					Description: Localizations.GetFormat("Embeds.Notifications.AddedAdditionalSongs.FromAlbum", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code()), SpotifyAlbum.Name),
 
-				})).Build())
+				})))
 
 			}()
 
@@ -1011,14 +1010,14 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				}
 
-				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().
 					AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 						Title:       Localizations.Get("Embeds.Notifications.AddedAdditionalSongs.Title", G.Locale.Code()),
 						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 						Description: Localizations.GetFormat("Embeds.Notifications.AddedAdditionalSongs.FromPlaylist", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code()), SpotifyPlaylist.Name),
 
-					})).Build())
+					})))
 
 			}()
 
@@ -1071,13 +1070,13 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				}
 
-				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 					Title:       Localizations.Get("Embeds.Notifications.AddedAdditionalSongs.Title", G.Locale.Code()),
 					Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 					Description: Localizations.GetFormat("Embeds.Notifications.AddedAdditionalSongs.FromAlbum", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code()), AppleMusicAlbum.Attributes.Name),
 
-				})).Build())
+				})))
 
 			}()
 
@@ -1114,21 +1113,21 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				}
 
-				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
+				Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().
 					AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 						Title:       Localizations.Get("Embeds.Notifications.AddedAdditionalSongs.Title", G.Locale.Code()),
 						Author:      Localizations.Get("Embeds.Categories.Notifications", G.Locale.Code()),
 						Description: Localizations.GetFormat("Embeds.Notifications.AddedAdditionalSongs.FromPlaylist", G.Locale.Code(), len(AllOtherSongs)+1, Localizations.Pluralize("Song", len(AllOtherSongs)+1, G.Locale.Code()), AppleMusicPlaylist.Attributes.Name),
 
-					})).Build())
+					})))
 
 			}()
 
 	}
 
 	// Auto-plays if first in queue and not already playing
-		
+
 	if (PosAdded == 0 && G.Queue.State != StatePlaying) {
 
 		go func() { // done as to not block
@@ -1155,7 +1154,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	if Song == nil {
 
 		return fmt.Errorf("cannot play nil song")
-		
+
 	}
 
 	defer func() {
@@ -1199,7 +1198,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	if G.VoiceConnection == nil {
 
 		return fmt.Errorf("voice connection closed")
-		
+
 	}
 
 	if G.Queue.PlaybackSession != nil {
@@ -1219,7 +1218,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 				Utils.Logger.Error("Playback", fmt.Sprintf("Panic in OnFinished: %v", r))
 			}
-			
+
 		}()
 
 		Utils.Logger.Info("Playback", fmt.Sprintf("Playback finished for song: %s", Song.Title))
@@ -1227,18 +1226,18 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 		G.StreamerMutex.Lock()
 
 		if G.VoiceConnection == nil {
-			
+
 			G.StreamerMutex.Unlock()
-			return 
-			
+			return
+
 		}
 
 		// Double-check we aren't interfering with a new session
 		if Playback != nil && G.Queue.PlaybackSession != Playback {
-			
+
 			G.StreamerMutex.Unlock()
 			return
-			
+
 		}
 
 		G.Queue.PlaybackSession = nil
@@ -1269,7 +1268,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 		go func() {
 
-			_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreateBuilder().
+			_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().
 				AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 					Title:       Localizations.Get("Embeds.Notifications.StreamingError.Title", Locale),
@@ -1277,8 +1276,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 					Description: Localizations.Get("Embeds.Notifications.StreamingError.Description", Locale),
 					Color:       Utils.ERROR,
 
-				})).
-				Build())
+				})))
 
 			if ErrorSending != nil {
 
@@ -1359,7 +1357,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
                 G.StreamerMutex.Unlock()
                 return
-				
+
             }
 
             if Playback.Streamer == nil {
@@ -1374,7 +1372,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
             G.Queue.SendToWebsockets(Event_ProgressUpdate, map[string]any{"Progress": Progress})
 
         }
-        
+
     }()
 
 	// Stop inactivity timer when playback starts (unless autoplay is enabled)

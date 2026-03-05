@@ -91,14 +91,13 @@ func RemoveSong(Event *events.ComponentInteractionCreate, TidalID int64) {
 
 	}
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().
+	Event.CreateMessage(discord.NewMessageCreate().
 		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Embeds.Categories.Playback", Locale),
 			Author:      Localizations.Get("Embeds.Categories.Playback", Locale),
 			Description: "Song removed from queue.",
 
-		})).
-		Build())
+		})))
 
 }

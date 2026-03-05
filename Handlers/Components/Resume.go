@@ -55,10 +55,9 @@ func Resume(Event *events.ComponentInteractionCreate) {
 
 		}
 
-		Event.UpdateMessage(discord.NewMessageUpdateBuilder().
+		Event.UpdateMessage(discord.NewMessageUpdate().
 			AddEmbeds(Guild.Queue.Current.Embed(State)).
-			AddActionRow(Guild.Queue.Current.Buttons(State)...).
-			Build())
+			AddActionRow(Guild.Queue.Current.Buttons(State)...))
 
 	} else {
 

@@ -68,7 +68,7 @@ func ChunkString(S string, Size int) []string {
 		if End > len(S) {
 
 			End = len(S)
-			
+
 		}
 
 		Chunks = append(Chunks, S[i:End])
@@ -111,7 +111,7 @@ func LyricsFetcher(Title string, Artist string) (*LyricsAPIResponse, error) {
 		return nil, Err
 
 	}
-	
+
 	defer Resp.Body.Close()
 
 	if Resp.StatusCode != http.StatusOK {
@@ -123,13 +123,13 @@ func LyricsFetcher(Title string, Artist string) (*LyricsAPIResponse, error) {
 	var APIResp LyricsAPIResponse
 
 	Decoder := json.NewDecoder(Resp.Body)
-	
+
 	if Err := Decoder.Decode(&APIResp); Err != nil {
 
 		return nil, Err
 
 	}
-	
+
 	if len(APIResp.Lyrics) == 0 {
 
 		return nil, fmt.Errorf("no lyrics found")
@@ -144,7 +144,7 @@ type LyricsResponse struct {
 
 	Embeds []discord.Embed
 	Buttons []discord.InteractiveComponent
-	
+
 }
 
 func BuildLyricsResponse(GuildID snowflake.ID, Locale string) (*LyricsResponse, error) {
@@ -251,7 +251,7 @@ func BuildLyricsResponse(GuildID snowflake.ID, Locale string) (*LyricsResponse, 
 
 		Writers = Localizations.GetFormat("Embeds.Lyrics.WrittenBy", Locale, strings.Join(APIResp.Metadata.SongWriters, ", ")) + "\n\n"
 
-	} 
+	}
 
 	Truncated := Localizations.Get("Embeds.Lyrics.Truncated", Locale)
 
@@ -325,7 +325,7 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 
 		}
 
-		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
+		Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdate().
 			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       ErrorTitle,
@@ -334,17 +334,14 @@ func Lyrics(Event *events.ApplicationCommandInteractionCreate) {
 				Color:       Utils.ERROR,
 
 			})).
-			SetFlags(discord.MessageFlagsNone).
-			Build())
-
+			WithFlags(discord.MessageFlagsNone))
 		return
 
 	}
 
-	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
+	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdate().
 		AddEmbeds(Response.Embeds...).
 		AddActionRow(Response.Buttons...).
-		SetFlags(discord.MessageFlagsNone).
-		Build())
+		WithFlags(discord.MessageFlagsNone))
 
 }

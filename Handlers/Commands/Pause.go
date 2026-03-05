@@ -68,7 +68,7 @@ func Pause(Event *events.ApplicationCommandInteractionCreate) {
 
 	Buttons = append(Buttons, NextButton)
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().
+	Event.CreateMessage(discord.NewMessageCreate().
 		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Commands.Pause.Title", Locale),
@@ -76,7 +76,6 @@ func Pause(Event *events.ApplicationCommandInteractionCreate) {
 			Description: Localizations.Get("Commands.Pause.Description", Locale),
 
 		})).
-		AddActionRow(Buttons...).
-		Build())
-	
+		AddActionRow(Buttons...))
+
 }

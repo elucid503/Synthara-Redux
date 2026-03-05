@@ -69,7 +69,7 @@ func Resume(Event *events.ApplicationCommandInteractionCreate) {
 
 	Buttons = append(Buttons, NextButton)
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().
+	Event.CreateMessage(discord.NewMessageCreate().
 		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Commands.Resume.Title", Locale),
@@ -77,7 +77,6 @@ func Resume(Event *events.ApplicationCommandInteractionCreate) {
 			Description: Localizations.Get("Commands.Resume.Description", Locale),
 
 		})).
-		AddActionRow(Buttons...).
-		Build())
+		AddActionRow(Buttons...))
 	
 }

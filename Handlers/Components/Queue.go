@@ -37,9 +37,8 @@ func Queue(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().
+	Event.CreateMessage(discord.NewMessageCreate().
 		AddEmbeds(Response.Embeds...).
-		AddActionRow(Response.Buttons...).
-		Build())
+			AddActionRow(Response.Buttons...))
 
 }

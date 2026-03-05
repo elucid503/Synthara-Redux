@@ -160,9 +160,8 @@ func Album(Event *events.ApplicationCommandInteractionCreate) {
 		ID: snowflake.MustParse(Icons.GetID(Icons.Play)),
 	})
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().
+	Event.CreateMessage(discord.NewMessageCreate().
 		AddEmbeds(Embed.Build()).
-		AddActionRow(EnqueueButton, PlayButton).
-		Build())
+		AddActionRow(EnqueueButton, PlayButton))
 
 }

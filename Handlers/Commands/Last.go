@@ -69,7 +69,7 @@ func Last(Event *events.ApplicationCommandInteractionCreate) {
 
 	Buttons = append(Buttons, NextButton)
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().
+	Event.CreateMessage(discord.NewMessageCreate().
 		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Commands.Last.Title", Locale),
@@ -77,7 +77,6 @@ func Last(Event *events.ApplicationCommandInteractionCreate) {
 			Description: fmt.Sprintf(Localizations.Get("Commands.Last.Description", Locale), Guild.Queue.Current.Title),
 
 		})).
-		AddActionRow(Buttons...).
-		Build())
+		AddActionRow(Buttons...))
 
 }

@@ -85,7 +85,7 @@ func Last(Event *events.ComponentInteractionCreate) {
 
 	Buttons = append(Buttons, NextButton)
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().
+	Event.CreateMessage(discord.NewMessageCreate().
 		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Commands.Last.Title", Locale),
@@ -93,7 +93,6 @@ func Last(Event *events.ComponentInteractionCreate) {
 			Description: Localizations.Get("Commands.Last.Description", Locale),
 
 		})).
-		AddActionRow(Buttons...).
-		Build())
+			AddActionRow(Buttons...))
 
 }

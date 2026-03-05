@@ -221,6 +221,6 @@ func Play(Event *events.ApplicationCommandInteractionCreate) {
 	}
 
 	Utils.WaitFor(DeferDone)
-	Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.NewMessageUpdateBuilder().AddEmbeds(SongFound.Embed(State)).AddActionRow(SongFound.Buttons(State)...).Build())
+	Event.Client().Rest.UpdateInteractionResponse(Event.ApplicationID(), Event.Token(), discord.NewMessageUpdate().AddEmbeds(SongFound.Embed(State)).AddActionRow(SongFound.Buttons(State)...))
 
 }

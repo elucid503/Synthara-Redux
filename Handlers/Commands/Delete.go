@@ -70,7 +70,7 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 
 			if Guild.Channels.Text != 0 {
 
-				_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+				_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreate().
 					AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 						Title:       Localizations.Get("Commands.Delete.Message.Title", Guild.Locale.Code()),
@@ -78,8 +78,7 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 						Description: Message,
 						Color:       Utils.ERROR,
 
-					})).
-					Build())
+					})))
 
 				if ErrorSending != nil {
 
@@ -181,7 +180,7 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Guild.Channels.Text != 0 {
 
-		_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+		_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreate().
 			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 				Title:       Localizations.Get("Commands.Delete.Message.Title", Guild.Locale.Code()),
@@ -189,8 +188,7 @@ func Delete(Event *events.ApplicationCommandInteractionCreate) {
 				Description: Message,
 				Color:       Utils.ERROR,
 
-			})).
-			Build())
+			})))
 
 		if ErrorSending != nil {
 

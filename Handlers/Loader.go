@@ -517,7 +517,7 @@ func InitializeHandlers() {
 
 					})
 
-					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreateBuilder().
+					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreate().
 						AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 							Title:       Localizations.Get("Embeds.Notifications.ManualDisconnect.Title", Guild.Locale.Code()),
@@ -525,8 +525,7 @@ func InitializeHandlers() {
 							Description: Localizations.Get("Embeds.Notifications.ManualDisconnect.Description", Guild.Locale.Code()),
 
 						})).
-						AddActionRow(ReconnectButton).
-						Build())
+						AddActionRow(ReconnectButton))
 
 					if ErrorSending != nil {
 

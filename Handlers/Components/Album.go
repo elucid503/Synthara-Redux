@@ -31,14 +31,14 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 	// Validate that guild session exists
 
 	if Guild == nil {
-		
+
 		ErrorEmbed := Validation.GuildSessionError(Locale)
 		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
-		
+
 		return
 
 	}
-	
+
 	Parts := strings.Split(Event.Data.CustomID(), ":")
 
 	if len(Parts) < 2 {
@@ -55,7 +55,7 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 			})},
 
 			Flags: discord.MessageFlagEphemeral,
-			
+
 		})
 
 		return
@@ -79,7 +79,7 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 			})},
 
 			Flags: discord.MessageFlagEphemeral,
-			
+
 		})
 
 		return
@@ -102,13 +102,13 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 			})},
 
 			Flags: discord.MessageFlagEphemeral,
-			
+
 		})
 
 		return
 
 	}
-	
+
 	// Determine if the current song is part of this album and find its position
 	StartIndex := 0
 
@@ -148,7 +148,7 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 		Guild.Queue.Add(&SongCopy, Event.User().ID.String())
 
 	}
-		
+
 	QueueURL := fmt.Sprintf("%s/Queues/%s?View=Queue", strings.TrimRight(os.Getenv("DOMAIN"), "/"), GuildID.String())
 
 	ViewQueueButton := discord.NewButton(discord.ButtonStyleLink, Localizations.Get("Embeds.Queue.View", Locale), "", QueueURL, snowflake.ID(0)).WithEmoji(discord.ComponentEmoji{
@@ -157,7 +157,7 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 
 	})
 
-	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
+	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdate().
 		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Components.Album.Enqueued.Title", Locale),
@@ -168,16 +168,15 @@ func AlbumEnqueue(Event *events.ComponentInteractionCreate) {
 				if StartIndex > 0 && Guild.Queue.Current != nil && len(EnqueueSongs) > 0 {
 
 					return Localizations.GetFormat("Components.Album.Enqueued.DescriptionAfterCurrent", Locale, len(EnqueueSongs), Guild.Queue.Current.Title)
-				
+
 				}
 
 				return Localizations.GetFormat("Components.Album.Enqueued.Description", Locale, len(EnqueueSongs))
-			
+
 			}(),
 
 		})).
-		AddActionRow(ViewQueueButton).
-		Build())
+		AddActionRow(ViewQueueButton))
 
 }
 
@@ -217,7 +216,7 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 			})},
 
 			Flags: discord.MessageFlagEphemeral,
-			
+
 		})
 
 		return
@@ -241,7 +240,7 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 			})},
 
 			Flags: discord.MessageFlagEphemeral,
-			
+
 		})
 
 		return
@@ -266,7 +265,7 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 			})},
 
 			Flags: discord.MessageFlagEphemeral,
-			
+
 		})
 
 		return
@@ -288,7 +287,7 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdateBuilder().
+	Event.Client().Rest.UpdateInteractionResponse(Event.Client().ApplicationID, Event.Token(), discord.NewMessageUpdate().
 		AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 			Title:       Localizations.Get("Components.Album.Playing.Title", Locale),
@@ -296,6 +295,6 @@ func AlbumPlay(Event *events.ComponentInteractionCreate) {
 			Description: Localizations.GetFormat("Components.Album.Playing.Description", Locale, len(AlbumSongs)),
 			Color:       Utils.PRIMARY,
 
-		})).Build())
+		})))
 
 }

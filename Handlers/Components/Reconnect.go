@@ -116,12 +116,12 @@ func Reconnect(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	Event.CreateMessage(discord.NewMessageCreateBuilder().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+	Event.CreateMessage(discord.NewMessageCreate().AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
 
 		Title:       Localizations.Get("Embeds.Notifications.Reconnect.Title", Locale),
 		Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
 		Description: Localizations.GetFormat("Embeds.Notifications.Reconnect.Description", Locale, ChannelName),
 
-	})).Build())
+	})))
 
 }
