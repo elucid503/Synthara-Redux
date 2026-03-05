@@ -9,6 +9,8 @@ import (
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/gateway"
+	"github.com/disgoorg/disgo/voice"
+	"github.com/disgoorg/godave/golibdave"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +25,10 @@ var ServiceRestrictionMutex sync.RWMutex
 
 func InitDiscordClient() error {
 
-	InitializedClient, ErrorInitializing := disgo.New(os.Getenv("DISCORD_TOKEN"), bot.WithGatewayConfigOpts(gateway.WithIntents(gateway.IntentsNonPrivileged, gateway.IntentGuildVoiceStates)))
+	InitializedClient, ErrorInitializing := disgo.New(os.Getenv("DISCORD_TOKEN"),
+		bot.WithGatewayConfigOpts(gateway.WithIntents(gateway.IntentsNonPrivileged, gateway.IntentGuildVoiceStates)),
+		bot.WithVoiceManagerConfigOpts(voice.WithDaveSessionCreateFunc(golibdave.NewSession)),
+	)
 
 	if ErrorInitializing != nil {
 

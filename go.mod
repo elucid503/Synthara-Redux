@@ -13,7 +13,11 @@ require (
 	layeh.com/gopus v0.0.0-20210501142526-1ee02d434e32
 )
 
-require github.com/disgoorg/godave v0.0.0-20260211222359-4ef3e359a3af // indirect
+require (
+	github.com/disgoorg/godave v0.1.1-0.20260214205329-977ec02b706f // indirect
+	github.com/disgoorg/godave/golibdave v0.1.0 // indirect
+	github.com/disgoorg/godave/libdave v0.1.0 // indirect
+)
 
 require (
 	github.com/bitly/go-simplejson v0.5.1 // indirect
