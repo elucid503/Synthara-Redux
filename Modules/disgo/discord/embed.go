@@ -21,7 +21,7 @@ const (
 )
 
 // NewEmbed returns a new Embed struct with no fields set.
-func NewEmbed() Embed {
+func NewEmbedBuilder() Embed {
 	return Embed{}
 }
 
@@ -42,36 +42,36 @@ type Embed struct {
 	Fields      []EmbedField   `json:"fields,omitempty"`
 }
 
-// WithTitle Withs the title of the Embed
-func (e Embed) WithTitle(title string) Embed {
+// SetTitle sets the title of the Embed
+func (e Embed) SetTitle(title string) Embed {
 	e.Title = title
 	return e
 }
 
-// WithTitlef Withs the title of the Embed with format
-func (e Embed) WithTitlef(title string, a ...any) Embed {
-	return e.WithTitle(fmt.Sprintf(title, a...))
+// SetTitlef sets the title of the Embed with format
+func (e Embed) SetTitlef(title string, a ...any) Embed {
+	return e.SetTitle(fmt.Sprintf(title, a...))
 }
 
-// WithDescription Withs the description of the Embed
-func (e Embed) WithDescription(description string) Embed {
+// SetDescription sets the description of the Embed
+func (e Embed) SetDescription(description string) Embed {
 	e.Description = description
 	return e
 }
 
-// WithDescriptionf Withs the description of the Embed with format
-func (e Embed) WithDescriptionf(description string, a ...any) Embed {
-	return e.WithDescription(fmt.Sprintf(description, a...))
+// SetDescriptionf sets the description of the Embed with format
+func (e Embed) SetDescriptionf(description string, a ...any) Embed {
+	return e.SetDescription(fmt.Sprintf(description, a...))
 }
 
-// WithEmbedAuthor Withs the author of the Embed using an EmbedAuthor struct
-func (e Embed) WithEmbedAuthor(author *EmbedAuthor) Embed {
+// SetEmbedAuthor sets the author of the Embed using an EmbedAuthor struct
+func (e Embed) SetEmbedAuthor(author *EmbedAuthor) Embed {
 	e.Author = author
 	return e
 }
 
-// WithAuthor Withs the author of the Embed with all properties
-func (e Embed) WithAuthor(name string, url string, iconURL string) Embed {
+// SetAuthor sets the author of the Embed with all properties
+func (e Embed) SetAuthor(name string, url string, iconURL string) Embed {
 	if e.Author == nil {
 		e.Author = &EmbedAuthor{}
 	}
@@ -81,8 +81,8 @@ func (e Embed) WithAuthor(name string, url string, iconURL string) Embed {
 	return e
 }
 
-// WithAuthorName Withs the author name of the Embed
-func (e Embed) WithAuthorName(name string) Embed {
+// SetAuthorName sets the author name of the Embed
+func (e Embed) SetAuthorName(name string) Embed {
 	if e.Author == nil {
 		e.Author = &EmbedAuthor{}
 	}
@@ -90,13 +90,13 @@ func (e Embed) WithAuthorName(name string) Embed {
 	return e
 }
 
-// WithAuthorNamef Withs the author name of the Embed with format
-func (e Embed) WithAuthorNamef(name string, a ...any) Embed {
-	return e.WithAuthorName(fmt.Sprintf(name, a...))
+// SetAuthorNamef sets the author name of the Embed with format
+func (e Embed) SetAuthorNamef(name string, a ...any) Embed {
+	return e.SetAuthorName(fmt.Sprintf(name, a...))
 }
 
-// WithAuthorURL Withs the author URL of the Embed
-func (e Embed) WithAuthorURL(url string) Embed {
+// SetAuthorURL sets the author URL of the Embed
+func (e Embed) SetAuthorURL(url string) Embed {
 	if e.Author == nil {
 		e.Author = &EmbedAuthor{}
 	}
@@ -104,13 +104,13 @@ func (e Embed) WithAuthorURL(url string) Embed {
 	return e
 }
 
-// WithAuthorURLf Withs the author URL of the Embed with format
-func (e Embed) WithAuthorURLf(url string, a ...any) Embed {
-	return e.WithAuthorURL(fmt.Sprintf(url, a...))
+// SetAuthorURLf sets the author URL of the Embed with format
+func (e Embed) SetAuthorURLf(url string, a ...any) Embed {
+	return e.SetAuthorURL(fmt.Sprintf(url, a...))
 }
 
-// WithAuthorIcon Withs the author icon of the Embed
-func (e Embed) WithAuthorIcon(iconURL string) Embed {
+// SetAuthorIcon sets the author icon of the Embed
+func (e Embed) SetAuthorIcon(iconURL string) Embed {
 	if e.Author == nil {
 		e.Author = &EmbedAuthor{}
 	}
@@ -118,26 +118,26 @@ func (e Embed) WithAuthorIcon(iconURL string) Embed {
 	return e
 }
 
-// WithAuthorIconf Withs the author icon of the Embed with format
-func (e Embed) WithAuthorIconf(iconURL string, a ...any) Embed {
-	return e.WithAuthorIcon(fmt.Sprintf(iconURL, a...))
+// SetAuthorIconf sets the author icon of the Embed with format
+func (e Embed) SetAuthorIconf(iconURL string, a ...any) Embed {
+	return e.SetAuthorIcon(fmt.Sprintf(iconURL, a...))
 }
 
-// WithColor Withs the color of the Embed
+// SetColor sets the color of the Embed
 // The color should be an integer representation of a hexadecimal color code (e.g. 0xFF0000 for red)
-func (e Embed) WithColor(color int) Embed {
+func (e Embed) SetColor(color int) Embed {
 	e.Color = color
 	return e
 }
 
-// WithEmbedFooter Withs the footer of the Embed
-func (e Embed) WithEmbedFooter(footer *EmbedFooter) Embed {
+// SetEmbedFooter sets the footer of the Embed
+func (e Embed) SetEmbedFooter(footer *EmbedFooter) Embed {
 	e.Footer = footer
 	return e
 }
 
-// WithFooter Withs the footer icon of the Embed
-func (e Embed) WithFooter(text string, iconURL string) Embed {
+// SetFooter sets the footer icon of the Embed
+func (e Embed) SetFooter(text string, iconURL string) Embed {
 	if e.Footer == nil {
 		e.Footer = &EmbedFooter{}
 	}
@@ -146,8 +146,8 @@ func (e Embed) WithFooter(text string, iconURL string) Embed {
 	return e
 }
 
-// WithFooterText Withs the footer text of the Embed
-func (e Embed) WithFooterText(text string) Embed {
+// SetFooterText sets the footer text of the Embed
+func (e Embed) SetFooterText(text string) Embed {
 	if e.Footer == nil {
 		e.Footer = &EmbedFooter{}
 	}
@@ -155,13 +155,13 @@ func (e Embed) WithFooterText(text string) Embed {
 	return e
 }
 
-// WithFooterTextf Withs the footer text of the Embed with format
-func (e Embed) WithFooterTextf(text string, a ...any) Embed {
-	return e.WithFooterText(fmt.Sprintf(text, a...))
+// SetFooterTextf sets the footer text of the Embed with format
+func (e Embed) SetFooterTextf(text string, a ...any) Embed {
+	return e.SetFooterText(fmt.Sprintf(text, a...))
 }
 
-// WithFooterIcon Withs the footer icon of the Embed
-func (e Embed) WithFooterIcon(iconURL string) Embed {
+// SetFooterIcon sets the footer icon of the Embed
+func (e Embed) SetFooterIcon(iconURL string) Embed {
 	if e.Footer == nil {
 		e.Footer = &EmbedFooter{}
 	}
@@ -169,13 +169,13 @@ func (e Embed) WithFooterIcon(iconURL string) Embed {
 	return e
 }
 
-// WithFooterIconf Withs the footer icon of the Embed
-func (e Embed) WithFooterIconf(iconURL string, a ...any) Embed {
-	return e.WithFooterIcon(fmt.Sprintf(iconURL, a...))
+// SetFooterIconf sets the footer icon of the Embed
+func (e Embed) SetFooterIconf(iconURL string, a ...any) Embed {
+	return e.SetFooterIcon(fmt.Sprintf(iconURL, a...))
 }
 
-// WithImage Withs the image of the Embed
-func (e Embed) WithImage(url string) Embed {
+// SetImage sets the image of the Embed
+func (e Embed) SetImage(url string) Embed {
 	if e.Image == nil {
 		e.Image = &EmbedResource{}
 	}
@@ -183,13 +183,13 @@ func (e Embed) WithImage(url string) Embed {
 	return e
 }
 
-// WithImagef Withs the image of the Embed with format
-func (e Embed) WithImagef(url string, a ...any) Embed {
-	return e.WithImage(fmt.Sprintf(url, a...))
+// SetImagef sets the image of the Embed with format
+func (e Embed) SetImagef(url string, a ...any) Embed {
+	return e.SetImage(fmt.Sprintf(url, a...))
 }
 
-// WithThumbnail Withs the thumbnail of the Embed
-func (e Embed) WithThumbnail(url string) Embed {
+// SetThumbnail sets the thumbnail of the Embed
+func (e Embed) SetThumbnail(url string) Embed {
 	if e.Thumbnail == nil {
 		e.Thumbnail = &EmbedResource{}
 	}
@@ -197,24 +197,24 @@ func (e Embed) WithThumbnail(url string) Embed {
 	return e
 }
 
-// WithThumbnailf Withs the thumbnail of the Embed with format
-func (e Embed) WithThumbnailf(url string, a ...any) Embed {
-	return e.WithThumbnail(fmt.Sprintf(url, a...))
+// SetThumbnailf sets the thumbnail of the Embed with format
+func (e Embed) SetThumbnailf(url string, a ...any) Embed {
+	return e.SetThumbnail(fmt.Sprintf(url, a...))
 }
 
-// WithURL Withs the URL of the Embed
-func (e Embed) WithURL(url string) Embed {
+// SetURL sets the URL of the Embed
+func (e Embed) SetURL(url string) Embed {
 	e.URL = url
 	return e
 }
 
-// WithURLf Withs the URL of the Embed with format
-func (e Embed) WithURLf(url string, a ...any) Embed {
-	return e.WithURL(fmt.Sprintf(url, a...))
+// SetURLf sets the URL of the Embed with format
+func (e Embed) SetURLf(url string, a ...any) Embed {
+	return e.SetURL(fmt.Sprintf(url, a...))
 }
 
-// WithTimestamp Withs the timestamp of the Embed
-func (e Embed) WithTimestamp(time time.Time) Embed {
+// SetTimestamp sets the timestamp of the Embed
+func (e Embed) SetTimestamp(time time.Time) Embed {
 	e.Timestamp = &time
 	return e
 }
@@ -225,8 +225,8 @@ func (e Embed) AddField(name string, value string, inline bool) Embed {
 	return e
 }
 
-// WithField Withs a field to the Embed by name and value
-func (e Embed) WithField(i int, name string, value string, inline bool) Embed {
+// SetField sets a field to the Embed by name and value
+func (e Embed) SetField(i int, name string, value string, inline bool) Embed {
 	if len(e.Fields) > i {
 		e.Fields[i] = EmbedField{Name: name, Value: value, Inline: &inline}
 	}
@@ -239,8 +239,8 @@ func (e Embed) AddFields(fields ...EmbedField) Embed {
 	return e
 }
 
-// WithFields Withs fields of the Embed
-func (e Embed) WithFields(fields ...EmbedField) Embed {
+// SetFields sets fields of the Embed
+func (e Embed) SetFields(fields ...EmbedField) Embed {
 	e.Fields = fields
 	return e
 }

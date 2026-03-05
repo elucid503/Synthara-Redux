@@ -138,7 +138,7 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Embeds: []discord.Embed{EmbedBuilder.Build()},
+		Embeds: []discord.Embed{EmbedBuilder},
 
 	})
 

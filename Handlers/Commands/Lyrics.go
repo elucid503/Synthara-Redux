@@ -292,7 +292,7 @@ func BuildLyricsResponse(GuildID snowflake.ID, Locale string) (*LyricsResponse, 
 	Embed.SetAuthor(Localizations.Get("Embeds.Lyrics.Title", Locale), "", "")
 
 	return &LyricsResponse{
-		Embeds: []discord.Embed{Embed.Build()},
+		Embeds: []discord.Embed{Embed},
 		Buttons: []discord.InteractiveComponent{discord.NewButton(discord.ButtonStyleLink, ViewLabel, "", Page, snowflake.ID(0))},
 	}, nil
 

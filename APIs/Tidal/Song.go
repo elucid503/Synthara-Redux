@@ -291,7 +291,7 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 
 	Embed.SetColor(DominantColor)
 
-	return Embed.Build()
+	return Embed
 
 }
 

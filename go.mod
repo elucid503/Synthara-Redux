@@ -2,7 +2,7 @@ module Synthara-Redux
 
 go 1.24.1
 
-//replace github.com/disgoorg/disgo => ./Modules/disgo
+replace github.com/disgoorg/disgo => ./Modules/disgo
 
 require (
 	github.com/disgoorg/disgo v0.19.2

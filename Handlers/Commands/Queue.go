@@ -174,7 +174,7 @@ func BuildQueueResponse(GuildID snowflake.ID, Locale string) (*QueueResponse, er
 
 	return &QueueResponse{
 		
-		Embeds: []discord.Embed{Embed.Build()},
+		Embeds: []discord.Embed{Embed},
 		Buttons: []discord.InteractiveComponent{discord.NewButton(discord.ButtonStyleLink, Localizations.Get("Embeds.Queue.View", Locale), "", Page, snowflake.ID(0))},
 	
 	}, nil

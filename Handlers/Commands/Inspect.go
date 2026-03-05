@@ -208,7 +208,7 @@ func ShowGuildOverview(Event *events.ApplicationCommandInteractionCreate, Locale
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Embeds: []discord.Embed{EmbedBuilder.Build()},
+		Embeds: []discord.Embed{EmbedBuilder},
 
 	})
 
@@ -513,7 +513,7 @@ func ShowGuildDetails(Event *events.ApplicationCommandInteractionCreate, Locale 
 
 	Event.CreateMessage(discord.MessageCreate{
 
-		Embeds: []discord.Embed{EmbedBuilder.Build()},
+		Embeds: []discord.Embed{EmbedBuilder},
 
 	})
 	

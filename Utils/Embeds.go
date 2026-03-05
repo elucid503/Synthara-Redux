@@ -74,6 +74,6 @@ func CreateEmbed(Options EmbedOptions) discord.Embed {
 
 	}
 	
-	return EmbedBuilder.Build()
+	return EmbedBuilder
 
 }

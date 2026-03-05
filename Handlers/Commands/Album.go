@@ -161,7 +161,7 @@ func Album(Event *events.ApplicationCommandInteractionCreate) {
 	})
 
 	Event.CreateMessage(discord.NewMessageCreate().
-		AddEmbeds(Embed.Build()).
+		AddEmbeds(Embed).
 		AddActionRow(EnqueueButton, PlayButton))
 
 }
