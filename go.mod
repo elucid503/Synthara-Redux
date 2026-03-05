@@ -2,8 +2,11 @@ module Synthara-Redux
 
 go 1.24.1
 
+//replace github.com/disgoorg/disgo => ./Modules/disgo
+
 require (
 	github.com/disgoorg/disgo v0.19.2
+	github.com/disgoorg/godave/golibdave v0.1.0
 	github.com/disgoorg/snowflake/v2 v2.0.3
 	github.com/gin-gonic/gin v1.11.0
 	github.com/gorilla/websocket v1.5.3
@@ -15,7 +18,6 @@ require (
 
 require (
 	github.com/disgoorg/godave v0.1.1-0.20260214205329-977ec02b706f // indirect
-	github.com/disgoorg/godave/golibdave v0.1.0 // indirect
 	github.com/disgoorg/godave/libdave v0.1.0 // indirect
 )
 
