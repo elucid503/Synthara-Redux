@@ -1,13 +1,15 @@
 package Utils
 
-import "github.com/disgoorg/disgo/discord"
+import (
+	"github.com/disgoorg/disgo/discord"
+)
 
 // Embed / Bot colors
 const (
 
 	PRIMARY= 0x96BEFF
 	ERROR = 0xD196FF
-	
+
 )
 
 type EmbedOptions struct {
@@ -73,7 +75,7 @@ func CreateEmbed(Options EmbedOptions) discord.Embed {
 		EmbedBuilder.SetURL(Options.URL)
 
 	}
-	
+
 	return EmbedBuilder
 
 }
