@@ -288,7 +288,7 @@ func Search(Query string, SearchType string) (*SearchResult, error) {
 
 	path := fmt.Sprintf("/search/?%s", Params.Encode())
 
-	Resp, Err := TryAPIs(path)
+	Resp, Err := TryAPIs(path, 0)
 
 	if Err != nil {
 
@@ -347,7 +347,7 @@ func FetchStreaming(ID int64, Quality string, StartFrom int) (*Streaming, error)
 		if StartFrom < len(BaseAPIURLs)-1 {
 
 			Utils.Logger.Warn("Tidal API", fmt.Sprintf("Failed to decode streaming response from API %d: %s. Trying next API...", StartFrom, Err.Error()))
-			return FetchStreaming(ID, Quality, StartFrom+1)
+			return FetchStreaming(ID, Quality, StartFrom + 1)
 
 		} else {
 
@@ -365,7 +365,7 @@ func FetchInfo(ID int64) (*Info, error) {
 
 	path := fmt.Sprintf("/info/?id=%d", ID)
 
-	Resp, Err := TryAPIs(path)
+	Resp, Err := TryAPIs(path, 0)
 
 	if Err != nil { return nil, Err }
 
@@ -392,7 +392,7 @@ func FetchInfo(ID int64) (*Info, error) {
 func FetchDash(ID int64, Quality string) ([]byte, error) {
 
 	path := fmt.Sprintf("/dash/?id=%d&quality=%s", ID, Quality)
-	Resp, Err := TryAPIs(path)
+	Resp, Err := TryAPIs(path, 0)
 
 	if Err != nil { return nil, Err }
 
@@ -415,7 +415,7 @@ func FetchCover(ID int64, Query string) ([]Cover, error) {
 	if Query != "" { Params.Set("q", Query) }
 
 	path := fmt.Sprintf("/cover/?%s", Params.Encode())
-	Resp, Err := TryAPIs(path)
+	Resp, Err := TryAPIs(path, 0)
 
 	if Err != nil { return nil, Err }
 
@@ -442,7 +442,7 @@ func FetchCover(ID int64, Query string) ([]Cover, error) {
 func FetchAlbum(ID int64) (*Album, error) {
 
 	path := fmt.Sprintf("/album/?id=%d", ID)
-	Resp, Err := TryAPIs(path)
+	Resp, Err := TryAPIs(path, 0)
 
 	if Err != nil {
 
@@ -473,7 +473,7 @@ func FetchAlbum(ID int64) (*Album, error) {
 func FetchPlaylist(ID string) (map[string]interface{}, error) {
 
 	path := fmt.Sprintf("/playlist/?id=%s", ID)
-	Resp, Err := TryAPIs(path)
+	Resp, Err := TryAPIs(path, 0)
 
 	if Err != nil { return nil, Err }
 
@@ -512,7 +512,7 @@ func FetchArtist(ID int64, Full bool) ([]Artist, error) {
 	}
 
 	path := fmt.Sprintf("/artist/?%s", Params.Encode())
-	Resp, Err := TryAPIs(path)
+	Resp, Err := TryAPIs(path, 0)
 
 	if Err != nil { return nil, Err }
 
@@ -539,7 +539,7 @@ func FetchArtist(ID int64, Full bool) ([]Artist, error) {
 func FetchLyrics(ID int64) ([]Lyrics, error) { // not really good
 
 	path := fmt.Sprintf("/lyrics/?id=%d", ID)
-	Resp, Err := TryAPIs(path)
+	Resp, Err := TryAPIs(path, 0)
 
 	if Err != nil { return nil, Err }
 
