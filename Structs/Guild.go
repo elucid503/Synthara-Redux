@@ -1186,8 +1186,6 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	// Get stream URL from Tidal
 	StreamURL, ErrorFetchingStream := Tidal.GetStreamURL(Song.TidalID)
 
-	fmt.Println("Stream URL:", StreamURL) // Debug log for stream URL
-
 	if ErrorFetchingStream != nil {
 
 		fmt.Println("Error fetching stream URL:", ErrorFetchingStream) // Debug log for error

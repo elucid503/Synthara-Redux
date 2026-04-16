@@ -135,9 +135,17 @@ func Init() {
 }
 
 // TryAPIs makes a request to the first working API endpoint
-func TryAPIs(Path string) (*http.Response, error) {
+func TryAPIs(Path string, StartFrom int) (*http.Response, error) {
 
-	for _, BaseURL := range BaseAPIURLs {
+	URLS := BaseAPIURLs
+
+	if StartFrom > 0 && StartFrom < len(BaseAPIURLs) {
+
+		URLS = BaseAPIURLs[StartFrom:]
+
+	}
+
+	for _, BaseURL := range URLS {
 
 		URL := BaseURL + Path
 		Req, Err := http.NewRequest("GET", URL, nil)
@@ -308,13 +316,13 @@ func Search(Query string, SearchType string) (*SearchResult, error) {
 
 }
 
-func FetchStreaming(ID int64, Quality string) (*Streaming, error) {
+func FetchStreaming(ID int64, Quality string, StartFrom int) (*Streaming, error) {
 
 	Utils.Logger.Info("Tidal API", fmt.Sprintf("Fetching streaming info for track %d", ID))
 
 	path := fmt.Sprintf("/track/?id=%d&quality=%s", ID, Quality)
 
-	Resp, Err := TryAPIs(path)
+	Resp, Err := TryAPIs(path, 0)
 
 	if Err != nil {
 
@@ -334,7 +342,18 @@ func FetchStreaming(ID int64, Quality string) (*Streaming, error) {
 
 	if Err := json.NewDecoder(Resp.Body).Decode(&Wrapper); Err != nil {
 
-		return nil, Err
+		// Recursively try next if StartFrom isn't > StreamingURLs
+
+		if StartFrom < len(BaseAPIURLs)-1 {
+
+			Utils.Logger.Warn("Tidal API", fmt.Sprintf("Failed to decode streaming response from API %d: %s. Trying next API...", StartFrom, Err.Error()))
+			return FetchStreaming(ID, Quality, StartFrom+1)
+
+		} else {
+
+			return nil, fmt.Errorf("failed to decode streaming response: %w; no other endpoints available", Err)
+
+		}
 
 	}
 
@@ -913,7 +932,7 @@ func GetStreamURL(TrackID int64) (string, error) {
 
 	}
 
-	Streaming, Err := FetchStreaming(TrackID, QualityLow)
+	Streaming, Err := FetchStreaming(TrackID, QualityLow, 0)
 
 	if Err != nil {
 
