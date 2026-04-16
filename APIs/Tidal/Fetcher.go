@@ -147,6 +147,8 @@ func TryAPIs(Path string, StartFrom int) (*http.Response, error) {
 
 	for _, BaseURL := range URLS {
 
+		fmt.Printf("Trying API: %s%s\n", BaseURL, Path)
+
 		URL := BaseURL + Path
 		Req, Err := http.NewRequest("GET", URL, nil)
 
@@ -321,8 +323,6 @@ func FetchStreaming(ID int64, Quality string, StartFrom int) (*Streaming, error)
 	Utils.Logger.Info("Tidal API", fmt.Sprintf("Fetching streaming info for track %d", ID))
 
 	path := fmt.Sprintf("/track/?id=%d&quality=%s", ID, Quality)
-
-	fmt.Printf("Trying to fetch streaming info from path: %s\n", path)
 
 	Resp, Err := TryAPIs(path, 0)
 
