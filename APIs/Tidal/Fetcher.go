@@ -322,6 +322,8 @@ func FetchStreaming(ID int64, Quality string, StartFrom int) (*Streaming, error)
 
 	path := fmt.Sprintf("/track/?id=%d&quality=%s", ID, Quality)
 
+	fmt.Printf("Trying to fetch streaming info from path: %s\n", path)
+
 	Resp, Err := TryAPIs(path, 0)
 
 	if Err != nil {
