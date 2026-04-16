@@ -1173,7 +1173,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 			buf := make([]byte, 1<<16) // 64kb buffer
 			runtime.Stack(buf, true)
-			
+
 			Utils.Logger.Error("Playback", fmt.Sprintf("Stack trace: %s", string(buf)))
 
 			G.Queue.SetState(StateIdle)
@@ -1186,8 +1186,11 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	// Get stream URL from Tidal
 	StreamURL, ErrorFetchingStream := Tidal.GetStreamURL(Song.TidalID)
 
+	fmt.Println("Stream URL:", StreamURL) // Debug log for stream URL
+
 	if ErrorFetchingStream != nil {
 
+		fmt.Println("Error fetching stream URL:", ErrorFetchingStream) // Debug log for error
 		return ErrorFetchingStream
 
 	}
