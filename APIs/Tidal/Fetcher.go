@@ -365,7 +365,7 @@ func FetchInfo(ID int64) (*Info, error) {
 		return nil, Err
 
 	}
-	
+
 	return &Wrapper.Data, nil
 
 }
@@ -433,10 +433,10 @@ func FetchAlbum(ID int64) (*Album, error) {
 
 	defer Resp.Body.Close()
 
-	if Resp.StatusCode != 200 { 
-		
-		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode) 
-	
+	if Resp.StatusCode != 200 {
+
+		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode)
+
 	}
 
 	var Wrapper Response[Album]
@@ -461,9 +461,9 @@ func FetchPlaylist(ID string) (map[string]interface{}, error) {
 	defer Resp.Body.Close()
 
 	if Resp.StatusCode != 200 {
-		
+
 		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode)
-	
+
 	}
 
 	var Wrapper Response[map[string]interface{}]
@@ -484,14 +484,14 @@ func FetchArtist(ID int64, Full bool) ([]Artist, error) {
 
 	if (Full) {
 
-		Params.Set("f", fmt.Sprintf("%d", ID)) 
+		Params.Set("f", fmt.Sprintf("%d", ID))
 
 	} else {
 
 		Params.Set("id", fmt.Sprintf("%d", ID))
 
 	}
-	
+
 	path := fmt.Sprintf("/artist/?%s", Params.Encode())
 	Resp, Err := TryAPIs(path)
 
@@ -500,11 +500,11 @@ func FetchArtist(ID int64, Full bool) ([]Artist, error) {
 	defer Resp.Body.Close()
 
 	if Resp.StatusCode != 200 {
-		
-		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode) 
-		
-	} 
-	
+
+		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode)
+
+	}
+
 	var Wrapper Response[[]Artist]
 
 	if Err := json.NewDecoder(Resp.Body).Decode(&Wrapper); Err != nil {
@@ -526,10 +526,10 @@ func FetchLyrics(ID int64) ([]Lyrics, error) { // not really good
 
 	defer Resp.Body.Close()
 
-	if Resp.StatusCode != 200 { 
-		
-		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode) 
-	
+	if Resp.StatusCode != 200 {
+
+		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode)
+
 	}
 
 	var Wrapper Response[[]Lyrics]
@@ -574,7 +574,7 @@ func FetchAlbumTracks(AlbumID int64) ([]Song, error) {
 		return nil, Err
 
 	}
-	
+
 	Songs := make([]Song, 0)
 	Limit := 100
 	Offset := 0
@@ -760,7 +760,7 @@ func FetchTrackMix(TrackID int64) (string, error) {
 
 	// First, try to get mix ID from track info
 	Info, Err := FetchInfo(TrackID)
-	
+
 	if Err != nil { return "", Err }
 
 	if Info.Mixes.TrackMix != "" {
@@ -804,10 +804,10 @@ func FetchMixItems(MixID string) ([]Song, error) {
 
 	Resp, Err := HTTPClient.Do(Request)
 
-	if Err != nil { 
+	if Err != nil {
 
 		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to fetch mix items: %s", Err.Error()))
-		return nil, Err 
+		return nil, Err
 
 	}
 
@@ -830,7 +830,7 @@ func FetchMixItems(MixID string) ([]Song, error) {
 	}
 
 	Songs := make([]Song, 0, len(Wrapper.Items))
-	
+
 	for _, Item := range Wrapper.Items {
 
 		Song := TrackToSong(Item.Item)
@@ -917,6 +917,7 @@ func GetStreamURL(TrackID int64) (string, error) {
 
 	if Err != nil {
 
+		fmt.Printf("Error making request for track %d: %s\n", TrackID, Err.Error())
 		return "", Err
 
 	}
@@ -925,6 +926,7 @@ func GetStreamURL(TrackID int64) (string, error) {
 
 	if Err != nil {
 
+		fmt.Printf("Error parsing manifest for track %d: %s\n", TrackID, Err.Error())
 		return "", Err
 
 	}
@@ -948,7 +950,7 @@ func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
 	// Decode base64
 
 	ManifestBytes, Err := base64.StdEncoding.DecodeString(ManifestBase64)
-	
+
 	if Err != nil {
 
 		return "", "", nil, fmt.Errorf("failed to decode manifest: %w", Err)
@@ -962,7 +964,7 @@ func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
 	if strings.HasPrefix(strings.TrimSpace(ManifestStr), "{") {
 
 		var BTS BTSManifest
-		
+
 		if Err := json.Unmarshal(ManifestBytes, &BTS); Err != nil {
 
 			return "", "", nil, fmt.Errorf("failed to parse BTS manifest: %w", Err)
@@ -978,13 +980,13 @@ func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
 		// Return direct URL
 
 		return BTS.URLs[0], "", nil, nil
-		
+
 	}
 
 	// DASH format (XML)
 
 	var MPD DASHManifest
-	
+
 	if Err := xml.Unmarshal(ManifestBytes, &MPD); Err != nil {
 
 		return "", "", nil, fmt.Errorf("failed to parse DASH manifest: %w", Err)
@@ -998,7 +1000,7 @@ func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
 	// Fallback: regex extraction
 
 	if InitURL == "" || MediaTemplate == "" {
-		
+
 		InitRe := regexp.MustCompile(`initialization="([^"]+)"`)
 		MediaRe := regexp.MustCompile(`media="([^"]+)"`)
 
@@ -1007,7 +1009,7 @@ func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
 			InitURL = Match[1]
 
 		}
-		
+
 		if Match := MediaRe.FindStringSubmatch(ManifestStr); len(Match) > 1 {
 
 			MediaTemplate = Match[1]
@@ -1030,7 +1032,7 @@ func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
 	// Calculate segment count
 
 	SegmentCount := 0
-	
+
 	for _, Seg := range SegTemplate.Timeline.Segments {
 
 		SegmentCount += Seg.Repeat + 1
@@ -1040,10 +1042,10 @@ func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
 	// Fallback: regex for segment count
 
 	if SegmentCount == 0 {
-		
+
 		SegRe := regexp.MustCompile(`<S d="\d+"(?: r="(\d+)")?`)
 		Matches := SegRe.FindAllStringSubmatch(ManifestStr, -1)
-		
+
 		for _, Match := range Matches {
 
 			Repeat := 0
@@ -1060,9 +1062,9 @@ func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
 	}
 
 	// Generate segment URLs
-	
+
 	var SegmentURLs []string
-	
+
 	for I := 1; I <= SegmentCount; I++ {
 
 		SegmentURL := strings.ReplaceAll(MediaTemplate, "$Number$", fmt.Sprintf("%d", I))
@@ -1071,7 +1073,7 @@ func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
 	}
 
 	return "", InitURL, SegmentURLs, nil
-	
+
 }
 
 // FetchSearchSuggestions fetches autocomplete suggestions from Tidal
