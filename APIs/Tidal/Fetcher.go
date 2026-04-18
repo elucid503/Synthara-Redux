@@ -29,25 +29,29 @@ var HTTPClient = &http.Client{Timeout: 10 * time.Second}
 var TokenMutex sync.RWMutex
 var CachedToken string
 var TokenExpiry time.Time
-var RefreshToken string
 
 var StreamURLMutexes sync.Map
 
-const TidalAuthURL = "https://auth.tidal.com/v1/oauth2/token"
+// Tidal OAuth credentials
+
+const (
+	TidalClientID     = "txNoH4kkV41MfH25"
+	TidalClientSecret = "dQjy0MinCEvxi1O4UmxvxWnDjt4cgHBPw8ll6nYBk98="
+	TidalAuthURL      = "https://auth.tidal.com/v1/oauth2/token"
+)
 
 // TokenResponse represents the OAuth token response from Tidal
 
 type TokenResponse struct {
 
-	ClientName   string `json:"clientName"`
+	ClientName string `json:"clientName"`
 
-	Scope        string `json:"scope"`
-	TokenType    string `json:"token_type"`
+	Scope     string `json:"scope"`
+	TokenType string `json:"token_type"`
 
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	AccessToken string `json:"access_token"`
 
-	ExpiresIn    int    `json:"expires_in"`
+	ExpiresIn int `json:"expires_in"`
 
 }
 
@@ -111,26 +115,13 @@ func Init() {
 
 	}
 
-	// If access+refresh tokens are provided via env, use those directly
-	EnvAccess := strings.TrimSpace(os.Getenv("TIDAL_ACCESS_TOKEN"))
-	EnvRefresh := strings.TrimSpace(os.Getenv("TIDAL_REFRESH_TOKEN"))
+	// Fetch initial token
 
-	if EnvAccess != "" && EnvRefresh != "" {
+	if _, Err := GetBearerToken(); Err != nil {
 
-		TokenMutex.Lock()
-		CachedToken = EnvAccess
-		BearerToken = EnvAccess
-		RefreshToken = EnvRefresh
-		// Assume up to 1 hour remaining; will refresh transparently when expired
-		TokenExpiry = time.Now().Add(time.Hour)
-		TokenMutex.Unlock()
-
-		Utils.Logger.Info("Tidal API", "Using TIDAL_ACCESS_TOKEN / TIDAL_REFRESH_TOKEN from environment.")
-		return
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to fetch initial Tidal token: %s", Err.Error()))
 
 	}
-
-	Utils.Logger.Error("Tidal API", "TIDAL_ACCESS_TOKEN and TIDAL_REFRESH_TOKEN are required but not set.")
 
 }
 
@@ -186,7 +177,7 @@ func TryAPIs(Path string, StartFrom int) (*http.Response, error) {
 
 }
 
-// GetBearerToken returns a valid bearer token, refreshing via refresh_token if expired
+// GetBearerToken returns a valid bearer token, fetching a new one if expired
 func GetBearerToken() (string, error) {
 
 	TokenMutex.RLock()
@@ -198,9 +189,12 @@ func GetBearerToken() (string, error) {
 
 		return Token, nil
 
+
 	}
 
 	TokenMutex.RUnlock()
+
+	// Need to fetch new token
 
 	TokenMutex.Lock()
 	defer TokenMutex.Unlock()
@@ -213,21 +207,19 @@ func GetBearerToken() (string, error) {
 
 	}
 
-	if RefreshToken == "" {
-
-		return "", fmt.Errorf("TIDAL token expired and no refresh token available")
-
-	}
+	// Create URL-encoded form request
 
 	FormData := url.Values{}
-	FormData.Set("grant_type", "refresh_token")
-	FormData.Set("refresh_token", RefreshToken)
+
+	FormData.Set("client_id", TidalClientID)
+	FormData.Set("client_secret", TidalClientSecret)
+	FormData.Set("grant_type", "client_credentials")
 
 	Req, Err := http.NewRequest("POST", TidalAuthURL, strings.NewReader(FormData.Encode()))
 
 	if Err != nil {
 
-		return "", fmt.Errorf("failed to create refresh request: %w", Err)
+		return "", fmt.Errorf("failed to create token request: %w", Err)
 
 	}
 
@@ -237,7 +229,7 @@ func GetBearerToken() (string, error) {
 
 	if Err != nil {
 
-		return "", fmt.Errorf("failed to refresh token: %w", Err)
+		return "", fmt.Errorf("failed to fetch token: %w", Err)
 
 	}
 
@@ -246,7 +238,7 @@ func GetBearerToken() (string, error) {
 	if Resp.StatusCode != http.StatusOK {
 
 		BodyBytes, _ := io.ReadAll(Resp.Body)
-		return "", fmt.Errorf("token refresh failed with status %d: %s", Resp.StatusCode, string(BodyBytes))
+		return "", fmt.Errorf("token request failed with status %d: %s", Resp.StatusCode, string(BodyBytes))
 
 	}
 
@@ -254,17 +246,15 @@ func GetBearerToken() (string, error) {
 
 	if Err := json.NewDecoder(Resp.Body).Decode(&TokenResp); Err != nil {
 
-		return "", fmt.Errorf("failed to parse refresh response: %w", Err)
+		return "", fmt.Errorf("failed to parse token response: %w", Err)
 
 	}
+
+	// Cache the token with some buffer before expiry (5 minutes early)
 
 	CachedToken = TokenResp.AccessToken
 	TokenExpiry = time.Now().Add(time.Duration(TokenResp.ExpiresIn-300) * time.Second)
 	BearerToken = CachedToken
-
-	if TokenResp.RefreshToken != "" {
-		RefreshToken = TokenResp.RefreshToken
-	}
 
 	Utils.Logger.Info("Tidal API", "Tidal bearer token refreshed.")
 
