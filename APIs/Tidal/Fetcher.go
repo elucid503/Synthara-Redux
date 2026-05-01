@@ -4,15 +4,12 @@ import (
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Utils"
 	"compress/gzip"
-	"encoding/base64"
 	"encoding/json"
-	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
-	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -20,7 +17,7 @@ import (
 
 // Generic wrapper for API responses
 
-var BaseAPIURLs []string
+var BaseAPIURL string
 var BearerToken string
 var HTTPClient = &http.Client{Timeout: 10 * time.Second}
 
@@ -66,56 +63,22 @@ var DefaultHeaders = map[string]string{
 
 func Init() {
 
-	APIs := strings.TrimSpace(os.Getenv("STREAMING_APIS"))
+	API := strings.TrimSpace(os.Getenv("STREAMING_API_ENDPOINT"))
 
-	if APIs == "" {
+	if API == "" {
 
-		// Fallback to old single endpoint
-
-		APIs = strings.TrimSpace(os.Getenv("STREAMING_API_ENDPOINT"))
-
-		if APIs == "" {
-
-			Utils.Logger.Error("Tidal API", "No STREAMING_APIS or STREAMING_API_ENDPOINT configured")
-			return
-
-		}
-
-	}
-
-	APIList := strings.Split(APIs, ",")
-	BaseAPIURLs = make([]string, 0, len(APIList))
-
-	for _, API := range APIList {
-
-		API = strings.TrimSpace(API)
-
-		if API == "" {
-
-			continue
-
-		}
-
-		if !strings.HasPrefix(API, "http://") && !strings.HasPrefix(API, "https://") {
-
-			API = "https://" + API
-
-
-		}
-
-		API = strings.TrimRight(API, "/")
-		BaseAPIURLs = append(BaseAPIURLs, API)
-
-	}
-
-	if len(BaseAPIURLs) == 0 {
-
-		Utils.Logger.Error("Tidal API", "No valid APIs found in STREAMING_APIS")
+		Utils.Logger.Error("Tidal API", "No STREAMING_API_ENDPOINT configured")
 		return
 
 	}
 
-	// Fetch initial token
+	if !strings.HasPrefix(API, "http://") && !strings.HasPrefix(API, "https://") {
+
+		API = "https://" + API
+
+	}
+
+	BaseAPIURL = strings.TrimRight(API, "/")
 
 	if _, Err := GetBearerToken(); Err != nil {
 
@@ -125,55 +88,47 @@ func Init() {
 
 }
 
-// TryAPIs makes a request to the first working API endpoint
-func TryAPIs(Path string, StartFrom int) (*http.Response, error) {
+// TryAPIs makes a request to the configured API endpoint
+func TryAPIs(Path string, _ int) (*http.Response, error) {
 
-	URLS := BaseAPIURLs
+	if BaseAPIURL == "" {
 
-	if StartFrom > 0 && StartFrom < len(BaseAPIURLs) {
-
-		URLS = BaseAPIURLs[StartFrom:]
+		return nil, fmt.Errorf("no API endpoint configured")
 
 	}
 
-	for _, BaseURL := range URLS {
+	URL := BaseAPIURL + Path
+	Req, Err := http.NewRequest("GET", URL, nil)
 
-		fmt.Printf("Trying API: %s%s\n", BaseURL, Path)
+	if Err != nil {
 
-		URL := BaseURL + Path
-		Req, Err := http.NewRequest("GET", URL, nil)
-
-		if Err != nil {
-
-			continue
-
-		}
-
-		AddDefaultHeaders(Req)
-
-		Resp, Err := HTTPClient.Do(Req)
-
-		if Err != nil {
-
-			continue
-
-		}
-
-		if Resp.StatusCode >= 200 && Resp.StatusCode < 300 {
-
-			return Resp, nil
-
-		}
-
-		if Resp.Body != nil {
-
-			Resp.Body.Close()
-
-		}
+		return nil, Err
 
 	}
 
-	return nil, fmt.Errorf("all APIs failed for path: %s", Path)
+	AddDefaultHeaders(Req)
+
+	Resp, Err := HTTPClient.Do(Req)
+
+	if Err != nil {
+
+		return nil, Err
+
+	}
+
+	if Resp.StatusCode >= 200 && Resp.StatusCode < 300 {
+
+		return Resp, nil
+
+	}
+
+	if Resp.Body != nil {
+
+		Resp.Body.Close()
+
+	}
+
+	return nil, fmt.Errorf("API returned HTTP %d for path: %s", Resp.StatusCode, Path)
 
 }
 
@@ -301,51 +256,6 @@ func Search(Query string, SearchType string) (*SearchResult, error) {
 	if Err := json.NewDecoder(Resp.Body).Decode(&Wrapper); Err != nil {
 
 		return nil, Err
-
-	}
-
-	return &Wrapper.Data, nil
-
-}
-
-func FetchStreaming(ID int64, Quality string, StartFrom int) (*Streaming, error) {
-
-	Utils.Logger.Info("Tidal API", fmt.Sprintf("Fetching streaming info for track %d", ID))
-
-	path := fmt.Sprintf("/track/?id=%d&quality=%s", ID, Quality)
-
-	Resp, Err := TryAPIs(path, 0)
-
-	if Err != nil {
-
-		return nil, Err
-
-	}
-
-	defer Resp.Body.Close()
-
-	if Resp.StatusCode != 200 {
-
-		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode)
-
-	}
-
-	var Wrapper Response[Streaming]
-
-	if Err := json.NewDecoder(Resp.Body).Decode(&Wrapper); Err != nil {
-
-		// Recursively try next if StartFrom isn't > StreamingURLs
-
-		if StartFrom < len(BaseAPIURLs)-1 {
-
-			Utils.Logger.Warn("Tidal API", fmt.Sprintf("Failed to decode streaming response from API %d: %s. Trying next API...", StartFrom, Err.Error()))
-			return FetchStreaming(ID, Quality, StartFrom + 1)
-
-		} else {
-
-			return nil, fmt.Errorf("failed to decode streaming response: %w; no other endpoints available", Err)
-
-		}
 
 	}
 
@@ -892,7 +802,11 @@ func GetSong(TrackID int64) (Song, error) {
 
 }
 
-// GetStreamURL fetches the direct streaming URL for a track
+const QobuzAPIBase = "https://qobuz.kennyy.com.br"
+
+// GetStreamURL fetches a direct streaming URL for a track via Qobuz.
+// It resolves the track's ISRC from the HiFi API, searches Qobuz for a
+// matching track, then requests a signed streaming URL at quality 5 (MPEG).
 func GetStreamURL(TrackID int64) (string, error) {
 
 	Cache := Globals.GetOrCreateCache("TidalStreamURLs")
@@ -924,166 +838,80 @@ func GetStreamURL(TrackID int64) (string, error) {
 
 	}
 
-	Streaming, Err := FetchStreaming(TrackID, QualityLow, 0)
+	// Step 1: Resolve ISRC from HiFi API
+	Info, Err := FetchInfo(TrackID)
 
 	if Err != nil {
 
-		fmt.Printf("Error making request for track %d: %s\n", TrackID, Err.Error())
-		return "", Err
+		return "", fmt.Errorf("failed to fetch track info for %d: %w", TrackID, Err)
 
 	}
 
-	DirectURL, _, _, Err := ParseManifest(Streaming.Manifest)
+	if Info.ISRC == "" {
+
+		return "", fmt.Errorf("no ISRC for track %d", TrackID)
+
+	}
+
+	Utils.Logger.Info("Tidal API", fmt.Sprintf("Resolved ISRC %s for track %d", Info.ISRC, TrackID))
+
+	// Step 2: Search Qobuz by ISRC
+	SearchURL := fmt.Sprintf("%s/api/get-music?q=%s&offset=0", QobuzAPIBase, url.QueryEscape(Info.ISRC))
+	SearchResp, Err := HTTPClient.Get(SearchURL)
 
 	if Err != nil {
 
-		fmt.Printf("Error parsing manifest for track %d: %s\n", TrackID, Err.Error())
-		return "", Err
+		return "", fmt.Errorf("Qobuz search failed for ISRC %s: %w", Info.ISRC, Err)
 
 	}
 
-	if DirectURL == "" {
+	defer SearchResp.Body.Close()
 
-		return "", fmt.Errorf("no direct URL available for track %d", TrackID)
+	var SearchResult QobuzSearchResponse
+
+	if Err := json.NewDecoder(SearchResp.Body).Decode(&SearchResult); Err != nil {
+
+		return "", fmt.Errorf("failed to decode Qobuz search response: %w", Err)
 
 	}
 
-	Cache.Set(Key, DirectURL, 1 * time.Hour) // 1 hour TTL
+	if !SearchResult.Success || len(SearchResult.Data.Tracks.Items) == 0 {
 
-	return DirectURL, nil
+		return "", fmt.Errorf("no Qobuz results for ISRC %s (track %d)", Info.ISRC, TrackID)
 
-}
+	}
 
-// ParseManifest decodes a base64 manifest and extracts playable URLs
-// Returns: directURL (for BTS), initURL + segmentURLs (for DASH), error
-func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
+	QobuzTrackID := SearchResult.Data.Tracks.Items[0].ID
 
-	// Decode base64
-
-	ManifestBytes, Err := base64.StdEncoding.DecodeString(ManifestBase64)
+	// Step 3: Get signed streaming URL from Qobuz
+	DownloadURL := fmt.Sprintf("%s/api/download-music?track_id=%d&quality=5", QobuzAPIBase, QobuzTrackID)
+	DownloadResp, Err := HTTPClient.Get(DownloadURL)
 
 	if Err != nil {
 
-		return "", "", nil, fmt.Errorf("failed to decode manifest: %w", Err)
+		return "", fmt.Errorf("Qobuz download request failed for track %d: %w", QobuzTrackID, Err)
 
 	}
 
-	ManifestStr := string(ManifestBytes)
+	defer DownloadResp.Body.Close()
 
-	// Checks if BTS format (JSON)
+	var DownloadResult QobuzDownloadResponse
 
-	if strings.HasPrefix(strings.TrimSpace(ManifestStr), "{") {
+	if Err := json.NewDecoder(DownloadResp.Body).Decode(&DownloadResult); Err != nil {
 
-		var BTS BTSManifest
-
-		if Err := json.Unmarshal(ManifestBytes, &BTS); Err != nil {
-
-			return "", "", nil, fmt.Errorf("failed to parse BTS manifest: %w", Err)
-
-		}
-
-		if len(BTS.URLs) == 0 {
-
-			return "", "", nil, fmt.Errorf("no URLs in BTS manifest")
-
-		}
-
-		// Return direct URL
-
-		return BTS.URLs[0], "", nil, nil
+		return "", fmt.Errorf("failed to decode Qobuz download response: %w", Err)
 
 	}
 
-	// DASH format (XML)
+	if !DownloadResult.Success || DownloadResult.Data.URL == "" {
 
-	var MPD DASHManifest
-
-	if Err := xml.Unmarshal(ManifestBytes, &MPD); Err != nil {
-
-		return "", "", nil, fmt.Errorf("failed to parse DASH manifest: %w", Err)
+		return "", fmt.Errorf("Qobuz returned no URL for track %d (ISRC %s)", QobuzTrackID, Info.ISRC)
 
 	}
 
-	SegTemplate := MPD.Period.AdaptationSet.Representation.SegmentTemplate
-	InitURL := SegTemplate.Initialization
-	MediaTemplate := SegTemplate.Media
+	Cache.Set(Key, DownloadResult.Data.URL, 1*time.Hour)
 
-	// Fallback: regex extraction
-
-	if InitURL == "" || MediaTemplate == "" {
-
-		InitRe := regexp.MustCompile(`initialization="([^"]+)"`)
-		MediaRe := regexp.MustCompile(`media="([^"]+)"`)
-
-		if Match := InitRe.FindStringSubmatch(ManifestStr); len(Match) > 1 {
-
-			InitURL = Match[1]
-
-		}
-
-		if Match := MediaRe.FindStringSubmatch(ManifestStr); len(Match) > 1 {
-
-			MediaTemplate = Match[1]
-
-		}
-
-	}
-
-	if InitURL == "" {
-
-		return "", "", nil, fmt.Errorf("no initialization URL in DASH manifest")
-
-	}
-
-	// Unescape HTML entities
-
-	InitURL = strings.ReplaceAll(InitURL, "&amp;", "&")
-	MediaTemplate = strings.ReplaceAll(MediaTemplate, "&amp;", "&")
-
-	// Calculate segment count
-
-	SegmentCount := 0
-
-	for _, Seg := range SegTemplate.Timeline.Segments {
-
-		SegmentCount += Seg.Repeat + 1
-
-	}
-
-	// Fallback: regex for segment count
-
-	if SegmentCount == 0 {
-
-		SegRe := regexp.MustCompile(`<S d="\d+"(?: r="(\d+)")?`)
-		Matches := SegRe.FindAllStringSubmatch(ManifestStr, -1)
-
-		for _, Match := range Matches {
-
-			Repeat := 0
-
-			if len(Match) > 1 && Match[1] != "" {
-
-				fmt.Sscanf(Match[1], "%d", &Repeat)
-
-			}
-
-			SegmentCount += Repeat + 1
-
-		}
-	}
-
-	// Generate segment URLs
-
-	var SegmentURLs []string
-
-	for I := 1; I <= SegmentCount; I++ {
-
-		SegmentURL := strings.ReplaceAll(MediaTemplate, "$Number$", fmt.Sprintf("%d", I))
-		SegmentURLs = append(SegmentURLs, SegmentURL)
-
-	}
-
-	return "", InitURL, SegmentURLs, nil
+	return DownloadResult.Data.URL, nil
 
 }
 

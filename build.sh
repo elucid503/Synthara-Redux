@@ -7,7 +7,7 @@ echo ""
 
 # Set CGO flags for optimization and warning suppression
 
-export CGO_CFLAGS="-O3 -Wno-unused-result"
+export CGO_CFLAGS="-O3 -Wno-unused-result -Wno-stringop-overread"
 export CGO_CFLAGS="$CGO_CFLAGS -I$HOME/.local/include"
 export CGO_LDFLAGS="-L$HOME/.local/lib -Wl,-rpath,$HOME/.local/lib"
 export PKG_CONFIG_PATH="$HOME/.local/lib/pkgconfig:$PKG_CONFIG_PATH"

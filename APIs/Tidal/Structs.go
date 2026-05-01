@@ -160,6 +160,27 @@ type Streaming struct {
 	TrackReplayGain    float64 `json:"trackReplayGain"`
 }
 
+// Qobuz API response types
+
+type QobuzSearchResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		Tracks struct {
+			Total int `json:"total"`
+			Items []struct {
+				ID int64 `json:"id"`
+			} `json:"items"`
+		} `json:"tracks"`
+	} `json:"data"`
+}
+
+type QobuzDownloadResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		URL string `json:"url"`
+	} `json:"data"`
+}
+
 // BTS manifest structure (JSON)
 
 type BTSManifest struct {

@@ -10,9 +10,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	mp3 "github.com/hajimehoshi/go-mp3"
 
 	"Synthara-Redux/Utils"
 
@@ -21,7 +24,7 @@ import (
 
 // MP4Streamer handles streaming MP4/AAC files from Tidal
 type MP4Streamer struct {
-	
+
 	Processor *MP4Processor
 
 	Paused  atomic.Bool
@@ -149,16 +152,41 @@ func (S *MP4Streamer) Stop() {
 
 }
 
-// StreamFromURL fetches and processes audio from a direct MP4 URL using chunked streaming
+// StreamFromURL fetches and processes audio from a URL, detecting MP3 vs MP4 automatically
 func (S *MP4Streamer) StreamFromURL(Ctx context.Context, URL string) error {
+
+	// We must probe the content type before committing to a streaming strategy
+
+	HeadReq, Err := http.NewRequestWithContext(Ctx, "HEAD", URL, nil)
+
+	if Err != nil {
+
+		return fmt.Errorf("failed to create probe request: %w", Err)
+
+	}
+
+	ProbeClient := &http.Client{Timeout: 10 * time.Second}
+	HeadResp, Err := ProbeClient.Do(HeadReq)
+
+	if Err != nil {
+
+		return fmt.Errorf("failed to probe stream: %w", Err)
+
+	}
+
+	HeadResp.Body.Close()
+
+	if strings.Contains(HeadResp.Header.Get("Content-Type"), "audio/mpeg") {
+		return S.StreamMP3FromURL(Ctx, URL)
+	}
+
+	// MP4/AAC path: fetch first 1MB to find moov atom
 
 	Client := &http.Client{Timeout: 60 * time.Second}
 
-	// First, fetch just the header to parse moov atom (usually first 500KB-1MB)
-
-	HeaderSize := int64(1024 * 1024) // 1MB should be enough for moov
+	HeaderSize := int64(1024 * 1024)
 	HeaderReq, Err := http.NewRequest("GET", URL, nil)
-	
+
 	if Err != nil {
 
 		return fmt.Errorf("failed to create header request: %w", Err)
@@ -168,6 +196,7 @@ func (S *MP4Streamer) StreamFromURL(Ctx context.Context, URL string) error {
 	HeaderReq.Header.Set("Range", fmt.Sprintf("bytes=0-%d", HeaderSize-1))
 
 	HeaderResp, Err := Client.Do(HeaderReq)
+
 	if Err != nil {
 
 		return fmt.Errorf("failed to fetch MP4 header: %w", Err)
@@ -183,13 +212,12 @@ func (S *MP4Streamer) StreamFromURL(Ctx context.Context, URL string) error {
 	}
 
 	HeaderData, Err := io.ReadAll(HeaderResp.Body)
+
 	if Err != nil {
 
 		return fmt.Errorf("failed to read header: %w", Err)
 
 	}
-
-	// Parse MP4 header to extract metadata
 
 	Info := &MP4AudioInfo{
 
@@ -206,9 +234,125 @@ func (S *MP4Streamer) StreamFromURL(Ctx context.Context, URL string) error {
 
 	}
 
-	// Now stream the mdat content in chunks
-
 	return S.streamMdatChunked(Ctx, URL, Info, Client)
+
+}
+
+// StreamMP3FromURL streams a raw MP3, decodes it to PCM, and encodes to Opus frames.
+// The go-mp3 decoder handles ID3 tags and all MPEG layer 3 variants natively.
+func (S *MP4Streamer) StreamMP3FromURL(Ctx context.Context, URL string) error {
+
+	Req, Err := http.NewRequestWithContext(Ctx, "GET", URL, nil)
+	if Err != nil {
+		return fmt.Errorf("failed to create request: %w", Err)
+	}
+
+	// No overall timeout — the context handles cancellation for a long stream
+	StreamClient := &http.Client{}
+	Resp, Err := StreamClient.Do(Req)
+	if Err != nil {
+		return fmt.Errorf("failed to fetch MP3 stream: %w", Err)
+	}
+	defer Resp.Body.Close()
+
+	if Resp.StatusCode != http.StatusOK && Resp.StatusCode != http.StatusPartialContent {
+		return fmt.Errorf("HTTP %d", Resp.StatusCode)
+	}
+
+	MP3Dec, Err := mp3.NewDecoder(Resp.Body)
+	if Err != nil {
+		return fmt.Errorf("failed to initialize MP3 decoder: %w", Err)
+	}
+
+	SourceRate := MP3Dec.SampleRate()
+	SamplesPerOpusFrame := FrameSize * Channels // 960 * 2 = 1920 int16 values
+
+	SafeSend := func(Data []byte) bool {
+		if S.IsStopped() {
+			return false
+		}
+		defer func() { recover() }()
+		S.OpusFrameChan <- Data
+		atomic.AddInt64(&S.Progress, 20)
+		atomic.AddInt64(&S.BytesStreamed, int64(len(Data)))
+		return true
+	}
+
+	PCMBuffer := make([]int16, 0, SamplesPerOpusFrame*8)
+	ReadBuf := make([]byte, 16384)
+
+	for {
+
+		if S.IsStopped() {
+			break
+		}
+
+		N, ReadErr := MP3Dec.Read(ReadBuf)
+
+		if N > 0 {
+
+			// Convert little-endian bytes to int16 samples
+			SampleCount := N / 2
+			PCMChunk := make([]int16, SampleCount)
+			for i := 0; i < SampleCount; i++ {
+				PCMChunk[i] = int16(uint16(ReadBuf[i*2]) | uint16(ReadBuf[i*2+1])<<8)
+			}
+
+			// Resample to 48kHz (Qobuz MP3 is 44100Hz, Discord requires 48000Hz)
+			if SourceRate != SampleRate {
+				PCMChunk = ResamplePCM(PCMChunk, SourceRate, SampleRate, Channels)
+			}
+
+			PCMBuffer = append(PCMBuffer, PCMChunk...)
+
+			// Drain complete Opus frames from the buffer
+			for len(PCMBuffer) >= SamplesPerOpusFrame {
+
+				if S.IsStopped() {
+					return nil
+				}
+
+				OpusData, EncErr := S.Processor.OpusEncoder.Encode(PCMBuffer[:SamplesPerOpusFrame], FrameSize, MaxPacketSize)
+				if EncErr != nil {
+					return EncErr
+				}
+
+				if !SafeSend(OpusData) {
+					return nil
+				}
+
+				PCMBuffer = PCMBuffer[SamplesPerOpusFrame:]
+
+			}
+
+		}
+
+		if ReadErr != nil {
+			if ReadErr == io.EOF {
+				break
+			}
+			if Ctx.Err() != nil {
+				return nil // context cancelled — normal stop
+			}
+			return fmt.Errorf("MP3 decode error: %w", ReadErr)
+		}
+
+	}
+
+	// Flush any remaining samples with silence padding
+	if len(PCMBuffer) > 0 && !S.IsStopped() {
+
+		Padding := make([]int16, SamplesPerOpusFrame-len(PCMBuffer))
+		PCMBuffer = append(PCMBuffer, Padding...)
+
+		OpusData, EncErr := S.Processor.OpusEncoder.Encode(PCMBuffer, FrameSize, MaxPacketSize)
+		if EncErr == nil {
+			SafeSend(OpusData)
+		}
+
+	}
+
+	return nil
 
 }
 
@@ -218,7 +362,7 @@ func (S *MP4Streamer) ProcessMP4(Data []byte) error {
 	// Parse MP4 to extract AAC frames with proper boundaries
 
 	AACFrames, ASC, _, _, Err := S.Processor.ParseMP4(Data)
-	
+
 	if Err != nil {
 
 		return fmt.Errorf("failed to parse MP4: %w", Err)
@@ -266,7 +410,7 @@ func (S *MP4Streamer) ProcessMP4(Data []byte) error {
 
 	SamplesPerOpusFrame := FrameSize * Channels
 	PCMBuffer := make([]int16, 0, SamplesPerOpusFrame*4)
-	
+
 	for _, AACFrame := range AACFrames {
 
 		if S.IsStopped() {
@@ -274,7 +418,7 @@ func (S *MP4Streamer) ProcessMP4(Data []byte) error {
 			break
 
 		}
-		
+
 		// Decode single AAC frame (already resampled to 48kHz stereo)
 
 		PCM, Err := Decoder.DecodeFrame(AACFrame)
@@ -284,9 +428,9 @@ func (S *MP4Streamer) ProcessMP4(Data []byte) error {
 			continue
 
 		}
-		
+
 		PCMBuffer = append(PCMBuffer, PCM...)
-		
+
 		// Encode and send complete Opus frames immediately
 
 		for len(PCMBuffer) >= SamplesPerOpusFrame {
@@ -304,13 +448,13 @@ func (S *MP4Streamer) ProcessMP4(Data []byte) error {
 				return Err
 
 			}
-			
+
 			if !SafeSend(OpusData) {
 
 				return nil
 
 			}
-			
+
 			PCMBuffer = PCMBuffer[SamplesPerOpusFrame:]
 
 		}
@@ -323,7 +467,7 @@ func (S *MP4Streamer) ProcessMP4(Data []byte) error {
 
 		Padding := make([]int16, SamplesPerOpusFrame-len(PCMBuffer))
 		PCMBuffer = append(PCMBuffer, Padding...)
-		
+
 		OpusData, Err := S.Processor.OpusEncoder.Encode(PCMBuffer, FrameSize, MaxPacketSize)
 
 		if Err == nil {
@@ -331,7 +475,7 @@ func (S *MP4Streamer) ProcessMP4(Data []byte) error {
 			SafeSend(OpusData)
 
 		}
-		
+
 	}
 
 	return nil
@@ -339,7 +483,7 @@ func (S *MP4Streamer) ProcessMP4(Data []byte) error {
 
 // MP4Processor handles AAC extraction and encoding
 type MP4Processor struct {
-	
+
 	AACDecoder  *FDKAACDecoder
 	OpusEncoder *gopus.Encoder
 
@@ -385,7 +529,7 @@ type MP4AudioInfo struct {
 	SampleRate  int
 
 	NumChannels int
-	
+
 	MdatOffset  int64    // Offset to mdat payload
 	MdatSize    int64    // Size of mdat payload
 
@@ -396,22 +540,22 @@ type MP4AudioInfo struct {
 func (P *MP4Processor) ParseMP4(Data []byte) ([][]byte, []byte, int, int, error) {
 
 	Reader := bytes.NewReader(Data)
-	
+
 	Info := &MP4AudioInfo{
 
 		SampleRate:  44100,
 		NumChannels: 2,
 
 	}
-	
+
 	var MdatData []byte
-	
+
 	// First pass: find all atoms
 
 	for {
 
 		StartPos, _ := Reader.Seek(0, io.SeekCurrent)
-		
+
 		Header := make([]byte, 8)
 		_, Err := Reader.Read(Header)
 
@@ -424,12 +568,12 @@ func (P *MP4Processor) ParseMP4(Data []byte) ([][]byte, []byte, int, int, error)
 		if Err != nil {
 
 			return nil, nil, 0, 0, Err
-			
+
 		}
-		
+
 		AtomSize := int64(Header[0])<<24 | int64(Header[1])<<16 | int64(Header[2])<<8 | int64(Header[3])
 		AtomType := string(Header[4:8])
-		
+
 		// Handles extended size
 
 		if AtomSize == 1 {
@@ -438,17 +582,17 @@ func (P *MP4Processor) ParseMP4(Data []byte) ([][]byte, []byte, int, int, error)
 			Reader.Read(ExtHeader)
 
 			AtomSize = int64(ExtHeader[0])<<56 | int64(ExtHeader[1])<<48 | int64(ExtHeader[2])<<40 | int64(ExtHeader[3])<<32 | int64(ExtHeader[4])<<24 | int64(ExtHeader[5])<<16 | int64(ExtHeader[6])<<8 | int64(ExtHeader[7])
-		
+
 		}
-		
+
 		if AtomSize < 8 {
-			
+
 			break
 
 		}
-		
+
 		DataSize := AtomSize - 8
-		
+
 		switch AtomType {
 
 			// see below for comments on what each one is
@@ -459,14 +603,14 @@ func (P *MP4Processor) ParseMP4(Data []byte) ([][]byte, []byte, int, int, error)
 				Info.MdatSize = DataSize
 				MdatData = make([]byte, DataSize)
 				io.ReadFull(Reader, MdatData)
-				
+
 			case "moov":
 
 				MoovData := make([]byte, DataSize)
 
 				io.ReadFull(Reader, MoovData)
 				parseMP4Moov(MoovData, Info)
-				
+
 			default:
 
 				Reader.Seek(DataSize, io.SeekCurrent)
@@ -474,14 +618,14 @@ func (P *MP4Processor) ParseMP4(Data []byte) ([][]byte, []byte, int, int, error)
 		}
 
 	}
-	
+
 	if len(MdatData) == 0 {
 		return nil, nil, 0, 0, errors.New("no mdat atom found")
 	}
-	
+
 	// Split mdat into AAC frames using sample sizes
 	var AACFrames [][]byte
-	
+
 	if len(Info.SampleSizes) > 0 {
 
 		// Use sample size table to extract frames
@@ -507,20 +651,20 @@ func (P *MP4Processor) ParseMP4(Data []byte) ([][]byte, []byte, int, int, error)
 		AACFrames = append(AACFrames, MdatData)
 
 	}
-	
+
 	if len(AACFrames) == 0 {
 
 		return nil, nil, 0, 0, errors.New("no AAC frames extracted")
 
 	}
-	
+
 	return AACFrames, Info.ASC, Info.SampleRate, Info.NumChannels, nil
 
 }
 
 // parseMP4Moov parses moov atom to extract audio configuration
 func parseMP4Moov(Data []byte, Info *MP4AudioInfo) {
-	
+
 	// Parse nested atoms in moov
 	parseMP4Atoms(Data, Info, 0)
 
@@ -528,57 +672,57 @@ func parseMP4Moov(Data []byte, Info *MP4AudioInfo) {
 
 // parseMP4Atoms recursively parses MP4 atoms
 func parseMP4Atoms(Data []byte, Info *MP4AudioInfo, Depth int) {
-	
+
 	Offset := 0
-	
+
 	for Offset < len(Data)-8 {
-		
+
 		AtomSize := int(Data[Offset])<<24 | int(Data[Offset+1])<<16 | int(Data[Offset+2])<<8 | int(Data[Offset+3])
 		AtomType := string(Data[Offset+4 : Offset+8])
-		
+
 		if AtomSize < 8 || Offset+AtomSize > len(Data) {
 			break
 		}
-		
+
 		AtomData := Data[Offset+8 : Offset+AtomSize]
-		
+
 		switch AtomType {
 		case "trak", "mdia", "minf", "stbl":
 			// Container atoms - parse recursively
 			parseMP4Atoms(AtomData, Info, Depth+1)
-			
+
 		case "stsd":
 			// Sample description - contains mp4a
 			if len(AtomData) > 8 {
 				parseMP4Atoms(AtomData[8:], Info, Depth+1) // Skip version/flags and entry count
 			}
-			
+
 		case "mp4a":
 			// Audio sample entry
 			if len(AtomData) >= 28 {
 				Info.NumChannels = int(AtomData[16])<<8 | int(AtomData[17])
 				SampleRateFixed := int(AtomData[24])<<24 | int(AtomData[25])<<16 | int(AtomData[26])<<8 | int(AtomData[27])
 				Info.SampleRate = SampleRateFixed >> 16
-				
+
 				// Parse nested atoms (esds is inside mp4a)
 				if len(AtomData) > 28 {
 					parseMP4Atoms(AtomData[28:], Info, Depth+1)
 				}
 			}
-			
+
 		case "esds":
 			// Elementary stream descriptor - contains ASC
 			if len(AtomData) > 4 {
 				Info.ASC = extractASCFromEsds(AtomData)
 			}
-			
+
 		case "stsz":
 			// Sample size table
 			if len(AtomData) >= 12 {
 				// Version (1) + Flags (3) + Sample Size (4) + Sample Count (4)
 				DefaultSize := int(AtomData[4])<<24 | int(AtomData[5])<<16 | int(AtomData[6])<<8 | int(AtomData[7])
 				SampleCount := int(AtomData[8])<<24 | int(AtomData[9])<<16 | int(AtomData[10])<<8 | int(AtomData[11])
-				
+
 				if DefaultSize != 0 {
 					// All samples have the same size
 					Info.SampleSizes = make([]uint32, SampleCount)
@@ -596,28 +740,28 @@ func parseMP4Atoms(Data []byte, Info *MP4AudioInfo, Depth int) {
 				}
 			}
 		}
-		
+
 		Offset += AtomSize
 	}
 }
 
 // DecodeAACFrames decodes individual AAC frames using FDK-AAC
 func (P *MP4Processor) DecodeAACFrames(Frames [][]byte, ASC []byte) ([]int16, error) {
-	
+
 	if len(Frames) == 0 {
 		return nil, errors.New("no AAC frames to decode")
 	}
-	
+
 	// Use the raw AAC decoder with ASC
 	var AllPCM []int16
-	
+
 	// Create decoder for raw AAC
 	Decoder, Err := NewRawAACDecoder(ASC)
 	if Err != nil {
 		return nil, Err
 	}
 	defer Decoder.Close()
-	
+
 	// Decode each frame
 	for _, Frame := range Frames {
 		PCM, Err := Decoder.DecodeFrame(Frame)
@@ -626,11 +770,11 @@ func (P *MP4Processor) DecodeAACFrames(Frames [][]byte, ASC []byte) ([]int16, er
 		}
 		AllPCM = append(AllPCM, PCM...)
 	}
-	
+
 	if len(AllPCM) == 0 {
 		return nil, errors.New("no PCM data decoded")
 	}
-	
+
 	return AllPCM, nil
 }
 
@@ -642,30 +786,30 @@ func (P *MP4Processor) EncodePCMToOpus(PCMData []int16) ([][]byte, error) {
 
 	// Process complete frames
 	for i := 0; i+SamplesPerFrame <= len(PCMData); i += SamplesPerFrame {
-		
+
 		PCMFrame := PCMData[i : i+SamplesPerFrame]
-		
+
 		OpusData, Err := P.OpusEncoder.Encode(PCMFrame, FrameSize, MaxPacketSize)
 		if Err != nil {
 			return nil, Err
 		}
-		
+
 		OpusFrames = append(OpusFrames, OpusData)
 	}
 
 	// Handle remaining samples with padding
 	Remaining := len(PCMData) % SamplesPerFrame
 	if Remaining > 0 {
-		
+
 		StartIdx := len(PCMData) - Remaining
 		PCMFrame := make([]int16, SamplesPerFrame)
 		copy(PCMFrame, PCMData[StartIdx:])
-		
+
 		OpusData, Err := P.OpusEncoder.Encode(PCMFrame, FrameSize, MaxPacketSize)
 		if Err != nil {
 			return nil, Err
 		}
-		
+
 		OpusFrames = append(OpusFrames, OpusData)
 	}
 
@@ -676,15 +820,15 @@ func (P *MP4Processor) EncodePCMToOpus(PCMData []int16) ([][]byte, error) {
 func (P *MP4Processor) ExtractAACFromMP4(Data []byte) ([]byte, []byte, int, int, error) {
 
 	Reader := bytes.NewReader(Data)
-	
+
 	// Parse MP4 atoms to find mdat and audio config
 
 	SampleRate := 44100
 	NumChannels := 2
-	
+
 	var AudioData []byte
 	var AudioSpecificConfig []byte
-	
+
 	for {
 
 		// Read atom header (size + type)
@@ -695,14 +839,14 @@ func (P *MP4Processor) ExtractAACFromMP4(Data []byte) ([]byte, []byte, int, int,
 
 		if Err == io.EOF { break }
 		if Err != nil { return nil, nil, 0, 0, Err}
-		
+
 		AtomSize := int64(Header[0])<<24 | int64(Header[1])<<16 | int64(Header[2])<<8 | int64(Header[3])
 		AtomType := string(Header[4:8])
-		
-		if AtomSize < 8 { break } // 8 bytes minimum is valid 
-		
+
+		if AtomSize < 8 { break } // 8 bytes minimum is valid
+
 		DataSize := AtomSize - 8
-		
+
 		if AtomType == "mdat" {
 
 			// This contains the actual audio data
@@ -716,7 +860,7 @@ func (P *MP4Processor) ExtractAACFromMP4(Data []byte) ([]byte, []byte, int, int,
 				return nil, nil, 0, 0, fmt.Errorf("failed to read mdat: %w", Err)
 
 			}
-			
+
 		} else if AtomType == "moov" {
 
 			// Parse moov for audio configuration
@@ -762,25 +906,25 @@ func (P *MP4Processor) ExtractAACFromMP4(Data []byte) ([]byte, []byte, int, int,
 		}
 
 	}
-	
+
 	if len(AudioData) == 0 {
 
 		return nil, nil, 0, 0, errors.New("no audio data found in MP4")
 
 	}
-	
+
 	return AudioData, AudioSpecificConfig, SampleRate, NumChannels, nil
 
 }
 
 // parseMoovForAudioConfig attempts to extract audio configuration from moov atom
 func parseMoovForAudioConfig(Data []byte) (int, int, []byte) {
-	
+
 	SampleRate := 0
 	Channels := 0
 
 	var ASC []byte
-	
+
 	// Search for 'esds' atom which contains AudioSpecificConfig
 
 	for i := 0; i < len(Data)-4; i++ {
@@ -797,7 +941,7 @@ func parseMoovForAudioConfig(Data []byte) (int, int, []byte) {
 		}
 
 	}
-	
+
 	// Search for 'mp4a' atom which contains audio config
 
 	for i := 0; i < len(Data)-28; i++ {
@@ -820,7 +964,7 @@ func parseMoovForAudioConfig(Data []byte) (int, int, []byte) {
 		}
 
 	}
-	
+
 	return SampleRate, Channels, ASC
 
 }
@@ -830,22 +974,22 @@ func extractASCFromEsds(Data []byte) []byte {
 
 	// esds format is complex with variable length descriptors
 	// We're looking for the DecSpecificInfo descriptor (tag 0x05), which contains the AudioSpecificConfig
-	
+
 	if len(Data) < 10 {
 
 		return nil
 
 	}
-	
+
 	// Skip version and flags (4 bytes)
 
 	Pos := 4
-	
+
 	for Pos < len(Data)-2 {
 
 		Tag := Data[Pos]
 		Pos++
-		
+
 		// Read length (variable length encoding)
 
 		Length := 0
@@ -863,7 +1007,7 @@ func extractASCFromEsds(Data []byte) []byte {
 			Pos++
 
 		}
-		
+
 		if Tag == 0x05 { // DecSpecificInfoTag - this is the ASC
 
 			if Pos+Length <= len(Data) && Length > 0 {
@@ -875,8 +1019,8 @@ func extractASCFromEsds(Data []byte) []byte {
 
 			}
 		}
-		
-		// For ES_Descriptor (0x03) and DecoderConfigDescriptor (0x04), 
+
+		// For ES_Descriptor (0x03) and DecoderConfigDescriptor (0x04),
 		// we need to skip headers and continue parsing
 
 		if Tag == 0x03 {
@@ -895,13 +1039,13 @@ func extractASCFromEsds(Data []byte) []byte {
 			continue
 
 		}
-		
+
 		// Skip unknown tags
 
 		Pos += Length
 
 	}
-	
+
 	return nil
 
 }
@@ -911,12 +1055,12 @@ func (P *MP4Processor) DecodeAndEncodeAAC(AACData []byte, ASC []byte, SourceSamp
 
 	var OpusFrames [][]byte
 	SamplesPerFrame := FrameSize * Channels
-	
+
 	PCMBuffer := make([]int16, 0, SamplesPerFrame*10)
 
 	// For raw AAC in MP4, we need to decode the entire stream
 	// The data is already in raw AAC format (without ADTS headers)
-	
+
 	var PCMData []int16
 	var Err error
 
@@ -932,7 +1076,7 @@ func (P *MP4Processor) DecodeAndEncodeAAC(AACData []byte, ASC []byte, SourceSamp
 		PCMData, Err = P.decodeADTS(AACData)
 
 	}
-	
+
 	if Err != nil {
 
 		// Tries ADTS as last resort
@@ -1000,7 +1144,7 @@ func (P *MP4Processor) DecodeAndEncodeAAC(AACData []byte, ASC []byte, SourceSamp
 
 // decodeADTS decodes ADTS-framed AAC data
 func (P *MP4Processor) decodeADTS(Data []byte) ([]int16, error) {
-	
+
 	var AllPCM []int16
 	Offset := 0
 
@@ -1012,7 +1156,7 @@ func (P *MP4Processor) decodeADTS(Data []byte) ([]int16, error) {
 			break
 
 		}
-		
+
 		if Data[Offset] != 0xFF || (Data[Offset+1]&0xF0) != 0xF0 {
 
 			Offset++
@@ -1029,9 +1173,9 @@ func (P *MP4Processor) decodeADTS(Data []byte) ([]int16, error) {
 			HeaderSize = 9
 
 		}
-		
+
 		FrameLength := int(Data[Offset+3]&0x03)<<11 | int(Data[Offset+4])<<3 | int(Data[Offset+5]>>5)
-		
+
 		if FrameLength < HeaderSize || Offset+FrameLength > len(Data) {
 
 			Offset++
@@ -1043,7 +1187,7 @@ func (P *MP4Processor) decodeADTS(Data []byte) ([]int16, error) {
 
 		Frame := Data[Offset : Offset+FrameLength]
 		PCM, Err := P.AACDecoder.Decode(Frame)
-		
+
 		if Err == nil && PCM != nil {
 
 			AllPCM = append(AllPCM, PCM...)
@@ -1078,7 +1222,7 @@ func (S *MP4Streamer) parseMP4Header(Data []byte, Info *MP4AudioInfo) {
 
 		if Err == io.EOF { break } // done
 
-		if Err != nil { return } // errorhybTF% 
+		if Err != nil { return } // errorhybTF%
 
 		AtomSize := int64(Header[0])<<24 | int64(Header[1])<<16 | int64(Header[2])<<8 | int64(Header[3])
 		AtomType := string(Header[4:8])
@@ -1087,7 +1231,7 @@ func (S *MP4Streamer) parseMP4Header(Data []byte, Info *MP4AudioInfo) {
 
 			ExtHeader := make([]byte, 8)
 			Reader.Read(ExtHeader)
-			
+
 			AtomSize = int64(ExtHeader[0])<<56 | int64(ExtHeader[1])<<48 | int64(ExtHeader[2])<<40 | int64(ExtHeader[3])<<32 | int64(ExtHeader[4])<<24 | int64(ExtHeader[5])<<16 | int64(ExtHeader[6])<<8 | int64(ExtHeader[7])
 
 		}
@@ -1361,7 +1505,7 @@ func (P *MP4Processor) Close() {
 
 // MP4Playback wraps the streamer for playback control
 type MP4Playback struct {
-	
+
 	Streamer *MP4Streamer
 	Stopped  atomic.Bool
 
@@ -1411,7 +1555,7 @@ type MP4OpusProvider struct {
 }
 
 func (P *MP4OpusProvider) ProvideOpusFrame() ([]byte, error) {
-	
+
 	Frame, Available := P.Streamer.GetNextFrame()
 
 	if Frame != nil && Available {
@@ -1454,13 +1598,13 @@ func PlayMP4(URL string, OnFinished func(), SendToWS func(Event string, Data any
 	go func() {
 
 		Err := Streamer.StreamFromURL(Ctx, URL)
-		
+
 		if Err != nil {
 
 			Utils.Logger.Error("Streaming", fmt.Sprintf("Streaming error: %s", Err.Error()))
-			
+
 			Playback.Stop()
-			
+
 			if OnStreamingError != nil {
 
 				OnStreamingError()
@@ -1474,7 +1618,7 @@ func PlayMP4(URL string, OnFinished func(), SendToWS func(Event string, Data any
 		// Waits for all frames to be consumed
 
 		Streamer.Mutex.Lock()
-		
+
 		func() {
 			defer func() {
 
