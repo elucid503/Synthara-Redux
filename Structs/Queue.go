@@ -147,14 +147,6 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				Queue.SendNowPlayingMessage()
 
-				ErrorPlaying := Guild.Play(Queue.Current)
-
-				if ErrorPlaying != nil {
-
-					Utils.Logger.Error("Playback", fmt.Sprintf("Error playing song %s for Queue %s: %s", Queue.Current.Title, Queue.ParentID.String(), ErrorPlaying.Error()))
-
-				}
-
 			} else {
 
 				Utils.Logger.Info("Queue", fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
