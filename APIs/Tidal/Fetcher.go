@@ -802,7 +802,7 @@ func GetSong(TrackID int64) (Song, error) {
 
 }
 
-const QobuzAPIBase = "https://qobuz.kennyy.com.br"
+const QobuzAPIBase = "https://qdl-api.monochrome.tf"
 
 // GetStreamURL fetches a direct streaming URL for a track via Qobuz.
 // It resolves the track's ISRC from the HiFi API, searches Qobuz for a
