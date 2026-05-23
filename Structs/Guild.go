@@ -28,6 +28,8 @@ import (
 var GuildStore = make(map[snowflake.ID]*Guild)
 var GuildStoreMutex sync.Mutex
 
+var ErrStreamUnavailable = errors.New("stream unavailable")
+
 type Guild struct {
 
 	ID snowflake.ID `json:"id"`
@@ -1138,6 +1140,28 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 				Utils.Logger.Error("Playback", fmt.Sprintf("Error playing song: %s", PlayError.Error()))
 
+				if errors.Is(PlayError, ErrStreamUnavailable) {
+
+					Locale := G.Locale.Code()
+
+					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(G.Channels.Text, discord.NewMessageCreate().
+						AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+							Title:       Localizations.Get("Embeds.Notifications.SongUnavailable.Title", Locale),
+							Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+							Description: Localizations.Get("Embeds.Notifications.SongUnavailable.DescriptionImmediate", Locale),
+							Color:       Utils.ERROR,
+
+						})))
+
+					if ErrorSending != nil {
+
+						Utils.Logger.Error("Command", fmt.Sprintf("Error sending unavailable message to guild %s: %s", G.ID.String(), ErrorSending.Error()))
+
+					}
+
+				}
+
 			}
 
 		}()
@@ -1188,8 +1212,8 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 	if ErrorFetchingStream != nil {
 
-		fmt.Println("Error fetching stream URL:", ErrorFetchingStream) // Debug log for error
-		return ErrorFetchingStream
+		Utils.Logger.Error("Streaming", fmt.Sprintf("Stream unavailable for song %s: %s", Song.Title, ErrorFetchingStream.Error()))
+		return ErrStreamUnavailable
 
 	}
 

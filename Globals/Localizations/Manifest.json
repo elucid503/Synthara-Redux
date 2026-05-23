@@ -2653,6 +2653,47 @@
 					"ja": "この曲をストリーミングできませんでした。\nこれは他の問題を示している可能性があります。しばらくお待ちください。"
 				}
 			},
+			"SongUnavailable": {
+				"Title": {
+					"en-US": "This Song is Unavailable",
+					"en-GB": "This Song is Unavailable",
+					"es-ES": "Esta Canción No Está Disponible",
+					"es-419": "Esta Canción No Está Disponible",
+					"zh-CN": "此歌曲不可用",
+					"fr": "Cette Chanson n'est pas Disponible",
+					"it": "Questa Canzone Non è Disponibile",
+					"de": "Dieses Lied ist nicht verfügbar",
+					"pl": "Ta Piosenka jest niedostępna",
+					"ru": "Эта Песня недоступна",
+					"ja": "この曲は利用できません"
+				},
+				"DescriptionImmediate": {
+					"en-US": "Streaming is not available for this Song; please use /play with a different query.",
+					"en-GB": "Streaming is not available for this Song; please use /play with a different query.",
+					"es-ES": "El streaming no está disponible para esta canción; usa /play con una búsqueda diferente.",
+					"es-419": "El streaming no está disponible para esta canción; usa /play con una búsqueda diferente.",
+					"zh-CN": "此歌曲无法进行流媒体播放；请使用 /play 搜索其他歌曲。",
+					"fr": "Le streaming n'est pas disponible pour cette chanson ; veuillez utiliser /play avec une autre recherche.",
+					"it": "Lo streaming non è disponibile per questa canzone; usa /play con una ricerca diversa.",
+					"de": "Das Streaming ist für dieses Lied nicht verfügbar; bitte verwende /play mit einer anderen Suche.",
+					"pl": "Strumieniowanie nie jest dostępne dla tej piosenki; użyj /play z innym zapytaniem.",
+					"ru": "Стриминг недоступен для этой песни; используйте /play с другим запросом.",
+					"ja": "この曲はストリーミングできません。別のクエリで /play を使用してください。"
+				},
+				"DescriptionQueued": {
+					"en-US": "Streaming is not available for this Song; it will be skipped.",
+					"en-GB": "Streaming is not available for this Song; it will be skipped.",
+					"es-ES": "El streaming no está disponible para esta canción; se omitirá.",
+					"es-419": "El streaming no está disponible para esta canción; se omitirá.",
+					"zh-CN": "此歌曲无法进行流媒体播放；它将被跳过。",
+					"fr": "Le streaming n'est pas disponible pour cette chanson ; elle sera ignorée.",
+					"it": "Lo streaming non è disponibile per questa canzone; verrà saltata.",
+					"de": "Das Streaming ist für dieses Lied nicht verfügbar; es wird übersprungen.",
+					"pl": "Strumieniowanie nie jest dostępne dla tej piosenki; zostanie pominięta.",
+					"ru": "Стриминг недоступен для этой песни; она будет пропущена.",
+					"ja": "この曲はストリーミングできません。スキップされます。"
+				}
+			},
 			"AddedToQueue": {
 				"Title": {
 					"en-US": "Added %s To Queue",

@@ -197,6 +197,7 @@ func (u *UnmarshalChannel) UnmarshalJSON(data []byte) error {
 		channel = v
 
 	case ChannelTypeGuildNews:
+
 		var v GuildNewsChannel
 		err = json.Unmarshal(data, &v)
 		channel = v

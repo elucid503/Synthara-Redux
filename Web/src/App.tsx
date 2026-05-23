@@ -11,7 +11,7 @@ import QueueView from './Views/Queue';
 function App() {
 
     const [Socket, SetSocket] = useState<WebSocket | null>(null);
-   
+
     const [CurrentSong, SetCurrentSong] = useState<Song | null>(null);
     const [PreviousSongs, SetPreviousSongs] = useState<Song[]>([]);
     const [UpcomingSongs, SetUpcomingSongs] = useState<Song[]>([]);
@@ -35,7 +35,7 @@ function App() {
                 const Target = E.target as HTMLElement;
 
                 if (!Target.closest('.context-menu-trigger') && !Target.closest('.context-menu-content')) {
-                   
+
                     SetActiveContextMenu(null);
 
                 }
@@ -68,7 +68,7 @@ function App() {
 
     const [PlayerStateValue, SetPlayerStateValue] = useState<PlayerState>(PlayerState.Idle);
     const [CurrentTime, SetCurrentTime] = useState(0); // in milliseconds
-    
+
     const [ActiveView, SetActiveView] = useState<'Details' | 'Queue' | 'Lyrics'>(() => {
 
         const Params = new URLSearchParams(window.location.search);
@@ -88,21 +88,18 @@ function App() {
     const UpcomingSongsLengthRef = useRef<number>(0);
 
     const [Lyrics, SetLyrics] = useState<LyricsResponse | null>(null);
-    const [LyricsLoading, SetLyricsLoading] = useState(false);
     const [LyricsError, SetLyricsError] = useState(false);
 
     const CurrentTimeBuffer = 2000; // 2000ms buffer for progress updates
-    
+
     const FetchLyricsAndSetState = async (Song: Song) => {
 
-        SetLyricsLoading(true);
         SetLyricsError(false);
 
         const { data, error } = await FetchLyrics(Song);
-        
+
         SetLyrics(data);
         SetLyricsError(error);
-        SetLyricsLoading(false);
 
     };
 
@@ -148,7 +145,7 @@ function App() {
             WS.onmessage = (Event) => {
 
                 const Message: WSMessage<any> = JSON.parse(Event.data);
-                
+
                 switch (Message.Event) {
 
                     case WSEvents.Event_Initial:
@@ -157,24 +154,24 @@ function App() {
                         SetPreviousSongs(Message.Data.Previous || []);
                         SetUpcomingSongs(Message.Data.Upcoming || []);
                         SetPlayerStateValue(Message.Data.State);
-                        
+
                         const InitialProgress = Message.Data.Progress;
                         SetCurrentTime(Math.max(0, (InitialProgress - CurrentTimeBuffer)));
 
                     break;
-                        
+
                     case WSEvents.Event_StateChanged:
 
                         SetPlayerStateValue(Message.Data.State);
 
                     break;
-                    
+
                     case WSEvents.Event_ProgressUpdate:
 
                         SetCurrentTime(Math.max(0, (Message.Data.Progress - CurrentTimeBuffer)));
 
                     break;
-                        
+
                     case WSEvents.Event_QueueUpdated:
 
                         SetPreviousSongs(Message.Data.Previous || []);
@@ -202,7 +199,7 @@ function App() {
                         }
 
                         break;
-                    
+
                     case WSEvents.Event_Error:
 
                         const ErrorData = Message.Data as { Message: string };
@@ -228,7 +225,7 @@ function App() {
                 if (ShouldReconnect) {
 
                     ReconnectAttempts++;
-                    
+
                     if (ReconnectAttempts > 3) {
 
                         SetQueueEnded(true);
@@ -253,7 +250,7 @@ function App() {
         return () => {
 
             ShouldReconnect = false;
-            
+
             clearTimeout(ReconnectTimeout);
             WS?.close();
 
@@ -319,7 +316,7 @@ function App() {
             FetchLyricsAndSetState(CurrentSong);
 
         }
-        
+
     }, [ActiveView, CurrentSong]);
 
     const HandlePlayPause = () => {
@@ -406,14 +403,14 @@ function App() {
     return (
 
         <div className="min-h-screen relative text-white flex items-center justify-center p-8">
-            
+
             {/* Blurred background */}
 
             <div className="absolute inset-0 overflow-hidden">
 
                 <div className="absolute inset-0 bg-cover bg-center blur-3xl scale-110 opacity-40" style={{ backgroundImage: `url(${BackgroundImage})` }} />
                 <div className="absolute inset-0 bg-zinc-950/50" />
-                
+
             </div>
 
             <div className="w-full max-w-2xl relative z-10">
@@ -431,7 +428,7 @@ function App() {
                         <div className="min-h-[200px] flex items-center justify-center">
 
                             <LyricsView Lyrics={Lyrics} LyricsError={LyricsError} CurrentTime={CurrentTime} />
-                            
+
                         </div>
 
                     )}
@@ -443,7 +440,7 @@ function App() {
                         <div className="min-h-[200px] max-h-[500px] overflow-y-scroll">
 
                             <QueueView key={CurrentSong ? CurrentSong.tidal_id.toString() : 'none'} Current={CurrentSong} PreviousSongs={PreviousSongs} UpcomingSongs={UpcomingSongs} ActiveContextMenu={ActiveContextMenu} SetActiveContextMenu={SetActiveContextMenu} OnMove={HandleMove} />
-                            
+
                         </div>
 
                     )}
@@ -457,13 +454,13 @@ function App() {
                     {/* Bar Track */}
 
                     <div className="relative w-full h-1 bg-zinc-700 rounded-full overflow-hidden">
-                    
+
                     {/* Bar Fill */}
-                    
+
                     <div className="absolute top-0 left-0 h-full bg-white rounded-full transition-all duration-100" style={{ width: `${(CurrentTime / (CurrentSong.duration.seconds * 1000)) * 100}%` }}/></div>
 
                     {/* Time Labels */}
-                    
+
                     <div className="flex justify-between text-sm text-zinc-500 mt-2">
 
                         <span>{FormatTime(CurrentTime / 1000)}</span>
@@ -480,11 +477,11 @@ function App() {
                     <button onClick={HandlePrevious} className="text-white hover:text-zinc-400 transition-colors" aria-label="Previous" >
                         <SkipBack size={40} fill="currentColor"/>
                     </button>
-                    
+
                     <button onClick={HandlePlayPause} className="w-20 h-20 rounded-full bg-white text-zinc-950 hover:bg-zinc-200 transition-colors flex items-center justify-center" aria-label={PlayerStateValue === PlayerState.Playing ? 'Pause' : 'Play'} >
                         {PlayerStateValue == PlayerState.Playing ? (<Pause size={32} fill="currentColor" /> ) : (<Play size={32} fill="currentColor" className="ml-1" /> )}
                     </button>
-                    
+
                     <button onClick={HandleNext} className="text-white hover:text-zinc-400 transition-colors" aria-label="Next" >
                         <SkipForward size={40} fill="currentColor"/>
                     </button>
@@ -516,15 +513,15 @@ function App() {
                 const IsPrevious = ActiveContextMenu.type == 'Previous';
 
                 return (
-                    
+
                     <div className="fixed w-48 bg-zinc-600/35 backdrop-blur-md border border-white/10 rounded-xl shadow-xl z-50 overflow-hidden context-menu-content" style={{ top: ActiveContextMenu.y + 4, left: ActiveContextMenu.x - 192 }} >
-                        
+
                         <div className="p-1">
 
                             {IsPrevious && (
 
                                 <button onClick={() => HandleReplay(ActiveContextMenu.index)} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg transition-colors" >
-                                   
+
                                     <RefreshCw size={14} />
                                     Replay
 
@@ -533,16 +530,16 @@ function App() {
                             )}
 
                             <button onClick={() => !IsPrevious && HandleJump(ActiveContextMenu.index)} className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg ${IsPrevious ? 'text-zinc-400 cursor-not-allowed' : 'transition-colors'}`}>
-                                
+
                                 <CornerDownRight size={14} />
                                 Jump To
 
                             </button>
-                            
+
                             {!IsPrevious && (
 
                                 <button onClick={() => HandleRemove(ActiveContextMenu.index)} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 rounded-lg text-red-400 hover:text-red-300 transition-colors">
-                                   
+
                                     <Trash2 size={14} />
                                     Remove
 
@@ -560,7 +557,7 @@ function App() {
             {Toast && (
 
                 <div className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-white text-zinc-950 rounded-lg shadow-lg z-50 animate-fade-in">
-                    
+
                     {Toast}
 
                 </div>

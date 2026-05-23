@@ -12,10 +12,12 @@ export interface Song {
 
         seconds: number;
         formatted: string;
-        
+
     };
 
     cover: string;
+
+    unavailable?: boolean;
 
 }
 

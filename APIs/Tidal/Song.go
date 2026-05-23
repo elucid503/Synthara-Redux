@@ -28,8 +28,10 @@ type Song struct {
 
 	MixID string `json:"mix_id"` // For AutoPlay (TRACK_MIX)
 
+	Unavailable bool `json:"unavailable,omitempty"`
+
 	Internal SongInternal `json:"-"`
-		
+
 }
 
 type SongDuration struct {

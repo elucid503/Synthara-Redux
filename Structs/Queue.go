@@ -7,6 +7,7 @@ import (
 	"Synthara-Redux/Globals/Icons"
 	"Synthara-Redux/Globals/Localizations"
 	"Synthara-Redux/Utils"
+	"errors"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -269,7 +270,46 @@ func QueueUpdatedHandler(Queue *Queue) {
 
 	if ErrorGettingStream != nil {
 
-		Utils.Logger.Error("Streaming", fmt.Sprintf("Error caching stream URL for song %s: %s", NextSong.Title, ErrorGettingStream.Error()))
+		Utils.Logger.Error("Streaming", fmt.Sprintf("Stream unavailable for queued song %s: %s", NextSong.Title, ErrorGettingStream.Error()))
+
+		NextSong.Unavailable = true
+
+		go Queue.SendToWebsockets(Event_QueueUpdated, map[string]interface{}{
+
+			"Current":     Queue.Current,
+			"Previous":    Queue.Previous,
+			"Upcoming":    Queue.Upcoming,
+			"Suggestions": Queue.Suggestions,
+
+		})
+
+		PrefetchGuild := GetGuild(Queue.ParentID, false)
+
+		if PrefetchGuild != nil {
+
+			Locale := PrefetchGuild.Locale.Code()
+
+			go func() {
+
+				_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(PrefetchGuild.Channels.Text, discord.NewMessageCreate().
+					AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+						Title:       Localizations.Get("Embeds.Notifications.SongUnavailable.Title", Locale),
+						Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+						Description: Localizations.Get("Embeds.Notifications.SongUnavailable.DescriptionQueued", Locale),
+						Color:       Utils.ERROR,
+
+					})))
+
+				if ErrorSending != nil {
+
+					Utils.Logger.Error("Command", fmt.Sprintf("Error sending unavailable message to guild %s: %s", PrefetchGuild.ID.String(), ErrorSending.Error()))
+
+				}
+
+			}()
+
+		}
 
 	}
 
@@ -529,6 +569,32 @@ func (Q *Queue) Play() bool {
 	if ErrorPlaying != nil {
 
 		Utils.Logger.Error("Playback", fmt.Sprintf("Error playing song %s for Queue %s: %s", Q.Current.Title, Q.ParentID.String(), ErrorPlaying.Error()))
+
+		if errors.Is(ErrorPlaying, ErrStreamUnavailable) {
+
+			Locale := Guild.Locale.Code()
+
+			go func() {
+
+				_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreate().
+					AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+						Title:       Localizations.Get("Embeds.Notifications.SongUnavailable.Title", Locale),
+						Author:      Localizations.Get("Embeds.Categories.Error", Locale),
+						Description: Localizations.Get("Embeds.Notifications.SongUnavailable.DescriptionQueued", Locale),
+						Color:       Utils.ERROR,
+
+					})))
+
+				if ErrorSending != nil {
+
+					Utils.Logger.Error("Command", fmt.Sprintf("Error sending unavailable message to guild %s: %s", Guild.ID.String(), ErrorSending.Error()))
+
+				}
+
+			}()
+
+		}
 
 		// Set state back to idle on error
 
