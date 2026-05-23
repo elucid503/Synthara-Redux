@@ -25,7 +25,8 @@ const (
 	OperationJump   = "Jump"
 	OperationRemove = "Remove"
 	OperationMove   = "Move"
-	OperationReplay = "Replay"
+	OperationReplay   = "Replay"
+	OperationEnqueue  = "Enqueue"
 
 )
 
@@ -230,10 +231,35 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 			if !Ok { return }
 
 			Guild.Queue.Replay(int(Index))
-			
+
 			if Guild.Queue.Current != nil {
 
 				SendWebOperationMessageWithSong(Guild, "Web.Operations.Replay.Title", "Web.Operations.Replay.Description", Locale, Guild.Queue.Current.Title)
+
+			}
+
+		case OperationEnqueue:
+
+			TidalID, Ok := Message["TidalID"].(float64)
+
+			if !Ok { return }
+
+			URI := fmt.Sprintf("Synthara-Redux:Song:%d", int64(TidalID))
+			SongFound, _, ErrorHandling := Guild.HandleURI(URI, "Web")
+
+			if ErrorHandling != nil {
+
+				Guild.Queue.SendToWebsockets("ERROR", map[string]interface{}{
+					"Message": "Failed to add song to queue.",
+				})
+
+				return
+
+			}
+
+			if SongFound != nil {
+
+				SendWebOperationMessageWithSong(Guild, "Web.Operations.Enqueue.Title", "Web.Operations.Enqueue.Description", Locale, SongFound.Title)
 
 			}
 

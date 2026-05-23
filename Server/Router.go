@@ -9,7 +9,11 @@ import (
 func InitializeRoutes() {
 
 	Globals.WebServer.GET("/Queues/:ID", HandleQueuePage)
+
 	Globals.WebServer.GET("/API/Queue", HandleWSConnections)
+
+	Globals.WebServer.GET("/API/Search", HandleSearch)
+	Globals.WebServer.GET("/API/Suggestions", HandleSuggestions)
 
 }
 

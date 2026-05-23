@@ -2790,18 +2790,18 @@
 					"ru": "Некоторые Песни Отобраны",
 					"ja": "一部の曲が選別されました"
 				},
-			"Description": {
-				"en-US": "%d out of %d %s from **%s** could not be found.",
-				"en-GB": "%d out of %d %s from **%s** could not be found.",
-				"es-ES": "%d de %d %s de **%s** no se pudieron encontrar.",
-				"es-419": "%d de %d %s de **%s** no se pudieron encontrar.",
-				"zh-CN": "**%s** 中的 %d/%d %s无法找到。",
-				"fr": "%d sur %d %s de **%s** n'ont pas pu être trouvées.",
-				"it": "%d su %d %s da **%s** non sono state trovate.",
-				"de": "%d von %d %s von **%s** konnten nicht gefunden werden.",
-				"pl": "%d z %d %s z **%s** nie mogło zostać znalezionych.",
-				"ru": "%d из %d %s из **%s** не удалось найти.",
-				"ja": "**%s** の %d/%d %sが見つかりませんでした。"
+				"Description": {
+					"en-US": "%d out of %d %s from **%s** could not be found.",
+					"en-GB": "%d out of %d %s from **%s** could not be found.",
+					"es-ES": "%d de %d %s de **%s** no se pudieron encontrar.",
+					"es-419": "%d de %d %s de **%s** no se pudieron encontrar.",
+					"zh-CN": "**%s** 中的 %d/%d %s无法找到。",
+					"fr": "%d sur %d %s de **%s** n'ont pas pu être trouvées.",
+					"it": "%d su %d %s da **%s** non sono state trovate.",
+					"de": "%d von %d %s von **%s** konnten nicht gefunden werden.",
+					"pl": "%d z %d %s z **%s** nie mogło zostać znalezionych.",
+					"ru": "%d из %d %s из **%s** не удалось найти.",
+					"ja": "**%s** の %d/%d %sが見つかりませんでした。"
 				}
 			},
 			"Welcome": {
@@ -3514,6 +3514,34 @@
 					"pl": "Teraz odtwarzane: %s",
 					"ru": "Сейчас играет: %s",
 					"ja": "再生中：%s"
+				}
+			},
+			"Enqueue": {
+				"Title": {
+					"en-US": "Song Added To Queue",
+					"en-GB": "Song Added To Queue",
+					"es-ES": "Canción Añadida A La Cola",
+					"es-419": "Canción Añadida A La Cola",
+					"zh-CN": "歌曲已添加到队列",
+					"fr": "Chanson Ajoutée À La File",
+					"it": "Canzone Aggiunta Alla Coda",
+					"de": "Lied Zur Warteschlange Hinzugefügt",
+					"pl": "Utwór Dodany Do Kolejki",
+					"ru": "Песня Добавлена В Очередь",
+					"ja": "曲がキューに追加されました"
+				},
+				"Description": {
+					"en-US": "**Added:** %s",
+					"en-GB": "**Added:** %s",
+					"es-ES": "**Añadido:** %s",
+					"es-419": "**Añadido:** %s",
+					"zh-CN": "**已添加：** %s",
+					"fr": "**Ajouté :** %s",
+					"it": "**Aggiunto:** %s",
+					"de": "**Hinzugefügt:** %s",
+					"pl": "**Dodano:** %s",
+					"ru": "**Добавлено:** %s",
+					"ja": "**追加済み：** %s"
 				}
 			}
 		},

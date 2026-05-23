@@ -37,7 +37,7 @@ export enum WSEvents {
     Event_QueueUpdated = "QUEUE_UPDATED",
 
     Event_ProgressUpdate = "PROGRESS_UPDATE",
-    
+
     Event_Error = "ERROR",
 
 }
@@ -54,6 +54,29 @@ export enum Operation {
     Remove = "Remove",
     Move = "Move",
     Replay = "Replay",
+    Enqueue = "Enqueue",
+
+}
+
+export interface SearchResult {
+
+    tidal_id: number;
+
+    title: string;
+    subtitle: string;
+
+}
+
+export interface SuggestionItem {
+
+    type: 'Track' | 'Text';
+
+    text?: string;
+
+    tidal_id?: number;
+
+    title?: string;
+    subtitle?: string;
 
 }
 

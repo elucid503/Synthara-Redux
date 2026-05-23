@@ -1,12 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Trash2, CornerDownRight, RefreshCw } from 'lucide-react';
 
-import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse } from './Types';
-import { NormalizeCoverURL, FormatTime, SendOperation, FetchLyrics } from './Utils/Misc';
+import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse, SearchResult } from './Types';
+import { NormalizeCoverURL, FormatTime, SendOperation, FetchLyrics, HttpURL, WsURL } from './Utils/Misc';
 
 import DetailsView from './Views/Details';
 import LyricsView from './Views/Lyrics';
 import QueueView from './Views/Queue';
+import SearchBar from './Components/Search';
+import SearchResultsView from './Views/Search';
 
 function App() {
 
@@ -69,7 +71,9 @@ function App() {
     const [PlayerStateValue, SetPlayerStateValue] = useState<PlayerState>(PlayerState.Idle);
     const [CurrentTime, SetCurrentTime] = useState(0); // in milliseconds
 
-    const [ActiveView, SetActiveView] = useState<'Details' | 'Queue' | 'Lyrics'>(() => {
+    const GuildID = window.location.href.split('/').pop()?.split('?')[0] ?? '';
+
+    const [ActiveView, SetActiveView] = useState<'Details' | 'Queue' | 'Lyrics' | 'Search'>(() => {
 
         const Params = new URLSearchParams(window.location.search);
         const View = Params.get('View');
@@ -81,10 +85,12 @@ function App() {
 
     });
 
+    const [SearchResults, SetSearchResults] = useState<SearchResult[]>([]);
+
     const [BackgroundImage, SetBackgroundImage] = useState<string>('');
 
     const CurrentSongIdRef = useRef<number | null>(null);
-    const ActiveViewRef = useRef<'Details' | 'Queue' | 'Lyrics'>(ActiveView);
+    const ActiveViewRef = useRef<'Details' | 'Queue' | 'Lyrics' | 'Search'>(ActiveView);
     const UpcomingSongsLengthRef = useRef<number>(0);
 
     const [Lyrics, SetLyrics] = useState<LyricsResponse | null>(null);
@@ -131,7 +137,7 @@ function App() {
 
         const Connect = () => {
 
-            WS = new WebSocket(`${import.meta.env.VITE_SERVER_URL}/API/Queue?ID=${QueueID}`);
+            WS = new WebSocket(WsURL(`/API/Queue?ID=${QueueID}`));
 
             WS.onopen = () => {
 
@@ -372,6 +378,31 @@ function App() {
 
     };
 
+    const HandleEnqueue = (TidalID: number) => {
+
+        SendOperation(Socket, Operation.Enqueue, { TidalID });
+        SetSearchResults([]);
+        SetActiveView('Queue');
+
+    };
+
+    const HandleSearch = async (Query: string) => {
+
+        try {
+
+            const Res = await fetch(HttpURL(`/API/Search?ID=${GuildID}&q=${encodeURIComponent(Query)}`));
+            SetSearchResults(Res.ok ? await Res.json() : []);
+
+        } catch {
+
+            SetSearchResults([]);
+
+        }
+
+        SetActiveView('Search');
+
+    };
+
     if (QueueEnded) {
 
         return (
@@ -402,7 +433,7 @@ function App() {
 
     return (
 
-        <div className="min-h-screen relative text-white flex items-center justify-center p-8">
+        <div className="min-h-screen relative text-white flex items-center justify-center px-8 pt-24 pb-8">
 
             {/* Blurred background */}
 
@@ -437,9 +468,21 @@ function App() {
 
                     {ActiveView == 'Queue' && (
 
-                        <div className="min-h-[200px] max-h-[500px] overflow-y-scroll">
+                        <div className="min-h-[200px] max-h-[500px] overflow-y-auto">
 
                             <QueueView key={CurrentSong ? CurrentSong.tidal_id.toString() : 'none'} Current={CurrentSong} PreviousSongs={PreviousSongs} UpcomingSongs={UpcomingSongs} ActiveContextMenu={ActiveContextMenu} SetActiveContextMenu={SetActiveContextMenu} OnMove={HandleMove} />
+
+                        </div>
+
+                    )}
+
+                    {/* Search Results View */}
+
+                    {ActiveView == 'Search' && (
+
+                        <div className="min-h-[200px] max-h-[500px] overflow-y-auto">
+
+                            <SearchResultsView Results={SearchResults} OnEnqueue={HandleEnqueue} />
 
                         </div>
 
@@ -503,6 +546,18 @@ function App() {
                     <button onClick={() => SetActiveView('Queue')} className={`px-6 py-2 rounded-md border transition-colors ${ActiveView == 'Queue' ? 'bg-white text-zinc-950 border-white' : 'bg-transparent text-white border-zinc-600 hover:border-white' }`} >
                         Queue
                     </button>
+
+                </div>
+
+            </div>
+
+            {/* Fixed top search bar */}
+
+            <div className="fixed top-10 left-0 right-0 z-40 px-6 pt-4">
+
+                <div className="max-w-2xl mx-auto">
+
+                    <SearchBar GuildID={GuildID} OnSearch={HandleSearch} OnEnqueue={HandleEnqueue} />
 
                 </div>
 

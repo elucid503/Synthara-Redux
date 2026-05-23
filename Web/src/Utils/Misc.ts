@@ -1,5 +1,11 @@
 import { Song, LyricsResponse, Operation } from '../Types';
 
+const Secure = import.meta.env.VITE_SECURE === 'true';
+const Host = import.meta.env.VITE_SERVER_HOST;
+
+export const HttpURL = (Path: string) => `http${Secure ? 's' : ''}://${Host}${Path}`;
+export const WsURL = (Path: string) => `ws${Secure ? 's' : ''}://${Host}${Path}`;
+
 // Normalizes Google cover URLs to ensure 512x512 dimensions
 export const NormalizeCoverURL = (URL: string): string => {
 

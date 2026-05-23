@@ -4,6 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
 :root {
 
   font-family: "DIN 2014",sans-serif;
