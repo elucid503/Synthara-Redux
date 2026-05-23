@@ -3404,6 +3404,66 @@
 	},
 	"Web": {
 		"Operations": {
+			"Pause": {
+				"Description": {
+					"en-US": "%s paused playback.",
+					"en-GB": "%s paused playback.",
+					"es-ES": "%s pausó la reproducción.",
+					"es-419": "%s pausó la reproducción.",
+					"zh-CN": "%s 暂停了播放。",
+					"fr": "%s a mis la lecture en pause.",
+					"it": "%s ha messo in pausa la riproduzione.",
+					"de": "%s hat die Wiedergabe pausiert.",
+					"pl": "%s wstrzymał odtwarzanie.",
+					"ru": "%s приостановил воспроизведение.",
+					"ja": "%s が再生を一時停止しました。"
+				}
+			},
+			"Resume": {
+				"Description": {
+					"en-US": "%s resumed playback.",
+					"en-GB": "%s resumed playback.",
+					"es-ES": "%s reanudó la reproducción.",
+					"es-419": "%s reanudó la reproducción.",
+					"zh-CN": "%s 恢复了播放。",
+					"fr": "%s a repris la lecture.",
+					"it": "%s ha ripreso la riproduzione.",
+					"de": "%s hat die Wiedergabe fortgesetzt.",
+					"pl": "%s wznowił odtwarzanie.",
+					"ru": "%s возобновил воспроизведение.",
+					"ja": "%s が再生を再開しました。"
+				}
+			},
+			"Next": {
+				"Description": {
+					"en-US": "%s skipped to %s.",
+					"en-GB": "%s skipped to %s.",
+					"es-ES": "%s saltó a %s.",
+					"es-419": "%s saltó a %s.",
+					"zh-CN": "%s 跳到了 %s。",
+					"fr": "%s est passé à %s.",
+					"it": "%s è passato a %s.",
+					"de": "%s ist zu %s gesprungen.",
+					"pl": "%s przeskoczył do %s.",
+					"ru": "%s перешёл к %s.",
+					"ja": "%s が %s にスキップしました。"
+				}
+			},
+			"Last": {
+				"Description": {
+					"en-US": "%s returned to %s.",
+					"en-GB": "%s returned to %s.",
+					"es-ES": "%s volvió a %s.",
+					"es-419": "%s volvió a %s.",
+					"zh-CN": "%s 返回到了 %s。",
+					"fr": "%s est revenu à %s.",
+					"it": "%s è tornato a %s.",
+					"de": "%s ist zu %s zurückgekehrt.",
+					"pl": "%s wrócił do %s.",
+					"ru": "%s вернулся к %s.",
+					"ja": "%s が %s に戻りました。"
+				}
+			},
 			"Jump": {
 				"Title": {
 					"en-US": "Jumped To Song",
@@ -3419,17 +3479,17 @@
 					"ja": "曲にジャンプしました"
 				},
 				"Description": {
-					"en-US": "**Now Playing:** %s",
-					"en-GB": "**Now Playing:** %s",
-					"es-ES": "Ahora reproduciendo: %s",
-					"es-419": "Ahora reproduciendo: %s",
-					"zh-CN": "正在播放：%s",
-					"fr": "En cours de lecture : %s",
-					"it": "In riproduzione: %s",
-					"de": "Jetzt läuft: %s",
-					"pl": "Teraz odtwarzane: %s",
-					"ru": "Сейчас играет: %s",
-					"ja": "再生中：%s"
+					"en-US": "%s jumped to %s.",
+					"en-GB": "%s jumped to %s.",
+					"es-ES": "%s saltó a %s.",
+					"es-419": "%s saltó a %s.",
+					"zh-CN": "%s 跳到了 %s。",
+					"fr": "%s est passé à %s.",
+					"it": "%s è passato a %s.",
+					"de": "%s ist zu %s gesprungen.",
+					"pl": "%s przeskoczył do %s.",
+					"ru": "%s перешёл к %s.",
+					"ja": "%s が %s にジャンプしました。"
 				}
 			},
 			"Remove": {
@@ -3447,17 +3507,17 @@
 					"ja": "キューから曲を削除しました"
 				},
 				"Description": {
-					"en-US": "The Song has been removed from the Queue.",
-					"en-GB": "The Song has been removed from the Queue.",
-					"es-ES": "La canción ha sido eliminada de la cola.",
-					"es-419": "La canción ha sido eliminada de la cola.",
-					"zh-CN": "歌曲已从队列中移除。",
-					"fr": "La chanson a été retirée de la file d'attente.",
-					"it": "La canzone è stata rimossa dalla coda.",
-					"de": "Das Lied wurde aus der Warteschlange entfernt.",
-					"pl": "Utwór został usunięty z kolejki.",
-					"ru": "Песня была удалена из очереди.",
-					"ja": "曲がキューから削除されました。"
+					"en-US": "%s removed a song from the queue.",
+					"en-GB": "%s removed a song from the queue.",
+					"es-ES": "%s eliminó una canción de la cola.",
+					"es-419": "%s eliminó una canción de la cola.",
+					"zh-CN": "%s 从队列中移除了一首歌曲。",
+					"fr": "%s a retiré une chanson de la file d'attente.",
+					"it": "%s ha rimosso una canzone dalla coda.",
+					"de": "%s hat ein Lied aus der Warteschlange entfernt.",
+					"pl": "%s usunął utwór z kolejki.",
+					"ru": "%s удалил песню из очереди.",
+					"ja": "%s がキューから曲を削除しました。"
 				}
 			},
 			"Move": {
@@ -3475,17 +3535,17 @@
 					"ja": "キューが並び替えられました"
 				},
 				"Description": {
-					"en-US": "A Song has been moved in the Queue.",
-					"en-GB": "A Song has been moved in the Queue.",
-					"es-ES": "Una canción ha sido movida en la cola.",
-					"es-419": "Una canción ha sido movida en la cola.",
-					"zh-CN": "队列中的歌曲已移动。",
-					"fr": "Une chanson a été déplacée dans la file d'attente.",
-					"it": "Una canzone è stata spostata nella coda.",
-					"de": "Ein Lied wurde in der Warteschlange verschoben.",
-					"pl": "Utwór został przeniesiony w kolejce.",
-					"ru": "Песня была перемещена в очереди.",
-					"ja": "キュー内で曲が移動されました。"
+					"en-US": "%s reordered the queue.",
+					"en-GB": "%s reordered the queue.",
+					"es-ES": "%s reordenó la cola.",
+					"es-419": "%s reordenó la cola.",
+					"zh-CN": "%s 重新排序了队列。",
+					"fr": "%s a réorganisé la file d'attente.",
+					"it": "%s ha riordinato la coda.",
+					"de": "%s hat die Warteschlange neu geordnet.",
+					"pl": "%s zmienił kolejność kolejki.",
+					"ru": "%s переупорядочил очередь.",
+					"ja": "%s がキューを並び替えました。"
 				}
 			},
 			"Replay": {
@@ -3503,17 +3563,17 @@
 					"ja": "曲をリプレイしています"
 				},
 				"Description": {
-					"en-US": "**Now Playing:** %s",
-					"en-GB": "**Now Playing:** %s",
-					"es-ES": "Ahora reproduciendo: %s",
-					"es-419": "Ahora reproduciendo: %s",
-					"zh-CN": "正在播放：%s",
-					"fr": "En cours de lecture : %s",
-					"it": "In riproduzione: %s",
-					"de": "Jetzt läuft: %s",
-					"pl": "Teraz odtwarzane: %s",
-					"ru": "Сейчас играет: %s",
-					"ja": "再生中：%s"
+					"en-US": "%s replayed %s.",
+					"en-GB": "%s replayed %s.",
+					"es-ES": "%s volvió a reproducir %s.",
+					"es-419": "%s volvió a reproducir %s.",
+					"zh-CN": "%s 重播了 %s。",
+					"fr": "%s a relancé %s.",
+					"it": "%s ha riprodotto di nuovo %s.",
+					"de": "%s hat %s erneut abgespielt.",
+					"pl": "%s odtworzył ponownie %s.",
+					"ru": "%s повторно включил %s.",
+					"ja": "%s が %s をリプレイしました。"
 				}
 			},
 			"Enqueue": {
@@ -3531,32 +3591,19 @@
 					"ja": "曲がキューに追加されました"
 				},
 				"Description": {
-					"en-US": "**Added:** %s",
-					"en-GB": "**Added:** %s",
-					"es-ES": "**Añadido:** %s",
-					"es-419": "**Añadido:** %s",
-					"zh-CN": "**已添加：** %s",
-					"fr": "**Ajouté :** %s",
-					"it": "**Aggiunto:** %s",
-					"de": "**Hinzugefügt:** %s",
-					"pl": "**Dodano:** %s",
-					"ru": "**Добавлено:** %s",
-					"ja": "**追加済み：** %s"
+					"en-US": "%s added %s.",
+					"en-GB": "%s added %s.",
+					"es-ES": "%s añadió %s.",
+					"es-419": "%s añadió %s.",
+					"zh-CN": "%s 添加了 %s。",
+					"fr": "%s a ajouté %s.",
+					"it": "%s ha aggiunto %s.",
+					"de": "%s hat %s hinzugefügt.",
+					"pl": "%s dodał %s.",
+					"ru": "%s добавил %s.",
+					"ja": "%s が %s を追加しました。"
 				}
 			}
-		},
-		"Prefix": {
-			"en-US": "**From Web:**",
-			"en-GB": "**From Web:**",
-			"es-ES": "**Desde Web:**",
-			"es-419": "**Desde Web:**",
-			"zh-CN": "**来自网页：**",
-			"fr": "**Depuis le Web :**",
-			"it": "**Dal Web:**",
-			"de": "**Vom Web:**",
-			"pl": "**Z Sieci:**",
-			"ru": "**Из Веб:**",
-			"ja": "**Webから：**"
 		}
 	},
 	"Components": {

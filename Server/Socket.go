@@ -7,6 +7,7 @@ import (
 	"Synthara-Redux/Utils"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
@@ -14,20 +15,23 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const (
+type WebIdentifier struct {
+	Name string
+	Icon string
+}
 
+const (
 	OperationPause  = "Pause"
 	OperationResume = "Resume"
 
-	OperationNext   = "Next"
-	OperationLast   = "Last"
+	OperationNext = "Next"
+	OperationLast = "Last"
 
-	OperationJump   = "Jump"
-	OperationRemove = "Remove"
-	OperationMove   = "Move"
-	OperationReplay   = "Replay"
-	OperationEnqueue  = "Enqueue"
-
+	OperationJump    = "Jump"
+	OperationRemove  = "Remove"
+	OperationMove    = "Move"
+	OperationReplay  = "Replay"
+	OperationEnqueue = "Enqueue"
 )
 
 var Upgrader = websocket.Upgrader{
@@ -37,7 +41,6 @@ var Upgrader = websocket.Upgrader{
 		return true
 
 	},
-
 }
 
 func HandleWSConnections(Context *gin.Context) {
@@ -101,15 +104,13 @@ func HandleWSConnections(Context *gin.Context) {
 
 		"Data": map[string]interface{}{
 
-			"Current": Guild.Queue.Current,
+			"Current":  Guild.Queue.Current,
 			"Previous": Guild.Queue.Previous,
 			"Upcoming": Guild.Queue.Upcoming,
 
-			"State": Guild.Queue.State,
+			"State":    Guild.Queue.State,
 			"Progress": Progress,
-
 		},
-
 	}
 
 	Socket.WriteJSON(InitialState)
@@ -119,7 +120,7 @@ func HandleWSConnections(Context *gin.Context) {
 	for {
 
 		var Message map[string]interface{}
-		
+
 		ErrorReading := Socket.ReadJSON(&Message)
 
 		if ErrorReading != nil {
@@ -144,7 +145,11 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 
 	Operation, Ok := Message["Operation"].(string)
 
-	if !Ok { return }
+	if !Ok {
+		return
+	}
+
+	Identifier := ParseWebIdentifier(Message)
 
 	// Check if guild is locked
 	if Guild.Features.Locked {
@@ -152,7 +157,6 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 		Guild.Queue.SendToWebsockets("ERROR", map[string]interface{}{
 
 			"Message": "Web controls are locked. Use /unlock to re-enable.",
-
 		})
 
 		return
@@ -163,112 +167,179 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 
 	switch Operation {
 
-		case OperationPause:
+	case OperationPause:
 
-			Guild.Queue.SetState(Structs.StatePaused)
-			
-			SendWebOperationMessage(Guild, "Commands.Pause.Title", "Commands.Pause.Description", Locale)
+		Guild.Queue.SetState(Structs.StatePaused)
 
-		case OperationResume:
+		SendWebOperationMessage(Guild, "Commands.Pause.Title", "Web.Operations.Pause.Description", Locale, Identifier)
 
-			Guild.Queue.SetState(Structs.StatePlaying)
+	case OperationResume:
 
-			SendWebOperationMessage(Guild, "Commands.Resume.Title", "Commands.Resume.Description", Locale)
+		Guild.Queue.SetState(Structs.StatePlaying)
 
-		case OperationNext:
+		SendWebOperationMessage(Guild, "Commands.Resume.Title", "Web.Operations.Resume.Description", Locale, Identifier)
 
-			Guild.Queue.Next(true)
+	case OperationNext:
 
-		case OperationLast:
+		Guild.Queue.Next(true)
 
-			Guild.Queue.Last()
+		if Guild.Queue.Current != nil {
 
-			if Guild.Queue.Current != nil {
+			SendWebOperationMessageWithSong(Guild, "Commands.Next.Title", "Web.Operations.Next.Description", Locale, Identifier, Guild.Queue.Current.Title)
 
-				SendWebOperationMessageWithSong(Guild, "Commands.Last.Title", "Commands.Last.Description", Locale, Guild.Queue.Current.Title)
+		}
 
-			}
+	case OperationLast:
 
-		case OperationJump:
+		Guild.Queue.Last()
 
-			Index, Ok := Message["Index"].(float64)
+		if Guild.Queue.Current != nil {
 
-			if !Ok { return }
+			SendWebOperationMessageWithSong(Guild, "Commands.Last.Title", "Web.Operations.Last.Description", Locale, Identifier, Guild.Queue.Current.Title)
 
-			Guild.Queue.Jump(int(Index))
-			
-			if Guild.Queue.Current != nil {
+		}
 
-				SendWebOperationMessageWithSong(Guild, "Web.Operations.Jump.Title", "Web.Operations.Jump.Description", Locale, Guild.Queue.Current.Title)
+	case OperationJump:
 
-			}
+		Index, Ok := Message["Index"].(float64)
 
-		case OperationRemove:
+		if !Ok {
 
-			Index, Ok := Message["Index"].(float64)
+			return
 
-			if !Ok { return }
+		}
 
-			Guild.Queue.Remove(int(Index))
+		Guild.Queue.Jump(int(Index))
 
-			SendWebOperationMessage(Guild, "Web.Operations.Remove.Title", "Web.Operations.Remove.Description", Locale)
+		if Guild.Queue.Current != nil {
 
-		case OperationMove:
+			SendWebOperationMessageWithSong(Guild, "Web.Operations.Jump.Title", "Web.Operations.Jump.Description", Locale, Identifier, Guild.Queue.Current.Title)
 
-			FromIndex, FromOk := Message["FromIndex"].(float64)
-			ToIndex, ToOk := Message["ToIndex"].(float64)
+		}
 
-			if !FromOk || !ToOk { return }
+	case OperationRemove:
 
-			Guild.Queue.Move(int(FromIndex), int(ToIndex))
+		Index, Ok := Message["Index"].(float64)
 
-			SendWebOperationMessage(Guild, "Web.Operations.Move.Title", "Web.Operations.Move.Description", Locale)
+		if !Ok {
 
-		case OperationReplay:
+			return
 
-			Index, Ok := Message["Index"].(float64)
+		}
 
-			if !Ok { return }
+		Guild.Queue.Remove(int(Index))
 
-			Guild.Queue.Replay(int(Index))
+		SendWebOperationMessage(Guild, "Web.Operations.Remove.Title", "Web.Operations.Remove.Description", Locale, Identifier)
 
-			if Guild.Queue.Current != nil {
+	case OperationMove:
 
-				SendWebOperationMessageWithSong(Guild, "Web.Operations.Replay.Title", "Web.Operations.Replay.Description", Locale, Guild.Queue.Current.Title)
+		FromIndex, FromOk := Message["FromIndex"].(float64)
+		ToIndex, ToOk := Message["ToIndex"].(float64)
 
-			}
+		if !FromOk || !ToOk {
 
-		case OperationEnqueue:
+			return
 
-			TidalID, Ok := Message["TidalID"].(float64)
+		}
 
-			if !Ok { return }
+		Guild.Queue.Move(int(FromIndex), int(ToIndex))
 
-			URI := fmt.Sprintf("Synthara-Redux:Song:%d", int64(TidalID))
-			SongFound, _, ErrorHandling := Guild.HandleURI(URI, "Web")
+		SendWebOperationMessage(Guild, "Web.Operations.Move.Title", "Web.Operations.Move.Description", Locale, Identifier)
 
-			if ErrorHandling != nil {
+	case OperationReplay:
 
-				Guild.Queue.SendToWebsockets("ERROR", map[string]interface{}{
-					"Message": "Failed to add song to queue.",
-				})
+		Index, Ok := Message["Index"].(float64)
 
-				return
+		if !Ok {
 
-			}
+			return
 
-			if SongFound != nil {
+		}
 
-				SendWebOperationMessageWithSong(Guild, "Web.Operations.Enqueue.Title", "Web.Operations.Enqueue.Description", Locale, SongFound.Title)
+		Guild.Queue.Replay(int(Index))
 
-			}
+		if Guild.Queue.Current != nil {
+
+			SendWebOperationMessageWithSong(Guild, "Web.Operations.Replay.Title", "Web.Operations.Replay.Description", Locale, Identifier, Guild.Queue.Current.Title)
+
+		}
+
+	case OperationEnqueue:
+
+		TidalID, Ok := Message["TidalID"].(float64)
+
+		if !Ok {
+
+			return
+
+		}
+
+		URI := fmt.Sprintf("Synthara-Redux:Song:%d", int64(TidalID))
+		SongFound, _, ErrorHandling := Guild.HandleURI(URI, "Web")
+
+		if ErrorHandling != nil {
+
+			Guild.Queue.SendToWebsockets("ERROR", map[string]interface{}{
+				"Message": "Failed to add song to queue.",
+			})
+
+			return
+
+		}
+
+		if SongFound != nil {
+
+			SendWebOperationMessageWithSong(Guild, "Web.Operations.Enqueue.Title", "Web.Operations.Enqueue.Description", Locale, Identifier, SongFound.Title)
+
+		}
 
 	}
 
 }
 
+func ParseWebIdentifier(Message map[string]interface{}) WebIdentifier {
+
+	Identifier := WebIdentifier{Name: "Web User"}
+	RawIdentifier, Ok := Message["Identifier"].(map[string]interface{})
+
+	if !Ok {
+
+		return Identifier
+
+	}
+
+	if Name, Ok := RawIdentifier["Name"].(string); Ok {
+
+		Name = strings.TrimSpace(Name)
+
+		if Name != "" {
+
+			Runes := []rune(Name)
+
+			if len(Runes) > 40 {
+
+				Name = string(Runes[:40])
+
+			}
+
+			Identifier.Name = Name
+
+		}
+
+	}
+
+	if Icon, Ok := RawIdentifier["Icon"].(string); Ok {
+
+		Identifier.Icon = strings.TrimSpace(Icon)
+
+	}
+
+	return Identifier
+
+}
+
 // SendWebOperationMessage sends a notification to Discord for web operations
-func SendWebOperationMessage(Guild *Structs.Guild, TitleKey string, DescKey string, Locale string) {
+func SendWebOperationMessage(Guild *Structs.Guild, TitleKey string, DescKey string, Locale string, Identifier WebIdentifier) {
 
 	if Guild.Channels.Text == 0 {
 
@@ -278,8 +349,7 @@ func SendWebOperationMessage(Guild *Structs.Guild, TitleKey string, DescKey stri
 
 	go func() {
 
-		Prefix := Localizations.Get("Web.Prefix", Locale)
-		Description := Prefix + " " + Localizations.Get(DescKey, Locale)
+		Description := Localizations.GetFormat(DescKey, Locale, Identifier.Name)
 
 		_, _ = Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreate().
 			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
@@ -295,7 +365,7 @@ func SendWebOperationMessage(Guild *Structs.Guild, TitleKey string, DescKey stri
 }
 
 // SendWebOperationMessageWithSong sends a notification with song name
-func SendWebOperationMessageWithSong(Guild *Structs.Guild, TitleKey string, DescKey string, Locale string, SongTitle string) {
+func SendWebOperationMessageWithSong(Guild *Structs.Guild, TitleKey string, DescKey string, Locale string, Identifier WebIdentifier, SongTitle string) {
 
 	if Guild.Channels.Text == 0 {
 
@@ -305,8 +375,7 @@ func SendWebOperationMessageWithSong(Guild *Structs.Guild, TitleKey string, Desc
 
 	go func() {
 
-		Prefix := Localizations.Get("Web.Prefix", Locale)
-		Description := Prefix + " " + Localizations.GetFormat(DescKey, Locale, SongTitle)
+		Description := Localizations.GetFormat(DescKey, Locale, Identifier.Name, SongTitle)
 
 		_, _ = Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreate().
 			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{

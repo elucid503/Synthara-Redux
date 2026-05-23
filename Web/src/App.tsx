@@ -1,14 +1,15 @@
 import { useEffect, useState, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Trash2, CornerDownRight, RefreshCw } from 'lucide-react';
 
-import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse, SearchResult } from './Types';
-import { NormalizeCoverURL, FormatTime, SendOperation, FetchLyrics, HttpURL, WsURL } from './Utils/Misc';
+import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse, SearchResult, WebIdentifier } from './Types';
+import { NormalizeCoverURL, FormatTime, SendOperation, FetchLyrics, FormatURL, FormatWS, GetStoredIdentifier, SaveIdentifier } from './Utils/Misc';
 
 import DetailsView from './Views/Details';
 import LyricsView from './Views/Lyrics';
 import QueueView from './Views/Queue';
 import SearchBar from './Components/Search';
 import SearchResultsView from './Views/Search';
+import Identify from './Components/Identify';
 
 function App() {
 
@@ -25,6 +26,8 @@ function App() {
 
     const [Toast, SetToast] = useState<string | null>(null);
     const ToastTimeoutRef = useRef<any>(null);
+    const [Identifier, SetIdentifier] = useState<WebIdentifier | null>(() => GetStoredIdentifier());
+    const [ShowIdentifyModal, SetShowIdentifyModal] = useState(() => !GetStoredIdentifier());
 
     // Close context menu on click outside or scroll
 
@@ -137,7 +140,7 @@ function App() {
 
         const Connect = () => {
 
-            WS = new WebSocket(WsURL(`/API/Queue?ID=${QueueID}`));
+            WS = new WebSocket(FormatWS(`/API/Queue?ID=${QueueID}`));
 
             WS.onopen = () => {
 
@@ -390,7 +393,7 @@ function App() {
 
         try {
 
-            const Res = await fetch(HttpURL(`/API/Search?ID=${GuildID}&q=${encodeURIComponent(Query)}`));
+            const Res = await fetch(FormatURL(`/API/Search?ID=${GuildID}&q=${encodeURIComponent(Query)}`));
             SetSearchResults(Res.ok ? await Res.json() : []);
 
         } catch {
@@ -403,6 +406,20 @@ function App() {
 
     };
 
+    const HandleIdentifySubmit = (NewIdentifier: WebIdentifier) => {
+
+        SaveIdentifier(NewIdentifier);
+        SetIdentifier(NewIdentifier);
+        SetShowIdentifyModal(false);
+
+    };
+
+    const IdentifyModal = ShowIdentifyModal ? (
+
+        <Identify InitialValue={Identifier} Required={!Identifier} OnClose={() => SetShowIdentifyModal(false)} OnSubmit={HandleIdentifySubmit} />
+
+    ) : null;
+
     if (QueueEnded) {
 
         return (
@@ -410,6 +427,7 @@ function App() {
             <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
 
                 <div className="text-zinc-500 text-lg">This Queue has Ended</div>
+                {IdentifyModal}
 
             </div>
 
@@ -424,6 +442,7 @@ function App() {
             <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
 
                 <div className="text-zinc-500 text-lg">{HasEverConnected ? 'No Songs are currently playing.' : 'No Queue Found'}</div>
+                {IdentifyModal}
 
             </div>
 
@@ -557,7 +576,7 @@ function App() {
 
                 <div className="max-w-2xl mx-auto">
 
-                    <SearchBar GuildID={GuildID} OnSearch={HandleSearch} OnEnqueue={HandleEnqueue} />
+                    <SearchBar GuildID={GuildID} OnSearch={HandleSearch} OnEnqueue={HandleEnqueue} OnEditIdentify={() => SetShowIdentifyModal(true)} Identifier={Identifier} />
 
                 </div>
 
@@ -618,6 +637,7 @@ function App() {
                 </div>
 
             )}
+            {IdentifyModal}
         </div>
 
     );

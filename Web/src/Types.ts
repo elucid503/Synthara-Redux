@@ -58,6 +58,13 @@ export enum Operation {
 
 }
 
+export interface WebIdentifier {
+
+    Name: string;
+    Icon: string;
+
+}
+
 export interface SearchResult {
 
     tidal_id: number;
