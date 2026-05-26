@@ -37,10 +37,11 @@ func notify(Guild *Structs.Guild, Title, Description, Author string, Color int) 
 
 	Embed := Utils.CreateEmbed(Utils.EmbedOptions{
 
-		Title:       Title,
+		Title: Title,
 		Description: Description,
-		Author:      Author,
-		Color:       Color,
+		Author: Author,
+
+		Color: Color,
 
 	})
 
@@ -64,17 +65,27 @@ func notifyLocalized(Guild *Structs.Guild, TitleKey, DescriptionKey, AuthorKey s
 
 	Locale := Guild.Locale.Code()
 
-	notify(Guild,
-
-		Localizations.Get(TitleKey, Locale),
-		Localizations.Get(DescriptionKey, Locale),
-		Localizations.Get(AuthorKey, Locale),
-		Color,
-	)
+	notify(Guild, Localizations.Get(TitleKey, Locale), Localizations.Get(DescriptionKey, Locale), Localizations.Get(AuthorKey, Locale), Color)
 
 }
 
-func notifyNowPlaying(Guild *Structs.Guild, Song *Tidal.Song, Pos int, Locale string) {
+func notifyLocalizedWithMember(Guild *Structs.Guild, UserID snowflake.ID, TitleKey, DescriptionKey, AuthorKey string, Color int) {
+
+	if Guild == nil {
+
+		return
+
+	}
+
+	Locale := Guild.Locale.Code()
+
+	Mention := fmt.Sprintf("<@%s>", UserID)
+
+	notify(Guild, Localizations.Get(TitleKey, Locale), Localizations.GetFormat(DescriptionKey, Locale, Mention), Localizations.Get(AuthorKey, Locale), Color)
+
+}
+
+func notifyNowPlaying(Guild *Structs.Guild, Song *Tidal.Song, Pos int, Locale string, UserID snowflake.ID) {
 
 	if Guild == nil || Song == nil || Guild.Channels.Text == 0 {
 
@@ -88,7 +99,7 @@ func notifyNowPlaying(Guild *Structs.Guild, Song *Tidal.Song, Pos int, Locale st
 
 		GuildID: Guild.ID,
 
-		SongPosition:  Pos,
+		SongPosition: Pos,
 
 		TotalPrevious: len(Guild.Queue.Previous),
 		TotalUpcoming: len(Guild.Queue.Upcoming),
@@ -99,13 +110,15 @@ func notifyNowPlaying(Guild *Structs.Guild, Song *Tidal.Song, Pos int, Locale st
 
 	Embed := Song.Embed(State)
 
-	Description := Localizations.Get("Embeds.NowPlaying.AddedViaVoice", Locale)
+	Mention := fmt.Sprintf("<@%s>", UserID)
 
-	NewDescription := Embed.Description
+	VoiceLine := Localizations.GetFormat("Embeds.NowPlaying.AddedByMemberViaVoice", Locale, Mention)
 
-	NewDescription += "\n\n" + Description
+	ModifiedDescription := Embed.Description
 
-	Embed.Description = NewDescription
+	ModifiedDescription += VoiceLine
+
+	Embed.Description = ModifiedDescription
 
 	_, ErrSend := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text,
 

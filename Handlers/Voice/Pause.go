@@ -21,13 +21,7 @@ func Pause(GuildID, UserID snowflake.ID, _ string) {
 
 	if Guild.Queue.State != Structs.StatePlaying {
 
-		notifyLocalized(Guild,
-
-			"Commands.Pause.Error.Title",
-			"Commands.Pause.Error.Description",
-			"Embeds.Categories.Error",
-			Utils.ERROR,
-		)
+		notifyLocalized(Guild, "Commands.Pause.Error.Title", "Commands.Pause.Error.Description", "Embeds.Categories.Error", Utils.ERROR)
 
 		return
 
@@ -35,12 +29,6 @@ func Pause(GuildID, UserID snowflake.ID, _ string) {
 
 	Guild.Queue.SetState(Structs.StatePaused)
 
-	notifyLocalized(Guild,
-
-		"Commands.Pause.Title",
-		"Commands.Pause.Description",
-		"Embeds.Categories.Playback",
-		Utils.PRIMARY,
-	)
+	notifyLocalizedWithMember(Guild, UserID, "Commands.Pause.Title", "Embeds.NowPlaying.AddedByMemberViaVoice", "Embeds.Categories.Playback", Utils.PRIMARY)
 
 }

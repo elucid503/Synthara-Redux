@@ -37,7 +37,7 @@ func Register(Command string, Handler CommandHandler) {
 func lookupHandler(Command string) CommandHandler {
 
 	commandRegistryMu.RLock()
-	defer commandRegistryMu.Unlock()
+	defer commandRegistryMu.RUnlock()
 
 	return commandRegistry[Command]
 

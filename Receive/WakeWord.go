@@ -14,8 +14,7 @@ import (
 	sherpa "github.com/k2-fsa/sherpa-onnx-go-linux"
 )
 
-// Default model paths. Override via env vars KWS_ENCODER, KWS_DECODER,
-// KWS_JOINER, KWS_TOKENS, KWS_KEYWORDS_FILE if you place models elsewhere.
+// Default model paths for the on-device KWS model. Can be overridden with environment variables.
 const (
 
 	defaultModelDir = "./Receive/Models/kws"
@@ -31,8 +30,8 @@ const (
 	envKeywordsThreshold = "KWS_KEYWORDS_THRESHOLD"
 	envMaxActivePaths = "KWS_MAX_ACTIVE_PATHS"
 
-	defaultKeywordsScore = 12.0
-	defaultKeywordsThreshold = 0.0001
+	defaultKeywordsScore = 16.0
+	defaultKeywordsThreshold = 0.000025 // admittedly low, but false-positives not really a big problem here...
 	defaultMaxActivePaths = 16
 
 )

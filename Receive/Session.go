@@ -814,11 +814,38 @@ func (S *Session) timeoutLoop(Ctx context.Context) {
 
 }
 
+const prerollExpireAfterSilence = 2 * time.Second // config for how long to keep frames after speech ends
+
+// checkPrerollExpiry discards the preroll when a speech segment has ended
+func (S *Session) checkPrerollExpiry() {
+
+	SincePacket := S.silenceSincePacket()
+
+	if SincePacket == 0 || SincePacket < prerollExpireAfterSilence {
+
+		return
+
+	}
+
+	// Don't clear while an STT wake probe is in flight or its hit is queued
+
+	if S.wakeProbeBusy.Load() || len(S.wakeProbeHit) > 0 {
+
+		return
+
+	}
+
+	S.opusPreroll.Clear()
+
+}
+
 func (S *Session) checkTimeouts() {
 
 	if S.state.Load() != stateCapturing {
 
 		S.checkHotMic()
+		S.checkPrerollExpiry()
+
 		return
 
 	}

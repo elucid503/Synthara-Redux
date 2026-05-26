@@ -2951,6 +2951,19 @@
 				"ru": "Добавлено голосом",
 				"ja": "音声で追加"
 			},
+			"AddedByMemberViaVoice": {
+				"en-US": "By %s via Voice",
+				"en-GB": "By %s via Voice",
+				"es-ES": "Por %s por voz",
+				"es-419": "Por %s por voz",
+				"zh-CN": "由 %s 通过语音",
+				"fr": "Par %s via la voix",
+				"it": "Da %s tramite voce",
+				"de": "Von %s per Sprache",
+				"pl": "Przez %s głosem",
+				"ru": "От %s голосом",
+				"ja": "%s による音声"
+			},
 			"SuggestedSong": {
 				"en-US": "This is a **suggested Song**.",
 				"en-GB": "This is a **suggested Song**.",

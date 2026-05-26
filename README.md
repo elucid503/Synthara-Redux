@@ -4,7 +4,7 @@ A high-performance Discord music bot written in Go, featuring real-time audio tr
 
 ## Overview
 
-Synthara-Redux provides seamless music streaming in Discord voice channels with native transcoding. The bot supports YouTube, Spotify, Apple Music, and Tidal URLs, includes full Queue management, lyrics display, and a React-based web dashboard for remote control.
+Synthara-Redux provides seamless music streaming in Discord voice channels with native transcoding. The bot supports YouTube, Spotify, Apple Music, and Tidal URLs, includes full Queue management, lyrics display, a React-based web dashboard for remote control, and even voice commands.
 
 ## Features
 
@@ -21,6 +21,7 @@ Synthara-Redux provides seamless music streaming in Discord voice channels with 
 - **Lyrics Integration**: Synchronized (Word-Synced) lyrics fetched from multiple providers
 - **User History**: Records listening history and preferences
 - **Web Controls Lock**: Optional security to restrict web-based operations
+- **Voice Commands**: Voice-activated commands for hands-free operation
 
 ### Audio Quality
 - Native AAC decoding via FDK-AAC (no FFMPEG dependency)

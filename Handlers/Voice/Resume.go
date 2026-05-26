@@ -21,13 +21,7 @@ func Resume(GuildID, UserID snowflake.ID, _ string) {
 
 	if Guild.Queue.State != Structs.StatePaused {
 
-		notifyLocalized(Guild,
-
-			"Commands.Resume.Error.Title",
-			"Commands.Resume.Error.Description",
-			"Embeds.Categories.Error",
-			Utils.ERROR,
-		)
+		notifyLocalized(Guild, "Commands.Resume.Error.Title", "Commands.Resume.Error.Description", "Embeds.Categories.Error", Utils.ERROR)
 
 		return
 
@@ -35,12 +29,6 @@ func Resume(GuildID, UserID snowflake.ID, _ string) {
 
 	Guild.Queue.SetState(Structs.StatePlaying)
 
-	notifyLocalized(Guild,
-
-		"Commands.Resume.Title",
-		"Commands.Resume.Description",
-		"Embeds.Categories.Playback",
-		Utils.PRIMARY,
-	)
+	notifyLocalizedWithMember(Guild, UserID, "Commands.Resume.Title", "Embeds.NowPlaying.AddedByMemberViaVoice", "Embeds.Categories.Playback", Utils.PRIMARY)
 
 }

@@ -55,6 +55,6 @@ func Play(GuildID, UserID snowflake.ID, Args string) {
 
 	}
 
-	notifyNowPlaying(Guild, Song, Pos, Locale)
+	notifyNowPlaying(Guild, Song, Pos, Locale, UserID)
 
 }
