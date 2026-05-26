@@ -20,7 +20,6 @@ func Next(Event *events.ComponentInteractionCreate) {
 
 	Guild := Structs.GetGuild(GuildID, false)
 
-	// Validate guild session
 	if Guild == nil {
 
 		ErrorEmbed := Validation.GuildSessionError(Locale)
@@ -29,7 +28,6 @@ func Next(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	// Validate user is in voice
 	if ErrorEmbed := Validation.VoiceStateError(GuildID, Event.User().ID, Locale); ErrorEmbed != nil {
 
 		Event.CreateMessage(discord.MessageCreate{Embeds: []discord.Embed{*ErrorEmbed}, Flags: discord.MessageFlagEphemeral})
@@ -37,9 +35,15 @@ func Next(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	Success := Guild.Queue.Next(true)
+	Advanced, Ended := Guild.Queue.Next(true)
 
-	if !Success {
+	if Ended {
+
+		return
+
+	}
+
+	if !Advanced {
 
 		Event.CreateMessage(discord.MessageCreate{
 

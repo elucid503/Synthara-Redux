@@ -102,6 +102,13 @@ func registerVoiceCommands() {
 	Receive.Register(Receive.CommandPlay, Voice.Play)
 	Receive.Register(Receive.CommandPause, Voice.Pause)
 	Receive.Register(Receive.CommandResume, Voice.Resume)
+	Receive.Register(Receive.CommandNext, Voice.Next)
+	Receive.Register(Receive.CommandLast, Voice.Last)
+	Receive.Register(Receive.CommandLeave, Voice.Leave)
+	Receive.Register(Receive.CommandShuffle, Voice.Shuffle)
+	Receive.Register(Receive.CommandRepeat, Voice.Repeat)
+	Receive.Register(Receive.CommandReplay, Voice.Replay)
+	Receive.Register(Receive.CommandAutoplay, Voice.Autoplay)
 
 	Receive.SetVoiceCueHandler(func(GuildID snowflake.ID, Kind Receive.VoiceCueKind) {
 
@@ -245,6 +252,10 @@ func InitializeHandlers() {
 
 				Commands.Ping(Event)
 
+			case "about":
+
+				Commands.About(Event)
+
 			case "play":
 
 				Commands.Play(Event)
@@ -316,6 +327,10 @@ func InitializeHandlers() {
 			case "album":
 
 				Commands.Album(Event)
+
+			case "connect":
+
+				Commands.Connect(Event)
 
 			case "leave":
 

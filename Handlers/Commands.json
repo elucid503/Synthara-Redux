@@ -33,6 +33,92 @@
 		]
 	},
 	{
+		"name": "about",
+		"name_localizations": {
+			"en-US": "about",
+			"en-GB": "about",
+			"es-ES": "acerca-de",
+			"es-419": "acerca-de",
+			"zh-CN": "关于",
+			"fr": "à-propos",
+			"it": "informazioni",
+			"de": "über",
+			"pl": "o-bocie",
+			"ru": "о-боте",
+			"ja": "について"
+		},
+		"description": "Use this command to read guides about different features.",
+		"description_localizations": {
+			"en-US": "Use this command to read guides about different features.",
+			"en-GB": "Use this command to read guides about different features.",
+			"es-ES": "Usa este comando para leer guías sobre diferentes funciones.",
+			"es-419": "Usa este comando para leer guías sobre diferentes funciones.",
+			"zh-CN": "使用此命令阅读有关不同功能的指南。",
+			"fr": "Utilisez cette commande pour lire des guides sur différentes fonctionnalités.",
+			"it": "Usa questo comando per leggere le guide su diverse funzionalità.",
+			"de": "Verwende diesen Befehl, um Anleitungen zu verschiedenen Funktionen zu lesen.",
+			"pl": "Użyj tej komendy, aby przeczytać przewodniki dotyczące różnych funkcji.",
+			"ru": "Используйте эту команду, чтобы читать руководства о различных функциях.",
+			"ja": "このコマンドを使用して、さまざまな機能に関するガイドを読むことができます。"
+		},
+		"options": [
+			{
+				"type": 3,
+				"name": "category",
+				"name_localizations": {
+					"en-US": "category",
+					"en-GB": "category",
+					"es-ES": "categoría",
+					"es-419": "categoría",
+					"zh-CN": "类别",
+					"fr": "catégorie",
+					"it": "categoria",
+					"de": "kategorie",
+					"pl": "kategoria",
+					"ru": "категория",
+					"ja": "カテゴリ"
+				},
+				"description": "Use this option to choose which guide to display.",
+				"description_localizations": {
+					"en-US": "Use this option to choose which guide to display.",
+					"en-GB": "Use this option to choose which guide to display.",
+					"es-ES": "Usa esta opción para elegir qué guía mostrar.",
+					"es-419": "Usa esta opción para elegir qué guía mostrar.",
+					"zh-CN": "使用此选项选择要显示的指南。",
+					"fr": "Utilisez cette option pour choisir le guide à afficher.",
+					"it": "Usa questa opzione per scegliere quale guida visualizzare.",
+					"de": "Verwende diese Option, um auszuwählen, welche Anleitung angezeigt werden soll.",
+					"pl": "Użyj tej opcji, aby wybrać przewodnik do wyświetlenia.",
+					"ru": "Используйте эту опцию, чтобы выбрать, какое руководство показать.",
+					"ja": "このオプションを使用して、表示するガイドを選択します。"
+				},
+				"required": true,
+				"choices": [
+					{
+						"name": "Voice Commands",
+						"name_localizations": {
+							"en-US": "Voice Commands",
+							"en-GB": "Voice Commands",
+							"es-ES": "Comandos de Voz",
+							"es-419": "Comandos de Voz",
+							"zh-CN": "语音命令",
+							"fr": "Commandes Vocales",
+							"it": "Comandi Vocali",
+							"de": "Sprachbefehle",
+							"pl": "Polecenia Głosowe",
+							"ru": "Голосовые Команды",
+							"ja": "音声コマンド"
+						},
+						"value": "voice"
+					}
+				]
+			}
+		],
+		"contexts": [
+			0
+		]
+	},
+	{
 		"name": "play",
 		"name_localizations": {
 			"en-US": "play",
@@ -982,6 +1068,39 @@
 			"pl": "Użyj tej komendy, aby wyświetlić i odtworzyć album odtwarzanego utworu.",
 			"ru": "Используйте эту команду для просмотра и воспроизведения альбома текущей песни.",
 			"ja": "このコマンドを使用して、現在再生中の曲のアルバムを表示および再生します。"
+		},
+		"contexts": [
+			0
+		]
+	},
+	{
+		"name": "connect",
+		"name_localizations": {
+			"en-US": "connect",
+			"en-GB": "connect",
+			"es-ES": "conectar",
+			"es-419": "conectar",
+			"zh-CN": "连接",
+			"fr": "connecter",
+			"it": "connetti",
+			"de": "verbinden",
+			"pl": "połącz",
+			"ru": "подключить",
+			"ja": "接続"
+		},
+		"description": "Use this command to join your voice channel without starting playback.",
+		"description_localizations": {
+			"en-US": "Use this command to join your voice channel without starting playback.",
+			"en-GB": "Use this command to join your voice channel without starting playback.",
+			"es-ES": "Usa este comando para unirte a tu canal de voz sin iniciar la reproducción.",
+			"es-419": "Usa este comando para unirte a tu canal de voz sin iniciar la reproducción.",
+			"zh-CN": "使用此命令加入您的语音频道而不开始播放。",
+			"fr": "Utilisez cette commande pour rejoindre votre canal vocal sans démarrer la lecture.",
+			"it": "Usa questo comando per unirti al tuo canale vocale senza avviare la riproduzione.",
+			"de": "Verwende diesen Befehl, um deinem Sprachkanal beizutreten, ohne die Wiedergabe zu starten.",
+			"pl": "Użyj tej komendy, aby dołączyć do kanału głosowego bez rozpoczynania odtwarzania.",
+			"ru": "Используйте эту команду, чтобы присоединиться к голосовому каналу без начала воспроизведения.",
+			"ja": "このコマンドを使用して、再生を開始せずにボイスチャンネルに参加します。"
 		},
 		"contexts": [
 			0

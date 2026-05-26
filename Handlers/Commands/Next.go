@@ -40,9 +40,15 @@ func Next(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	Success := Guild.Queue.Next(true)
+	Advanced, Ended := Guild.Queue.Next(true)
 
-	if !Success {
+	if Ended {
+
+		return
+
+	}
+
+	if !Advanced {
 
 		Event.CreateMessage(discord.MessageCreate{
 
@@ -63,7 +69,6 @@ func Next(Event *events.ApplicationCommandInteractionCreate) {
 
 	}
 
-	// Create control buttons
 	Buttons := []discord.InteractiveComponent{}
 
 	LastButton := discord.NewButton(discord.ButtonStyleSecondary, "", "Last", "", 0).WithEmoji(discord.ComponentEmoji{

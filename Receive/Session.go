@@ -39,7 +39,7 @@ const (
 
 	minCommandPCMBytes = TargetSampleRate * 2 * 3 / 2 // 1.5s @ 16kHz mono
 
-	prerollMaxFrames = 100 // ~2s @ 20ms/frame
+	prerollMaxFrames = 50 // ~1s @ 20ms/frame — enough to cover the wake word + KWS detection latency
 
 	playArgsPacketSilence = 2 * time.Second
 	minPlayArgsCapture = 2 * time.Second
@@ -88,7 +88,7 @@ type Session struct {
 	finalizing atomic.Bool
 	dispatched atomic.Bool
 
-	awaitingPlayArgs bool // for play specific; TODO: generalize for "command tail" detection?
+	awaitingCommandTail bool // set for commands that take a multi-word arg; waits for silence before finalizing
 
 	ctx context.Context
 	cancel context.CancelFunc
@@ -307,6 +307,12 @@ func (S *Session) runListening(PCM []int16) {
 
 	if Energy < hotMicEnergyThreshold {
 
+		// Acoustic silence marks a speech-segment boundary. Discard the preroll
+		// so audio from a prior utterance cannot bleed into the next capture.
+		// (DTX-based clearing via checkPrerollExpiry requires a 2-second packet
+		// gap, which is too slow when the user speaks again shortly after.)
+		S.opusPreroll.Clear()
+
 		S.speechStartAt.Store(0)
 
 		if Hit := S.wake.FlushPending(); Hit != "" {
@@ -378,7 +384,7 @@ func (S *Session) beginCapture() {
 
 	S.finalizing.Store(false)
 	S.dispatched.Store(false)
-	S.awaitingPlayArgs = false
+	S.awaitingCommandTail = false
 
 	emitVoiceCue(S.GuildID, VoiceCueWake)
 	emitCaptureDuck(S.GuildID, true)
@@ -528,7 +534,7 @@ func (S *Session) handleTranscriptUpdate(Upd TranscriptUpdate) {
 
 	if Upd.Text == "" {
 
-		if Upd.SpeechFinal && S.awaitingPlayArgs {
+		if Upd.SpeechFinal && S.awaitingCommandTail {
 
 			S.finalizeCapture()
 		}
@@ -541,7 +547,7 @@ func (S *Session) handleTranscriptUpdate(Upd TranscriptUpdate) {
 
 	if !OK {
 
-		if Upd.SpeechFinal && S.awaitingPlayArgs {
+		if Upd.SpeechFinal && S.awaitingCommandTail {
 
 			S.finalizeCapture()
 
@@ -551,44 +557,42 @@ func (S *Session) handleTranscriptUpdate(Upd TranscriptUpdate) {
 
 	}
 
-	if Cmd.Command == CommandPause || Cmd.Command == CommandResume {
+	if CommandClearsTrailingArgs(Cmd.Command) {
 
 		Cmd.Args = ""
 
 	}
 
-	switch Cmd.Command {
+	// Commands that take a free-form multi-word argument must never dispatch on a partial result, since the user may still be speaking.
 
-	case CommandPause, CommandResume:
+	if CommandNeedsMultiWordArgs(Cmd.Command) {
+
+		S.awaitingCommandTail = true
+
+		if Upd.SpeechFinal {
+
+			S.finalizeCapture()
+
+		}
+
+		return
+
+	}
+
+	if CommandDispatchesImmediately(Cmd.Command, Cmd.Args) {
 
 		S.dispatchCommand(Cmd)
 		S.abortCapture()
 
 		return
 
-	case CommandPlay:
-
-		if Cmd.Args != "" {
-
-			S.dispatchCommand(Cmd)
-			S.abortCapture()
-
-			return
-
-		}
-
-		S.awaitingPlayArgs = true
-
 	}
 
-	// xAI utterance-end: flush STT for play-args tail or if JIT did not fire.
+	// xAI utterance-end: flush STT if JIT did not fire...
+
 	if Upd.SpeechFinal && !S.dispatched.Load() {
 
-		if S.awaitingPlayArgs {
-
-			S.finalizeCapture()
-
-		}
+		S.finalizeCapture()
 
 	}
 
@@ -743,7 +747,7 @@ func (S *Session) endCapture() {
 	S.finalizing.Store(false)
 	S.speechStartAt.Store(0)
 
-	S.awaitingPlayArgs = false
+	S.awaitingCommandTail = false
 
 	S.cooldownUntil = time.Now().Add(postCaptureCooldown)
 
@@ -856,7 +860,7 @@ func (S *Session) checkTimeouts() {
 
 	}
 
-	if S.awaitingPlayArgs {
+	if S.awaitingCommandTail {
 
 		if CaptureAge >= minPlayArgsCapture {
 

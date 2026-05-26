@@ -5,16 +5,21 @@ import (
 	"unicode"
 )
 
-// Map of supported command verbs; allows fuzzy matching
 const (
 
 	CommandPlay = "play"
 	CommandPause = "pause"
 	CommandResume = "resume"
+	CommandNext = "next"
+	CommandLast = "last"
+	CommandLeave = "leave"
+	CommandShuffle = "shuffle"
+	CommandRepeat = "repeat"
+	CommandReplay = "replay"
+	CommandAutoplay = "autoplay"
 
 )
 
-// ParsedCommand is the structured result of parsing a transcribed utterance.
 type ParsedCommand struct {
 
 	Prefix string
@@ -23,12 +28,9 @@ type ParsedCommand struct {
 
 }
 
-// Parse takes the raw text from xAI and pulls out the prefix, command and args if possible.
 func Parse(Text string) (ParsedCommand, bool) {
 
 	Cleaned := strings.ToLower(strings.TrimSpace(Text))
-
-	// Drop punctuation but keep spaces
 
 	Cleaned = stripPunct(Cleaned)
 
@@ -46,11 +48,9 @@ func Parse(Text string) (ParsedCommand, bool) {
 
 	}
 
-	// xAI sometimes prepends conversational fillers ("hey", "okay", "uh"), so we scan for the wake word in the first few tokens
-
 	PrefixIdx := -1
 
-	for i := 0; i < len(Tokens) && i < 3; i++ {
+	for i := 0; i < len(Tokens); i++ {
 
 		if fuzzyMatchSynthara(Tokens[i]) {
 
@@ -60,8 +60,6 @@ func Parse(Text string) (ParsedCommand, bool) {
 		}
 
 	}
-
-	// If the wake word didn't survive transcription, we can still continue...
 
 	var Rest []string
 
@@ -85,9 +83,7 @@ func Parse(Text string) (ParsedCommand, bool) {
 
 	Args = strings.TrimSpace(Args)
 
-	// TODO: generalize this for other commands if we add more; some commands may want to ignore args if they look like garbage. perhaps a field of the command struct?
-
-	if Cmd == CommandPause || Cmd == CommandResume {
+	if CommandClearsTrailingArgs(Cmd) {
 
 		Args = ""
 
@@ -101,7 +97,7 @@ func Parse(Text string) (ParsedCommand, bool) {
 
 	return ParsedCommand{
 
-		Prefix: "Synthara", // hardcoded
+		Prefix: "Synthara",
 
 		Command: Cmd,
 		Args: Args,
@@ -110,7 +106,56 @@ func Parse(Text string) (ParsedCommand, bool) {
 
 }
 
-// transcriptLooksEnglish rejects CJK and similar scripts xAI sometimes emits with language=en.
+func CommandClearsTrailingArgs(Command string) bool {
+
+	switch Command {
+
+	case CommandPause, CommandResume, CommandNext, CommandLast, CommandLeave:
+
+		return true
+
+	default:
+
+		return false
+
+	}
+
+}
+
+// CommandNeedsMultiWordArgs returns true for commands whose argument is a free-form phrase (e.g. a song name) that may span several words.
+func CommandNeedsMultiWordArgs(Command string) bool {
+
+	switch Command {
+
+	case CommandPlay:
+
+		return true
+
+	default:
+
+		return false
+
+	}
+
+}
+
+func CommandDispatchesImmediately(Command, Args string) bool {
+
+	switch Command {
+
+	case CommandPause, CommandResume, CommandNext, CommandLast, CommandLeave,
+		CommandShuffle, CommandRepeat, CommandReplay, CommandAutoplay:
+
+		return true
+
+	default:
+
+		return false
+
+	}
+
+}
+
 func transcriptLooksEnglish(Text string) bool {
 
 	if strings.TrimSpace(Text) == "" {
@@ -133,7 +178,6 @@ func transcriptLooksEnglish(Text string) bool {
 
 }
 
-// fuzzyMatchSynthara checks whether a token is plausibly "Synthara"
 func fuzzyMatchSynthara(Token string) bool {
 
 	Token = strings.ToLower(Token)
@@ -152,8 +196,6 @@ func fuzzyMatchSynthara(Token string) bool {
 		return true
 
 	}
-
-	// Same starting letter as synthara (s/c) with generous edit distance.
 
 	if len(Token) >= 3 && (Token[0] == 's' || Token[0] == 'c') {
 
@@ -215,6 +257,34 @@ func normalizeCommand(Token string) string {
 
 		return CommandResume
 
+	case "next", "skip", "forward":
+
+		return CommandNext
+
+	case "last", "previous", "back", "prev":
+
+		return CommandLast
+
+	case "leave", "disconnect", "dc", "quit":
+
+		return CommandLeave
+
+	case "shuffle", "shuffled", "shuffling":
+
+		return CommandShuffle
+
+	case "repeat", "loop", "looped":
+
+		return CommandRepeat
+
+	case "replay", "again":
+
+		return CommandReplay
+
+	case "autoplay", "auto", "radio":
+
+		return CommandAutoplay
+
 	}
 
 	return ""
@@ -243,7 +313,6 @@ func stripPunct(S string) string {
 
 }
 
-// Standard edit distance with O(n) memory.
 func levenshtein(A, B string) int {
 
 	if A == B {

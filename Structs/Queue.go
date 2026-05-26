@@ -140,7 +140,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 			}
 
-			Advanced := Queue.Next(false) // Notified below
+			Advanced, _ := Queue.Next(false) // Notified below
 
 			if Advanced {
 
@@ -152,47 +152,7 @@ func QueueStateHandler(Queue *Queue, State int) {
 
 				Utils.Logger.Info("Queue", fmt.Sprintf("Queue %s has no more songs to play", Queue.ParentID.String()))
 
-				// Send queue update to notify UI that queue has ended
-				Queue.Functions.Updated(Queue)
-
-				// Sends a message indicating the queue has ended
-
-				TextChannelID := Guild.Channels.Text
-
-				go func() {
-
-					AutoPlayButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.AutoPlay", Guild.Locale.Code()), "AutoPlay", "", 0).WithEmoji(discord.ComponentEmoji{
-
-						ID: snowflake.MustParse(Icons.GetID(Icons.Sparkles)),
-
-					})
-
-					DisconnectButton := discord.NewButton(discord.ButtonStyleDanger, Localizations.Get("Buttons.Disconnect", Guild.Locale.Code()), "Disconnect", "", 0).WithEmoji(discord.ComponentEmoji{
-
-						ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
-
-					})
-
-					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(TextChannelID, discord.NewMessageCreate().
-						AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
-
-							Title:       Localizations.Get("Embeds.Notifications.QueueEnded.Title", Guild.Locale.Code()),
-							Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
-							Description: Localizations.Get("Embeds.Notifications.QueueEnded.Description", Guild.Locale.Code()),
-
-						})).
-						AddActionRow(AutoPlayButton, DisconnectButton))
-
-					if ErrorSending != nil {
-
-						Utils.Logger.Error("Command", fmt.Sprintf("Error sending queue ended message to channel %s for Queue %s: %s", TextChannelID, Queue.ParentID.String(), ErrorSending.Error()))
-
-					}
-
-				}()
-
-				// Start inactivity timer instead of immediate cleanup
-				Guild.StartInactivityTimer()
+				Queue.notifyQueueEnded(Guild)
 
 			}
 
@@ -324,8 +284,9 @@ func (Q *Queue) SetState(NewState int) {
 
 }
 
-// Next moves forward by one song in the upcoming queue; returns false when none exist.
-func (Q *Queue) Next(Notify bool) bool {
+// Next moves forward by one song in the upcoming queue.
+// When nothing remains to play, the queue is finished and ended is true (bot stays in voice).
+func (Q *Queue) Next(Notify bool) (advanced bool, ended bool) {
 
 	Guild := GetGuild(Q.ParentID, false)
 
@@ -358,15 +319,150 @@ func (Q *Queue) Next(Notify bool) bool {
 
 	}
 
-	Resp := Q.moveTo(1, true)
+	if Q.moveTo(1, true) {
 
-	if (Notify && Q.Current != nil) {
+		if Notify && Q.Current != nil {
 
-		Q.SendNowPlayingMessage()
+			Q.SendNowPlayingMessage()
+
+		}
+
+		return true, false
 
 	}
 
-	return Resp
+	if Q.FinishQueue(Notify) {
+
+		return false, true
+
+	}
+
+	return false, false
+
+}
+
+// FinishQueue stops playback, clears the active track, and keeps the bot in voice until inactivity timeout.
+func (Q *Queue) FinishQueue(Notify bool) bool {
+
+	Guild := GetGuild(Q.ParentID, false)
+
+	if Guild == nil {
+
+		return false
+
+	}
+
+	AlreadyEmpty := Q.Current == nil && Q.PlaybackSession == nil && len(Q.Upcoming) == 0
+
+	Guild.StreamerMutex.Lock()
+
+	if Q.PlaybackSession != nil {
+
+		Q.PlaybackSession.Stop()
+		Q.PlaybackSession = nil
+
+	}
+
+	if Guild.VoiceMixer != nil {
+
+		Guild.VoiceMixer.SetInner(nil)
+
+	} else if Guild.VoiceConnection != nil {
+
+		Guild.VoiceConnection.SetOpusFrameProvider(nil)
+
+	}
+
+	if Q.Current != nil {
+
+		Q.Previous = append(Q.Previous, Q.Current)
+		Q.Current = nil
+
+	}
+
+	Q.State = StateIdle
+
+	Guild.StreamerMutex.Unlock()
+
+	Q.SendToWebsockets(Event_StateChanged, map[string]interface{}{"State": StateIdle})
+
+	Q.Functions.Updated(Q)
+
+	if AlreadyEmpty {
+
+		Guild.StartInactivityTimer()
+
+		return true
+
+	}
+
+	if Notify {
+
+		Q.notifyQueueEnded(Guild)
+
+	} else {
+
+		Guild.StartInactivityTimer()
+
+	}
+
+	return true
+
+}
+
+func (Q *Queue) notifyQueueEnded(Guild *Guild) {
+
+	if Guild == nil {
+
+		return
+
+	}
+
+	TextChannelID := Guild.Channels.Text
+
+	if TextChannelID == 0 {
+
+		Guild.StartInactivityTimer()
+
+		return
+
+	}
+
+	Locale := Guild.Locale.Code()
+
+	go func() {
+
+		AutoPlayButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.AutoPlay", Locale), "AutoPlay", "", 0).WithEmoji(discord.ComponentEmoji{
+
+			ID: snowflake.MustParse(Icons.GetID(Icons.Sparkles)),
+
+		})
+
+		DisconnectButton := discord.NewButton(discord.ButtonStyleDanger, Localizations.Get("Buttons.Disconnect", Locale), "Disconnect", "", 0).WithEmoji(discord.ComponentEmoji{
+
+			ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
+
+		})
+
+		_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(TextChannelID, discord.NewMessageCreate().
+			AddEmbeds(Utils.CreateEmbed(Utils.EmbedOptions{
+
+				Title:       Localizations.Get("Embeds.Notifications.QueueEnded.Title", Locale),
+				Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
+				Description: Localizations.Get("Embeds.Notifications.QueueEnded.Description", Locale),
+
+			})).
+			AddActionRow(AutoPlayButton, DisconnectButton))
+
+		if ErrorSending != nil {
+
+			Utils.Logger.Error("Command", fmt.Sprintf("Error sending queue ended message to channel %s for Queue %s: %s", TextChannelID, Q.ParentID.String(), ErrorSending.Error()))
+
+		}
+
+	}()
+
+	Guild.StartInactivityTimer()
 
 }
 

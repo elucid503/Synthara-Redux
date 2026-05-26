@@ -181,9 +181,13 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 
 	case OperationNext:
 
-		Guild.Queue.Next(true)
+		Advanced, Ended := Guild.Queue.Next(true)
 
-		if Guild.Queue.Current != nil {
+		if Ended {
+
+			SendWebOperationMessage(Guild, "Embeds.Notifications.QueueEnded.Title", "Embeds.Notifications.QueueEnded.Description", Locale, Identifier)
+
+		} else if Advanced && Guild.Queue.Current != nil {
 
 			SendWebOperationMessageWithSong(Guild, "Commands.Next.Title", "Web.Operations.Next.Description", Locale, Identifier, Guild.Queue.Current.Title)
 

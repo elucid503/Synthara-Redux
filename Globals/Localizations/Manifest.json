@@ -28,6 +28,53 @@
 				"ja": "ボットはオンラインで応答しています。"
 			}
 		},
+		"About": {
+			"Voice": {
+				"Content": {
+					"en-US": "# Voice Commands\nControl Synthara hands-free in a voice channel with the bot.\n\n## Getting Started\n1. Use `/connect` or `/play` so Synthara joins your voice channel.\n2. Stay in the **same voice channel** as the bot.\n3. Say the wake word **Synthara**, then your command (English works best).\n\n**Example:** `Synthara, play never gonna give you up`\n\n## Wake Word\nBegin each command with **Synthara**. The bot also recognizes common mis-hearings like *Synthia* or *Sentara*.\n\nFor **play**, say `Synthara, play`, then the song name when prompted.\n\n## Playback\n- **play** *[song or URL]* — search or queue a track (same as `/play`)\n- **pause** — pause the current song\n- **resume** / **continue** — resume playback\n- **next** / **skip** — skip; if the queue is empty, playback ends and the bot stays in voice for one hour\n- **last** / **previous** / **back** — return to the previous track\n- **replay** *[position]* — replay from history (`0` = most recent)\n\n## Queue and Modes\n- **shuffle** *[on/off]* — enable, disable, or toggle shuffle\n- **repeat** *[off/one/all]* — set repeat, or say **repeat** alone to cycle modes\n- **autoplay** *[on/off]* — enable, disable, or toggle autoplay when the queue runs dry\n\n## Session\n- **leave** / **disconnect** — disconnect the bot from voice\n\n## Tips\n- You must be in a voice channel with the bot.\n- Confirmations are posted in the bot's notification channel.\n- Use `/connect` to join voice without starting music.\n\nRun `/about` and choose **Voice Commands** anytime to see this guide again.",
+					"en-GB": "# Voice Commands\nControl Synthara hands-free in a voice channel with the bot.\n\n## Getting Started\n1. Use `/connect` or `/play` so Synthara joins your voice channel.\n2. Stay in the **same voice channel** as the bot.\n3. Say the wake word **Synthara**, then your command (English works best).\n\n**Example:** `Synthara, play never gonna give you up`\n\n## Wake Word\nBegin each command with **Synthara**. The bot also recognises common mis-hearings like *Synthia* or *Sentara*.\n\nFor **play**, say `Synthara, play`, then the song name when prompted.\n\n## Playback\n- **play** *[song or URL]* — search or queue a track (same as `/play`)\n- **pause** — pause the current song\n- **resume** / **continue** — resume playback\n- **next** / **skip** — skip; if the queue is empty, playback ends and the bot stays in voice for one hour\n- **last** / **previous** / **back** — return to the previous track\n- **replay** *[position]* — replay from history (`0` = most recent)\n\n## Queue and Modes\n- **shuffle** *[on/off]* — enable, disable, or toggle shuffle\n- **repeat** *[off/one/all]* — set repeat, or say **repeat** alone to cycle modes\n- **autoplay** *[on/off]* — enable, disable, or toggle autoplay when the queue runs dry\n\n## Session\n- **leave** / **disconnect** — disconnect the bot from voice\n\n## Tips\n- You must be in a voice channel with the bot.\n- Confirmations are posted in the bot's notification channel.\n- Use `/connect` to join voice without starting music.\n\nRun `/about` and choose **Voice Commands** anytime to see this guide again.",
+					"es-ES": "# Comandos de Voz\nControla Synthara sin manos en un canal de voz con el bot.\n\n## Primeros Pasos\n1. Usa `/connect` o `/play` para que Synthara se una a tu canal de voz.\n2. Permanece en el **mismo canal de voz** que el bot.\n3. Di la palabra de activación **Synthara**, luego tu comando (el inglés funciona mejor).\n\n**Ejemplo:** `Synthara, play never gonna give you up`\n\n## Palabra de Activación\nEmpieza cada comando con **Synthara**. El bot también reconoce errores comunes como *Synthia* o *Sentara*.\n\nPara **play**, di `Synthara, play` y luego el nombre de la canción cuando se te indique.\n\n## Reproducción\n- **play** *[canción o URL]* — buscar o encolar una pista (igual que `/play`)\n- **pause** — pausar la canción actual\n- **resume** / **continue** — reanudar la reproducción\n- **next** / **skip** — saltar; si la cola está vacía, termina la reproducción y el bot permanece en voz durante una hora\n- **last** / **previous** / **back** — volver a la pista anterior\n- **replay** *[posición]* — reproducir del historial (`0` = la más reciente)\n\n## Cola y Modos\n- **shuffle** *[on/off]* — activar, desactivar o alternar aleatorio\n- **repeat** *[off/one/all]* — establecer repetición, o di **repeat** solo para alternar modos\n- **autoplay** *[on/off]* — activar, desactivar o alternar reproducción automática cuando la cola se agote\n\n## Sesión\n- **leave** / **disconnect** — desconectar el bot del canal de voz\n\n## Consejos\n- Debes estar en un canal de voz con el bot.\n- Las confirmaciones se publican en el canal de notificaciones del bot.\n- Usa `/connect` para unirte a voz sin iniciar música.\n\nEjecuta `/about` y elige **Comandos de Voz** cuando quieras ver esta guía de nuevo.",
+					"es-419": "# Comandos de Voz\nControla Synthara sin manos en un canal de voz con el bot.\n\n## Primeros Pasos\n1. Usa `/connect` o `/play` para que Synthara se una a tu canal de voz.\n2. Permanece en el **mismo canal de voz** que el bot.\n3. Di la palabra de activación **Synthara**, luego tu comando (el inglés funciona mejor).\n\n**Ejemplo:** `Synthara, play never gonna give you up`\n\n## Palabra de Activación\nEmpieza cada comando con **Synthara**. El bot también reconoce errores comunes como *Synthia* o *Sentara*.\n\nPara **play**, di `Synthara, play` y luego el nombre de la canción cuando se te indique.\n\n## Reproducción\n- **play** *[canción o URL]* — buscar o encolar una pista (igual que `/play`)\n- **pause** — pausar la canción actual\n- **resume** / **continue** — reanudar la reproducción\n- **next** / **skip** — saltar; si la cola está vacía, termina la reproducción y el bot permanece en voz durante una hora\n- **last** / **previous** / **back** — volver a la pista anterior\n- **replay** *[posición]* — reproducir del historial (`0` = la más reciente)\n\n## Cola y Modos\n- **shuffle** *[on/off]* — activar, desactivar o alternar aleatorio\n- **repeat** *[off/one/all]* — establecer repetición, o di **repeat** solo para alternar modos\n- **autoplay** *[on/off]* — activar, desactivar o alternar reproducción automática cuando la cola se agote\n\n## Sesión\n- **leave** / **disconnect** — desconectar el bot del canal de voz\n\n## Consejos\n- Debes estar en un canal de voz con el bot.\n- Las confirmaciones se publican en el canal de notificaciones del bot.\n- Usa `/connect` para unirte a voz sin iniciar música.\n\nEjecuta `/about` y elige **Comandos de Voz** cuando quieras ver esta guía de nuevo.",
+					"zh-CN": "# 语音命令\n在与机器人同一语音频道中免提控制 Synthara。\n\n## 入门\n1. 使用 `/connect` 或 `/play` 让 Synthara 加入你的语音频道。\n2. 请留在与机器人**相同的语音频道**中。\n3. 说出唤醒词 **Synthara**，然后说出命令（英语效果最佳）。\n\n**示例：** `Synthara, play never gonna give you up`\n\n## 唤醒词\n每个命令都以 **Synthara** 开头。机器人也能识别常见误听，如 *Synthia* 或 *Sentara*。\n\n对于 **play**，说 `Synthara, play`，然后按提示说出歌曲名称。\n\n## 播放\n- **play** *[歌曲或 URL]* — 搜索或加入队列（与 `/play` 相同）\n- **pause** — 暂停当前歌曲\n- **resume** / **continue** — 恢复播放\n- **next** / **skip** — 跳过；若队列为空，播放结束，机器人将在语音中保留一小时\n- **last** / **previous** / **back** — 返回上一首\n- **replay** *[位置]* — 从历史记录重播（`0` = 最近一首）\n\n## 队列与模式\n- **shuffle** *[on/off]* — 开启、关闭或切换随机播放\n- **repeat** *[off/one/all]* — 设置循环，或单独说 **repeat** 以切换模式\n- **autoplay** *[on/off]* — 在队列播完后开启、关闭或切换自动播放\n\n## 会话\n- **leave** / **disconnect** — 将机器人断开语音连接\n\n## 提示\n- 你必须与机器人在同一语音频道中。\n- 确认消息会发布在机器人的通知频道。\n- 使用 `/connect` 可在不开始播放的情况下加入语音。\n\n随时运行 `/about` 并选择 **语音命令** 可再次查看本指南。",
+					"fr": "# Commandes Vocales\nContrôlez Synthara mains libres dans un canal vocal avec le bot.\n\n## Pour Commencer\n1. Utilisez `/connect` ou `/play` pour que Synthara rejoigne votre canal vocal.\n2. Restez dans le **même canal vocal** que le bot.\n3. Dites le mot d'éveil **Synthara**, puis votre commande (l'anglais fonctionne le mieux).\n\n**Exemple :** `Synthara, play never gonna give you up`\n\n## Mot d'Éveil\nCommencez chaque commande par **Synthara**. Le bot reconnaît aussi les erreurs courantes comme *Synthia* ou *Sentara*.\n\nPour **play**, dites `Synthara, play`, puis le titre lorsque vous y êtes invité.\n\n## Lecture\n- **play** *[titre ou URL]* — rechercher ou mettre en file (comme `/play`)\n- **pause** — mettre en pause\n- **resume** / **continue** — reprendre la lecture\n- **next** / **skip** — passer; si la file est vide, la lecture s'arrête et le bot reste en vocal pendant une heure\n- **last** / **previous** / **back** — revenir au morceau précédent\n- **replay** *[position]* — rejouer depuis l'historique (`0` = le plus récent)\n\n## File et Modes\n- **shuffle** *[on/off]* — activer, désactiver ou basculer le mélange\n- **repeat** *[off/one/all]* — définir la répétition, ou dites **repeat** seul pour faire défiler les modes\n- **autoplay** *[on/off]* — activer, désactiver ou basculer la lecture automatique quand la file est vide\n\n## Session\n- **leave** / **disconnect** — déconnecter le bot du vocal\n\n## Conseils\n- Vous devez être dans un canal vocal avec le bot.\n- Les confirmations sont publiées dans le canal de notifications du bot.\n- Utilisez `/connect` pour rejoindre le vocal sans lancer la musique.\n\nLancez `/about` et choisissez **Commandes Vocales** pour revoir ce guide.",
+					"it": "# Comandi Vocali\nControlla Synthara a mani libere in un canale vocale con il bot.\n\n## Per Iniziare\n1. Usa `/connect` o `/play` così Synthara entra nel tuo canale vocale.\n2. Resta nello **stesso canale vocale** del bot.\n3. Di' la parola di attivazione **Synthara**, poi il comando (l'inglese funziona meglio).\n\n**Esempio:** `Synthara, play never gonna give you up`\n\n## Parola di Attivazione\nInizia ogni comando con **Synthara**. Il bot riconosce anche errori comuni come *Synthia* o *Sentara*.\n\nPer **play**, di' `Synthara, play`, poi il titolo quando richiesto.\n\n## Riproduzione\n- **play** *[brano o URL]* — cerca o accoda (come `/play`)\n- **pause** — metti in pausa\n- **resume** / **continue** — riprendi la riproduzione\n- **next** / **skip** — salta; se la coda è vuota, la riproduzione termina e il bot resta in vocale per un'ora\n- **last** / **previous** / **back** — torna al brano precedente\n- **replay** *[posizione]* — riproduci dalla cronologia (`0` = il più recente)\n\n## Coda e Modalità\n- **shuffle** *[on/off]* — attiva, disattiva o alterna shuffle\n- **repeat** *[off/one/all]* — imposta la ripetizione, o di' **repeat** da solo per scorrere le modalità\n- **autoplay** *[on/off]* — attiva, disattiva o alterna autoplay quando la coda finisce\n\n## Sessione\n- **leave** / **disconnect** — disconnetti il bot dal vocale\n\n## Suggerimenti\n- Devi essere in un canale vocale con il bot.\n- Le conferme vengono pubblicate nel canale notifiche del bot.\n- Usa `/connect` per entrare in vocale senza avviare musica.\n\nEsegui `/about` e scegli **Comandi Vocali** per rivedere questa guida.",
+					"de": "# Sprachbefehle\nSteuere Synthara freihändig in einem Sprachkanal mit dem Bot.\n\n## Erste Schritte\n1. Verwende `/connect` oder `/play`, damit Synthara deinem Sprachkanal beitritt.\n2. Bleibe im **selben Sprachkanal** wie der Bot.\n3. Sage das Aktivierungswort **Synthara**, dann deinen Befehl (Englisch funktioniert am besten).\n\n**Beispiel:** `Synthara, play never gonna give you up`\n\n## Aktivierungswort\nBeginne jeden Befehl mit **Synthara**. Der Bot erkennt auch häufige Fehlhörungen wie *Synthia* oder *Sentara*.\n\nBei **play** sage `Synthara, play` und danach den Songtitel, wenn du dazu aufgefordert wirst.\n\n## Wiedergabe\n- **play** *[Song oder URL]* — suchen oder einreihen (wie `/play`)\n- **pause** — aktuellen Song pausieren\n- **resume** / **continue** — Wiedergabe fortsetzen\n- **next** / **skip** — überspringen; ist die Warteschlange leer, endet die Wiedergabe und der Bot bleibt eine Stunde im Sprachkanal\n- **last** / **previous** / **back** — zum vorherigen Song\n- **replay** *[Position]* — aus Verlauf wiedergeben (`0` = zuletzt gespielt)\n\n## Warteschlange und Modi\n- **shuffle** *[on/off]* — Zufallswiedergabe ein-, ausschalten oder umschalten\n- **repeat** *[off/one/all]* — Wiederholung setzen, oder nur **repeat** sagen, um Modi zu wechseln\n- **autoplay** *[on/off]* — Autoplay ein-, ausschalten oder umschalten, wenn die Warteschlange leer ist\n\n## Sitzung\n- **leave** / **disconnect** — Bot aus dem Sprachkanal trennen\n\n## Tipps\n- Du musst mit dem Bot in einem Sprachkanal sein.\n- Bestätigungen erscheinen im Benachrichtigungskanal des Bots.\n- Nutze `/connect`, um dem Sprachkanal beizutreten, ohne Musik zu starten.\n\nFühre `/about` aus und wähle **Sprachbefehle**, um diese Anleitung erneut zu sehen.",
+					"pl": "# Polecenia Głosowe\nSteruj Syntharą bez użycia rąk na kanale głosowym z botem.\n\n## Na Start\n1. Użyj `/connect` lub `/play`, aby Synthara dołączyła do twojego kanału głosowego.\n2. Zostań na **tym samym kanale głosowym** co bot.\n3. Powiedz słowo aktywujące **Synthara**, a następnie polecenie (najlepiej działa angielski).\n\n**Przykład:** `Synthara, play never gonna give you up`\n\n## Słowo Aktywujące\nKażde polecenie zaczynaj od **Synthara**. Bot rozpoznaje też typowe pomyłki, jak *Synthia* lub *Sentara*.\n\nDla **play** powiedz `Synthara, play`, a potem podaj tytuł, gdy zostaniesz o to poproszony.\n\n## Odtwarzanie\n- **play** *[utwór lub URL]* — wyszukaj lub dodaj do kolejki (jak `/play`)\n- **pause** — wstrzymaj bieżący utwór\n- **resume** / **continue** — wznów odtwarzanie\n- **next** / **skip** — pomiń; gdy kolejka jest pusta, odtwarzanie się kończy, a bot zostaje na głosowym przez godzinę\n- **last** / **previous** / **back** — wróć do poprzedniego utworu\n- **replay** *[pozycja]* — odtwórz z historii (`0` = najnowszy)\n\n## Kolejka i Tryby\n- **shuffle** *[on/off]* — włącz, wyłącz lub przełącz losową kolejność\n- **repeat** *[off/one/all]* — ustaw powtarzanie lub powiedz samo **repeat**, aby przełączać tryby\n- **autoplay** *[on/off]* — włącz, wyłącz lub przełącz autoplay, gdy kolejka się skończy\n\n## Sesja\n- **leave** / **disconnect** — rozłącz bota z kanału głosowego\n\n## Wskazówki\n- Musisz być z botem na kanale głosowym.\n- Potwierdzenia trafiają na kanał powiadomień bota.\n- Użyj `/connect`, aby dołączyć do głosu bez startu muzyki.\n\nUruchom `/about` i wybierz **Polecenia Głosowe**, aby zobaczyć ten przewodnik ponownie.",
+					"ru": "# Голосовые Команды\nУправляйте Synthara без рук в голосовом канале с ботом.\n\n## Начало Работы\n1. Используйте `/connect` или `/play`, чтобы Synthara подключилась к вашему голосовому каналу.\n2. Оставайтесь в **том же голосовом канале**, что и бот.\n3. Произнесите слово активации **Synthara**, затем команду (лучше всего работает английский).\n\n**Пример:** `Synthara, play never gonna give you up`\n\n## Слово Активации\nКаждая команда начинается с **Synthara**. Бот также распознаёт частые ошибки, например *Synthia* или *Sentara*.\n\nДля **play** скажите `Synthara, play`, а затем назовите песню по запросу.\n\n## Воспроизведение\n- **play** *[песня или URL]* — поиск или добавление в очередь (как `/play`)\n- **pause** — пауза\n- **resume** / **continue** — продолжить воспроизведение\n- **next** / **skip** — пропуск; если очередь пуста, воспроизведение завершается, бот остаётся в голосе один час\n- **last** / **previous** / **back** — вернуться к предыдущему треку\n- **replay** *[позиция]* — воспроизвести из истории (`0` = самый недавний)\n\n## Очередь и Режимы\n- **shuffle** *[on/off]* — включить, выключить или переключить перемешивание\n- **repeat** *[off/one/all]* — установить повтор или сказать только **repeat** для переключения режимов\n- **autoplay** *[on/off]* — включить, выключить или переключить автовоспроизведение при пустой очереди\n\n## Сеанс\n- **leave** / **disconnect** — отключить бота от голосового канала\n\n## Советы\n- Вы должны быть с ботом в голосовом канале.\n- Подтверждения публикуются в канале уведомлений бота.\n- Используйте `/connect`, чтобы войти в голос без начала музыки.\n\nЗапустите `/about` и выберите **Голосовые Команды**, чтобы снова открыть это руководство.",
+					"ja": "# 音声コマンド\nボットと同じボイスチャンネルで Synthara をハンズフリー操作できます。\n\n## はじめに\n1. `/connect` または `/play` で Synthara をボイスチャンネルに参加させます。\n2. ボットと**同じボイスチャンネル**に留まってください。\n3. ウェイクワード **Synthara** の後にコマンドを話します（英語が最も安定します）。\n\n**例:** `Synthara, play never gonna give you up`\n\n## ウェイクワード\nすべてのコマンドは **Synthara** から始めます。*Synthia* や *Sentara* などの聞き間違いも認識します。\n\n**play** では `Synthara, play` と言い、促されたら曲名を話せます。\n\n## 再生\n- **play** *[曲または URL]* — 検索またはキューに追加（`/play` と同じ）\n- **pause** — 一時停止\n- **resume** / **continue** — 再生再開\n- **next** / **skip** — スキップ；キューが空の場合は再生が終了し、ボットは1時間ボイスに残ります\n- **last** / **previous** / **back** — 前の曲へ\n- **replay** *[位置]* — 履歴から再生（`0` = 直近）\n\n## キューとモード\n- **shuffle** *[on/off]* — シャッフルのオン/オフ/切替\n- **repeat** *[off/one/all]* — リピート設定、または **repeat** のみでモード切替\n- **autoplay** *[on/off]* — キュー終了時の自動再生をオン/オフ/切替\n\n## セッション\n- **leave** / **disconnect** — ボットをボイスから切断\n\n## ヒント\n- ボットと同じボイスチャンネルにいる必要があります。\n- 確認はボットの通知チャンネルに投稿されます。\n- `/connect` で音楽を始めずにボイスに参加できます。\n\n`/about` で **音声コマンド** を選ぶと、このガイドをいつでも再表示できます。"
+				}
+			},
+			"Error": {
+				"UnknownCategory": {
+					"Title": {
+						"en-US": "Unknown Category",
+						"en-GB": "Unknown Category",
+						"es-ES": "Categoría Desconocida",
+						"es-419": "Categoría Desconocida",
+						"zh-CN": "未知类别",
+						"fr": "Catégorie Inconnue",
+						"it": "Categoria Sconosciuta",
+						"de": "Unbekannte Kategorie",
+						"pl": "Nieznana Kategoria",
+						"ru": "Неизвестная Категория",
+						"ja": "不明なカテゴリ"
+					},
+					"Description": {
+						"en-US": "That guide category is not available.",
+						"en-GB": "That guide category is not available.",
+						"es-ES": "Esa categoría de guía no está disponible.",
+						"es-419": "Esa categoría de guía no está disponible.",
+						"zh-CN": "该指南类别不可用。",
+						"fr": "Cette catégorie de guide n'est pas disponible.",
+						"it": "Quella categoria di guida non è disponibile.",
+						"de": "Diese Anleitungskategorie ist nicht verfügbar.",
+						"pl": "Ta kategoria przewodnika jest niedostępna.",
+						"ru": "Эта категория руководства недоступна.",
+						"ja": "そのガイドカテゴリは利用できません。"
+					}
+				}
+			}
+		},
 		"Lock": {
 			"Success": {
 				"Title": {
@@ -1469,6 +1516,49 @@
 					"pl": "Nie można pobrać informacji o albumie. Spróbuj ponownie później.",
 					"ru": "Не удалось получить информацию об альбоме. Попробуйте позже.",
 					"ja": "アルバム情報を取得できませんでした。後でもう一度お試しください。"
+				}
+			}
+		},
+		"Connect": {
+			"DefaultChannelName": {
+				"en-US": "voice channel",
+				"en-GB": "voice channel",
+				"es-ES": "canal de voz",
+				"es-419": "canal de voz",
+				"zh-CN": "语音频道",
+				"fr": "canal vocal",
+				"it": "canale vocale",
+				"de": "Sprachkanal",
+				"pl": "kanał głosowy",
+				"ru": "голосовой канал",
+				"ja": "ボイスチャンネル"
+			},
+			"Success": {
+				"Title": {
+					"en-US": "Connected",
+					"en-GB": "Connected",
+					"es-ES": "Conectado",
+					"es-419": "Conectado",
+					"zh-CN": "已连接",
+					"fr": "Connecté",
+					"it": "Connesso",
+					"de": "Verbunden",
+					"pl": "Połączono",
+					"ru": "Подключено",
+					"ja": "接続しました"
+				},
+				"Description": {
+					"en-US": "Joined **%s**. You can use voice commands or `/play` to start music.",
+					"en-GB": "Joined **%s**. You can use voice commands or `/play` to start music.",
+					"es-ES": "Unido a **%s**. Puedes usar comandos de voz o `/play` para iniciar música.",
+					"es-419": "Unido a **%s**. Puedes usar comandos de voz o `/play` para iniciar música.",
+					"zh-CN": "已加入 **%s**。您可以使用语音命令或 `/play` 开始播放音乐。",
+					"fr": "Rejoint **%s**. Vous pouvez utiliser les commandes vocales ou `/play` pour démarrer la musique.",
+					"it": "Connesso a **%s**. Puoi usare i comandi vocali o `/play` per avviare la musica.",
+					"de": "**%s** beigetreten. Du kannst Sprachbefehle oder `/play` verwenden, um Musik zu starten.",
+					"pl": "Dołączono do **%s**. Możesz użyć poleceń głosowych lub `/play`, aby rozpocząć muzykę.",
+					"ru": "Подключено к **%s**. Вы можете использовать голосовые команды или `/play` для начала музыки.",
+					"ja": "**%s** に参加しました。音声コマンドまたは `/play` で音楽を開始できます。"
 				}
 			}
 		},
@@ -2952,12 +3042,12 @@
 				"ja": "音声で追加"
 			},
 			"AddedByMemberViaVoice": {
-				"en-US": "By %s via Voice",
-				"en-GB": "By %s via Voice",
-				"es-ES": "Por %s por voz",
-				"es-419": "Por %s por voz",
-				"zh-CN": "由 %s 通过语音",
-				"fr": "Par %s via la voix",
+				"en-US": "Added by %s via Voice",
+				"en-GB": "Added by %s via Voice",
+				"es-ES": "Añadido por %s por voz",
+				"es-419": "Añadido por %s por voz",
+				"zh-CN": "由 %s 通过语音添加",
+				"fr": "Ajouté par %s via la voix",
 				"it": "Da %s tramite voce",
 				"de": "Von %s per Sprache",
 				"pl": "Przez %s głosem",
