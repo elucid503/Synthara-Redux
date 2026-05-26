@@ -7,6 +7,8 @@ import (
 	"Synthara-Redux/Handlers/Autocomplete"
 	"Synthara-Redux/Handlers/Commands"
 	"Synthara-Redux/Handlers/Components"
+	"Synthara-Redux/Handlers/Voice"
+	"Synthara-Redux/Receive"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
 	"encoding/json"
@@ -25,10 +27,10 @@ type CommandEntry struct {
 
 	Name string `json:"name"`
 	NameLocalizations map[discord.Locale]string `json:"name_localizations,omitempty"`
-	
+
 	Description string `json:"description"`
 	DescriptionLocalizations map[discord.Locale]string `json:"description_localizations,omitempty"`
-	
+
 	Options []discord.UnmarshalApplicationCommandOption `json:"options,omitempty"`
 
 	Contexts []discord.InteractionContextType `json:"contexts,omitempty"`
@@ -66,16 +68,19 @@ func InitializeCommands() {
 		for i, opt := range Command.Options {
 
 			Options[i] = opt.ApplicationCommandOption
-			
+
 		}
 
 		CommandsToRegister[Index] = discord.SlashCommandCreate{
 
 			Name: Command.Name,
 			NameLocalizations: Command.NameLocalizations,
+
 			Description: Command.Description,
 			DescriptionLocalizations: Command.DescriptionLocalizations,
+
 			Options: Options,
+
 			Contexts: Command.Contexts,
 
 		}
@@ -95,15 +100,30 @@ func InitializeCommands() {
 
 }
 
+func registerVoiceCommands() {
+
+	Receive.Register(Receive.CommandPlay, Voice.Play)
+	Receive.Register(Receive.CommandPause, Voice.Pause)
+	Receive.Register(Receive.CommandResume, Voice.Resume)
+
+}
+
 func InitializeHandlers() {
-	
+
+	registerVoiceCommands()
+
 	// Ready
 
 	Globals.DiscordClient.AddEventListeners(bot.NewListenerFunc(func(Event *events.Ready) {
+
 		defer func() {
+
 			if r := recover(); r != nil {
+
 				Utils.Logger.Error("Event", fmt.Sprintf("Panic in Ready handler: %v", r))
+
 			}
+
 		}()
 
 		Utils.Logger.Info("Discord", "Discord Client is ready!")
@@ -127,7 +147,7 @@ func InitializeHandlers() {
 			}()
 
 			if Event.Data.GuildID() != nil {
-				
+
 				Guild := Structs.GetGuild(*Event.GuildID(), false)
 
 				if Guild != nil {
@@ -145,57 +165,57 @@ func InitializeHandlers() {
 		go func() {
 
 			// Check if service is restricted for non-developers
-										
+
 			Globals.ServiceRestrictionMutex.RLock()
 
 			IsRestricted := Globals.ServiceRestricted
 			CustomMessage := Globals.ServiceRestrictionMessage
-			
+
 			Globals.ServiceRestrictionMutex.RUnlock()
-			
+
 			if IsRestricted {
-				
+
 				// Check if user is a developer
-				
+
 				DeveloperIDs := os.Getenv("DEVELOPERS")
 				UserID := Event.User().ID.String()
-				
+
 				if !strings.Contains(DeveloperIDs, UserID) {
-					
+
 					// Non-developer trying to use service while restricted
-					
+
 					Locale := Event.Locale().Code()
-					
+
 					Description := Localizations.Get("Commands.Restrict.UserBlocked.Description", Locale)
-					
+
 					if CustomMessage != "" {
-						
+
 						Description = CustomMessage
-						
+
 					}
-					
+
 					Event.CreateMessage(discord.MessageCreate{
-						
+
 						Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
-							
+
 							Title:       Localizations.Get("Commands.Restrict.UserBlocked.Title", Locale),
 							Description: Description,
 							Color:       Utils.ERROR,
-							
+
 						})},
-						
+
 						Flags: discord.MessageFlagEphemeral,
-						
+
 					})
-					
+
 					return
-					
+
 				}
-				
+
 			}
-								
+
 			// Switching for each command; not really a better way to do this
-			
+
 			switch Event.Data.CommandName() {
 
 				case "ping":
@@ -210,7 +230,7 @@ func InitializeHandlers() {
 
 					Commands.Pause(Event)
 
-				case "resume": 
+				case "resume":
 
 					Commands.Resume(Event)
 
@@ -293,7 +313,7 @@ func InitializeHandlers() {
 				case "restrict":
 
 					Commands.Restrict(Event)
-				
+
 				case "forget":
 
 					Commands.Forget(Event)
@@ -317,7 +337,7 @@ func InitializeHandlers() {
 				Utils.Logger.Error("Event", fmt.Sprintf("Panic in AutocompleteInteractionCreate handler: %v", r))
 
 			}
-			
+
 		}()
 
 		go func() {
@@ -385,7 +405,7 @@ func InitializeHandlers() {
 
 			Parts := strings.Split(CustomID, ":")
 			BaseID := Parts[0]
-			
+
 			switch BaseID {
 
 				case "Last":
@@ -508,7 +528,7 @@ func InitializeHandlers() {
 			if (Event.VoiceState.ChannelID == nil && !Guild.Internal.Disconnecting) { // we do not want to call this if Cleanup() was already called...
 
 				go func() {
-					
+
 					Guild.Cleanup(true) // important: we must force cleanup to disconnect as we are disconnected remotely
 
 					ReconnectButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.Reconnect", Guild.Locale.Code()), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
@@ -530,7 +550,7 @@ func InitializeHandlers() {
 					if ErrorSending != nil {
 
 						Utils.Logger.Error("Command", fmt.Sprintf("Error sending manual disconnect message to guild %s: %s", Guild.ID, ErrorSending.Error()))
-					
+
 					}
 
 				}()
@@ -540,7 +560,7 @@ func InitializeHandlers() {
 		}()
 
 	}))
-		
+
 	Utils.Logger.Info("Loader", "Event handlers initialized.")
 
 }
@@ -561,7 +581,7 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 
 		Locale := Event.Locale().Code()
 		WelcomeMessage := Localizations.Get("Embeds.Notifications.Welcome.Content", Locale)
-		
+
 		_, Err := Globals.DiscordClient.Rest.CreateFollowupMessage(Event.ApplicationID(), Event.Token(), discord.MessageCreate{
 
 			Content: WelcomeMessage,
@@ -582,7 +602,7 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 	LatestNotification, NotifError := Structs.GetLatestNotification()
 
 	if NotifError != nil { return } // No notifications found, probably
-	
+
 	if User.LastNotificationSeen == LatestNotification.ID { return }
 
 	// Create notification embed

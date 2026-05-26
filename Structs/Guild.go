@@ -10,6 +10,7 @@ import (
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Globals/Icons"
 	"Synthara-Redux/Globals/Localizations"
+	"Synthara-Redux/Receive"
 	"Synthara-Redux/Utils"
 	"context"
 	"errors"
@@ -43,6 +44,8 @@ type Guild struct {
 
 	VoiceConnection voice.Conn `json:"-"`
 	StreamerMutex sync.Mutex `json:"-"`
+
+	VoiceReceiver *Receive.Receiver `json:"-"`
 
 	Internal GuildInternal `json:"-"`
 
@@ -82,7 +85,7 @@ type GuildInternal struct {
 	Disconnecting bool `json:"disconnecting"`
 
 	InactivityTimer *time.Timer `json:"-"`
-	InactivityMutex sync.Mutex   `json:"-"`
+	InactivityMutex sync.Mutex `json:"-"`
 
 }
 
@@ -91,7 +94,7 @@ func NewGuild(ID snowflake.ID, Locale discord.Locale) *Guild {
 
 	Created := &Guild{
 
-		ID:   ID,
+		ID: ID,
 		Locale: Locale,
 
 		Queue: Queue{
@@ -193,10 +196,15 @@ func GetGuild(ID snowflake.ID, Create bool) *Guild {
 
 // Connect Establishes a voice connection to the specified channel. Gateway events are handled.
 func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID) error {
+
 	defer func() {
+
 		if r := recover(); r != nil {
+
 			Utils.Logger.Error("Guild", fmt.Sprintf("Panic in Guild.Connect for guild %s: %v", G.ID.String(), r))
+
 		}
+
 	}()
 
 	G.Channels.Voice = VoiceChannelID
@@ -222,7 +230,10 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 
 	VoiceConnection := Globals.DiscordClient.VoiceManager.CreateConn(G.ID)
 
-	ErrorOpening := VoiceConnection.Open(OpenContext, G.Channels.Voice, false, true)
+	VoiceCommandsActive := Receive.IsEnabled()
+	SelfDeaf := !VoiceCommandsActive
+
+	ErrorOpening := VoiceConnection.Open(OpenContext, G.Channels.Voice, false, SelfDeaf)
 
 	if ErrorOpening != nil {
 
@@ -236,16 +247,31 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 
 	G.VoiceConnection = VoiceConnection
 
+	if VoiceCommandsActive {
+
+		G.VoiceReceiver = Receive.AttachReceiver(G.ID, VoiceConnection)
+
+	} else if Receive.VoiceCommandsRequested() {
+
+		Utils.Logger.Warn("Guild", fmt.Sprintf("Voice commands requested for guild %s but wake-word model is unavailable; receiver not attached", G.ID))
+
+	}
+
 	return nil;
 
 }
 
 // Disconnect Closes the existing voice connection; if none exists, returns an error
 func (G *Guild) Disconnect(CloseConn bool) error {
+
 	defer func() {
+
 		if r := recover(); r != nil {
+
 			Utils.Logger.Error("Guild", fmt.Sprintf("Panic in Guild.Disconnect for guild %s: %v", G.ID.String(), r))
+
 		}
+
 	}()
 
 	G.Internal.Disconnecting = true
@@ -322,6 +348,15 @@ func (G *Guild) Cleanup(CloseConn bool) error {
 	G.Queue.Previous = nil
 	G.Queue.Upcoming = nil
 	G.Queue.Suggestions = nil
+
+	// We should tear down the voice receiver before the underlying connection
+
+	if G.VoiceReceiver != nil {
+
+		G.VoiceReceiver.Close()
+		G.VoiceReceiver = nil
+
+	}
 
 	// Closes voice connection if requested
 

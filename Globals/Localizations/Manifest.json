@@ -2938,6 +2938,19 @@
 				"ru": "%s Мин",
 				"ja": "%s 分"
 			},
+			"AddedViaVoice": {
+				"en-US": "Added via Voice",
+				"en-GB": "Added via Voice",
+				"es-ES": "Añadido por voz",
+				"es-419": "Añadido por voz",
+				"zh-CN": "通过语音添加",
+				"fr": "Ajouté par la voix",
+				"it": "Aggiunto tramite voce",
+				"de": "Per Sprache hinzugefügt",
+				"pl": "Dodano głosem",
+				"ru": "Добавлено голосом",
+				"ja": "音声で追加"
+			},
 			"SuggestedSong": {
 				"en-US": "This is a **suggested Song**.",
 				"en-GB": "This is a **suggested Song**.",

@@ -1,0 +1,7 @@
+▁S Y N TH AR A :6.0 #0.01
+▁S Y N AR A :5.5 #0.015
+▁S IN TH AR A :5.5 #0.015
+▁C Y N TH AR A :5.0 #0.02
+▁S Y N THER A :5.0 #0.02
+▁S Y N TH A :4.5 #0.02
+▁TA RA :4.0 #0.025
