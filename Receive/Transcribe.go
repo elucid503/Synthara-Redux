@@ -1,19 +1,15 @@
 package Receive
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"Synthara-Redux/Utils"
@@ -23,17 +19,20 @@ import (
 
 const (
 
-	sttLanguage = "en" 	// English only
+	sttLanguage = "en" // English only
 
 	sttLanguageEnv = "VOICE_STT_LANGUAGE"
 
-	xaiPCMChunkBytes = 3200 // ~100ms PCM16 mono @ 16kHz (xAI native rate).
+	xaiPCMChunkBytes = 3200 // 100ms PCM16 mono @ 16kHz.
 
 	sttDebugEnv = "VOICE_STT_DEBUG"
 
 	transcribeHardTimeout = 12 * time.Second
 	transcribeReadyTimeout = 5 * time.Second
 	transcribeDoneWait = 5 * time.Second
+
+	envSTTEndpointing  = "VOICE_STT_ENDPOINTING_MS"
+	defaultEndpointing = 200
 
 )
 
@@ -57,25 +56,22 @@ type Transcriber struct {
 	cancel context.CancelFunc
 
 	ready chan struct{}
-	done  chan struct{}
+	done chan struct{}
 
 	writeMu sync.Mutex
 	pcmBuf []byte
 
 	startOnce sync.Once
+	timeoutOnce sync.Once
 	closeOnce sync.Once
-	doneOnce  sync.Once
+	doneOnce sync.Once
 
 	textMu sync.Mutex
 	text string
 	interim string
-	hadFinal atomic.Bool
 
-	onUpdate OnTranscriptFunc
+	onUpdate   OnTranscriptFunc
 	onUpdateMu sync.Mutex
-
-	bytesSent atomic.Int64
-	finishedAt atomic.Int64
 
 }
 
@@ -88,121 +84,6 @@ type sttEnvelope struct {
 	SpeechFinal bool `json:"speech_final,omitempty"`
 
 	Message string `json:"message,omitempty"`
-
-}
-
-// TranscribeREST uploads raw PCM in one shot (fallback when WebSocket STT is empty).
-func TranscribeREST(Ctx context.Context, PCM []byte, SampleRate int) (string, error) {
-
-	return transcribeRESTPost(Ctx, PCM, SampleRate, true)
-
-}
-
-// TranscribeRESTWake is for short wake-word probes (no keyterm on short clips).
-func TranscribeRESTWake(Ctx context.Context, PCM []byte, SampleRate int) (string, error) {
-
-	return transcribeRESTPost(Ctx, PCM, SampleRate, false)
-
-}
-
-func transcribeRESTPost(Ctx context.Context, PCM []byte, SampleRate int, withKeyterm bool) (string, error) {
-
-	if len(PCM) == 0 {
-
-		return "", errors.New("empty pcm")
-
-	}
-
-	APIKey := os.Getenv("XAI_API_KEY")
-
-	if APIKey == "" {
-
-		return "", errors.New("XAI_API_KEY not set")
-
-	}
-
-	var Body bytes.Buffer
-	Writer := multipart.NewWriter(&Body)
-
-	Lang := sttLanguageValue()
-
-	_ = Writer.WriteField("audio_format", "pcm")
-	_ = Writer.WriteField("sample_rate", strconv.Itoa(SampleRate))
-	_ = Writer.WriteField("language", Lang)
-	_ = Writer.WriteField("format", "true")
-
-	if withKeyterm {
-
-		_ = Writer.WriteField("keyterm", "Synthara")
-
-	}
-
-	FilePart, Err := Writer.CreateFormFile("file", "audio.pcm")
-
-	if Err != nil {
-
-		return "", Err
-
-	}
-
-	if _, Err = FilePart.Write(PCM); Err != nil {
-
-		return "", Err
-
-	}
-
-	if Err = Writer.Close(); Err != nil {
-
-		return "", Err
-
-	}
-
-	Req, Err := http.NewRequestWithContext(Ctx, http.MethodPost, "https://api.x.ai/v1/stt", &Body)
-
-	if Err != nil {
-
-		return "", Err
-
-	}
-
-	Req.Header.Set("Authorization", "Bearer "+APIKey)
-	Req.Header.Set("Content-Type", Writer.FormDataContentType())
-
-	Resp, Err := http.DefaultClient.Do(Req)
-
-	if Err != nil {
-
-		return "", Err
-
-	}
-
-	defer Resp.Body.Close()
-
-	RespBody, Err := io.ReadAll(Resp.Body)
-
-	if Err != nil {
-
-		return "", Err
-
-	}
-
-	if Resp.StatusCode != http.StatusOK {
-
-		return "", fmt.Errorf("xai rest stt http %d: %s", Resp.StatusCode, string(RespBody))
-
-	}
-
-	var Parsed struct {
-		Text string `json:"text"`
-	}
-
-	if Err = json.Unmarshal(RespBody, &Parsed); Err != nil {
-
-		return "", fmt.Errorf("xai rest stt json: %w body=%s", Err, string(RespBody))
-
-	}
-
-	return Parsed.Text, nil
 
 }
 
@@ -242,7 +123,6 @@ func NewTranscriber(Parent context.Context) (*Transcriber, error) {
 		done: make(chan struct{}),
 
 		pcmBuf: make([]byte, 0, xaiPCMChunkBytes*2),
-
 	}
 
 	go T.readLoop(Ctx)
@@ -262,21 +142,6 @@ func NewTranscriber(Parent context.Context) (*Transcriber, error) {
 		return nil, Ctx.Err()
 
 	}
-
-	go func() {
-
-		select {
-
-		case <-time.After(transcribeHardTimeout):
-
-			Utils.Logger.Warn("Receive", "Transcriber: hard timeout reached, finalizing")
-			T.Finalize()
-
-		case <-T.done:
-
-		}
-
-	}()
 
 	return T, nil
 
@@ -339,6 +204,8 @@ func (T *Transcriber) Send(PCM []byte) error {
 
 func (T *Transcriber) writePCM(PCM []byte) error {
 
+	T.startHardTimeout()
+
 	T.conn.SetWriteDeadline(time.Now().Add(2 * time.Second))
 
 	if Err := T.conn.WriteMessage(websocket.BinaryMessage, PCM); Err != nil {
@@ -347,33 +214,52 @@ func (T *Transcriber) writePCM(PCM []byte) error {
 
 	}
 
-	T.bytesSent.Add(int64(len(PCM)))
 	return nil
 
 }
 
-// BytesSent returns total PCM bytes written to the STT socket.
-func (T *Transcriber) BytesSent() int64 {
+func (T *Transcriber) startHardTimeout() {
 
-	return T.bytesSent.Load()
+	T.timeoutOnce.Do(func() {
+
+		go func() {
+
+			select {
+
+			case <-time.After(transcribeHardTimeout):
+
+				Utils.Logger.Warn("Receive", "Transcriber: hard timeout reached, finalizing")
+				T.Finalize()
+
+			case <-T.done:
+
+			}
+
+		}()
+
+	})
 
 }
 
-// Flush sends any buffered PCM still waiting to go out.
-func (T *Transcriber) Flush() error {
+func (T *Transcriber) Done() bool {
 
-	T.writeMu.Lock()
-	defer T.writeMu.Unlock()
+	if T == nil {
 
-	if T.conn == nil || len(T.pcmBuf) == 0 {
-
-		return nil
+		return true
 
 	}
 
-	Err := T.writePCM(T.pcmBuf)
-	T.pcmBuf = T.pcmBuf[:0]
-	return Err
+	select {
+
+	case <-T.done:
+
+		return true
+
+	default:
+
+		return false
+
+	}
 
 }
 
@@ -438,13 +324,6 @@ func (T *Transcriber) bestText() string {
 
 }
 
-// SpeechEnded reports whether any is_final partial arrived.
-func (T *Transcriber) SpeechEnded() bool {
-
-	return T.hadFinal.Load()
-
-}
-
 // Close shuts the WebSocket. Idempotent.
 func (T *Transcriber) Close() {
 
@@ -479,7 +358,6 @@ func (T *Transcriber) signalDone() {
 	T.doneOnce.Do(func() {
 
 		close(T.done)
-		T.finishedAt.Store(time.Now().UnixNano())
 
 	})
 
@@ -533,8 +411,6 @@ func (T *Transcriber) absorbPartial(Env sttEnvelope) {
 
 		}
 
-		T.hadFinal.Store(true)
-
 	} else {
 
 		T.interim = Env.Text
@@ -555,9 +431,8 @@ func (T *Transcriber) absorbPartial(Env sttEnvelope) {
 
 		Text: Best,
 
-		IsFinal: Env.IsFinal,
+		IsFinal:     Env.IsFinal,
 		SpeechFinal: Env.SpeechFinal,
-
 	})
 
 }
@@ -701,13 +576,37 @@ func sttLanguageValue() string {
 func xaiSTTWebSocketURL() string {
 
 	Lang := url.QueryEscape(sttLanguageValue())
+	Endpointing := strconv.Itoa(sttEndpointingMS())
 
 	return "wss://api.x.ai/v1/stt" +
 		"?sample_rate=16000" +
 		"&encoding=pcm" +
 		"&language=" + Lang +
 		"&interim_results=true" +
-		"&endpointing=800" +
+		"&endpointing=" + Endpointing +
 		"&filler_words=false"
+
+}
+
+func sttEndpointingMS() int {
+
+	V := os.Getenv(envSTTEndpointing)
+
+	if V == "" {
+
+		return defaultEndpointing
+
+	}
+
+	Parsed, Err := strconv.Atoi(V)
+
+	if Err != nil || Parsed < 0 || Parsed > 5000 {
+
+		Utils.Logger.Warn("Receive", fmt.Sprintf("Invalid %s=%q, using %d", envSTTEndpointing, V, defaultEndpointing))
+		return defaultEndpointing
+
+	}
+
+	return Parsed
 
 }

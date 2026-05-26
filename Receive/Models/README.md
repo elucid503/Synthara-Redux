@@ -15,7 +15,7 @@ Default directory: `./Receive/Models/kws/` (relative to the process working dire
 | `KWS_KEYWORDS_FILE` | `./Receive/Models/kws/keywords.txt` |
 | `KWS_BPE_VOCAB` | `./Receive/Models/kws/bpe.model` |
 
-Optional tuning: `KWS_KEYWORDS_SCORE`, `KWS_KEYWORDS_THRESHOLD`, `KWS_MAX_ACTIVE_PATHS`, `KWS_BATCH_MS`, `VOICE_WAKE_STT_FALLBACK`, `VOICE_COMMANDS=false` to disable.
+Optional tuning: `KWS_KEYWORDS_SCORE`, `KWS_KEYWORDS_THRESHOLD`, `KWS_MAX_ACTIVE_PATHS`, `KWS_BATCH_MS`, `VOICE_COMMANDS=false` to disable.
 
 If any file is missing, wake-word detection is skipped and voice commands stay off; the rest of the bot still runs.
 

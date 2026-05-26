@@ -112,11 +112,7 @@ func (s *defaultAudioSender) send() {
 			}
 			s.silentFrames--
 		} else if !s.sentSpeakingStop {
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()
-			if err = s.conn.SetSpeaking(ctx, SpeakingFlagNone); err != nil {
-				s.handleErr(err)
-			}
+			s.setSpeakingAsync(SpeakingFlagNone)
 			s.sentSpeakingStop = true
 			s.sentSpeakingStart = false
 		}
@@ -124,11 +120,7 @@ func (s *defaultAudioSender) send() {
 	}
 
 	if !s.sentSpeakingStart {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		if err = s.conn.SetSpeaking(ctx, SpeakingFlagMicrophone); err != nil {
-			s.handleErr(err)
-		}
+		s.setSpeakingAsync(SpeakingFlagMicrophone)
 		s.sentSpeakingStart = true
 		s.sentSpeakingStop = false
 		s.silentFrames = 5
@@ -137,6 +129,16 @@ func (s *defaultAudioSender) send() {
 	if _, err = s.conn.UDP().Write(opus); err != nil {
 		s.handleErr(err)
 	}
+}
+
+func (s *defaultAudioSender) setSpeakingAsync(flags SpeakingFlags) {
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := s.conn.SetSpeaking(ctx, flags); err != nil {
+			s.handleErr(err)
+		}
+	}()
 }
 
 func (s *defaultAudioSender) handleErr(err error) {

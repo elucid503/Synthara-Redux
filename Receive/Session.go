@@ -14,7 +14,9 @@ import (
 
 type transcriberOpenResult struct {
 
+	captureID uint64
 	transcriber *Transcriber
+
 	err error
 
 }
@@ -23,7 +25,6 @@ const (
 
 	stateListening int32 = iota
 	stateCapturing // 1
-	stateBlacklisted // 2
 
 )
 
@@ -34,7 +35,7 @@ const (
 	commandCaptureMin = 2 * time.Second
 	commandCaptureMax = 8 * time.Second
 
-	commandTailAfterPacket  = 2 * time.Second
+	commandTailAfterPacket = 2 * time.Second
 
 	minCommandPCMBytes = TargetSampleRate * 2 * 3 / 2 // 1.5s @ 16kHz mono
 
@@ -75,12 +76,11 @@ type Session struct {
 
 	transcriber *Transcriber
 	transcriberReady chan transcriberOpenResult
+	captureID atomic.Uint64
 
 	captureBuf [][]byte
 	capturePCM []byte
 
-	captureFramesSent int
-	captureSpeechFrames int
 	captureStartedAt time.Time
 
 	cooldownUntil time.Time
@@ -90,12 +90,7 @@ type Session struct {
 
 	awaitingPlayArgs bool // for play specific; TODO: generalize for "command tail" detection?
 
-	probePCM []byte
-	lastWakeProbeAt  time.Time
-
-	wakeProbeBusy atomic.Bool
-	wakeProbeHit chan string
-
+	ctx context.Context
 	cancel context.CancelFunc
 	closed atomic.Bool
 
@@ -118,12 +113,12 @@ func NewSession(GuildID, UserID snowflake.ID, Dispatcher *Dispatcher) (*Session,
 	S := &Session{
 
 		GuildID: GuildID,
-		UserID: UserID,
+		UserID:  UserID,
 
 		dispatcher: Dispatcher,
-		decoder: Decoder,
+		decoder:    Decoder,
 
-		wake: NewWakeStream(),
+		wake:  NewWakeStream(),
 		inbox: make(chan []byte, 512),
 
 		opusPreroll: newOpusPreroll(prerollMaxFrames),
@@ -131,10 +126,9 @@ func NewSession(GuildID, UserID snowflake.ID, Dispatcher *Dispatcher) (*Session,
 		sttUpdates: make(chan TranscriptUpdate, 32),
 
 		transcriberReady: make(chan transcriberOpenResult, 1),
-		wakeProbeHit: make(chan string, 1),
 
+		ctx:    Ctx,
 		cancel: Cancel,
-
 	}
 
 	S.state.Store(stateListening)
@@ -259,10 +253,6 @@ func (S *Session) run(Ctx context.Context) {
 
 			S.handleTranscriptUpdate(Upd)
 
-		case Text := <-S.wakeProbeHit:
-
-			S.drainWakeProbeHit(Text)
-
 		}
 
 	}
@@ -289,9 +279,6 @@ func (S *Session) handleFrame(Opus []byte) {
 
 		if InCooldown {
 
-			// Still probe via STT during post-command cooldown
-
-			S.runSTTProbePath(PCM)
 			return
 
 		}
@@ -329,7 +316,6 @@ func (S *Session) runListening(PCM []int16) {
 
 		}
 
-		S.flushSTTWakeProbeOnSilence()
 		return
 
 	}
@@ -350,14 +336,6 @@ func (S *Session) runListening(PCM []int16) {
 
 	}
 
-	S.runSTTProbePath(PCM)
-
-}
-
-func (S *Session) runSTTProbePath(PCM []int16) {
-
-	S.maybeSTTWakeProbe(PCM)
-
 }
 
 func (S *Session) beginCapture() {
@@ -369,13 +347,10 @@ func (S *Session) beginCapture() {
 	}
 
 	S.wake.Reset()
-	S.probePCM = nil
 
+	captureID := S.captureID.Add(1)
 	S.captureStartedAt = time.Now()
-	S.captureFramesSent = 0
-	S.captureSpeechFrames = 0
-	S.capturePCM = nil
-	S.captureBuf = nil
+	S.resetCaptureBuffers()
 
 	S.decoder.ResetCapturePath()
 
@@ -393,17 +368,11 @@ func (S *Session) beginCapture() {
 		S.capturePCM = append(S.capturePCM, Chunk...)
 		S.captureBuf = append(S.captureBuf, Chunk)
 
-		if FrameHasSpeech(PCMFrame) {
-
-			S.captureSpeechFrames++
-
-		}
-
 	}
 
 	if Drops := S.inboxDrops.Swap(0); Drops > 0 {
 
-		Utils.Logger.Warn("Receive", fmt.Sprintf("Dropped %d opus frame(s) before capture (user %s)", Drops, S.UserID, ))
+		Utils.Logger.Warn("Receive", fmt.Sprintf("Dropped %d opus frame(s) before capture (user %s)", Drops, S.UserID))
 
 	}
 
@@ -411,19 +380,30 @@ func (S *Session) beginCapture() {
 	S.dispatched.Store(false)
 	S.awaitingPlayArgs = false
 
-	go func() {
+	emitVoiceCue(S.GuildID, VoiceCueWake)
+	emitCaptureDuck(S.GuildID, true)
 
-		Trans, ErrTrans := NewTranscriber(context.Background())
-
-		S.transcriberReady <- transcriberOpenResult{transcriber: Trans, err: ErrTrans}
-
-	}()
+	go S.openTranscriber(captureID)
 
 }
 
 func (S *Session) handleTranscriberReady(Res transcriberOpenResult) {
 
-	if S.state.Load() != stateCapturing {
+	if Res.err != nil {
+
+		Utils.Logger.Error("Receive", fmt.Sprintf("Transcriber open failed: %s", Res.err.Error()))
+
+		if S.state.Load() == stateCapturing && Res.captureID == S.captureID.Load() {
+
+			S.abortCapture()
+
+		}
+
+		return
+
+	}
+
+	if S.state.Load() != stateCapturing || Res.captureID != S.captureID.Load() {
 
 		if Res.transcriber != nil {
 
@@ -435,16 +415,20 @@ func (S *Session) handleTranscriberReady(Res transcriberOpenResult) {
 
 	}
 
-	if Res.err != nil {
+	S.attachTranscriber(Res.transcriber)
 
-		Utils.Logger.Error("Receive", fmt.Sprintf("Transcriber open failed: %s", Res.err.Error()))
-		S.abortCapture()
+}
 
+func (S *Session) attachTranscriber(Trans *Transcriber) {
+
+	if Trans == nil || Trans.Done() {
+
+		S.transcriber = nil
 		return
 
 	}
 
-	S.transcriber = Res.transcriber
+	S.transcriber = Trans
 
 	S.transcriber.SetOnUpdate(func(Upd TranscriptUpdate) {
 
@@ -466,10 +450,6 @@ func (S *Session) handleTranscriberReady(Res transcriberOpenResult) {
 
 			Utils.Logger.Warn("Receive", fmt.Sprintf("Transcriber buffered send failed: %s", ErrSend.Error()))
 
-		} else {
-
-			S.captureFramesSent++
-
 		}
 
 	}
@@ -478,16 +458,32 @@ func (S *Session) handleTranscriberReady(Res transcriberOpenResult) {
 
 }
 
+func (S *Session) openTranscriber(captureID uint64) {
+
+	Trans, ErrTrans := NewTranscriber(S.ctx)
+
+	Res := transcriberOpenResult{captureID: captureID, transcriber: Trans, err: ErrTrans}
+
+	select {
+
+		case S.transcriberReady <- Res:
+
+		case <-S.ctx.Done():
+
+			if Trans != nil {
+
+				Trans.Close()
+
+			}
+
+	}
+
+}
+
 func (S *Session) runCapturing(PCM []int16) {
 
 	PCMBytes := Int16ToBytesLE(PCM)
 	S.capturePCM = append(S.capturePCM, PCMBytes...)
-
-	if FrameHasSpeech(PCM) {
-
-		S.captureSpeechFrames++
-
-	}
 
 	if S.transcriber == nil {
 
@@ -516,10 +512,6 @@ func (S *Session) runCapturing(PCM []int16) {
 
 		Utils.Logger.Warn("Receive", fmt.Sprintf("Transcriber send failed: %s", ErrSend.Error()))
 		S.finalizeCapture()
-
-	} else {
-
-		S.captureFramesSent++
 
 	}
 
@@ -622,7 +614,13 @@ func (S *Session) ensureTranscriber(Timeout time.Duration) *Transcriber {
 
 	if S.transcriber != nil {
 
-		return S.transcriber
+		if !S.transcriber.Done() {
+
+			return S.transcriber
+
+		}
+
+		S.transcriber = nil
 
 	}
 
@@ -686,10 +684,9 @@ func (S *Session) finalizeCapture() {
 
 	S.transcriber = nil
 
-	PCMCopy := PreparePCMForSTT(append([]byte(nil), S.capturePCM...))
 	AlreadyDispatched := S.dispatched.Load()
 
-	go func(T *Transcriber, PCM []byte, SkipDispatch bool) {
+	go func(T *Transcriber, SkipDispatch bool) {
 
 		defer func() {
 
@@ -707,16 +704,6 @@ func (S *Session) finalizeCapture() {
 		if SkipDispatch {
 
 			return
-
-		}
-
-		if Text == "" && len(PCM) > 0 {
-
-			if RESTText, ErrREST := TranscribeREST(context.Background(), PCM, TargetSampleRate); ErrREST == nil {
-
-				Text = RESTText
-
-			}
 
 		}
 
@@ -740,7 +727,7 @@ func (S *Session) finalizeCapture() {
 
 		}
 
-	}(Trans, PCMCopy, AlreadyDispatched)
+	}(Trans, AlreadyDispatched)
 
 	S.endCapture()
 
@@ -751,11 +738,7 @@ func (S *Session) endCapture() {
 	S.state.Store(stateListening)
 	S.captureStartedAt = time.Time{}
 
-	S.captureBuf = nil
-	S.capturePCM = nil
-
-	S.captureFramesSent = 0
-	S.captureSpeechFrames = 0
+	S.resetCaptureBuffers()
 
 	S.finalizing.Store(false)
 	S.speechStartAt.Store(0)
@@ -771,8 +754,7 @@ func (S *Session) endCapture() {
 
 	}
 
-	S.opusPreroll.Clear()
-	S.probePCM = nil
+	S.clearListeningAudio()
 
 	if S.decoder != nil {
 
@@ -786,6 +768,22 @@ func (S *Session) endCapture() {
 		S.wake.Reset()
 
 	}
+
+	emitVoiceCue(S.GuildID, VoiceCueEnd)
+	emitCaptureDuck(S.GuildID, false)
+
+}
+
+func (S *Session) resetCaptureBuffers() {
+
+	S.captureBuf = nil
+	S.capturePCM = nil
+
+}
+
+func (S *Session) clearListeningAudio() {
+
+	S.opusPreroll.Clear()
 
 }
 
@@ -822,14 +820,6 @@ func (S *Session) checkPrerollExpiry() {
 	SincePacket := S.silenceSincePacket()
 
 	if SincePacket == 0 || SincePacket < prerollExpireAfterSilence {
-
-		return
-
-	}
-
-	// Don't clear while an STT wake probe is in flight or its hit is queued
-
-	if S.wakeProbeBusy.Load() || len(S.wakeProbeHit) > 0 {
 
 		return
 

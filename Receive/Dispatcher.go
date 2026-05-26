@@ -13,7 +13,7 @@ type CommandHandler func(GuildID, UserID snowflake.ID, Args string)
 
 var (
 
-	commandRegistry   = make(map[string]CommandHandler)
+	commandRegistry = make(map[string]CommandHandler)
 	commandRegistryMu sync.RWMutex
 
 )

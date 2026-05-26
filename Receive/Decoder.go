@@ -9,10 +9,9 @@ import (
 )
 
 const (
-
 	OpusSampleRate = 48000
 	OpusChannels = 2
-	OpusFrameSamples  = 960 // 20ms @ 48kHz, per channel
+	OpusFrameSamples = 960 // 20ms @ 48kHz, per channel
 
 	TargetSampleRate = 16000
 	TargetChannels = 1
@@ -24,8 +23,7 @@ const (
 
 )
 
-// OpusPCMDecoder uses separate decoders for wake-word vs command capture so
-// capture work cannot desync the wake path. Each decoder resets after RTP gaps.
+// OpusPCMDecoder uses separate decoders for wake-word vs command capture
 type OpusPCMDecoder struct {
 
 	wakeDecoder *gopus.Decoder
@@ -61,7 +59,7 @@ func NewOpusPCMDecoder() (*OpusPCMDecoder, error) {
 
 	return &OpusPCMDecoder{
 
-		wakeDecoder:    WakeDec,
+		wakeDecoder: WakeDec,
 		captureDecoder: CaptureDec,
 
 	}, nil
@@ -226,6 +224,7 @@ func (D *OpusPCMDecoder) WakeResets() int {
 type PCMStats struct {
 
 	Frames int
+
 	RMS float32
 	Peak int16
 
@@ -422,7 +421,6 @@ func PCMStatsFrom(Samples []int16) PCMStats {
 		Frames: 1,
 		RMS:    FrameRMS(Samples),
 		Peak:   Peak,
-
 	}
 
 }

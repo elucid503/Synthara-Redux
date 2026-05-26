@@ -237,6 +237,6 @@ func (R *Receiver) logUnknownSSRC(SSRC uint32) {
 
 	}
 
-	Utils.Logger.Warn("Receive", fmt.Sprintf("Opus frame with unknown SSRC %d (guild %s); waiting for Discord speaking event", SSRC, R.GuildID, ))
+	Utils.Logger.Warn("Receive", fmt.Sprintf("Opus frame with unknown SSRC %d (guild %s); waiting for Discord speaking event", SSRC, R.GuildID))
 
 }

@@ -4,7 +4,7 @@ package Receive
 type opusPreroll struct {
 
 	frames [][]byte
-	max    int
+	max int
 
 }
 

@@ -802,11 +802,9 @@ func GetSong(TrackID int64) (Song, error) {
 
 }
 
-const QobuzAPIBase = "https://qdl-api.monochrome.tf"
+const QobuzAPIBase = "https://qobuz.kennyy.com.br/"
 
 // GetStreamURL fetches a direct streaming URL for a track via Qobuz.
-// It resolves the track's ISRC from the HiFi API, searches Qobuz for a
-// matching track, then requests a signed streaming URL at quality 5 (MPEG).
 func GetStreamURL(TrackID int64) (string, error) {
 
 	Cache := Globals.GetOrCreateCache("TidalStreamURLs")

@@ -101,104 +101,12 @@ func Parse(Text string) (ParsedCommand, bool) {
 
 	return ParsedCommand{
 
-		Prefix:  "Synthara", // hardcoded
+		Prefix: "Synthara", // hardcoded
 
 		Command: Cmd,
 		Args: Args,
 
 	}, true
-
-}
-
-// TranscriptHasWake reports whether transcribed text contains the wake word.
-func TranscriptHasWake(Text string) bool {
-
-	if !transcriptLooksEnglish(Text) {
-
-		return false
-
-	}
-
-	Cleaned := strings.ToLower(strings.TrimSpace(stripPunct(Text)))
-
-	if Cleaned == "" {
-
-		return false
-
-	}
-
-	for _, Tok := range strings.Fields(Cleaned) {
-
-		if fuzzyMatchSynthara(Tok) {
-
-			return true
-
-		}
-
-	}
-
-	Compact := strings.ReplaceAll(Cleaned, " ", "")
-
-	for _, Sub := range wakeSubstringHints() {
-
-		if strings.Contains(Compact, Sub) {
-
-			return true
-
-		}
-
-	}
-
-	return false
-
-}
-
-// TranscriptHasWakeProbe is a looser check used only for STT wake fallback.
-func TranscriptHasWakeProbe(Text string) bool {
-
-	if TranscriptHasWake(Text) {
-
-		return true
-
-	}
-
-	if !transcriptLooksEnglish(Text) {
-
-		return false
-
-	}
-
-	Compact := strings.ReplaceAll(strings.ToLower(stripPunct(Text)), " ", "")
-
-	if len(Compact) < 3 {
-
-		return false
-
-	}
-
-	for _, Sub := range wakeSubstringHints() {
-
-		if strings.Contains(Compact, Sub) {
-
-			return true
-
-		}
-
-	}
-
-	return false
-
-}
-
-func wakeSubstringHints() []string {
-
-	return []string{
-
-		"synthar", "synara", "sinthar", "cynthar", "synther", "synthra", "synth",
-		"syntha", "santha", "santor", "centaur", "cintra", "sintera", "syntera",
-		"tara", "dara", "nara", "thara", "sentara", "syntara",
-
-	}
 
 }
 
@@ -246,6 +154,7 @@ func fuzzyMatchSynthara(Token string) bool {
 	}
 
 	// Same starting letter as synthara (s/c) with generous edit distance.
+
 	if len(Token) >= 3 && (Token[0] == 's' || Token[0] == 'c') {
 
 		if levenshtein(Token, Target) <= 4 {
@@ -334,7 +243,7 @@ func stripPunct(S string) string {
 
 }
 
-// levenshtein implements the standard edit distance with O(n) memory.
+// Standard edit distance with O(n) memory.
 func levenshtein(A, B string) int {
 
 	if A == B {

@@ -21,26 +21,27 @@ const (
 
 	envEncoder = "KWS_ENCODER"
 	envDecoder = "KWS_DECODER"
-	envJoiner = "KWS_JOINER"
-	envTokens = "KWS_TOKENS"
+	envJoiner  = "KWS_JOINER"
+	envTokens  = "KWS_TOKENS"
 
-	envKeywordsFile = "KWS_KEYWORDS_FILE"
-	envBpeVocab = "KWS_BPE_VOCAB"
-	envKeywordsScore = "KWS_KEYWORDS_SCORE"
+	envKeywordsFile      = "KWS_KEYWORDS_FILE"
+	envBpeVocab          = "KWS_BPE_VOCAB"
+	envKeywordsScore     = "KWS_KEYWORDS_SCORE"
 	envKeywordsThreshold = "KWS_KEYWORDS_THRESHOLD"
-	envMaxActivePaths = "KWS_MAX_ACTIVE_PATHS"
+	envMaxActivePaths    = "KWS_MAX_ACTIVE_PATHS"
 
-	defaultKeywordsScore = 16.0
-	defaultKeywordsThreshold = 0.000025 // admittedly low, but false-positives not really a big problem here...
-	defaultMaxActivePaths = 16
+	defaultKeywordsScore = 40.0
+	defaultKeywordsThreshold = 0.000001 // favors false positives over missed wakes.
+	defaultMaxActivePaths = 32
 
 )
 
 var (
 
-	wakeSpotter *sherpa.KeywordSpotter
+	wakeSpotter  *sherpa.KeywordSpotter
+
 	wakeInitOnce sync.Once
-	wakeInitErr error
+	wakeInitErr  error
 
 )
 
@@ -85,19 +86,17 @@ func initWakeSpotter() {
 				Encoder: Encoder,
 				Decoder: Decoder,
 				Joiner:  Joiner,
-
 			},
 
-			Tokens: Tokens,
+			Tokens:   Tokens,
 			BpeVocab: BpeVocab,
 
-			NumThreads:   1,
+			NumThreads: 1,
 
 			Provider: "cpu",
 
-			ModelType: "zipformer2",
+			ModelType:    "zipformer2",
 			ModelingUnit: "bpe",
-
 		},
 
 		MaxActivePaths: envIntOrDefault(envMaxActivePaths, defaultMaxActivePaths),
@@ -105,7 +104,6 @@ func initWakeSpotter() {
 
 		KeywordsScore: envFloatOrDefault(envKeywordsScore, defaultKeywordsScore),
 		KeywordsThreshold: envFloatOrDefault(envKeywordsThreshold, defaultKeywordsThreshold),
-
 	}
 
 	Spotter := sherpa.NewKeywordSpotter(Cfg)

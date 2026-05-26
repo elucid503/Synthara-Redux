@@ -24,17 +24,15 @@ import (
 )
 
 type CommandEntry struct {
-
-	Name string `json:"name"`
+	Name              string                    `json:"name"`
 	NameLocalizations map[discord.Locale]string `json:"name_localizations,omitempty"`
 
-	Description string `json:"description"`
+	Description              string                    `json:"description"`
 	DescriptionLocalizations map[discord.Locale]string `json:"description_localizations,omitempty"`
 
 	Options []discord.UnmarshalApplicationCommandOption `json:"options,omitempty"`
 
 	Contexts []discord.InteractionContextType `json:"contexts,omitempty"`
-
 }
 
 func InitializeCommands() {
@@ -43,7 +41,7 @@ func InitializeCommands() {
 
 	if ErrorReading != nil {
 
-		Utils.Logger.Error("Loader", "Failed to read Commands.json: " + ErrorReading.Error())
+		Utils.Logger.Error("Loader", "Failed to read Commands.json: "+ErrorReading.Error())
 
 	}
 
@@ -53,7 +51,7 @@ func InitializeCommands() {
 
 	if ErrorUnmarshaling != nil {
 
-		Utils.Logger.Error("Loader", "Failed to unmarshal Commands.json: " + ErrorUnmarshaling.Error())
+		Utils.Logger.Error("Loader", "Failed to unmarshal Commands.json: "+ErrorUnmarshaling.Error())
 
 	}
 
@@ -73,16 +71,15 @@ func InitializeCommands() {
 
 		CommandsToRegister[Index] = discord.SlashCommandCreate{
 
-			Name: Command.Name,
+			Name:              Command.Name,
 			NameLocalizations: Command.NameLocalizations,
 
-			Description: Command.Description,
+			Description:              Command.Description,
 			DescriptionLocalizations: Command.DescriptionLocalizations,
 
 			Options: Options,
 
 			Contexts: Command.Contexts,
-
 		}
 
 	}
@@ -91,7 +88,7 @@ func InitializeCommands() {
 
 	if ErrorSetting != nil {
 
-		Utils.Logger.Error("Loader", "Failed to set global slash commands: " + ErrorSetting.Error())
+		Utils.Logger.Error("Loader", "Failed to set global slash commands: "+ErrorSetting.Error())
 		return
 
 	}
@@ -105,6 +102,34 @@ func registerVoiceCommands() {
 	Receive.Register(Receive.CommandPlay, Voice.Play)
 	Receive.Register(Receive.CommandPause, Voice.Pause)
 	Receive.Register(Receive.CommandResume, Voice.Resume)
+
+	Receive.SetVoiceCueHandler(func(GuildID snowflake.ID, Kind Receive.VoiceCueKind) {
+
+		Guild := Structs.GetGuild(GuildID, false)
+
+		if Guild == nil {
+
+			return
+
+		}
+
+		Guild.PlayVoiceCue(Kind)
+
+	})
+
+	Receive.SetVoiceCaptureDuckHandler(func(GuildID snowflake.ID, Start bool) {
+
+		Guild := Structs.GetGuild(GuildID, false)
+
+		if Guild == nil {
+
+			return
+
+		}
+
+		Guild.SetVoiceCaptureDucked(Start)
+
+	})
 
 }
 
@@ -139,7 +164,7 @@ func InitializeHandlers() {
 			}
 		}()
 
-		go func ()  {
+		go func() {
 			defer func() {
 				if r := recover(); r != nil {
 					Utils.Logger.Error("Event", fmt.Sprintf("Panic in ApplicationCommandInteractionCreate goroutine: %v", r))
@@ -201,11 +226,9 @@ func InitializeHandlers() {
 							Title:       Localizations.Get("Commands.Restrict.UserBlocked.Title", Locale),
 							Description: Description,
 							Color:       Utils.ERROR,
-
 						})},
 
 						Flags: discord.MessageFlagEphemeral,
-
 					})
 
 					return
@@ -218,105 +241,105 @@ func InitializeHandlers() {
 
 			switch Event.Data.CommandName() {
 
-				case "ping":
+			case "ping":
 
-					Commands.Ping(Event)
+				Commands.Ping(Event)
 
-				case "play":
+			case "play":
 
-					Commands.Play(Event)
+				Commands.Play(Event)
 
-				case "pause":
+			case "pause":
 
-					Commands.Pause(Event)
+				Commands.Pause(Event)
 
-				case "resume":
+			case "resume":
 
-					Commands.Resume(Event)
+				Commands.Resume(Event)
 
-				case "next":
+			case "next":
 
-					Commands.Next(Event)
+				Commands.Next(Event)
 
-				case "last":
+			case "last":
 
-					Commands.Last(Event)
+				Commands.Last(Event)
 
-				case "jump":
+			case "jump":
 
-					Commands.Jump(Event)
+				Commands.Jump(Event)
 
-				case "replay":
+			case "replay":
 
-					Commands.Replay(Event)
+				Commands.Replay(Event)
 
-				case "repeat":
+			case "repeat":
 
-					Commands.Repeat(Event)
+				Commands.Repeat(Event)
 
-				case "shuffle":
+			case "shuffle":
 
-					Commands.Shuffle(Event)
+				Commands.Shuffle(Event)
 
-				case "autoplay":
+			case "autoplay":
 
-					Commands.Autoplay(Event)
+				Commands.Autoplay(Event)
 
-				case "lyrics":
+			case "lyrics":
 
-					Commands.Lyrics(Event)
+				Commands.Lyrics(Event)
 
-				case "controls":
+			case "controls":
 
-					Commands.Controls(Event)
+				Commands.Controls(Event)
 
-				case "queue":
+			case "queue":
 
-					Commands.Queue(Event)
+				Commands.Queue(Event)
 
-				case "move":
+			case "move":
 
-					Commands.Move(Event)
+				Commands.Move(Event)
 
-				case "lock":
+			case "lock":
 
-					Commands.Lock(Event)
+				Commands.Lock(Event)
 
-				case "unlock":
+			case "unlock":
 
-					Commands.Unlock(Event)
+				Commands.Unlock(Event)
 
-				case "stats":
+			case "stats":
 
-					Commands.Stats(Event)
+				Commands.Stats(Event)
 
-				case "album":
+			case "album":
 
-					Commands.Album(Event)
+				Commands.Album(Event)
 
-				case "leave":
+			case "leave":
 
-					Commands.Leave(Event)
+				Commands.Leave(Event)
 
-				case "notify":
+			case "notify":
 
-					Commands.Notify(Event)
+				Commands.Notify(Event)
 
-				case "inspect":
+			case "inspect":
 
-					Commands.Inspect(Event)
+				Commands.Inspect(Event)
 
-				case "delete":
+			case "delete":
 
-					Commands.Delete(Event)
+				Commands.Delete(Event)
 
-				case "restrict":
+			case "restrict":
 
-					Commands.Restrict(Event)
+				Commands.Restrict(Event)
 
-				case "forget":
+			case "forget":
 
-					Commands.Forget(Event)
+				Commands.Forget(Event)
 
 			}
 
@@ -353,29 +376,29 @@ func InitializeHandlers() {
 
 			switch Event.Data.CommandName {
 
-				case "play":
+			case "play":
 
-					Autocomplete.PlayAutocomplete(Event)
+				Autocomplete.PlayAutocomplete(Event)
 
-				case "jump":
+			case "jump":
 
-					Autocomplete.JumpAutocomplete(Event)
+				Autocomplete.JumpAutocomplete(Event)
 
-				case "replay":
+			case "replay":
 
-					Autocomplete.ReplayAutocomplete(Event)
+				Autocomplete.ReplayAutocomplete(Event)
 
-				case "move":
+			case "move":
 
-					Autocomplete.MoveAutocomplete(Event)
+				Autocomplete.MoveAutocomplete(Event)
 
-				case "inspect":
+			case "inspect":
 
-					Autocomplete.InspectAutocomplete(Event)
+				Autocomplete.InspectAutocomplete(Event)
 
-				case "delete":
+			case "delete":
 
-					Autocomplete.DeleteAutocomplete(Event)
+				Autocomplete.DeleteAutocomplete(Event)
 
 			}
 
@@ -408,77 +431,77 @@ func InitializeHandlers() {
 
 			switch BaseID {
 
-				case "Last":
+			case "Last":
 
-					Components.Last(Event)
+				Components.Last(Event)
 
-				case "Lyrics":
+			case "Lyrics":
 
-					Components.Lyrics(Event)
+				Components.Lyrics(Event)
 
-				case "Play":
+			case "Play":
 
-					Components.Resume(Event)
+				Components.Resume(Event)
 
-				case "Pause":
+			case "Pause":
 
-					Components.Pause(Event)
+				Components.Pause(Event)
 
-				case "Queue":
+			case "Queue":
 
-					Components.Queue(Event)
+				Components.Queue(Event)
 
-				case "Next":
+			case "Next":
 
-					Components.Next(Event)
+				Components.Next(Event)
 
-				case "RemoveSong":
+			case "RemoveSong":
 
-					if len(Parts) > 1 {
+				if len(Parts) > 1 {
 
-						TidalID, ParseErr := strconv.ParseInt(Parts[1], 10, 64)
+					TidalID, ParseErr := strconv.ParseInt(Parts[1], 10, 64)
 
-						if ParseErr == nil {
+					if ParseErr == nil {
 
-							Components.RemoveSong(Event, TidalID)
-
-						}
+						Components.RemoveSong(Event, TidalID)
 
 					}
 
-				case "JumpToSong":
+				}
 
-					if len(Parts) > 1 {
+			case "JumpToSong":
 
-						TidalID, ParseErr := strconv.ParseInt(Parts[1], 10, 64)
+				if len(Parts) > 1 {
 
-						if ParseErr == nil {
+					TidalID, ParseErr := strconv.ParseInt(Parts[1], 10, 64)
 
-							Components.JumpToSong(Event, TidalID)
+					if ParseErr == nil {
 
-						}
+						Components.JumpToSong(Event, TidalID)
 
 					}
 
-				case "Reconnect":
+				}
 
-					Components.Reconnect(Event)
+			case "Reconnect":
 
-				case "AutoPlay":
+				Components.Reconnect(Event)
 
-					Components.Autoplay(Event)
+			case "AutoPlay":
 
-				case "AlbumEnqueue":
+				Components.Autoplay(Event)
 
-					Components.AlbumEnqueue(Event)
+			case "AlbumEnqueue":
 
-				case "AlbumPlay":
+				Components.AlbumEnqueue(Event)
 
-					Components.AlbumPlay(Event)
+			case "AlbumPlay":
 
-				case "Disconnect":
+				Components.AlbumPlay(Event)
 
-					Components.Disconnect(Event)
+			case "Disconnect":
+
+				Components.Disconnect(Event)
 
 			}
 
@@ -499,7 +522,7 @@ func InitializeHandlers() {
 
 		}()
 
-		go func () {
+		go func() {
 
 			defer func() {
 
@@ -511,21 +534,21 @@ func InitializeHandlers() {
 
 			}()
 
-			if (Event.VoiceState.UserID != Globals.DiscordClient.ApplicationID) {
+			if Event.VoiceState.UserID != Globals.DiscordClient.ApplicationID {
 
-				return; // Not our bot
+				return // Not our bot
 
 			}
 
 			Guild := Structs.GetGuild(Event.VoiceState.GuildID, false) // does not create if not found
 
-			if (Guild == nil) {
+			if Guild == nil {
 
-				return; // No active guild session
+				return // No active guild session
 
 			}
 
-			if (Event.VoiceState.ChannelID == nil && !Guild.Internal.Disconnecting) { // we do not want to call this if Cleanup() was already called...
+			if Event.VoiceState.ChannelID == nil && !Guild.Internal.Disconnecting { // we do not want to call this if Cleanup() was already called...
 
 				go func() {
 
@@ -534,7 +557,6 @@ func InitializeHandlers() {
 					ReconnectButton := discord.NewButton(discord.ButtonStyleSecondary, Localizations.Get("Buttons.Reconnect", Guild.Locale.Code()), "Reconnect", "", 0).WithEmoji(discord.ComponentEmoji{
 
 						ID: snowflake.MustParse(Icons.GetID(Icons.Call)),
-
 					})
 
 					_, ErrorSending := Globals.DiscordClient.Rest.CreateMessage(Guild.Channels.Text, discord.NewMessageCreate().
@@ -543,7 +565,6 @@ func InitializeHandlers() {
 							Title:       Localizations.Get("Embeds.Notifications.ManualDisconnect.Title", Guild.Locale.Code()),
 							Author:      Localizations.Get("Embeds.Categories.Notifications", Guild.Locale.Code()),
 							Description: Localizations.Get("Embeds.Notifications.ManualDisconnect.Description", Guild.Locale.Code()),
-
 						})).
 						AddActionRow(ReconnectButton))
 
@@ -586,12 +607,11 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 
 			Content: WelcomeMessage,
 			Flags:   discord.MessageFlagEphemeral,
-
 		})
 
 		if Err != nil {
 
-			Utils.Logger.Error("Notification", "Failed to send welcome message to user " + UserID.String() + ": " + Err.Error())
+			Utils.Logger.Error("Notification", "Failed to send welcome message to user "+UserID.String()+": "+Err.Error())
 
 		}
 
@@ -601,9 +621,13 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 
 	LatestNotification, NotifError := Structs.GetLatestNotification()
 
-	if NotifError != nil { return } // No notifications found, probably
+	if NotifError != nil {
+		return
+	} // No notifications found, probably
 
-	if User.LastNotificationSeen == LatestNotification.ID { return }
+	if User.LastNotificationSeen == LatestNotification.ID {
+		return
+	}
 
 	// Create notification embed
 
@@ -611,10 +635,9 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 
 		Title:       LatestNotification.Title,
 		Description: LatestNotification.Description,
-		Author: Localizations.Get("Embeds.Categories.Notifications", Event.Locale().Code()),
+		Author:      Localizations.Get("Embeds.Categories.Notifications", Event.Locale().Code()),
 
-		Color:       Utils.PRIMARY,
-
+		Color: Utils.PRIMARY,
 	})
 
 	// Sends as follow-up
@@ -622,7 +645,6 @@ func CheckAndDisplayNotification(Event *events.ApplicationCommandInteractionCrea
 	Event.Client().Rest.CreateFollowupMessage(Event.ApplicationID(), Event.Token(), discord.MessageCreate{
 
 		Embeds: []discord.Embed{NotificationEmbed},
-
 	})
 
 	// Mark as seen (after displaying the notification)
