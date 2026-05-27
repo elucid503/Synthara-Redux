@@ -60,6 +60,7 @@ type Session struct {
 	inboxDrops atomic.Uint64
 
 	wakeCh chan struct{}
+	tickCh chan struct{}
 
 	sttUpdates chan TranscriptUpdate
 	opusPreroll opusPreroll
@@ -118,6 +119,7 @@ func NewSession(GuildID, UserID snowflake.ID, Dispatcher *Dispatcher) (*Session,
 
 		inbox: make(chan []byte, 256),
 		wakeCh: make(chan struct{}, 1),
+		tickCh: make(chan struct{}, 1),
 
 		opusPreroll: newOpusPreroll(prerollMaxFrames),
 		sttUpdates: make(chan TranscriptUpdate, 32),
@@ -282,6 +284,10 @@ func (S *Session) run(Ctx context.Context) {
 		case Upd := <-S.sttUpdates:
 
 			S.handleTranscriptUpdate(Upd)
+
+		case <-S.tickCh:
+
+			S.checkTimeouts()
 
 		}
 
@@ -781,7 +787,15 @@ func (S *Session) timeoutLoop(Ctx context.Context) {
 
 		case <-Ticker.C:
 
-			S.checkTimeouts()
+			// Deliver a tick to eliminate data races on transcriber, capturePCM, etc.
+
+			select {
+
+				case S.tickCh <- struct{}{}:
+
+				default:
+
+			}
 
 		}
 

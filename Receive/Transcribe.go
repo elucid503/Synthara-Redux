@@ -36,6 +36,10 @@ const (
 
 	defaultEndpointing = 500 // silence gap in ms to finalize an utterance, per xAI recommendation
 
+	// pcmSilenceThreshold is the per-sample absolute-value ceiling below which a
+	// PCM16 chunk is considered silent and is not forwarded to xAI.
+	pcmSilenceThreshold = 256
+
 )
 
 // TranscriptUpdate is delivered to the session on each STT partial.
@@ -87,6 +91,25 @@ type sttEnvelope struct {
 	SpeechFinal bool `json:"speech_final,omitempty"`
 
 	Message string `json:"message,omitempty"`
+
+}
+
+// isPCMSilent reports whether every PCM16-LE sample in the chunk falls within the silence threshold.
+func isPCMSilent(PCM []byte) bool {
+
+	for i := 0; i+1 < len(PCM); i += 2 {
+
+		s := int16(uint16(PCM[i]) | uint16(PCM[i+1])<<8)
+
+		if s < -pcmSilenceThreshold || s > pcmSilenceThreshold {
+
+			return false
+
+		}
+
+	}
+
+	return true
 
 }
 
@@ -160,22 +183,28 @@ func (T *Transcriber) SetOnUpdate(Fn OnTranscriptFunc) {
 
 }
 
-// Send appends PCM and flushes in ~100ms chunks (xAI recommendation).
+// Send appends PCM and flushes in ~100ms chunks (xAI recommendation). Silent chunks are dropped.
 func (T *Transcriber) Send(PCM []byte) error {
 
-	if T == nil || len(PCM) == 0 {
+	if T == nil {
 
 		return errors.New("transcriber closed")
 
 	}
 
+	if len(PCM) == 0 {
+
+		return nil
+
+	}
+
 	select {
 
-	case <-T.done:
+		case <-T.done:
 
-		return errors.New("transcriber finished")
+			return errors.New("transcriber finished")
 
-	default:
+		default:
 
 	}
 
@@ -191,6 +220,12 @@ func (T *Transcriber) Send(PCM []byte) error {
 	T.pcmBuf.Append(PCM)
 
 	for _, Chunk := range T.pcmBuf.DrainChunks(xaiPCMChunkBytes) {
+
+		if isPCMSilent(Chunk) {
+
+			continue
+
+		}
 
 		if Err := T.writePCM(Chunk); Err != nil {
 
@@ -276,11 +311,15 @@ func (T *Transcriber) Finalize() {
 
 			for _, Chunk := range T.pcmBuf.DrainChunks(xaiPCMChunkBytes) {
 
-				_ = T.writePCM(Chunk)
+				if !isPCMSilent(Chunk) {
+
+					_ = T.writePCM(Chunk)
+
+				}
 
 			}
 
-			if Tail := T.pcmBuf.Remainder(); len(Tail) > 0 {
+			if Tail := T.pcmBuf.Remainder(); len(Tail) > 0 && !isPCMSilent(Tail) {
 
 				_ = T.writePCM(Tail)
 

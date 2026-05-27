@@ -88,7 +88,6 @@ func (s *defaultAudioReceiver) receive() {
 		return
 	}
 	if err != nil {
-		s.logger.Error("error while reading packet", slog.Any("err", err))
 		return
 	}
 	if s.opusReceiver != nil {

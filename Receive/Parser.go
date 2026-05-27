@@ -245,7 +245,7 @@ func normalizeCommand(Token string) string {
 
 	switch Token {
 
-	case "play", "plays", "played":
+	case "play", "plays", "played", "enqueue", "add", "queue":
 
 		return CommandPlay
 
