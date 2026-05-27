@@ -3042,17 +3042,17 @@
 				"ja": "音声で追加"
 			},
 			"AddedByMemberViaVoice": {
-				"en-US": "Added by %s via Voice",
-				"en-GB": "Added by %s via Voice",
-				"es-ES": "Añadido por %s por voz",
-				"es-419": "Añadido por %s por voz",
-				"zh-CN": "由 %s 通过语音添加",
-				"fr": "Ajouté par %s via la voix",
-				"it": "Da %s tramite voce",
-				"de": "Von %s per Sprache",
-				"pl": "Przez %s głosem",
-				"ru": "От %s голосом",
-				"ja": "%s による音声"
+				"en-US": "Requested by %s via Voice",
+				"en-GB": "Requested by %s via Voice",
+				"es-ES": "Solicitado por %s por voz",
+				"es-419": "Solicitado por %s por voz",
+				"zh-CN": "由 %s 通过语音请求",
+				"fr": "Demandé par %s via la voix",
+				"it": "Richiesto da %s tramite voce",
+				"de": "Angefordert von %s per Sprache",
+				"pl": "Zamówione przez %s głosem",
+				"ru": "Запрошено %s голосом",
+				"ja": "音声で %s にリクエストされました"
 			},
 			"SuggestedSong": {
 				"en-US": "This is a **suggested Song**.",

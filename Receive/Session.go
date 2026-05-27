@@ -41,8 +41,8 @@ const (
 
 	prerollMaxFrames = 50 // ~1s @ 20ms/frame — enough to cover the wake word + KWS detection latency
 
-	playArgsPacketSilence = 2 * time.Second
-	minPlayArgsCapture = 2 * time.Second
+	playArgsPacketSilence = 800 * time.Millisecond // fallback end-of-args detection via Discord packet gap
+	minPlayArgsCapture = 1 * time.Second
 
 	postCaptureCooldown = 150 * time.Millisecond
 

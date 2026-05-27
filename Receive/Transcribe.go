@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -31,8 +32,11 @@ const (
 	transcribeReadyTimeout = 5 * time.Second
 	transcribeDoneWait = 5 * time.Second
 
-	envSTTEndpointing  = "VOICE_STT_ENDPOINTING_MS"
-	defaultEndpointing = 200
+	envSTTEndpointing = "VOICE_STT_ENDPOINTING_MS"
+	// Silence (ms) before xAI fires speech_final. Must clear typical mid-phrase
+	// pauses in a spoken song title so multi-word "play" args aren't cut short;
+	// still tight enough to keep the fast finalize path responsive.
+	defaultEndpointing = 500
 
 )
 
@@ -67,8 +71,9 @@ type Transcriber struct {
 	doneOnce sync.Once
 
 	textMu sync.Mutex
-	text string
-	interim string
+	text string // committed: stitched, finalized utterances
+	utterance string // chunk-finals for the in-progress utterance (preview only)
+	interim string // volatile interim hypothesis for the current chunk
 
 	onUpdate   OnTranscriptFunc
 	onUpdateMu sync.Mutex
@@ -314,13 +319,65 @@ func (T *Transcriber) bestText() string {
 	T.textMu.Lock()
 	defer T.textMu.Unlock()
 
-	if T.text != "" {
+	return joinSpace(T.text, T.utterance, T.interim)
 
-		return T.text
+}
+
+// joinSpace concatenates non-empty, trimmed parts with a single space.
+func joinSpace(Parts ...string) string {
+
+	Out := ""
+
+	for _, P := range Parts {
+
+		P = strings.TrimSpace(P)
+
+		if P == "" {
+
+			continue
+
+		}
+
+		if Out == "" {
+
+			Out = P
+
+		} else {
+
+			Out = Out + " " + P
+
+		}
 
 	}
 
-	return T.interim
+	return Out
+
+}
+
+// appendFinal appends Addition to Existing unless it is already the tail of Existing. Both are trimmed, and if Existing is empty, Addition is returned as-is.
+func appendFinal(Existing, Addition string) string {
+
+	Addition = strings.TrimSpace(Addition)
+
+	if Addition == "" {
+
+		return Existing
+
+	}
+
+	if Existing == "" {
+
+		return Addition
+
+	}
+
+	if strings.HasSuffix(Existing, Addition) {
+
+		return Existing
+
+	}
+
+	return Existing + " " + Addition
 
 }
 
@@ -385,45 +442,43 @@ func (T *Transcriber) emitUpdate(Upd TranscriptUpdate) {
 
 func (T *Transcriber) absorbPartial(Env sttEnvelope) {
 
-	if Env.Text == "" {
-
-		if Env.SpeechFinal {
-
-			T.emitUpdate(TranscriptUpdate{Text: T.bestText(), IsFinal: true, SpeechFinal: true})
-
-		}
-
-		return
-
-	}
-
 	T.textMu.Lock()
 
-	if Env.IsFinal {
+	switch {
 
-		if T.text == "" {
+	case Env.SpeechFinal:
 
-			T.text = Env.Text
+		// Utterance boundary is a ~3s locked slice of the in-progress utterance, finalized by a silence gap
 
-		} else {
+		Utterance := Env.Text
 
-			T.text = T.text + " " + Env.Text
+		if Utterance == "" {
+
+			Utterance = joinSpace(T.utterance, T.interim)
 
 		}
 
-	} else {
+		T.text = appendFinal(T.text, Utterance)
+		T.utterance = ""
+		T.interim = ""
+
+	case Env.IsFinal:
+
+		// Chunk-final: a ~3s locked slice of the in-progress utterance. Buffer
+		// it for live previews only. The eventual speech_final carries the
+		// authoritative stitched text, so merging this into T.text would double
+		// the transcript once that arrives.
+
+		T.utterance = joinSpace(T.utterance, Env.Text)
+		T.interim = ""
+
+	default:
 
 		T.interim = Env.Text
 
 	}
 
-	Best := T.text
-
-	if Best == "" {
-
-		Best = T.interim
-
-	}
+	Best := joinSpace(T.text, T.utterance, T.interim)
 
 	T.textMu.Unlock()
 
@@ -529,25 +584,36 @@ func (T *Transcriber) readLoop(Ctx context.Context) {
 
 		case "transcript.done":
 
+			T.textMu.Lock()
+
 			if Env.Text != "" {
 
-				T.textMu.Lock()
+				// Authoritative full transcript after audio.done flush
 
-				if T.text == "" {
+				T.text = strings.TrimSpace(Env.Text)
 
-					T.text = Env.Text
+			} else {
+
+				// Empty flush, so we fold any pending preview into the committed text
+
+				T.text = joinSpace(T.text, T.utterance, T.interim)
+
+				if os.Getenv(sttDebugEnv) != "" {
+
+					Utils.Logger.Info("Receive", "STT transcript.done with empty text (WebSocket)")
 
 				}
 
-				T.textMu.Unlock()
-
-			} else if os.Getenv(sttDebugEnv) != "" {
-
-				Utils.Logger.Info("Receive", "STT transcript.done with empty text (WebSocket)")
-
 			}
 
-			T.emitUpdate(TranscriptUpdate{Text: T.bestText(), IsFinal: true, SpeechFinal: true})
+			T.utterance = ""
+			T.interim = ""
+
+			Best := T.text
+
+			T.textMu.Unlock()
+
+			T.emitUpdate(TranscriptUpdate{Text: Best, IsFinal: true, SpeechFinal: true})
 			return
 
 		case "error":
