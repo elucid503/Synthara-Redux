@@ -170,6 +170,14 @@ func (T *Transcriber) Send(PCM []byte) error {
 
 	}
 
+	// Drop silent frames so blank audio is never streamed to xAI.
+
+	if pcmIsSilent(PCM) {
+
+		return nil
+
+	}
+
 	select {
 
 	case <-T.done:
@@ -320,6 +328,31 @@ func (T *Transcriber) bestText() string {
 	defer T.textMu.Unlock()
 
 	return joinSpace(T.text, T.utterance, T.interim)
+
+}
+
+// pcmIsSilent reports whether a little-endian PCM16 chunk sits below the shared acoustic-silence threshold (same one as in wake detection)
+func pcmIsSilent(PCM []byte) bool {
+
+	N := len(PCM) / 2
+
+	if N == 0 {
+
+		return true
+
+	}
+
+	var Sum float64
+
+	for i := 0; i < N; i++ {
+
+		S := int16(uint16(PCM[i*2]) | uint16(PCM[i*2+1])<<8)
+		F := float64(S) / 32768.0
+		Sum += F * F
+
+	}
+
+	return float32(Sum/float64(N)) < hotMicEnergyThreshold
 
 }
 

@@ -653,11 +653,14 @@ func (S *Session) abortCapture() {
 	Trans := S.transcriber
 	S.transcriber = nil
 
+	// The command was already dispatched (JIT detection), so the final
+	// transcript is unwanted. Close tears the WebSocket down at once instead of
+	// flushing audio.done and waiting out transcript.done.
 	go func(T *Transcriber) {
 
 		if T != nil {
 
-			T.Finalize()
+			T.Close()
 
 		}
 
@@ -702,14 +705,17 @@ func (S *Session) finalizeCapture() {
 
 		}()
 
-		T.Finalize()
-		Text := T.Result()
-
 		if SkipDispatch {
 
+			// Result already dispatched via JIT; skip the audio.done or transcript.done round-trip
+
+			T.Close()
 			return
 
 		}
+
+		T.Finalize()
+		Text := T.Result()
 
 		if Text == "" {
 
