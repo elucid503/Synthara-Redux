@@ -60,7 +60,6 @@ function Identify({ InitialValue, Required, OnClose, OnSubmit }: IdentifyProps) 
                         <div className="min-w-0">
 
                             <div className="truncate text-lg font-semibold text-white">Identification</div>
-                            <div className="truncate text-sm text-zinc-400">Shown on web queue changes</div>
 
                         </div>
 
@@ -78,13 +77,7 @@ function Identify({ InitialValue, Required, OnClose, OnSubmit }: IdentifyProps) 
 
                 </div>
 
-                <div className="mb-5 text-sm text-zinc-300">
-
-                    Identify yourself so people in the call can see who made web edits.
-
-                </div>
-
-                <label className="mb-2 block text-sm text-zinc-300" htmlFor="identify-name">Display Name</label>
+                <label className="my-2 block text-sm text-zinc-300" htmlFor="identify-name">Display Name</label>
                 <input id="identify-name" value={Name} onChange={(Event) => SetName(Event.target.value)} className="mb-5 w-full rounded-lg border border-white/10 bg-zinc-800 px-3 py-2 text-white outline-none transition-colors placeholder:text-zinc-500 focus:border-white/40" placeholder="Enter your display name..." maxLength={40} autoFocus />
 
                 <div className="mb-2 text-sm text-zinc-300">Icon</div>

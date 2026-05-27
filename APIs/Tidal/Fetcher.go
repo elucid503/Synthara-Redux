@@ -4,12 +4,15 @@ import (
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Utils"
 	"compress/gzip"
+	"encoding/base64"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -284,6 +287,39 @@ func FetchInfo(ID int64) (*Info, error) {
 	if Err := json.NewDecoder(Resp.Body).Decode(&Wrapper); Err != nil {
 
 		return nil, Err
+
+	}
+
+	return &Wrapper.Data, nil
+
+}
+
+// FetchStreaming fetches playable stream metadata from the HiFi API /track endpoint.
+func FetchStreaming(ID int64, Quality string) (*Streaming, error) {
+
+	path := fmt.Sprintf("/track/?id=%d&quality=%s", ID, Quality)
+
+	Resp, Err := TryAPIs(path, 0)
+
+	if Err != nil {
+
+		return nil, Err
+
+	}
+
+	defer Resp.Body.Close()
+
+	if Resp.StatusCode != 200 {
+
+		return nil, fmt.Errorf("HTTP %d", Resp.StatusCode)
+
+	}
+
+	var Wrapper Response[Streaming]
+
+	if Err := json.NewDecoder(Resp.Body).Decode(&Wrapper); Err != nil {
+
+		return nil, fmt.Errorf("failed to decode streaming response: %w", Err)
 
 	}
 
@@ -802,10 +838,8 @@ func GetSong(TrackID int64) (Song, error) {
 
 }
 
-// GetStreamURL fetches a direct streaming URL for a track via Qobuz.
+// GetStreamURL resolves a direct streaming URL, preferring Qobuz and falling back to HiFi /track m4a.
 func GetStreamURL(TrackID int64) (string, error) {
-
-	QobuzAPIBase := os.Getenv("QOBUZ_STREAM_URL")
 
 	Cache := Globals.GetOrCreateCache("TidalStreamURLs")
 	Key := fmt.Sprintf("%d", TrackID)
@@ -836,7 +870,39 @@ func GetStreamURL(TrackID int64) (string, error) {
 
 	}
 
-	// Step 1: Resolve ISRC from HiFi API
+	StreamURL, Err := getStreamURLFromQobuz(TrackID)
+
+	if Err != nil {
+
+		Utils.Logger.Warn("Tidal API", fmt.Sprintf("Qobuz streaming failed for track %d: %s; trying HiFi API fallback", TrackID, Err.Error()))
+
+		StreamURL, Err = getStreamURLFromHiFi(TrackID)
+
+		if Err != nil {
+
+			return "", fmt.Errorf("all streaming sources failed for track %d: %w", TrackID, Err)
+
+		}
+
+	}
+
+	Cache.Set(Key, StreamURL, 1*time.Hour)
+
+	return StreamURL, nil
+
+}
+
+// getStreamURLFromQobuz resolves a track via ISRC lookup and Qobuz download API.
+func getStreamURLFromQobuz(TrackID int64) (string, error) {
+
+	QobuzAPIBase := strings.TrimRight(strings.TrimSpace(os.Getenv("QOBUZ_STREAM_URL")), "/")
+
+	if QobuzAPIBase == "" {
+
+		return "", fmt.Errorf("QOBUZ_STREAM_URL not configured")
+
+	}
+
 	Info, Err := FetchInfo(TrackID)
 
 	if Err != nil {
@@ -852,8 +918,6 @@ func GetStreamURL(TrackID int64) (string, error) {
 	}
 
 	Utils.Logger.Info("Tidal API", fmt.Sprintf("Resolved ISRC %s for track %d", Info.ISRC, TrackID))
-
-	// Step 2: Search Qobuz by ISRC
 
 	SearchURL := fmt.Sprintf("%s/api/get-music?q=%s&offset=0", QobuzAPIBase, url.QueryEscape(Info.ISRC))
 	SearchResp, Err := HTTPClient.Get(SearchURL)
@@ -882,7 +946,6 @@ func GetStreamURL(TrackID int64) (string, error) {
 
 	QobuzTrackID := SearchResult.Data.Tracks.Items[0].ID
 
-	// Step 3: Get signed streaming URL from Qobuz
 	DownloadURL := fmt.Sprintf("%s/api/download-music?track_id=%d&quality=5", QobuzAPIBase, QobuzTrackID)
 	DownloadResp, Err := HTTPClient.Get(DownloadURL)
 
@@ -908,9 +971,158 @@ func GetStreamURL(TrackID int64) (string, error) {
 
 	}
 
-	Cache.Set(Key, DownloadResult.Data.URL, 1*time.Hour)
-
 	return DownloadResult.Data.URL, nil
+
+}
+
+// getStreamURLFromHiFi fetches a direct m4a URL from the HiFi API /track manifest (legacy path).
+func getStreamURLFromHiFi(TrackID int64) (string, error) {
+
+	if BaseAPIURL == "" {
+
+		return "", fmt.Errorf("no HiFi API endpoint configured")
+
+	}
+
+	Streaming, Err := FetchStreaming(TrackID, QualityLow)
+
+	if Err != nil {
+
+		return "", fmt.Errorf("HiFi /track request failed: %w", Err)
+
+	}
+
+	DirectURL, _, _, Err := ParseManifest(Streaming.Manifest)
+
+	if Err != nil {
+
+		return "", fmt.Errorf("HiFi manifest parse failed: %w", Err)
+
+	}
+
+	if DirectURL == "" {
+
+		return "", fmt.Errorf("no direct URL in HiFi manifest for track %d", TrackID)
+
+	}
+
+	Utils.Logger.Info("Tidal API", fmt.Sprintf("HiFi fallback stream URL resolved for track %d", TrackID))
+
+	return DirectURL, nil
+
+}
+
+// ParseManifest decodes a base64 manifest and extracts playable URLs. Returns: directURL (BTS/m4a), initURL + segmentURLs (DASH), error.
+func ParseManifest(ManifestBase64 string) (string, string, []string, error) {
+
+	ManifestBytes, Err := base64.StdEncoding.DecodeString(ManifestBase64)
+
+	if Err != nil {
+
+		return "", "", nil, fmt.Errorf("failed to decode manifest: %w", Err)
+
+	}
+
+	ManifestStr := string(ManifestBytes)
+
+	if strings.HasPrefix(strings.TrimSpace(ManifestStr), "{") {
+
+		var BTS BTSManifest
+
+		if Err := json.Unmarshal(ManifestBytes, &BTS); Err != nil {
+
+			return "", "", nil, fmt.Errorf("failed to parse BTS manifest: %w", Err)
+
+		}
+
+		if len(BTS.URLs) == 0 {
+
+			return "", "", nil, fmt.Errorf("no URLs in BTS manifest")
+
+		}
+
+		return BTS.URLs[0], "", nil, nil
+
+	}
+
+	var MPD DASHManifest
+
+	if Err := xml.Unmarshal(ManifestBytes, &MPD); Err != nil {
+
+		return "", "", nil, fmt.Errorf("failed to parse DASH manifest: %w", Err)
+
+	}
+
+	SegTemplate := MPD.Period.AdaptationSet.Representation.SegmentTemplate
+	InitURL := SegTemplate.Initialization
+	MediaTemplate := SegTemplate.Media
+
+	if InitURL == "" || MediaTemplate == "" {
+
+		InitRe := regexp.MustCompile(`initialization="([^"]+)"`)
+		MediaRe := regexp.MustCompile(`media="([^"]+)"`)
+
+		if Match := InitRe.FindStringSubmatch(ManifestStr); len(Match) > 1 {
+
+			InitURL = Match[1]
+
+		}
+
+		if Match := MediaRe.FindStringSubmatch(ManifestStr); len(Match) > 1 {
+
+			MediaTemplate = Match[1]
+
+		}
+
+	}
+
+	if InitURL == "" {
+
+		return "", "", nil, fmt.Errorf("no initialization URL in DASH manifest")
+
+	}
+
+	InitURL = strings.ReplaceAll(InitURL, "&amp;", "&")
+	MediaTemplate = strings.ReplaceAll(MediaTemplate, "&amp;", "&")
+
+	SegmentCount := 0
+
+	for _, Seg := range SegTemplate.Timeline.Segments {
+
+		SegmentCount += Seg.Repeat + 1
+
+	}
+
+	if SegmentCount == 0 {
+
+		SegRe := regexp.MustCompile(`<S d="\d+"(?: r="(\d+)")?`)
+		Matches := SegRe.FindAllStringSubmatch(ManifestStr, -1)
+
+		for _, Match := range Matches {
+
+			Repeat := 0
+
+			if len(Match) > 1 && Match[1] != "" {
+
+				fmt.Sscanf(Match[1], "%d", &Repeat)
+
+			}
+
+			SegmentCount += Repeat + 1
+
+		}
+	}
+
+	var SegmentURLs []string
+
+	for I := 1; I <= SegmentCount; I++ {
+
+		SegmentURL := strings.ReplaceAll(MediaTemplate, "$Number$", fmt.Sprintf("%d", I))
+		SegmentURLs = append(SegmentURLs, SegmentURL)
+
+	}
+
+	return "", InitURL, SegmentURLs, nil
 
 }
 

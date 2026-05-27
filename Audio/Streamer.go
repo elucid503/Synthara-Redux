@@ -168,16 +168,14 @@ func (S *MP4Streamer) StreamFromURL(Ctx context.Context, URL string) error {
 	ProbeClient := &http.Client{Timeout: 10 * time.Second}
 	HeadResp, Err := ProbeClient.Do(HeadReq)
 
-	if Err != nil {
+	if Err == nil {
 
-		return fmt.Errorf("failed to probe stream: %w", Err)
+		HeadResp.Body.Close()
 
-	}
+		if strings.Contains(HeadResp.Header.Get("Content-Type"), "audio/mpeg") {
+			return S.StreamMP3FromURL(Ctx, URL)
+		}
 
-	HeadResp.Body.Close()
-
-	if strings.Contains(HeadResp.Header.Get("Content-Type"), "audio/mpeg") {
-		return S.StreamMP3FromURL(Ctx, URL)
 	}
 
 	// MP4/AAC path: fetch first 1MB to find moov atom
@@ -973,7 +971,6 @@ func parseMoovForAudioConfig(Data []byte) (int, int, []byte) {
 func extractASCFromEsds(Data []byte) []byte {
 
 	// esds format is complex with variable length descriptors
-	// We're looking for the DecSpecificInfo descriptor (tag 0x05), which contains the AudioSpecificConfig
 
 	if len(Data) < 10 {
 
@@ -1020,8 +1017,7 @@ func extractASCFromEsds(Data []byte) []byte {
 			}
 		}
 
-		// For ES_Descriptor (0x03) and DecoderConfigDescriptor (0x04),
-		// we need to skip headers and continue parsing
+		// For ES_Descriptor (0x03) and DecoderConfigDescriptor (0x04), we need to skip headers and continue parsing
 
 		if Tag == 0x03 {
 
@@ -1058,8 +1054,7 @@ func (P *MP4Processor) DecodeAndEncodeAAC(AACData []byte, ASC []byte, SourceSamp
 
 	PCMBuffer := make([]int16, 0, SamplesPerFrame*10)
 
-	// For raw AAC in MP4, we need to decode the entire stream
-	// The data is already in raw AAC format (without ADTS headers)
+	// For raw AAC in MP4, we need to decode the entire stream. The data is already in raw AAC format (without ADTS headers)
 
 	var PCMData []int16
 	var Err error
