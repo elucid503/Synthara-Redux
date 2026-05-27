@@ -18,8 +18,6 @@ func Play(GuildID, UserID snowflake.ID, Args string) {
 
 	Args = strings.TrimSpace(Args)
 
-	fmt.Printf("Play command invoked in guild %s by user %s with args: %s\n", GuildID, UserID, Args)
-
 	Guild := Structs.GetGuild(GuildID, true)
 
 	if Guild == nil {

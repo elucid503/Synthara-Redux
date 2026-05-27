@@ -802,10 +802,10 @@ func GetSong(TrackID int64) (Song, error) {
 
 }
 
-const QobuzAPIBase = "https://qobuz.kennyy.com.br/"
-
 // GetStreamURL fetches a direct streaming URL for a track via Qobuz.
 func GetStreamURL(TrackID int64) (string, error) {
+
+	QobuzAPIBase := os.Getenv("QOBUZ_STREAM_URL")
 
 	Cache := Globals.GetOrCreateCache("TidalStreamURLs")
 	Key := fmt.Sprintf("%d", TrackID)
@@ -854,6 +854,7 @@ func GetStreamURL(TrackID int64) (string, error) {
 	Utils.Logger.Info("Tidal API", fmt.Sprintf("Resolved ISRC %s for track %d", Info.ISRC, TrackID))
 
 	// Step 2: Search Qobuz by ISRC
+
 	SearchURL := fmt.Sprintf("%s/api/get-music?q=%s&offset=0", QobuzAPIBase, url.QueryEscape(Info.ISRC))
 	SearchResp, Err := HTTPClient.Get(SearchURL)
 
