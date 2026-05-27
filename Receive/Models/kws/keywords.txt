@@ -1,7 +1,0 @@
-▁S Y N TH AR A :10.0 #0.001
-▁S Y N AR A :9.0 #0.002
-▁S IN TH AR A :9.0 #0.002
-▁C Y N TH AR A :8.0 #0.003
-▁S Y N THER A :8.0 #0.003
-▁S Y N TH A :7.5 #0.003
-▁TA RA :7.0 #0.004

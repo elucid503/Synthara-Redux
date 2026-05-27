@@ -29,6 +29,12 @@ type RecentSearch struct {
 
 }
 
+type Settings struct {
+
+	VoiceCommandOptOut bool `bson:"voice_command_opt_out,omitempty"`
+
+}
+
 type User struct {
 
 	DiscordID string `bson:"_id"` // Primary key
@@ -39,6 +45,8 @@ type User struct {
 
 	Favorites map[string]int `bson:"favorites"` // URI -> Count
 	MostRecentMix string `bson:"most_recent_mix,omitempty"` // ID of the last played mix
+
+	Settings Settings `bson:"settings,omitempty"`
 
 }
 
@@ -132,6 +140,40 @@ func (U *User) SetLastNotificationSeen(NotificationID string) error {
 	return UpdateError
 
 }
+
+// VoiceCommandOptOut reports whether the user has opted out of voice commands.
+func (U *User) VoiceCommandOptOut() bool {
+
+	return U.Settings.VoiceCommandOptOut
+
+}
+
+// SetVoiceCommandOptOut persists the voice-command opt-out preference.
+func (U *User) SetVoiceCommandOptOut(OptOut bool) error {
+
+	Collection := Globals.Database.Collection("Users")
+
+	Context, Cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer Cancel()
+
+	U.Settings.VoiceCommandOptOut = OptOut
+
+	Update := bson.M{
+
+		"$set": bson.M{
+
+			"settings.voice_command_opt_out": OptOut,
+
+		},
+
+	}
+
+	_, UpdateError := Collection.UpdateOne(Context, bson.M{"_id": U.DiscordID}, Update, options.Update().SetUpsert(true))
+
+	return UpdateError
+
+}
+
 // AddRecentSearch adds a song to the user's recent searches (max 5, FIFO)
 func (U *User) AddRecentSearch(Title string, URI string) error {
 

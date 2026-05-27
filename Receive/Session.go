@@ -3,6 +3,8 @@ package Receive
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -30,65 +32,61 @@ const (
 
 const (
 
-	// Capture bounds
-
 	commandCaptureMin = 2 * time.Second
 	commandCaptureMax = 8 * time.Second
+	commandTailAfterSilence = 2 * time.Second
 
-	commandTailAfterPacket = 2 * time.Second
+	minCommandPCMBytes = TargetSampleRate * 2 * 3 / 2
+	prerollMaxFrames   = 50
 
-	minCommandPCMBytes = TargetSampleRate * 2 * 3 / 2 // 1.5s @ 16kHz mono
-
-	prerollMaxFrames = 50 // ~1s @ 20ms/frame — enough to cover the wake word + KWS detection latency
-
-	playArgsPacketSilence = 800 * time.Millisecond // fallback end-of-args detection via Discord packet gap
-	minPlayArgsCapture = 1 * time.Second
-
+	tailSilenceTimeout = 1 * time.Second
 	postCaptureCooldown = 150 * time.Millisecond
 
-	hotMicBlacklistAfter = 30 * time.Second // triage users with sustained audio input
-	hotMicBlacklistFor = 15 * time.Second // constant re-eval after 15s
-	hotMicEnergyThreshold float32 = 0.0006 // abt -40dBFS
+	discordSpeakingMax = 10 * time.Second
 
-	captureMaxDuration = 10 * time.Second
+	sttPreconnectMaxBytes = TargetSampleRate * 2 * 3
 
 )
 
 type Session struct {
 
 	GuildID snowflake.ID
-	UserID  snowflake.ID
+	UserID snowflake.ID
 
 	dispatcher *Dispatcher
-
-	decoder *OpusPCMDecoder
-	wake *WakeStream
+	decoder *OpusDecoder
 
 	inbox chan []byte
 	inboxDrops atomic.Uint64
+
+	wakeCh chan struct{}
+
 	sttUpdates chan TranscriptUpdate
 	opusPreroll opusPreroll
 
 	state atomic.Int32
-	lastPacketAt atomic.Int64
-	speechStartAt atomic.Int64
-	blacklistUntil atomic.Int64
+
+	discordSpeaking atomic.Bool
+	speakingSince atomic.Int64
+	lastSilentAt atomic.Int64
 
 	transcriber *Transcriber
 	transcriberReady chan transcriberOpenResult
 	captureID atomic.Uint64
 
-	captureBuf [][]byte
+	preCapture *PCMBuffer
 	capturePCM []byte
 
 	captureStartedAt time.Time
-
 	cooldownUntil time.Time
 
 	finalizing atomic.Bool
 	dispatched atomic.Bool
 
-	awaitingCommandTail bool // set for commands that take a multi-word arg; waits for silence before finalizing
+	awaitingCommandTail bool
+
+	lastTranscriptChange atomic.Int64 // UnixNano; 0 = no change yet this capture
+	lastTranscriptText   string       // run-goroutine only
 
 	ctx context.Context
 	cancel context.CancelFunc
@@ -100,7 +98,7 @@ type Session struct {
 
 func NewSession(GuildID, UserID snowflake.ID, Dispatcher *Dispatcher) (*Session, error) {
 
-	Decoder, ErrDecoder := NewOpusPCMDecoder()
+	Decoder, ErrDecoder := NewOpusDecoder()
 
 	if ErrDecoder != nil {
 
@@ -113,25 +111,32 @@ func NewSession(GuildID, UserID snowflake.ID, Dispatcher *Dispatcher) (*Session,
 	S := &Session{
 
 		GuildID: GuildID,
-		UserID:  UserID,
+		UserID: UserID,
 
 		dispatcher: Dispatcher,
-		decoder:    Decoder,
+		decoder: Decoder,
 
-		wake:  NewWakeStream(),
-		inbox: make(chan []byte, 512),
+		inbox: make(chan []byte, 256),
+		wakeCh: make(chan struct{}, 1),
 
 		opusPreroll: newOpusPreroll(prerollMaxFrames),
-
 		sttUpdates: make(chan TranscriptUpdate, 32),
-
 		transcriberReady: make(chan transcriberOpenResult, 1),
 
-		ctx:    Ctx,
+		preCapture: NewPCMBuffer(sttPreconnectMaxBytes),
+
+		ctx: Ctx,
 		cancel: Cancel,
+
 	}
 
 	S.state.Store(stateListening)
+
+	if ErrOpen := PicoOpenStream(GuildID, UserID); ErrOpen != nil {
+
+		Utils.Logger.Warn("Receive", fmt.Sprintf("Pico open stream: %s", ErrOpen.Error()))
+
+	}
 
 	S.wg.Add(1)
 	go S.run(Ctx)
@@ -145,23 +150,9 @@ func NewSession(GuildID, UserID snowflake.ID, Dispatcher *Dispatcher) (*Session,
 
 func (S *Session) Push(Opus []byte) {
 
-	if S.closed.Load() || S.wake == nil {
+	if S.closed.Load() {
 
 		return
-
-	}
-
-	if Until := S.blacklistUntil.Load(); Until > 0 && time.Now().UnixNano() < Until {
-
-		return
-
-	}
-
-	S.lastPacketAt.Store(time.Now().UnixNano())
-
-	if S.speechStartAt.Load() == 0 {
-
-		S.speechStartAt.Store(time.Now().UnixNano())
 
 	}
 
@@ -175,6 +166,46 @@ func (S *Session) Push(Opus []byte) {
 	default:
 
 		S.inboxDrops.Add(1)
+
+	}
+
+}
+
+func (S *Session) NotifyWake() {
+
+	if S.closed.Load() {
+
+		return
+
+	}
+
+	select {
+
+	case S.wakeCh <- struct{}{}:
+
+	default:
+
+	}
+
+}
+
+func (S *Session) SetDiscordSpeaking(Active bool) {
+
+	Was := S.discordSpeaking.Load()
+	S.discordSpeaking.Store(Active)
+
+	Now := time.Now().UnixNano()
+
+	if Active && !Was {
+
+		S.speakingSince.Store(Now)
+
+	}
+
+	if !Active {
+
+		S.speakingSince.Store(0)
+		S.lastSilentAt.Store(Now)
 
 	}
 
@@ -203,12 +234,7 @@ func (S *Session) Close() {
 
 	}
 
-	if S.wake != nil {
-
-		S.wake.Close()
-		S.wake = nil
-
-	}
+	_ = PicoCloseStream(S.GuildID, S.UserID)
 
 	if S.decoder != nil {
 
@@ -245,6 +271,10 @@ func (S *Session) run(Ctx context.Context) {
 
 			S.handleFrame(Opus)
 
+		case <-S.wakeCh:
+
+			S.beginCapture()
+
 		case Res := <-S.transcriberReady:
 
 			S.handleTranscriberReady(Res)
@@ -261,84 +291,35 @@ func (S *Session) run(Ctx context.Context) {
 
 func (S *Session) handleFrame(Opus []byte) {
 
+	PCM, ErrDecode := S.decoder.Decode(Opus)
+
+	if ErrDecode != nil {
+
+		return
+
+	}
+
 	switch S.state.Load() {
 
 	case stateListening:
 
 		S.opusPreroll.Push(Opus)
 
-		PCM, ErrDecode := S.decoder.DecodeWake(Opus)
-
-		if ErrDecode != nil {
+		if !S.cooldownUntil.IsZero() && time.Now().Before(S.cooldownUntil) {
 
 			return
 
 		}
 
-		InCooldown := !S.cooldownUntil.IsZero() && time.Now().Before(S.cooldownUntil)
+		if ErrFeed := PicoFeedPCM(S.GuildID, S.UserID, Int16ToBytesLE(PCM)); ErrFeed != nil {
 
-		if InCooldown {
-
-			return
+			Utils.Logger.Warn("Receive", fmt.Sprintf("Pico feed: %s", ErrFeed.Error()))
 
 		}
-
-		S.runListening(PCM)
 
 	case stateCapturing:
 
-		PCM, ErrDecode := S.decoder.DecodeCapture(Opus)
-
-		if ErrDecode != nil {
-
-			return
-
-		}
-
 		S.runCapturing(PCM)
-
-	}
-
-}
-
-func (S *Session) runListening(PCM []int16) {
-
-	Energy := FrameRMS(PCM)
-
-	if Energy < hotMicEnergyThreshold {
-
-		// Acoustic silence marks a speech-segment boundary. Discard the preroll
-		// so audio from a prior utterance cannot bleed into the next capture.
-		// (DTX-based clearing via checkPrerollExpiry requires a 2-second packet
-		// gap, which is too slow when the user speaks again shortly after.)
-		S.opusPreroll.Clear()
-
-		S.speechStartAt.Store(0)
-
-		if Hit := S.wake.FlushPending(); Hit != "" {
-
-			S.beginCapture()
-			return
-
-		}
-
-		return
-
-	}
-
-	WakeSamples := Int16ToFloat32(AmplifyInt16ForKWS(PCM))
-
-	if Hit := S.wake.Feed(WakeSamples); Hit != "" {
-
-		S.beginCapture()
-		return
-
-	}
-
-	if Hit := S.wake.FlushPartial(); Hit != "" {
-
-		S.beginCapture()
-		return
 
 	}
 
@@ -352,17 +333,15 @@ func (S *Session) beginCapture() {
 
 	}
 
-	S.wake.Reset()
-
 	captureID := S.captureID.Add(1)
+
 	S.captureStartedAt = time.Now()
 	S.resetCaptureBuffers()
-
-	S.decoder.ResetCapturePath()
+	S.decoder.Reset()
 
 	for _, OpusFrame := range S.opusPreroll.Drain() {
 
-		PCMFrame, ErrPre := S.decoder.DecodeCapture(OpusFrame)
+		PCMFrame, ErrPre := S.decoder.Decode(OpusFrame)
 
 		if ErrPre != nil {
 
@@ -372,7 +351,7 @@ func (S *Session) beginCapture() {
 
 		Chunk := Int16ToBytesLE(PCMFrame)
 		S.capturePCM = append(S.capturePCM, Chunk...)
-		S.captureBuf = append(S.captureBuf, Chunk)
+		S.preCapture.Append(Chunk)
 
 	}
 
@@ -386,7 +365,7 @@ func (S *Session) beginCapture() {
 	S.dispatched.Store(false)
 	S.awaitingCommandTail = false
 
-	emitVoiceCue(S.GuildID, VoiceCueWake)
+	emitFeedbackCue(S.GuildID, FeedbackCueCaptureStart)
 	emitCaptureDuck(S.GuildID, true)
 
 	go S.openTranscriber(captureID)
@@ -450,17 +429,17 @@ func (S *Session) attachTranscriber(Trans *Transcriber) {
 
 	})
 
-	for _, PCM := range S.captureBuf {
+	for _, PCM := range S.preCapture.DrainChunks(xaiPCMChunkBytes) {
 
-		if ErrSend := S.transcriber.Send(PCM); ErrSend != nil {
-
-			Utils.Logger.Warn("Receive", fmt.Sprintf("Transcriber buffered send failed: %s", ErrSend.Error()))
-
-		}
+		_ = S.transcriber.Send(PCM)
 
 	}
 
-	S.captureBuf = nil
+	if Tail := S.preCapture.Remainder(); len(Tail) > 0 {
+
+		_ = S.transcriber.Send(Tail)
+
+	}
 
 }
 
@@ -472,15 +451,15 @@ func (S *Session) openTranscriber(captureID uint64) {
 
 	select {
 
-		case S.transcriberReady <- Res:
+	case S.transcriberReady <- Res:
 
-		case <-S.ctx.Done():
+	case <-S.ctx.Done():
 
-			if Trans != nil {
+		if Trans != nil {
 
-				Trans.Close()
+			Trans.Close()
 
-			}
+		}
 
 	}
 
@@ -488,26 +467,24 @@ func (S *Session) openTranscriber(captureID uint64) {
 
 func (S *Session) runCapturing(PCM []int16) {
 
+	if S.speakingDuration() > discordSpeakingMax {
+
+		S.finalizeCapture()
+		return
+
+	}
+
 	PCMBytes := Int16ToBytesLE(PCM)
 	S.capturePCM = append(S.capturePCM, PCMBytes...)
 
 	if S.transcriber == nil {
 
-		const maxBufferedFrames = 300
-
-		S.captureBuf = append(S.captureBuf, PCMBytes)
-
-		if len(S.captureBuf) > maxBufferedFrames {
-
-			S.captureBuf = S.captureBuf[len(S.captureBuf)-maxBufferedFrames:]
-
-		}
-
+		S.preCapture.Append(PCMBytes)
 		return
 
 	}
 
-	if time.Since(S.captureStartedAt) > captureMaxDuration {
+	if time.Since(S.captureStartedAt) > commandCaptureMax+2*time.Second {
 
 		S.finalizeCapture()
 		return
@@ -523,12 +500,32 @@ func (S *Session) runCapturing(PCM []int16) {
 
 }
 
-// handleTranscriptUpdate runs JIT command detection on streaming partials.
+func (S *Session) speakingDuration() time.Duration {
+
+	At := S.speakingSince.Load()
+
+	if At == 0 {
+
+		return 0
+
+	}
+
+	return time.Duration(time.Now().UnixNano() - At)
+
+}
+
 func (S *Session) handleTranscriptUpdate(Upd TranscriptUpdate) {
 
 	if S.state.Load() != stateCapturing || S.dispatched.Load() {
 
 		return
+
+	}
+
+	if Upd.Text != "" && Upd.Text != S.lastTranscriptText {
+
+		S.lastTranscriptText = Upd.Text
+		S.lastTranscriptChange.Store(time.Now().UnixNano())
 
 	}
 
@@ -563,8 +560,6 @@ func (S *Session) handleTranscriptUpdate(Upd TranscriptUpdate) {
 
 	}
 
-	// Commands that take a free-form multi-word argument must never dispatch on a partial result, since the user may still be speaking.
-
 	if CommandNeedsMultiWordArgs(Cmd.Command) {
 
 		S.awaitingCommandTail = true
@@ -587,8 +582,6 @@ func (S *Session) handleTranscriptUpdate(Upd TranscriptUpdate) {
 		return
 
 	}
-
-	// xAI utterance-end: flush STT if JIT did not fire...
 
 	if Upd.SpeechFinal && !S.dispatched.Load() {
 
@@ -616,17 +609,13 @@ func (S *Session) dispatchCommand(Cmd ParsedCommand) {
 
 func (S *Session) ensureTranscriber(Timeout time.Duration) *Transcriber {
 
-	if S.transcriber != nil {
+	if S.transcriber != nil && !S.transcriber.Done() {
 
-		if !S.transcriber.Done() {
-
-			return S.transcriber
-
-		}
-
-		S.transcriber = nil
+		return S.transcriber
 
 	}
+
+	S.transcriber = nil
 
 	select {
 
@@ -653,9 +642,6 @@ func (S *Session) abortCapture() {
 	Trans := S.transcriber
 	S.transcriber = nil
 
-	// The command was already dispatched (JIT detection), so the final
-	// transcript is unwanted. Close tears the WebSocket down at once instead of
-	// flushing audio.done and waiting out transcript.done.
 	go func(T *Transcriber) {
 
 		if T != nil {
@@ -682,7 +668,7 @@ func (S *Session) finalizeCapture() {
 
 	if Trans == nil {
 
-		Utils.Logger.Warn("Receive", fmt.Sprintf("Capture ended with no transcriber (user %s, %d buffered frame(s))", S.UserID, len(S.captureBuf)))
+		Utils.Logger.Warn("Receive", fmt.Sprintf("Capture ended with no transcriber (user %s)", S.UserID))
 		S.endCapture()
 
 		return
@@ -690,7 +676,6 @@ func (S *Session) finalizeCapture() {
 	}
 
 	S.transcriber = nil
-
 	AlreadyDispatched := S.dispatched.Load()
 
 	go func(T *Transcriber, SkipDispatch bool) {
@@ -706,8 +691,6 @@ func (S *Session) finalizeCapture() {
 		}()
 
 		if SkipDispatch {
-
-			// Result already dispatched via JIT; skip the audio.done or transcript.done round-trip
 
 			T.Close()
 			return
@@ -747,14 +730,9 @@ func (S *Session) endCapture() {
 
 	S.state.Store(stateListening)
 	S.captureStartedAt = time.Time{}
-
 	S.resetCaptureBuffers()
-
 	S.finalizing.Store(false)
-	S.speechStartAt.Store(0)
-
 	S.awaitingCommandTail = false
-
 	S.cooldownUntil = time.Now().Add(postCaptureCooldown)
 
 	if S.transcriber != nil {
@@ -764,36 +742,25 @@ func (S *Session) endCapture() {
 
 	}
 
-	S.clearListeningAudio()
+	S.opusPreroll.Clear()
 
 	if S.decoder != nil {
 
-		S.decoder.ResetWakePath()
-		S.decoder.ResetCapturePath()
+		S.decoder.Reset()
 
 	}
 
-	if S.wake != nil {
-
-		S.wake.Reset()
-
-	}
-
-	emitVoiceCue(S.GuildID, VoiceCueEnd)
+	emitFeedbackCue(S.GuildID, FeedbackCueCaptureEnd)
 	emitCaptureDuck(S.GuildID, false)
 
 }
 
 func (S *Session) resetCaptureBuffers() {
 
-	S.captureBuf = nil
+	S.preCapture.Reset()
 	S.capturePCM = nil
-
-}
-
-func (S *Session) clearListeningAudio() {
-
-	S.opusPreroll.Clear()
+	S.lastTranscriptChange.Store(0)
+	S.lastTranscriptText = ""
 
 }
 
@@ -822,29 +789,9 @@ func (S *Session) timeoutLoop(Ctx context.Context) {
 
 }
 
-const prerollExpireAfterSilence = 2 * time.Second // config for how long to keep frames after speech ends
-
-// checkPrerollExpiry discards the preroll when a speech segment has ended
-func (S *Session) checkPrerollExpiry() {
-
-	SincePacket := S.silenceSincePacket()
-
-	if SincePacket == 0 || SincePacket < prerollExpireAfterSilence {
-
-		return
-
-	}
-
-	S.opusPreroll.Clear()
-
-}
-
 func (S *Session) checkTimeouts() {
 
 	if S.state.Load() != stateCapturing {
-
-		S.checkHotMic()
-		S.checkPrerollExpiry()
 
 		return
 
@@ -853,7 +800,14 @@ func (S *Session) checkTimeouts() {
 	Now := time.Now()
 	CaptureAge := Now.Sub(S.captureStartedAt)
 
-	if CaptureAge > captureMaxDuration {
+	if S.speakingDuration() > discordSpeakingMax {
+
+		S.finalizeCapture()
+		return
+
+	}
+
+	if CaptureAge > commandCaptureMax+2*time.Second {
 
 		S.finalizeCapture()
 		return
@@ -868,11 +822,16 @@ func (S *Session) checkTimeouts() {
 
 	if S.awaitingCommandTail {
 
-		if CaptureAge >= minPlayArgsCapture {
+		if CaptureAge >= commandCaptureMax {
 
-			SincePacket := S.silenceSincePacket()
+			S.finalizeCapture()
+			return
 
-			if SincePacket > playArgsPacketSilence {
+		}
+
+		if At := S.lastTranscriptChange.Load(); At != 0 {
+
+			if time.Duration(time.Now().UnixNano()-At) >= tailSilenceTimeout {
 
 				S.finalizeCapture()
 
@@ -883,8 +842,6 @@ func (S *Session) checkTimeouts() {
 		return
 
 	}
-
-	SincePacket := S.silenceSincePacket()
 
 	if CaptureAge < commandCaptureMin {
 
@@ -899,19 +856,17 @@ func (S *Session) checkTimeouts() {
 
 	}
 
-	if len(S.capturePCM) >= minCommandPCMBytes && SincePacket >= commandTailAfterPacket {
+	if len(S.capturePCM) >= minCommandPCMBytes && S.silenceSinceDiscordStopped() >= commandTailAfterSilence {
 
 		S.finalizeCapture()
 
 	}
 
-	S.checkHotMic()
-
 }
 
-func (S *Session) silenceSincePacket() time.Duration {
+func (S *Session) silenceSinceDiscordStopped() time.Duration {
 
-	At := S.lastPacketAt.Load()
+	At := S.lastSilentAt.Load()
 
 	if At == 0 {
 
@@ -923,24 +878,32 @@ func (S *Session) silenceSincePacket() time.Duration {
 
 }
 
-func (S *Session) checkHotMic() {
+func parseStreamID(StreamID string) (snowflake.ID, snowflake.ID, bool) {
 
-	Now := time.Now().UnixNano()
-	SpeechStart := S.speechStartAt.Load()
+	Parts := strings.SplitN(StreamID, ":", 2)
 
-	if SpeechStart > 0 && time.Duration(Now-SpeechStart) > hotMicBlacklistAfter {
+	if len(Parts) != 2 {
 
-		Utils.Logger.Warn("Receive", fmt.Sprintf("Hot mic detected (user %s); blacklisting briefly", S.UserID))
-
-		S.blacklistUntil.Store(time.Now().Add(hotMicBlacklistFor).UnixNano())
-		S.speechStartAt.Store(0)
-
-		if S.state.Load() == stateCapturing {
-
-			S.finalizeCapture()
-
-		}
+		return 0, 0, false
 
 	}
+
+	GuildU, ErrG := strconv.ParseUint(Parts[0], 10, 64)
+
+	if ErrG != nil {
+
+		return 0, 0, false
+
+	}
+
+	UserU, ErrU := strconv.ParseUint(Parts[1], 10, 64)
+
+	if ErrU != nil {
+
+		return 0, 0, false
+
+	}
+
+	return snowflake.ID(GuildU), snowflake.ID(UserU), true
 
 }

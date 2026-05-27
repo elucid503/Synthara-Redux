@@ -6,54 +6,76 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 )
 
-// VoiceCueKind matches Audio.CueKind without importing Audio (avoids cycles).
-type VoiceCueKind int
+// FeedbackCueKind identifies capture lifecycle audio feedback.
+type FeedbackCueKind int
 
 const (
-	VoiceCueWake VoiceCueKind = iota
-	VoiceCueEnd // 1
-
+	FeedbackCueCaptureStart FeedbackCueKind = iota
+	FeedbackCueCaptureEnd
 )
 
-// VoiceCueHandler plays wake/end feedback for a guild (registered from Handlers/Structs).
-type VoiceCueHandler func(GuildID snowflake.ID, Kind VoiceCueKind)
+type FeedbackCueHandler func(GuildID snowflake.ID, Kind FeedbackCueKind)
 
-// VoiceCaptureDuckHandler ducks or restores music for the full capture window.
-type VoiceCaptureDuckHandler func(GuildID snowflake.ID, Start bool)
+type CaptureDuckHandler func(GuildID snowflake.ID, Duck bool)
+
+type VoiceCommandOptOutChecker func(UserID snowflake.ID) bool
 
 var (
+	feedbackCueMu sync.RWMutex
+	feedbackCueFn FeedbackCueHandler
 
-	voiceCueHandlerMu sync.RWMutex
-	voiceCueHandlerFn VoiceCueHandler
+	captureDuckMu sync.RWMutex
+	captureDuckFn CaptureDuckHandler
 
-	voiceCaptureDuckHandlerMu sync.RWMutex
-	voiceCaptureDuckHandlerFn VoiceCaptureDuckHandler
-
+	voiceOptOutMu sync.RWMutex
+	voiceOptOutFn VoiceCommandOptOutChecker
 )
 
-// SetVoiceCueHandler registers playback feedback for wake/capture-end (e.g. from Structs).
-func SetVoiceCueHandler(fn VoiceCueHandler) {
+func SetFeedbackCueHandler(fn FeedbackCueHandler) {
 
-	voiceCueHandlerMu.Lock()
-	voiceCueHandlerFn = fn
-	voiceCueHandlerMu.Unlock()
-
-}
-
-// SetVoiceCaptureDuckHandler registers music duck/restore for voice command capture.
-func SetVoiceCaptureDuckHandler(fn VoiceCaptureDuckHandler) {
-
-	voiceCaptureDuckHandlerMu.Lock()
-	voiceCaptureDuckHandlerFn = fn
-	voiceCaptureDuckHandlerMu.Unlock()
+	feedbackCueMu.Lock()
+	feedbackCueFn = fn
+	feedbackCueMu.Unlock()
 
 }
 
-func emitVoiceCue(GuildID snowflake.ID, Kind VoiceCueKind) {
+func SetCaptureDuckHandler(fn CaptureDuckHandler) {
 
-	voiceCueHandlerMu.RLock()
-	fn := voiceCueHandlerFn
-	voiceCueHandlerMu.RUnlock()
+	captureDuckMu.Lock()
+	captureDuckFn = fn
+	captureDuckMu.Unlock()
+
+}
+
+func SetVoiceCommandOptOutChecker(fn VoiceCommandOptOutChecker) {
+
+	voiceOptOutMu.Lock()
+	voiceOptOutFn = fn
+	voiceOptOutMu.Unlock()
+
+}
+
+func voiceCommandOptOut(UserID snowflake.ID) bool {
+
+	voiceOptOutMu.RLock()
+	Fn := voiceOptOutFn
+	voiceOptOutMu.RUnlock()
+
+	if Fn == nil {
+
+		return false
+
+	}
+
+	return Fn(UserID)
+
+}
+
+func emitFeedbackCue(GuildID snowflake.ID, Kind FeedbackCueKind) {
+
+	feedbackCueMu.RLock()
+	fn := feedbackCueFn
+	feedbackCueMu.RUnlock()
 
 	if fn != nil {
 
@@ -63,15 +85,15 @@ func emitVoiceCue(GuildID snowflake.ID, Kind VoiceCueKind) {
 
 }
 
-func emitCaptureDuck(GuildID snowflake.ID, Start bool) {
+func emitCaptureDuck(GuildID snowflake.ID, Duck bool) {
 
-	voiceCaptureDuckHandlerMu.RLock()
-	fn := voiceCaptureDuckHandlerFn
-	voiceCaptureDuckHandlerMu.RUnlock()
+	captureDuckMu.RLock()
+	fn := captureDuckFn
+	captureDuckMu.RUnlock()
 
 	if fn != nil {
 
-		fn(GuildID, Start)
+		fn(GuildID, Duck)
 
 	}
 

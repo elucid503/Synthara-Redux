@@ -13,28 +13,35 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 )
 
-// Receiver attaches to a single guild's voice connection and fans Opus frames out to per-user sessions. Implements voice.OpusFrameReceiver
+// Receiver fans Opus frames into per-user voice sessions.
 type Receiver struct {
 
 	GuildID snowflake.ID
 
 	dispatcher *Dispatcher
 
-	mu sync.Mutex
 	sessions map[snowflake.ID]*Session
 
+	mu sync.Mutex
 	closed bool
 
 }
 
-// VoiceCommandsRequested is true unless VOICE_COMMANDS=false in the environment.
+var (
+
+	receiverRegistry sync.Map
+	picoHandlerOnce sync.Once
+
+)
+
+// VoiceCommandsRequested is true unless VOICE_COMMANDS=false.
 func VoiceCommandsRequested() bool {
 
 	return !strings.EqualFold(os.Getenv("VOICE_COMMANDS"), "false")
 
 }
 
-// IsEnabled returns whether voice command capture should be wired up.
+// IsEnabled reports whether voice capture should attach to a guild voice connection.
 func IsEnabled() bool {
 
 	if !VoiceCommandsRequested() {
@@ -43,42 +50,142 @@ func IsEnabled() bool {
 
 	}
 
-	return WakeWordEnabled()
+	return WakeDetectorReady()
 
 }
 
 // AttachReceiver hooks a Receiver into the given voice connection.
 func AttachReceiver(GuildID snowflake.ID, Conn voice.Conn) *Receiver {
 
-	if Conn == nil {
+	if Conn == nil || !IsEnabled() {
 
 		return nil
 
 	}
 
-	if !IsEnabled() {
+	picoHandlerOnce.Do(func() {
 
-		return nil
+		SetPicoWakeHandler(routePicoWake)
 
-	}
+	})
 
 	R := &Receiver{
 
 		GuildID: GuildID,
-
 		dispatcher: NewDispatcher(GuildID),
 		sessions: make(map[snowflake.ID]*Session),
 
 	}
 
+	receiverRegistry.Store(GuildID, R)
+
 	Conn.SetOpusFrameReceiver(R)
+
+	Conn.SetEventHandlerFunc(func(_ voice.Gateway, _ voice.Opcode, _ int, Data voice.GatewayMessageData) {
+
+		Speaking, OK := Data.(voice.GatewayMessageDataSpeaking)
+
+		if !OK {
+
+			return
+
+		}
+
+		UserID := Speaking.UserID
+
+		if UserID == 0 {
+
+			UserID = Conn.UserIDBySSRC(Speaking.SSRC)
+
+		}
+
+		if UserID == 0 {
+
+			return
+
+		}
+
+		Active := Speaking.Speaking&voice.SpeakingFlagMicrophone != 0
+		R.NotifySpeaking(UserID, Active)
+
+	})
 
 	return R
 
 }
 
-// Close detaches the receiver and tears down all per-user sessions.
+func routePicoWake(StreamID string) {
+
+	GuildID, UserID, OK := parseStreamID(StreamID)
+
+	if !OK {
+
+		return
+
+	}
+
+	Val, Loaded := receiverRegistry.Load(GuildID)
+
+	if !Loaded {
+
+		return
+
+	}
+
+	R, OK := Val.(*Receiver)
+
+	if !OK {
+
+		return
+
+	}
+
+	R.NotifyWake(UserID)
+
+}
+
+// NotifyWake signals a wake-word hit for a user.
+func (R *Receiver) NotifyWake(UserID snowflake.ID) {
+
+	R.mu.Lock()
+	Sess := R.sessions[UserID]
+	R.mu.Unlock()
+
+	if Sess != nil {
+
+		Sess.NotifyWake()
+
+	}
+
+}
+
+// NotifySpeaking updates Discord VAD state for a user session.
+func (R *Receiver) NotifySpeaking(UserID snowflake.ID, Active bool) {
+
+	Sess := R.getSession(UserID)
+
+	if Sess != nil {
+
+		Sess.SetDiscordSpeaking(Active)
+
+	}
+
+}
+
+func (R *Receiver) getSession(UserID snowflake.ID) *Session {
+
+	R.mu.Lock()
+	Sess := R.sessions[UserID]
+	R.mu.Unlock()
+
+	return Sess
+
+}
+
+// Close detaches and tears down all sessions.
 func (R *Receiver) Close() {
+
+	receiverRegistry.Delete(R.GuildID)
 
 	R.mu.Lock()
 
@@ -110,7 +217,7 @@ func (R *Receiver) Close() {
 
 }
 
-// ReceiveOpusFrame implements voice.OpusFrameReceiver. Should always be non-blocking and constant-time.
+// ReceiveOpusFrame implements voice.OpusFrameReceiver.
 func (R *Receiver) ReceiveOpusFrame(UserID snowflake.ID, Packet *voice.Packet) error {
 
 	if R == nil || Packet == nil || len(Packet.Opus) == 0 {
@@ -118,8 +225,6 @@ func (R *Receiver) ReceiveOpusFrame(UserID snowflake.ID, Packet *voice.Packet) e
 		return nil
 
 	}
-
-	// Ignores the bot's own audio...
 
 	if UserID == Globals.DiscordClient.ApplicationID {
 
@@ -147,7 +252,7 @@ func (R *Receiver) ReceiveOpusFrame(UserID snowflake.ID, Packet *voice.Packet) e
 
 }
 
-// CleanupUser should be called when a user stops speaking or leaves the voice channel, to free up resources.
+// CleanupUser frees per-user resources when they leave voice.
 func (R *Receiver) CleanupUser(UserID snowflake.ID) {
 
 	R.mu.Lock()
@@ -181,9 +286,7 @@ func (R *Receiver) getOrCreateSession(UserID snowflake.ID) *Session {
 
 	}
 
-	Sess, OK := R.sessions[UserID]
-
-	if OK {
+	if Sess, OK := R.sessions[UserID]; OK {
 
 		R.mu.Unlock()
 		return Sess
@@ -191,6 +294,12 @@ func (R *Receiver) getOrCreateSession(UserID snowflake.ID) *Session {
 	}
 
 	R.mu.Unlock()
+
+	if voiceCommandOptOut(UserID) {
+
+		return nil
+
+	}
 
 	NewSess, ErrNew := NewSession(R.GuildID, UserID, R.dispatcher)
 
@@ -211,11 +320,10 @@ func (R *Receiver) getOrCreateSession(UserID snowflake.ID) *Session {
 
 	}
 
-	if Existing, ExistsAfterUnlock := R.sessions[UserID]; ExistsAfterUnlock {
+	if Existing, Exists := R.sessions[UserID]; Exists {
 
 		R.mu.Unlock()
 		NewSess.Close()
-
 		return Existing
 
 	}

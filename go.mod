@@ -12,7 +12,6 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/hajimehoshi/go-mp3 v0.3.4
 	github.com/joho/godotenv v1.5.1
-	github.com/k2-fsa/sherpa-onnx-go-linux v1.13.0
 	github.com/kkdai/youtube/v2 v2.10.5
 	go.mongodb.org/mongo-driver v1.17.6
 	layeh.com/gopus v0.0.0-20210501142526-1ee02d434e32

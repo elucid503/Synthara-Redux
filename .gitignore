@@ -5,7 +5,5 @@ synthara-redux
 node_modules
 dist
 
-# Voice command wake-word model binaries (download separately per Receive/Models/README.md)
-Receive/Models/kws/*.onnx
-Receive/Models/kws/tokens.txt
-Receive/Models/kws/bpe.model
+Modules/pico/node_modules
+Modules/pico/dist

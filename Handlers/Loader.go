@@ -110,7 +110,7 @@ func registerVoiceCommands() {
 	Receive.Register(Receive.CommandReplay, Voice.Replay)
 	Receive.Register(Receive.CommandAutoplay, Voice.Autoplay)
 
-	Receive.SetVoiceCueHandler(func(GuildID snowflake.ID, Kind Receive.VoiceCueKind) {
+	Receive.SetFeedbackCueHandler(func(GuildID snowflake.ID, Kind Receive.FeedbackCueKind) {
 
 		Guild := Structs.GetGuild(GuildID, false)
 
@@ -120,11 +120,11 @@ func registerVoiceCommands() {
 
 		}
 
-		Guild.PlayVoiceCue(Kind)
+		Guild.PlayFeedbackCue(Kind)
 
 	})
 
-	Receive.SetVoiceCaptureDuckHandler(func(GuildID snowflake.ID, Start bool) {
+	Receive.SetCaptureDuckHandler(func(GuildID snowflake.ID, Start bool) {
 
 		Guild := Structs.GetGuild(GuildID, false)
 
@@ -135,6 +135,20 @@ func registerVoiceCommands() {
 		}
 
 		Guild.SetVoiceCaptureDucked(Start)
+
+	})
+
+	Receive.SetVoiceCommandOptOutChecker(func(UserID snowflake.ID) bool {
+
+		UserData, ErrUser := Structs.GetUser(UserID.String())
+
+		if ErrUser != nil {
+
+			return false
+
+		}
+
+		return UserData.VoiceCommandOptOut()
 
 	})
 
@@ -255,6 +269,10 @@ func InitializeHandlers() {
 			case "about":
 
 				Commands.About(Event)
+
+			case "settings":
+
+				Commands.Settings(Event)
 
 			case "play":
 

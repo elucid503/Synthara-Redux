@@ -16,9 +16,8 @@ type CueKind int
 
 const (
 
-	CueWake CueKind = iota
-	CueEnd // 1
-
+	CueCaptureStart CueKind = iota
+	CueCaptureEnd
 )
 
 const (
@@ -132,11 +131,11 @@ func cueFrames(kind CueKind) [][]int16 {
 
 	switch kind {
 
-	case CueWake:
+	case CueCaptureStart:
 
 		return cueFramesWake
 
-	case CueEnd:
+	case CueCaptureEnd:
 
 		return cueFramesEnd
 

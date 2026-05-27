@@ -261,7 +261,7 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 
 	} else if Receive.VoiceCommandsRequested() {
 
-		Utils.Logger.Warn("Guild", fmt.Sprintf("Voice commands requested for guild %s but wake-word model is unavailable; receiver not attached", G.ID))
+		Utils.Logger.Warn("Guild", fmt.Sprintf("Voice commands requested for guild %s but Porcupine wake detector is unavailable; receiver not attached", G.ID))
 
 	}
 
@@ -269,20 +269,20 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 
 }
 
-// PlayVoiceCue plays wake/end feedback through the guild voice mixer.
-func (G *Guild) PlayVoiceCue(Kind Receive.VoiceCueKind) {
+// PlayFeedbackCue plays capture start/end feedback through the guild voice mixer.
+func (G *Guild) PlayFeedbackCue(Kind Receive.FeedbackCueKind) {
 
 	var Cue Audio.CueKind
 
 	switch Kind {
 
-	case Receive.VoiceCueWake:
+	case Receive.FeedbackCueCaptureStart:
 
-		Cue = Audio.CueWake
+		Cue = Audio.CueCaptureStart
 
-	case Receive.VoiceCueEnd:
+	case Receive.FeedbackCueCaptureEnd:
 
-		Cue = Audio.CueEnd
+		Cue = Audio.CueCaptureEnd
 
 	default:
 
@@ -329,7 +329,7 @@ func (G *Guild) SetVoiceCaptureDucked(Ducked bool) {
 
 	}
 
-	Mixer.EndCaptureDuckAfter(Audio.CueDuration(Audio.CueEnd) + 50*time.Millisecond)
+	Mixer.EndCaptureDuckAfter(Audio.CueDuration(Audio.CueCaptureEnd) + 50*time.Millisecond)
 
 }
 

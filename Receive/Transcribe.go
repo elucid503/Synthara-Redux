@@ -33,10 +33,8 @@ const (
 	transcribeDoneWait = 5 * time.Second
 
 	envSTTEndpointing = "VOICE_STT_ENDPOINTING_MS"
-	// Silence (ms) before xAI fires speech_final. Must clear typical mid-phrase
-	// pauses in a spoken song title so multi-word "play" args aren't cut short;
-	// still tight enough to keep the fast finalize path responsive.
-	defaultEndpointing = 500
+
+	defaultEndpointing = 500 // silence gap in ms to finalize an utterance, per xAI recommendation
 
 )
 
@@ -63,7 +61,7 @@ type Transcriber struct {
 	done chan struct{}
 
 	writeMu sync.Mutex
-	pcmBuf []byte
+	pcmBuf  *PCMBuffer
 
 	startOnce sync.Once
 	timeoutOnce sync.Once
@@ -127,7 +125,8 @@ func NewTranscriber(Parent context.Context) (*Transcriber, error) {
 		ready: make(chan struct{}),
 		done: make(chan struct{}),
 
-		pcmBuf: make([]byte, 0, xaiPCMChunkBytes*2),
+		pcmBuf: NewPCMBuffer(xaiPCMChunkBytes * 4),
+
 	}
 
 	go T.readLoop(Ctx)
@@ -170,14 +169,6 @@ func (T *Transcriber) Send(PCM []byte) error {
 
 	}
 
-	// Drop silent frames so blank audio is never streamed to xAI.
-
-	if pcmIsSilent(PCM) {
-
-		return nil
-
-	}
-
 	select {
 
 	case <-T.done:
@@ -197,17 +188,15 @@ func (T *Transcriber) Send(PCM []byte) error {
 
 	}
 
-	T.pcmBuf = append(T.pcmBuf, PCM...)
+	T.pcmBuf.Append(PCM)
 
-	for len(T.pcmBuf) >= xaiPCMChunkBytes {
+	for _, Chunk := range T.pcmBuf.DrainChunks(xaiPCMChunkBytes) {
 
-		if Err := T.writePCM(T.pcmBuf[:xaiPCMChunkBytes]); Err != nil {
+		if Err := T.writePCM(Chunk); Err != nil {
 
 			return Err
 
 		}
-
-		T.pcmBuf = T.pcmBuf[xaiPCMChunkBytes:]
 
 	}
 
@@ -283,10 +272,19 @@ func (T *Transcriber) Finalize() {
 
 		T.writeMu.Lock()
 
-		if T.conn != nil && len(T.pcmBuf) > 0 {
+		if T.conn != nil {
 
-			_ = T.writePCM(T.pcmBuf)
-			T.pcmBuf = T.pcmBuf[:0]
+			for _, Chunk := range T.pcmBuf.DrainChunks(xaiPCMChunkBytes) {
+
+				_ = T.writePCM(Chunk)
+
+			}
+
+			if Tail := T.pcmBuf.Remainder(); len(Tail) > 0 {
+
+				_ = T.writePCM(Tail)
+
+			}
 
 		}
 
@@ -328,31 +326,6 @@ func (T *Transcriber) bestText() string {
 	defer T.textMu.Unlock()
 
 	return joinSpace(T.text, T.utterance, T.interim)
-
-}
-
-// pcmIsSilent reports whether a little-endian PCM16 chunk sits below the shared acoustic-silence threshold (same one as in wake detection)
-func pcmIsSilent(PCM []byte) bool {
-
-	N := len(PCM) / 2
-
-	if N == 0 {
-
-		return true
-
-	}
-
-	var Sum float64
-
-	for i := 0; i < N; i++ {
-
-		S := int16(uint16(PCM[i*2]) | uint16(PCM[i*2+1])<<8)
-		F := float64(S) / 32768.0
-		Sum += F * F
-
-	}
-
-	return float32(Sum/float64(N)) < hotMicEnergyThreshold
 
 }
 

@@ -1,0 +1,21 @@
+{
+  "name": "synthara-pico",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.6.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node --experimental-strip-types src/index.ts",
+    "start:built": "npm run build && node dist/index.js"
+  },
+  "dependencies": {
+    "@picovoice/porcupine-node": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "typescript": "^5.8.3"
+  }
+}

@@ -119,6 +119,124 @@
 		]
 	},
 	{
+		"name": "settings",
+		"name_localizations": {
+			"en-US": "settings",
+			"en-GB": "settings",
+			"es-ES": "ajustes",
+			"es-419": "ajustes",
+			"zh-CN": "设置",
+			"fr": "paramètres",
+			"it": "impostazioni",
+			"de": "einstellungen",
+			"pl": "ustawienia",
+			"ru": "настройки",
+			"ja": "設定"
+		},
+		"description": "Use this command to change your personal settings.",
+		"description_localizations": {
+			"en-US": "Use this command to change your personal settings.",
+			"en-GB": "Use this command to change your personal settings.",
+			"es-ES": "Usa este comando para cambiar tus ajustes personales.",
+			"es-419": "Usa este comando para cambiar tus ajustes personales.",
+			"zh-CN": "使用此命令更改你的个人机器人设置。",
+			"fr": "Utilisez cette commande pour modifier vos paramètres personnels.",
+			"it": "Usa questo comando per modificare le tue impostazioni personali.",
+			"de": "Verwende diesen Befehl, um deine persönlichen Bot-Einstellungen zu ändern.",
+			"pl": "Użyj tej komendy, aby zmienić swoje osobiste ustawienia bota.",
+			"ru": "Используйте эту команду, чтобы изменить личные настройки бота.",
+			"ja": "このコマンドを使用して、個人のボット設定を変更します。"
+		},
+		"options": [
+			{
+				"type": 3,
+				"name": "category",
+				"name_localizations": {
+					"en-US": "category",
+					"en-GB": "category",
+					"es-ES": "categoría",
+					"es-419": "categoría",
+					"zh-CN": "类别",
+					"fr": "catégorie",
+					"it": "categoria",
+					"de": "kategorie",
+					"pl": "kategoria",
+					"ru": "категория",
+					"ja": "カテゴリ"
+				},
+				"description": "Use this option to choose which setting to change.",
+				"description_localizations": {
+					"en-US": "Use this option to choose which setting to change.",
+					"en-GB": "Use this option to choose which setting to change.",
+					"es-ES": "Usa esta opción para elegir qué ajuste cambiar.",
+					"es-419": "Usa esta opción para elegir qué ajuste cambiar.",
+					"zh-CN": "使用此选项选择要更改的设置。",
+					"fr": "Utilisez cette option pour choisir le paramètre à modifier.",
+					"it": "Usa questa opzione per scegliere quale impostazione modificare.",
+					"de": "Verwende diese Option, um auszuwählen, welche Einstellung geändert werden soll.",
+					"pl": "Użyj tej opcji, aby wybrać ustawienie do zmiany.",
+					"ru": "Используйте эту опцию, чтобы выбрать, какую настройку изменить.",
+					"ja": "このオプションを使用して、変更する設定を選択します。"
+				},
+				"required": true,
+				"choices": [
+					{
+						"name": "Voice Command Opt-Out",
+						"name_localizations": {
+							"en-US": "Voice Command Opt-Out",
+							"en-GB": "Voice Command Opt-Out",
+							"es-ES": "Exclusión de Comandos de Voz",
+							"es-419": "Exclusión de Comandos de Voz",
+							"zh-CN": "语音命令退出",
+							"fr": "Désactivation des Commandes Vocales",
+							"it": "Opt-Out Comandi Vocali",
+							"de": "Sprachbefehle Abmelden",
+							"pl": "Rezygnacja z Poleceń Głosowych",
+							"ru": "Отказ от Голосовых Команд",
+							"ja": "音声コマンドのオプトアウト"
+						},
+						"value": "voice_command_opt_out"
+					}
+				]
+			},
+			{
+				"type": 5,
+				"name": "value",
+				"name_localizations": {
+					"en-US": "value",
+					"en-GB": "value",
+					"es-ES": "valor",
+					"es-419": "valor",
+					"zh-CN": "值",
+					"fr": "valeur",
+					"it": "valore",
+					"de": "wert",
+					"pl": "wartość",
+					"ru": "значение",
+					"ja": "値"
+				},
+				"description": "Use this option to enable or disable the selected setting. Defaults to false when omitted.",
+				"description_localizations": {
+					"en-US": "Use this option to enable or disable the selected setting. Defaults to false when omitted.",
+					"en-GB": "Use this option to enable or disable the selected setting. Defaults to false when omitted.",
+					"es-ES": "Usa esta opción para activar o desactivar el ajuste. Por defecto: false.",
+					"es-419": "Usa esta opción para activar o desactivar el ajuste. Por defecto: false.",
+					"zh-CN": "使用此选项启用或禁用所选设置。省略时默认为 false。",
+					"fr": "Utilisez cette option pour activer ou désactiver. Par défaut : false.",
+					"it": "Usa questa opzione per abilitare o disabilitare. Predefinito: false.",
+					"de": "Verwende diese Option zum Aktivieren oder Deaktivieren. Standard: false.",
+					"pl": "Użyj tej opcji, aby włączyć lub wyłączyć wybrane ustawienie. Domyślnie false, jeśli pominięte.",
+					"ru": "Используйте опцию, чтобы включить или отключить настройку. По умолчанию: false.",
+					"ja": "このオプションを使用して、選択した設定を有効または無効にします。省略時のデフォルトは false です。"
+				},
+				"required": true
+			}
+		],
+		"contexts": [
+			0
+		]
+	},
+	{
 		"name": "play",
 		"name_localizations": {
 			"en-US": "play",
