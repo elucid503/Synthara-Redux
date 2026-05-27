@@ -279,12 +279,14 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 		}
 
 		URI := fmt.Sprintf("Synthara-Redux:Song:%d", int64(TidalID))
-		SongFound, _, ErrorHandling := Guild.HandleURI(URI, "Web")
+		SongFound, _, ErrorHandling := Guild.HandleURI(URI, Identifier.Name)
 
 		if ErrorHandling != nil {
 
 			Guild.Queue.SendToWebsockets("ERROR", map[string]interface{}{
+
 				"Message": "Failed to add song to queue.",
+
 			})
 
 			return
