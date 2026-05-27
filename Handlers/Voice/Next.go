@@ -24,7 +24,7 @@ func Next(GuildID, UserID snowflake.ID, _ string) {
 
 	Guild.ResetInactivityTimer()
 
-	Advanced, Ended := Guild.Queue.Next(true)
+	Advanced, Ended := Guild.Queue.Next(false)
 
 	if Ended {
 

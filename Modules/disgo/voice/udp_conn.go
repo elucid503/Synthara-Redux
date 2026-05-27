@@ -274,6 +274,11 @@ func (u *udpConnImpl) Write(p []byte) (int, error) {
 
 	n, err := u.daveSession.Encrypt(u.ssrc, p, u.encryptBuffer)
 	if err != nil {
+		if err.Error() == "missing key ratchet" {
+			// DAVE key renegotiation in progress (e.g. a user left the channel).
+			// Drop the frame silently; the ratchet will be restored on next epoch.
+			return len(p), nil
+		}
 		return 0, fmt.Errorf("failed to encrypt packet: %w", err)
 	}
 

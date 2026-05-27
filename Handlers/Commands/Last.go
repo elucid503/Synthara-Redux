@@ -19,7 +19,7 @@ func Last(Event *events.ApplicationCommandInteractionCreate) {
 
 	Guild := Structs.GetGuild(GuildID, false) // does not create if not found
 
-	Success := Guild.Queue.Last()
+	Success := Guild.Queue.Last(true)
 
 	if !Success {
 

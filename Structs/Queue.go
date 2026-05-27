@@ -467,11 +467,11 @@ func (Q *Queue) notifyQueueEnded(Guild *Guild) {
 }
 
 // Previous moves to the most recently played song; returns false when there is no history.
-func (Q *Queue) Last() bool {
+func (Q *Queue) Last(Notify bool) bool {
 
 	Success := Q.moveTo(-1, true)
 
-	if Success {
+	if Success && Notify {
 
 		Q.SendNowPlayingMessage()
 

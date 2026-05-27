@@ -195,7 +195,7 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 
 	case OperationLast:
 
-		Guild.Queue.Last()
+		Guild.Queue.Last(true)
 
 		if Guild.Queue.Current != nil {
 

@@ -36,7 +36,7 @@ func Last(Event *events.ComponentInteractionCreate) {
 
 	}
 
-	Success := Guild.Queue.Last()
+	Success := Guild.Queue.Last(true)
 
 	if !Success {
 
