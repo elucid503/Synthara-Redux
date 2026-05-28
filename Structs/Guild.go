@@ -276,17 +276,17 @@ func (G *Guild) PlayFeedbackCue(Kind Receive.FeedbackCueKind) {
 
 	switch Kind {
 
-	case Receive.FeedbackCueCaptureStart:
+		case Receive.FeedbackCueCaptureStart:
 
-		Cue = Audio.CueCaptureStart
+			Cue = Audio.CueCaptureStart
 
-	case Receive.FeedbackCueCaptureEnd:
+		case Receive.FeedbackCueCaptureEnd:
 
-		Cue = Audio.CueCaptureEnd
+			Cue = Audio.CueCaptureEnd
 
-	default:
+		default:
 
-		return
+			return
 
 	}
 
@@ -303,6 +303,32 @@ func (G *Guild) PlayFeedbackCue(Kind Receive.FeedbackCueKind) {
 	}
 
 	Mixer.PlayCue(Cue)
+
+}
+
+// PlayVoiceResponse generates TTS audio for text and plays it through the guild voice mixer.
+func (G *Guild) PlayVoiceResponse(text string) {
+
+	G.StreamerMutex.Lock()
+	Mixer := G.VoiceMixer
+	G.StreamerMutex.Unlock()
+
+	if Mixer == nil {
+
+		return
+
+	}
+
+	Frames, Err := Audio.GenerateTTS(text)
+
+	if Err != nil {
+
+		Utils.Logger.Warn("Guild", fmt.Sprintf("TTS failed for guild %s: %s", G.ID, Err.Error()))
+		return
+
+	}
+
+	Mixer.PlayTTSOverlay(Frames)
 
 }
 

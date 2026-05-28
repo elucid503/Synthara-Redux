@@ -27,6 +27,7 @@ func Last(GuildID, UserID snowflake.ID, _ string) {
 	if !Guild.Queue.Last(false) {
 
 		notifyLocalized(Guild, "Commands.Last.Error.Title", "Commands.Last.Error.Description", "Embeds.Categories.Error", Utils.ERROR)
+		voiceRespond(GuildID, "There's no previous song.")
 
 		return
 

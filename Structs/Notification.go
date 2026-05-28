@@ -13,10 +13,11 @@ import (
 
 type Notification struct {
 
-	ID          string    `bson:"_id"` // Primary key
-	Title       string    `bson:"title"`
-	Description string    `bson:"description"`
-	Expiry      time.Time `bson:"expiry,omitempty"` // Optional expiration date
+	ID string    `bson:"_id"` // Primary key
+
+	Title string `bson:"title"`
+	Description string `bson:"description"`
+	Expiry time.Time `bson:"expiry,omitempty"` // Optional expiration date
 
 }
 
@@ -83,7 +84,7 @@ func GetLatestNotification() (*Notification, error) {
 	}
 
 	// Sorts by ID descending (most recent first)
-	
+
 	Options := options.FindOne().SetSort(bson.M{"_id": -1})
 
 	Error := Collection.FindOne(Context, Filter, Options).Decode(NotificationData)

@@ -33,6 +33,7 @@ func Play(GuildID, UserID snowflake.ID, Args string) {
 	if Args == "" {
 
 		notifyLocalized(Guild, "Commands.Play.Error.NoQuery.Title", "Commands.Play.Error.NoQuery.Description", "Embeds.Categories.Error", Utils.ERROR)
+		voiceRespond(GuildID, "What would you like me to play?")
 
 		return
 
@@ -43,6 +44,7 @@ func Play(GuildID, UserID snowflake.ID, Args string) {
 	if !VoiceStateExists || VoiceState.ChannelID == nil {
 
 		notifyLocalized(Guild, "Commands.Play.Error.NotInVoiceChannel.Title", "Commands.Play.Error.NotInVoiceChannel.Description", "Embeds.Categories.Error", Utils.ERROR)
+		voiceRespond(GuildID, "You're not in a voice channel.")
 
 		return
 
@@ -53,6 +55,7 @@ func Play(GuildID, UserID snowflake.ID, Args string) {
 	if ErrorConnecting != nil {
 
 		notify(Guild, Localizations.Get("Commands.Play.Error.FailedToConnect.Title", Locale), Localizations.GetFormat("Commands.Play.Error.FailedToConnect.Description", Locale, ErrorConnecting.Error()), Localizations.Get("Embeds.Categories.Error", Locale), Utils.ERROR)
+		voiceRespond(GuildID, "I couldn't join your voice channel.")
 
 		return
 
@@ -63,6 +66,7 @@ func Play(GuildID, UserID snowflake.ID, Args string) {
 	if ErrRoute != nil {
 
 		notify(Guild, Localizations.Get("Commands.Play.Error.InvalidInput.Title", Locale), Localizations.GetFormat("Commands.Play.Error.InvalidInput.Description", Locale, ErrRoute.Error()), Localizations.Get("Embeds.Categories.Error", Locale), Utils.ERROR)
+		voiceRespond(GuildID, "I couldn't find that.")
 
 		return
 
@@ -75,12 +79,27 @@ func Play(GuildID, UserID snowflake.ID, Args string) {
 	if ErrHandle != nil {
 
 		notify(Guild, Localizations.Get("Commands.Play.Error.FailedToHandle.Title", Locale), Localizations.GetFormat("Commands.Play.Error.FailedToHandle.Description", Locale, ErrHandle.Error()), Localizations.Get("Embeds.Categories.Error", Locale), Utils.ERROR)
+		voiceRespond(GuildID, "Something went wrong.")
 
 		return
 
 	}
 
 	trackPlayRequest(UserID, Song, URI)
+
+	if Pos == 0 {
+
+		voiceRespond(GuildID, "Now playing "+Song.Title+".")
+
+	} else if Pos == 1 {
+
+		voiceRespond(GuildID, "Got it, "+Song.Title+" is next in the queue.")
+
+	} else {
+
+		voiceRespond(GuildID, "Got it, "+Song.Title+" is "+strconv.Itoa(Pos)+" songs away.")
+
+	}
 
 	notifyPlayResult(Guild, Song, Pos, UserID)
 

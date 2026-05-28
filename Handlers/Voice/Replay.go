@@ -29,6 +29,7 @@ func Replay(GuildID, UserID snowflake.ID, Args string) {
 	if Position < 0 || Position >= len(Guild.Queue.Previous) {
 
 		notifyLocalized(Guild, "Commands.Replay.Error.InvalidPosition.Title", "Commands.Replay.Error.InvalidPosition.Description", "Embeds.Categories.Error", Utils.ERROR)
+		voiceRespond(GuildID, "That song isn't in your history.")
 
 		return
 
@@ -39,6 +40,7 @@ func Replay(GuildID, UserID snowflake.ID, Args string) {
 	if !Guild.Queue.Replay(ReplayIndex) {
 
 		notifyLocalized(Guild, "Commands.Replay.Error.InvalidPosition.Title", "Commands.Replay.Error.InvalidPosition.Description", "Embeds.Categories.Error", Utils.ERROR)
+		voiceRespond(GuildID, "That song isn't in your history.")
 
 		return
 

@@ -29,6 +29,7 @@ func Next(GuildID, UserID snowflake.ID, _ string) {
 	if Ended {
 
 		notifyLocalizedWithMember(Guild, UserID, "Embeds.Notifications.QueueEnded.Title", "Embeds.NowPlaying.AddedByMemberViaVoice", "Embeds.Categories.Notifications", Utils.PRIMARY)
+		voiceRespond(GuildID, "The queue has ended.")
 
 		return
 
@@ -37,6 +38,7 @@ func Next(GuildID, UserID snowflake.ID, _ string) {
 	if !Advanced {
 
 		notifyLocalized(Guild, "Commands.Next.Error.NoNextSong.Title", "Commands.Next.Error.NoNextSong.Description", "Embeds.Categories.Error", Utils.ERROR)
+		voiceRespond(GuildID, "There's nothing next in the queue.")
 
 		return
 

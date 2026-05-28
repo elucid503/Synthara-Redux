@@ -152,6 +152,20 @@ func registerVoiceCommands() {
 
 	})
 
+	Receive.SetVoiceResponseHandler(func(GuildID snowflake.ID, text string) {
+
+		Guild := Structs.GetGuild(GuildID, false)
+
+		if Guild == nil {
+
+			return
+
+		}
+
+		go Guild.PlayVoiceResponse(text)
+
+	})
+
 }
 
 func InitializeHandlers() {

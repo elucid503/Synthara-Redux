@@ -22,6 +22,7 @@ func Resume(GuildID, UserID snowflake.ID, _ string) {
 	if Guild.Queue.State != Structs.StatePaused {
 
 		notifyLocalized(Guild, "Commands.Resume.Error.Title", "Commands.Resume.Error.Description", "Embeds.Categories.Error", Utils.ERROR)
+		voiceRespond(GuildID, "There's nothing to resume.")
 
 		return
 

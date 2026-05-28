@@ -31,11 +31,13 @@ func Shuffle(GuildID, UserID snowflake.ID, Args string) {
 	if Enabled {
 
 		notifyLocalizedWithMember(Guild, UserID, "Commands.Shuffle.Enabled.Title", "Embeds.NowPlaying.AddedByMemberViaVoice", "Embeds.Categories.Playback", Utils.PRIMARY)
+		voiceRespond(GuildID, "Shuffle is on.")
 
 		return
 
 	}
 
 	notifyLocalizedWithMember(Guild, UserID, "Commands.Shuffle.Disabled.Title", "Embeds.NowPlaying.AddedByMemberViaVoice", "Embeds.Categories.Playback", Utils.PRIMARY)
+	voiceRespond(GuildID, "Shuffle is off.")
 
 }

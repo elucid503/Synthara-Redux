@@ -2,6 +2,8 @@
 *.exe
 synthara-redux
 
+Cache
+
 node_modules
 dist
 

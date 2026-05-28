@@ -6,6 +6,7 @@ import (
 	"Synthara-Redux/APIs/Tidal"
 	"Synthara-Redux/Globals"
 	"Synthara-Redux/Globals/Localizations"
+	"Synthara-Redux/Receive"
 	"Synthara-Redux/Structs"
 	"Synthara-Redux/Utils"
 	"Synthara-Redux/Validation"
@@ -110,12 +111,19 @@ func requireVoice(Guild *Structs.Guild, GuildID, UserID snowflake.ID, Locale str
 	if Embed := Validation.VoiceStateError(GuildID, UserID, Locale); Embed != nil {
 
 		notifyValidationEmbed(Guild, Embed)
+		voiceRespond(GuildID, "You're not in a voice channel.")
 
 		return false
 
 	}
 
 	return true
+
+}
+
+func voiceRespond(GuildID snowflake.ID, text string) {
+
+	Receive.EmitVoiceResponse(GuildID, text)
 
 }
 

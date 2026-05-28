@@ -10,8 +10,10 @@ import (
 type FeedbackCueKind int
 
 const (
+
 	FeedbackCueCaptureStart FeedbackCueKind = iota
-	FeedbackCueCaptureEnd
+	FeedbackCueCaptureEnd // 1
+
 )
 
 type FeedbackCueHandler func(GuildID snowflake.ID, Kind FeedbackCueKind)
@@ -20,7 +22,10 @@ type CaptureDuckHandler func(GuildID snowflake.ID, Duck bool)
 
 type VoiceCommandOptOutChecker func(UserID snowflake.ID) bool
 
+type VoiceResponseHandler func(GuildID snowflake.ID, text string)
+
 var (
+
 	feedbackCueMu sync.RWMutex
 	feedbackCueFn FeedbackCueHandler
 
@@ -29,6 +34,10 @@ var (
 
 	voiceOptOutMu sync.RWMutex
 	voiceOptOutFn VoiceCommandOptOutChecker
+
+	voiceResponseMu sync.RWMutex
+	voiceResponseFn VoiceResponseHandler
+
 )
 
 func SetFeedbackCueHandler(fn FeedbackCueHandler) {
@@ -52,6 +61,28 @@ func SetVoiceCommandOptOutChecker(fn VoiceCommandOptOutChecker) {
 	voiceOptOutMu.Lock()
 	voiceOptOutFn = fn
 	voiceOptOutMu.Unlock()
+
+}
+
+func SetVoiceResponseHandler(fn VoiceResponseHandler) {
+
+	voiceResponseMu.Lock()
+	voiceResponseFn = fn
+	voiceResponseMu.Unlock()
+
+}
+
+func EmitVoiceResponse(GuildID snowflake.ID, text string) {
+
+	voiceResponseMu.RLock()
+	Fn := voiceResponseFn
+	voiceResponseMu.RUnlock()
+
+	if Fn != nil {
+
+		Fn(GuildID, text)
+
+	}
 
 }
 

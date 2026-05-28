@@ -45,6 +45,7 @@ func Autoplay(GuildID, UserID snowflake.ID, Args string) {
 		}
 
 		notifyLocalizedWithMember(Guild, UserID, "Commands.AutoPlay.Title", "Embeds.NowPlaying.AddedByMemberViaVoice", "Embeds.Categories.Playback", Utils.PRIMARY)
+		voiceRespond(GuildID, "Autoplay is on.")
 
 		return
 
@@ -53,5 +54,6 @@ func Autoplay(GuildID, UserID snowflake.ID, Args string) {
 	Guild.StartInactivityTimer()
 
 	notifyLocalizedWithMember(Guild, UserID, "Commands.AutoPlay.Title", "Embeds.NowPlaying.AddedByMemberViaVoice", "Embeds.Categories.Playback", Utils.PRIMARY)
+	voiceRespond(GuildID, "Autoplay is off.")
 
 }

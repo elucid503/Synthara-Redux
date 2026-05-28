@@ -14,8 +14,10 @@ import (
 
 // OpusFrameProvider supplies 20ms Opus frames (which is same contract as disgo voice.OpusFrameProvider).
 type OpusFrameProvider interface {
+
 	ProvideOpusFrame() ([]byte, error)
 	Close()
+
 }
 
 // MixerProvider is the persistent outbound audio source for a guild voice connection.
@@ -29,9 +31,13 @@ type MixerProvider struct {
 	cueFrames [][]int16
 	cuePos int
 
+	ttsFrames [][]int16
+	ttsPos    int
+
 	overlayActive atomic.Bool
+	ttsActive atomic.Bool
 	captureDuckActive atomic.Bool
-	captureDuckEpoch atomic.Uint64
+	captureDuckEpoch  atomic.Uint64
 
 	dec *gopus.Decoder
 	enc *gopus.Encoder
@@ -159,6 +165,29 @@ func (M *MixerProvider) EndCaptureDuckAfter(delay time.Duration) {
 
 }
 
+// PlayTTSOverlay queues TTS PCM frames for playback after any active cue overlay finishes.
+func (M *MixerProvider) PlayTTSOverlay(frames [][]int16) {
+
+	if M == nil || len(frames) == 0 {
+
+		return
+
+	}
+
+	TTSDuration := time.Duration(len(frames)) * 20 * time.Millisecond
+
+	M.SetCaptureDuck(true)
+	M.EndCaptureDuckAfter(TTSDuration + 100*time.Millisecond)
+
+	M.cueMu.Lock()
+	M.ttsFrames = frames
+	M.ttsPos = 0
+	M.cueMu.Unlock()
+
+	M.ttsActive.Store(true)
+
+}
+
 // PlayCue starts (or replaces) a wake/end overlay; safe to call from any goroutine.
 func (M *MixerProvider) PlayCue(kind CueKind) {
 
@@ -215,11 +244,9 @@ func (M *MixerProvider) ProvideOpusFrame() ([]byte, error) {
 
 	M.cueMu.Lock()
 
-	Overlay := M.overlayActive.Load() && M.cuePos < len(M.cueFrames)
-
 	var CuePCM []int16
 
-	if Overlay {
+	if M.overlayActive.Load() && M.cuePos < len(M.cueFrames) {
 
 		CuePCM = M.cueFrames[M.cuePos]
 		M.cuePos++
@@ -230,9 +257,22 @@ func (M *MixerProvider) ProvideOpusFrame() ([]byte, error) {
 
 		}
 
+	} else if M.ttsActive.Load() && M.ttsPos < len(M.ttsFrames) {
+
+		CuePCM = M.ttsFrames[M.ttsPos]
+		M.ttsPos++
+
+		if M.ttsPos >= len(M.ttsFrames) {
+
+			M.ttsActive.Store(false)
+
+		}
+
 	}
 
 	M.cueMu.Unlock()
+
+	Overlay := CuePCM != nil
 
 	Duck := M.captureDuckActive.Load()
 
@@ -304,11 +344,14 @@ func (M *MixerProvider) Close() {
 	}
 
 	M.overlayActive.Store(false)
+	M.ttsActive.Store(false)
 	M.captureDuckActive.Store(false)
 
 	M.cueMu.Lock()
 	M.cueFrames = nil
 	M.cuePos = 0
+	M.ttsFrames = nil
+	M.ttsPos = 0
 	M.cueMu.Unlock()
 
 	M.mu.Lock()
