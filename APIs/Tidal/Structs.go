@@ -239,6 +239,13 @@ type AlbumItem struct {
 	Type string `json:"type"`
 }
 
+type ArtistTopTracksResponse struct {
+	Limit              int     `json:"limit"`
+	Offset             int     `json:"offset"`
+	TotalNumberOfItems int     `json:"totalNumberOfItems"`
+	Items              []Track `json:"items"`
+}
+
 // Mix items response structure
 type MixItems struct {
 	Limit              int       `json:"limit"`

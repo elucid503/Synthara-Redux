@@ -1549,6 +1549,92 @@
 				}
 			}
 		},
+		"Artist": {
+			"Error": {
+				"Title": {
+					"en-US": "Nothing Playing",
+					"en-GB": "Nothing Playing",
+					"es-ES": "No Hay Nada Reproduciendo",
+					"es-419": "No Hay Nada Reproduciendo",
+					"zh-CN": "没有播放内容",
+					"fr": "Rien Ne Joue",
+					"it": "Nessuna Riproduzione",
+					"de": "Nichts Wird Abgespielt",
+					"pl": "Nic Nie Gra",
+					"ru": "Ничего Не Воспроизводится",
+					"ja": "再生中の曲がありません"
+				},
+				"Description": {
+					"en-US": "There is no Song currently playing to show the artist for.",
+					"en-GB": "There is no Song currently playing to show the artist for.",
+					"es-ES": "No hay ninguna canción reproduciéndose para mostrar el artista.",
+					"es-419": "No hay ninguna canción reproduciéndose para mostrar el artista.",
+					"zh-CN": "当前没有播放歌曲以显示艺术家。",
+					"fr": "Il n'y a pas de chanson en cours de lecture pour afficher l'artiste.",
+					"it": "Non c'è nessuna canzone in riproduzione per mostrare l'artista.",
+					"de": "Es wird derzeit kein Lied abgespielt, um den Künstler anzuzeigen.",
+					"pl": "Nie odtwarzany żaden utwór, aby pokazać artystę.",
+					"ru": "В данный момент не воспроизводится песня для отображения исполнителя.",
+					"ja": "アーティストを表示するために再生中の曲がありません。"
+				}
+			},
+			"NoArtist": {
+				"Title": {
+					"en-US": "No Artist Available",
+					"en-GB": "No Artist Available",
+					"es-ES": "No Hay Artista Disponible",
+					"es-419": "No Hay Artista Disponible",
+					"zh-CN": "没有可用的艺术家",
+					"fr": "Aucun Artiste Disponible",
+					"it": "Nessun Artista Disponibile",
+					"de": "Kein Künstler Verfügbar",
+					"pl": "Brak Dostępnego Artysty",
+					"ru": "Исполнитель Недоступен",
+					"ja": "利用可能なアーティストがありません"
+				},
+				"Description": {
+					"en-US": "The currently playing Song does not have artist information.",
+					"en-GB": "The currently playing Song does not have artist information.",
+					"es-ES": "La canción que se está reproduciendo no tiene información del artista.",
+					"es-419": "La canción que se está reproduciendo no tiene información del artista.",
+					"zh-CN": "当前播放的歌曲没有艺术家信息。",
+					"fr": "La chanson en cours de lecture n'a pas d'informations sur l'artiste.",
+					"it": "La canzone in riproduzione non ha informazioni sull'artista.",
+					"de": "Das aktuell gespielte Lied hat keine Künstlerinformationen.",
+					"pl": "Odtwarzany utwór nie ma informacji o artyście.",
+					"ru": "У текущей песни нет информации об исполнителе.",
+					"ja": "現在再生中の曲にはアーティスト情報がありません。"
+				}
+			},
+			"FetchError": {
+				"Title": {
+					"en-US": "Artist Fetch Failed",
+					"en-GB": "Artist Fetch Failed",
+					"es-ES": "Error al Obtener el Artista",
+					"es-419": "Error al Obtener el Artista",
+					"zh-CN": "获取艺术家失败",
+					"fr": "Échec de la Récupération de l'Artiste",
+					"it": "Recupero Artista Fallito",
+					"de": "Künstler-Abruf Fehlgeschlagen",
+					"pl": "Nie Udało Się Pobrać Artysty",
+					"ru": "Не Удалось Получить Исполнителя",
+					"ja": "アーティストの取得に失敗しました"
+				},
+				"Description": {
+					"en-US": "Unable to fetch artist information. Please try again later.",
+					"en-GB": "Unable to fetch artist information. Please try again later.",
+					"es-ES": "No se pudo obtener la información del artista. Inténtalo de nuevo más tarde.",
+					"es-419": "No se pudo obtener la información del artista. Inténtalo de nuevo más tarde.",
+					"zh-CN": "无法获取艺术家信息。请稍后再试。",
+					"fr": "Impossible de récupérer les informations de l'artiste. Veuillez réessayer plus tard.",
+					"it": "Impossibile recuperare le informazioni dell'artista. Riprova più tardi.",
+					"de": "Künstlerinformationen konnten nicht abgerufen werden. Bitte versuchen Sie es später erneut.",
+					"pl": "Nie można pobrać informacji o artyście. Spróbuj ponownie później.",
+					"ru": "Не удалось получить информацию об исполнителе. Попробуйте позже.",
+					"ja": "アーティスト情報を取得できませんでした。後でもう一度お試しください。"
+				}
+			}
+		},
 		"Album": {
 			"Error": {
 				"Title": {
@@ -3251,6 +3337,73 @@
 				"ja": "(切り捨て)"
 			}
 		},
+		"Artist": {
+			"Title": {
+				"en-US": "Artist",
+				"en-GB": "Artist",
+				"es-ES": "Artista",
+				"es-419": "Artista",
+				"zh-CN": "艺术家",
+				"fr": "Artiste",
+				"it": "Artista",
+				"de": "Künstler",
+				"pl": "Artysta",
+				"ru": "Исполнитель",
+				"ja": "アーティスト"
+			},
+			"More": {
+				"en-US": "and %d more...",
+				"en-GB": "and %d more...",
+				"es-ES": "y %d más...",
+				"es-419": "y %d más...",
+				"zh-CN": "还有 %d 首...",
+				"fr": "et %d de plus...",
+				"it": "e altri %d...",
+				"de": "und %d mehr...",
+				"pl": "i %d więcej...",
+				"ru": "и ещё %d...",
+				"ja": "さらに %d 曲..."
+			},
+			"Stats": {
+				"en-US": "%d %s • %d Min",
+				"en-GB": "%d %s • %d Min",
+				"es-ES": "%d %s • %d Min",
+				"es-419": "%d %s • %d Min",
+				"zh-CN": "%d %s • %d 分钟",
+				"fr": "%d %s • %d Min",
+				"it": "%d %s • %d Min",
+				"de": "%d %s • %d Min",
+				"pl": "%d %s • %d Min",
+				"ru": "%d %s • %d Мин",
+				"ja": "%d %s • %d 分"
+			},
+			"EnqueueAll": {
+				"en-US": "Enqueue All",
+				"en-GB": "Enqueue All",
+				"es-ES": "Añadir Todo a la Cola",
+				"es-419": "Añadir Todo a la Cola",
+				"zh-CN": "全部加入队列",
+				"fr": "Ajouter Tout à la File",
+				"it": "Accoda Tutto",
+				"de": "Alle Einreihen",
+				"pl": "Dodaj Wszystko do Kolejki",
+				"ru": "Добавить Все в Очередь",
+				"ja": "すべてキューに追加"
+			},
+			"PlayAll": {
+				"en-US": "Play All",
+				"en-GB": "Play All",
+				"es-ES": "Reproducir Todo",
+				"es-419": "Reproducir Todo",
+				"zh-CN": "播放全部",
+				"fr": "Tout Jouer",
+				"it": "Riproduci Tutto",
+				"de": "Alle Abspielen",
+				"pl": "Odtwórz Wszystko",
+				"ru": "Воспроизвести Все",
+				"ja": "すべて再生"
+			}
+		},
 		"Album": {
 			"Title": {
 				"en-US": "Album",
@@ -3964,6 +4117,133 @@
 					"ru": "Воспроизводится %d песен из этого альбома.",
 					"ja": "このアルバムから %d 曲を再生中。"
 				}
+			}
+		}
+	},
+	"Artist": {
+		"InvalidID": {
+			"Title": {
+				"en-US": "Invalid Artist ID",
+				"en-GB": "Invalid Artist ID",
+				"es-ES": "ID de Artista Inválido",
+				"es-419": "ID de Artista Inválido",
+				"zh-CN": "无效的艺术家 ID",
+				"fr": "ID d'Artiste Invalide",
+				"it": "ID Artista Non Valido",
+				"de": "Ungültige Künstler-ID",
+				"pl": "Nieprawidłowy ID Artysty",
+				"ru": "Недействительный ID Исполнителя",
+				"ja": "無効なアーティストID"
+			},
+			"Description": {
+				"en-US": "The artist ID provided is invalid.",
+				"en-GB": "The artist ID provided is invalid.",
+				"es-ES": "El ID del artista proporcionado no es válido.",
+				"es-419": "El ID del artista proporcionado no es válido.",
+				"zh-CN": "提供的艺术家 ID 无效。",
+				"fr": "L'ID d'artiste fourni n'est pas valide.",
+				"it": "L'ID artista fornito non è valido.",
+				"de": "Die angegebene Künstler-ID ist ungültig.",
+				"pl": "Podany ID artysty jest nieprawidłowy.",
+				"ru": "Предоставленный ID исполнителя недействителен.",
+				"ja": "提供されたアーティストIDは無効です。"
+			}
+		},
+		"FetchError": {
+			"Title": {
+				"en-US": "Artist Fetch Failed",
+				"en-GB": "Artist Fetch Failed",
+				"es-ES": "Error al Obtener el Artista",
+				"es-419": "Error al Obtener el Artista",
+				"zh-CN": "获取艺术家失败",
+				"fr": "Échec de la Récupération de l'Artiste",
+				"it": "Recupero Artista Fallito",
+				"de": "Künstler-Abruf Fehlgeschlagen",
+				"pl": "Nie Udało Się Pobrać Artysty",
+				"ru": "Не Удалось Получить Исполнителя",
+				"ja": "アーティストの取得に失敗しました"
+			},
+			"Description": {
+				"en-US": "Unable to fetch artist songs. Please try again later.",
+				"en-GB": "Unable to fetch artist songs. Please try again later.",
+				"es-ES": "No se pudieron obtener las canciones del artista. Inténtalo de nuevo más tarde.",
+				"es-419": "No se pudieron obtener las canciones del artista. Inténtalo de nuevo más tarde.",
+				"zh-CN": "无法获取艺术家歌曲。请稍后再试。",
+				"fr": "Impossible de récupérer les chansons de l'artiste. Veuillez réessayer plus tard.",
+				"it": "Impossibile recuperare le canzoni dell'artista. Riprova più tardi.",
+				"de": "Künstler-Songs konnten nicht abgerufen werden. Bitte versuchen Sie es später erneut.",
+				"pl": "Nie można pobrać utworów artysty. Spróbuj ponownie później.",
+				"ru": "Не удалось получить песни исполнителя. Попробуйте позже.",
+				"ja": "アーティストの曲を取得できませんでした。後でもう一度お試しください。"
+			}
+		},
+		"Enqueued": {
+			"Title": {
+				"en-US": "Artist Enqueued",
+				"en-GB": "Artist Enqueued",
+				"es-ES": "Artista Añadido a la Cola",
+				"es-419": "Artista Añadido a la Cola",
+				"zh-CN": "艺术家已加入队列",
+				"fr": "Artiste Ajouté à la File",
+				"it": "Artista Accodato",
+				"de": "Künstler Eingereiht",
+				"pl": "Artysta Dodany do Kolejki",
+				"ru": "Исполнитель Добавлен в Очередь",
+				"ja": "アーティストがキューに追加されました"
+			},
+			"Description": {
+				"en-US": "Added %d songs to the queue.",
+				"en-GB": "Added %d songs to the queue.",
+				"es-ES": "Se añadieron %d canciones a la cola.",
+				"es-419": "Se añadieron %d canciones a la cola.",
+				"zh-CN": "已将 %d 首歌曲添加到队列。",
+				"fr": "%d chansons ajoutées à la file d'attente.",
+				"it": "Aggiunte %d canzoni alla coda.",
+				"de": "%d Lieder zur Warteschlange hinzugefügt.",
+				"pl": "Dodano %d utworów do kolejki.",
+				"ru": "Добавлено %d песен в очередь.",
+				"ja": "キューに %d 曲追加しました。"
+			},
+			"DescriptionAfterCurrent": {
+				"en-US": "Added %d songs after %s.",
+				"en-GB": "Added %d songs after %s.",
+				"es-ES": "Se añadieron %d canciones después de %s.",
+				"es-419": "Se añadieron %d canciones después de %s.",
+				"zh-CN": "已在 %s 之后添加 %d 首歌曲。",
+				"fr": "%d chansons ajoutées après %s.",
+				"it": "%d canzoni aggiunte dopo %s.",
+				"de": "%d Lieder nach %s hinzugefügt.",
+				"pl": "Dodano %d utworów po %s.",
+				"ru": "Добавлено %d песен после %s.",
+				"ja": "%s の後に %d 曲を追加しました。"
+			}
+		},
+		"Playing": {
+			"Title": {
+				"en-US": "Playing Artist",
+				"en-GB": "Playing Artist",
+				"es-ES": "Reproduciendo Artista",
+				"es-419": "Reproduciendo Artista",
+				"zh-CN": "正在播放艺术家",
+				"fr": "Lecture de l'Artiste",
+				"it": "Riproduzione Artista",
+				"de": "Künstler Wird Abgespielt",
+				"pl": "Odtwarzanie Artysty",
+				"ru": "Воспроизведение Исполнителя",
+				"ja": "アーティスト再生中"
+			},
+			"Description": {
+				"en-US": "Now playing %d songs from this artist.",
+				"en-GB": "Now playing %d songs from this artist.",
+				"es-ES": "Ahora reproduciendo %d canciones de este artista.",
+				"es-419": "Ahora reproduciendo %d canciones de este artista.",
+				"zh-CN": "正在播放此艺术家的 %d 首歌曲。",
+				"fr": "Lecture de %d chansons de cet artiste.",
+				"it": "In riproduzione %d canzoni da questo artista.",
+				"de": "%d Lieder von diesem Künstler werden abgespielt.",
+				"pl": "Odtwarzanie %d utworów tego artysty.",
+				"ru": "Воспроизводится %d песен от этого исполнителя.",
+				"ja": "このアーティストから %d 曲を再生中。"
 			}
 		}
 	},

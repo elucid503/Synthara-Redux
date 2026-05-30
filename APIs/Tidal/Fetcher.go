@@ -474,6 +474,93 @@ func FetchArtist(ID int64, Full bool) ([]Artist, error) {
 
 }
 
+func FetchArtistTopTracks(ArtistID int64) ([]Song, error) {
+
+	Cache := Globals.GetOrCreateCache("TidalArtistTopTracks")
+	Key := fmt.Sprintf("%d", ArtistID)
+
+	if Cached, Exists := Cache.Get(Key); Exists {
+
+		if Songs, Ok := Cached.([]Song); Ok {
+
+			Copy := make([]Song, len(Songs))
+			copy(Copy, Songs)
+
+			return Copy, nil
+
+		}
+
+	}
+
+	Token, Err := GetBearerToken()
+
+	if Err != nil {
+
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to get bearer token: %s", Err.Error()))
+		return nil, Err
+
+	}
+
+	Endpoint := fmt.Sprintf("https://api.tidal.com/v1/artists/%d/toptracks?countryCode=US&limit=50", ArtistID)
+
+	Request, Err := http.NewRequest("GET", Endpoint, nil)
+
+	if Err != nil {
+
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to create artist top tracks request: %s", Err.Error()))
+		return nil, Err
+
+	}
+
+	Request.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0")
+	Request.Header.Set("Accept", "application/json")
+	Request.Header.Set("Accept-Language", "en-US,en;q=0.9")
+	Request.Header.Set("Authorization", "Bearer "+Token)
+
+	Resp, RespErr := HTTPClient.Do(Request)
+
+	if RespErr != nil {
+
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to fetch artist top tracks for ID %d: %s", ArtistID, RespErr.Error()))
+		return nil, RespErr
+
+	}
+
+	defer Resp.Body.Close()
+
+	if Resp.StatusCode != 200 {
+
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Artist top tracks request returned HTTP %d for ID %d", Resp.StatusCode, ArtistID))
+		return nil, fmt.Errorf("HTTP %d fetching artist top tracks", Resp.StatusCode)
+
+	}
+
+	var Data ArtistTopTracksResponse
+
+	if Err := json.NewDecoder(Resp.Body).Decode(&Data); Err != nil {
+
+		Utils.Logger.Error("Tidal API", fmt.Sprintf("Failed to decode artist top tracks for ID %d: %s", ArtistID, Err.Error()))
+		return nil, Err
+
+	}
+
+	Songs := make([]Song, 0, len(Data.Items))
+
+	for _, Track := range Data.Items {
+
+		Song := TrackToSong(Track)
+		Songs = append(Songs, Song)
+
+	}
+
+	Cache.Set(Key, Songs, 1*time.Hour)
+
+	Utils.Logger.Info("Tidal API", fmt.Sprintf("Fetched %d top tracks for artist %d", len(Songs), ArtistID))
+
+	return Songs, nil
+
+}
+
 func FetchLyrics(ID int64) ([]Lyrics, error) { // not really good
 
 	path := fmt.Sprintf("/lyrics/?id=%d", ID)

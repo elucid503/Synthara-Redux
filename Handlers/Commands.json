@@ -1159,6 +1159,39 @@
 		]
 	},
 	{
+		"name": "artist",
+		"name_localizations": {
+			"en-US": "artist",
+			"en-GB": "artist",
+			"es-ES": "artista",
+			"es-419": "artista",
+			"zh-CN": "艺术家",
+			"fr": "artiste",
+			"it": "artista",
+			"de": "künstler",
+			"pl": "artysta",
+			"ru": "исполнитель",
+			"ja": "アーティスト"
+		},
+		"description": "Use this command to view and play the top songs of the currently playing Song's artist.",
+		"description_localizations": {
+			"en-US": "Use this command to view and play the top songs of the currently playing Song's artist.",
+			"en-GB": "Use this command to view and play the top songs of the currently playing Song's artist.",
+			"es-ES": "Usa este comando para ver y reproducir las mejores canciones del artista de la canción actual.",
+			"es-419": "Usa este comando para ver y reproducir las mejores canciones del artista de la canción actual.",
+			"zh-CN": "使用此命令查看并播放当前播放歌曲的艺术家的热门歌曲。",
+			"fr": "Voir et jouer les meilleures chansons de l'artiste de la chanson en cours.",
+			"it": "Visualizza e riproduci le canzoni più popolari dell'artista della canzone in riproduzione.",
+			"de": "Zeige und spiele die Top-Songs des Künstlers des aktuell gespielten Liedes.",
+			"pl": "Użyj tej komendy, aby wyświetlić i odtworzyć najpopularniejsze utwory artysty odtwarzanej piosenki.",
+			"ru": "Используйте эту команду для просмотра и воспроизведения лучших песен исполнителя текущей песни.",
+			"ja": "このコマンドを使用して、現在再生中の曲のアーティストのトップソングを表示および再生します。"
+		},
+		"contexts": [
+			0
+		]
+	},
+	{
 		"name": "album",
 		"name_localizations": {
 			"en-US": "album",

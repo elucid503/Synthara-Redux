@@ -356,6 +356,10 @@ func InitializeHandlers() {
 
 				Commands.Stats(Event)
 
+			case "artist":
+
+				Commands.Artist(Event)
+
 			case "album":
 
 				Commands.Album(Event)
@@ -545,6 +549,14 @@ func InitializeHandlers() {
 			case "AlbumPlay":
 
 				Components.AlbumPlay(Event)
+
+			case "ArtistEnqueue":
+
+				Components.ArtistEnqueue(Event)
+
+			case "ArtistPlay":
+
+				Components.ArtistPlay(Event)
 
 			case "Disconnect":
 

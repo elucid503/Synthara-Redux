@@ -16,11 +16,12 @@ type Song struct {
 	TidalID int64 `json:"tidal_id"`
 
 	Title   string   `json:"title"`
-	
+
 	Artists []string `json:"artists"`
 
-	Album   string `json:"album"`
-	AlbumID int64  `json:"album_id"`
+	Album    string `json:"album"`
+	AlbumID  int64  `json:"album_id"`
+	ArtistID int64  `json:"artist_id"`
 
 	Duration SongDuration `json:"duration"`
 
@@ -44,7 +45,7 @@ type SongDuration struct {
 type QueueInfo struct {
 
 	Playing bool `json:"playing"`
-	
+
 	GuildID snowflake.ID `json:"guild_id"`
 
 	SongPosition  int `json:"song_position"`
@@ -52,7 +53,7 @@ type QueueInfo struct {
 	TotalPrevious int `json:"total_previous"`
 
 	Locale string `json:"locale"`
-	
+
 }
 
 type SongInternal struct {
@@ -95,7 +96,7 @@ func TrackToSong(Track Track) Song {
 	for _, Artist := range Track.Artists {
 
 		Artists = append(Artists, Artist.Name)
-		
+
 	}
 
 	Cover := ""
@@ -108,22 +109,23 @@ func TrackToSong(Track Track) Song {
 
 	return Song{
 
-		TidalID:  Track.ID,
+		TidalID: Track.ID,
 
-		Title:    Track.Title,
+		Title: Track.Title,
 
-		Artists:  Artists,
+		Artists: Artists,
 
-		Album:    Track.Album.Title,
-		AlbumID:  Track.Album.ID,
+		Album: Track.Album.Title,
+		AlbumID: Track.Album.ID,
+		ArtistID: Track.Artist.ID,
 
-		Cover:    Cover,
+		Cover: Cover,
 
-		MixID:    Track.Mixes.TrackMix,
+		MixID: Track.Mixes.TrackMix,
 
 		Duration: SongDuration{
 
-			Seconds:   Track.Duration,
+			Seconds: Track.Duration,
 			Formatted: FormatDuration(Track.Duration),
 
 		},
@@ -140,7 +142,7 @@ func InfoToSong(Info Info) Song {
 	for _, Artist := range Info.Artists {
 
 		Artists = append(Artists, Artist.Name)
-		
+
 	}
 
 	Cover := ""
@@ -154,13 +156,14 @@ func InfoToSong(Info Info) Song {
 	return Song{
 
 		TidalID:  Info.ID,
-		
+
 		Title:    Info.Title,
-		
+
 		Artists:  Artists,
 
 		Album:    Info.Album.Title,
 		AlbumID:  Info.Album.ID,
+		ArtistID: Info.Artist.ID,
 
 		Cover:    Cover,
 
@@ -170,7 +173,7 @@ func InfoToSong(Info Info) Song {
 
 			Seconds:   Info.Duration,
 			Formatted: FormatDuration(Info.Duration),
-			
+
 		},
 
 	}
@@ -194,7 +197,7 @@ func ReplaceHyphens(s string) string {
 		}
 
 	}
-	
+
 	return result
 
 }
@@ -210,7 +213,7 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 			Title: "Error: No song data",
 			Description: "Unable to display song information",
 			Color: 0xff0000,
-			
+
 		}
 
 	}
@@ -230,7 +233,7 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 	AuthorName := Localizations.Get("Embeds.NowPlaying.AuthorNowPlaying", Locale)
 	AddedState := Localizations.Get("Embeds.NowPlaying.StatePlayedBy", Locale)
 
-	if State.SongPosition > 0 { 
+	if State.SongPosition > 0 {
 
 		SongWord := Localizations.Pluralize("Song", State.SongPosition, Locale)
 		AuthorName = Localizations.GetFormat("Embeds.NowPlaying.AuthorSongsAway", Locale, State.SongPosition, SongWord)
@@ -256,7 +259,7 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 
 	}
 
-	Page := fmt.Sprintf("%s/Queues/%s", os.Getenv("DOMAIN"), State.GuildID.String()) 
+	Page := fmt.Sprintf("%s/Queues/%s", os.Getenv("DOMAIN"), State.GuildID.String())
 	Embed.SetURL(Page)
 
 	Embed.SetThumbnail(S.Cover)
@@ -266,7 +269,7 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 	if (S.Internal.Playlist.Index >= 0) && (S.Internal.Playlist.Total > 0) {
 
 		Description += "\n" + Localizations.GetFormat("Embeds.NowPlaying.DescriptionInPlaylist", Locale, S.Internal.Playlist.Index + 1, S.Internal.Playlist.Total, S.Internal.Playlist.Name)
-		
+
 	}
 
 	if S.Internal.Suggested {
@@ -280,15 +283,15 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 	Embed.AddField(Localizations.Get("Embeds.NowPlaying.FieldArtists", Locale), ArtistNames, true)
 	Embed.AddField(Localizations.Get("Embeds.NowPlaying.FieldDuration", Locale), Localizations.GetFormat("Embeds.NowPlaying.DurationFormat", Locale, S.Duration.Formatted), true)
 	Embed.AddField(AddedState, S.Internal.Requestor, true)
-	
-	// Color 
+
+	// Color
 
 	DominantColor, ColorFetchError := Utils.GetDominantColorHex(S.Cover)
 
 	if ColorFetchError != nil {
 
 		Utils.Logger.Warn("Embed", fmt.Sprintf("Failed to get dominant color for song embed: %s", ColorFetchError.Error()))
-		
+
 	}
 
 	Embed.SetColor(DominantColor)
