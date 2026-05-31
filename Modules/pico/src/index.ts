@@ -7,7 +7,7 @@ import { StreamDetector } from "./streamDetector.js";
 
 const rootDir = dirname(fileURLToPath(import.meta.url));
 const modelPath = join(rootDir, "..", "model", "synthara.ppn");
-const sensitivity = 0.7;
+const sensitivity = 0.85; // higher = more sensitive, lower = less sensitive
 
 try {
 

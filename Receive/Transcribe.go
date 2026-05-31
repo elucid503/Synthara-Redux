@@ -36,9 +36,7 @@ const (
 
 	defaultEndpointing = 500 // silence gap in ms to finalize an utterance, per xAI recommendation
 
-	// pcmSilenceThreshold is the per-sample absolute-value ceiling below which a
-	// PCM16 chunk is considered silent and is not forwarded to xAI.
-	pcmSilenceThreshold = 256
+	pcmSilenceThreshold = 256 // pcmSilenceThreshold is the per-sample absolute-value ceiling below which a PCM16 chunk is considered silent and is not forwarded to xAI.
 
 )
 
