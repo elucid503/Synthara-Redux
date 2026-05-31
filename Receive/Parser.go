@@ -144,10 +144,13 @@ func CommandDispatchesImmediately(Command, Args string) bool {
 
 	switch Command {
 
-	case CommandPause, CommandResume, CommandNext, CommandLast, CommandLeave,
-		CommandShuffle, CommandRepeat, CommandReplay, CommandAutoplay, CommandVolume:
+	case CommandPause, CommandResume, CommandNext, CommandLast, CommandLeave, CommandShuffle, CommandRepeat, CommandReplay, CommandAutoplay:
 
 		return true
+
+	case CommandVolume:
+
+		return strings.TrimSpace(Args) != "" // volume command can be dispatched immediately if it has any argument at all
 
 	default:
 
@@ -318,6 +321,7 @@ func stripPunct(S string) string {
 
 }
 
+// Levenshtein distance implementation adapted from https://en.wikipedia.org/wiki/Levenshtein_distance#Iterative_with_two_matrix_rows
 func levenshtein(A, B string) int {
 
 	if A == B {
