@@ -109,6 +109,7 @@ func registerVoiceCommands() {
 	Receive.Register(Receive.CommandRepeat, Voice.Repeat)
 	Receive.Register(Receive.CommandReplay, Voice.Replay)
 	Receive.Register(Receive.CommandAutoplay, Voice.Autoplay)
+	Receive.Register(Receive.CommandVolume, Voice.Volume)
 
 	Receive.SetFeedbackCueHandler(func(GuildID snowflake.ID, Kind Receive.FeedbackCueKind) {
 
@@ -327,6 +328,10 @@ func InitializeHandlers() {
 			case "autoplay":
 
 				Commands.Autoplay(Event)
+
+			case "volume":
+
+				Commands.Volume(Event)
 
 			case "lyrics":
 

@@ -138,3 +138,45 @@ func ParseAutoplayEnabled(Args string, Current bool) bool {
 	return ParseShuffleEnabled(Args, Current)
 
 }
+
+func ParseVolumeLevel(Args string, Current int) (int, bool) {
+
+	Args = strings.TrimSpace(strings.ToLower(Args))
+
+	if Args == "" {
+
+		return Current, false
+
+	}
+
+	Tokens := strings.Fields(Args)
+
+	if len(Tokens) > 0 {
+
+		Args = Tokens[0]
+
+	}
+
+	switch Args {
+
+	case "low", "down", "quieter", "lower", "decrease":
+
+		return Structs.ClampVolume(Current - Structs.VolumeStep), true
+
+	case "high", "up", "louder", "higher", "increase":
+
+		return Structs.ClampVolume(Current + Structs.VolumeStep), true
+
+	}
+
+	Args = strings.TrimSuffix(Args, "%")
+
+	if Value, ErrParse := strconv.Atoi(Args); ErrParse == nil {
+
+		return Structs.ClampVolume(Value), true
+
+	}
+
+	return Current, false
+
+}

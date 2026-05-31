@@ -2,6 +2,7 @@ package Apple
 
 import (
 	"Synthara-Redux/APIs/Tidal"
+	"Synthara-Redux/Utils"
 	"fmt"
 	"slices"
 	"sync"
@@ -29,9 +30,7 @@ func AppleMusicIDToSong(AppleMusicID string) (Tidal.Song, *Song, error) {
 
 	}
 
-	// Return the first Tidal result as the best match
-
-	return TidalResults[0], AppleMusicSong, nil
+	return Utils.GetBestSearchResult(SearchQuery, TidalResults), AppleMusicSong, nil
 
 }
 

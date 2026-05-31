@@ -180,6 +180,9 @@ func InfoToSong(Info Info) Song {
 
 }
 
+func (S Song) GetTitle() string    { return S.Title }
+func (S Song) GetArtists() []string { return S.Artists }
+
 func ReplaceHyphens(s string) string {
 
 	result := ""

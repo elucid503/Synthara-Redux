@@ -78,6 +78,7 @@ type Features struct {
 	Shuffle  bool `json:"shuffle"`
 	Autoplay bool `json:"autoplay"`
 	Locked   bool `json:"locked"`
+	Volume   int  `json:"volume"`
 
 }
 
@@ -131,6 +132,7 @@ func NewGuild(ID snowflake.ID, Locale discord.Locale) *Guild {
 			Shuffle:  false,
 			Autoplay: false,
 			Locked:   false,
+			Volume:   DefaultVolume,
 		},
 
 		VoiceConnection: nil,
@@ -647,7 +649,8 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 		}
 
-		SongFound = &SearchResults[0]
+		Best := Utils.GetBestSearchResult(ID, SearchResults)
+		SongFound = &Best
 
 		PosAdded = G.Queue.Add(SongFound, Requestor)
 
@@ -1519,7 +1522,19 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 	}
 
-	Provider := &Audio.MP4OpusProvider{
+	VolumeProcessor, ErrorCreatingVolume := Audio.NewVolumeProcessor()
+
+	if ErrorCreatingVolume != nil {
+
+		Playback.Stop()
+		return ErrorCreatingVolume
+
+	}
+
+	VolumeProcessor.SetVolume(G.Features.Volume)
+	Playback.Volume = VolumeProcessor
+
+	InnerProvider := &Audio.MP4OpusProvider{
 
 		Streamer: Playback.Streamer,
 	}
@@ -1533,11 +1548,16 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 	if G.VoiceMixer != nil {
 
-		G.VoiceMixer.SetInner(Provider)
+		G.VoiceMixer.SetVolumeProcessor(VolumeProcessor)
+		G.VoiceMixer.SetInner(InnerProvider)
 
 	} else {
 
-		G.VoiceConnection.SetOpusFrameProvider(Provider)
+		G.VoiceConnection.SetOpusFrameProvider(&Audio.VolumeOpusProvider{
+
+			Inner:  InnerProvider,
+			Volume: VolumeProcessor,
+		})
 
 	}
 

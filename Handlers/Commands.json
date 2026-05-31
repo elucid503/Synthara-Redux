@@ -1126,6 +1126,194 @@
 		]
 	},
 	{
+		"name": "volume",
+		"name_localizations": {
+			"en-US": "volume",
+			"en-GB": "volume",
+			"es-ES": "volume",
+			"es-419": "volume",
+			"zh-CN": "volume",
+			"fr": "volume",
+			"it": "volume",
+			"de": "volume",
+			"pl": "volume",
+			"ru": "volume",
+			"ja": "volume"
+		},
+		"description": "Use this command to change playback volume.",
+		"description_localizations": {
+			"en-US": "Use this command to change playback volume.",
+			"en-GB": "Use this command to change playback volume.",
+			"es-ES": "Usa este comando para cambiar el volumen de reproducción.",
+			"es-419": "Usa este comando para cambiar el volumen de reproducción.",
+			"zh-CN": "使用此命令更改播放音量。",
+			"fr": "Utilisez cette commande pour modifier le volume de lecture.",
+			"it": "Usa questo comando per modificare il volume di riproduzione.",
+			"de": "Verwende diesen Befehl, um die Wiedergabelautstärke zu ändern.",
+			"pl": "Użyj tej komendy, aby zmienić głośność odtwarzania.",
+			"ru": "Используйте эту команду, чтобы изменить громкость воспроизведения.",
+			"ja": "このコマンドを使用して再生音量を変更します。"
+		},
+		"options": [
+			{
+				"type": 4,
+				"name": "level",
+				"name_localizations": {
+					"en-US": "level",
+					"en-GB": "level",
+					"es-ES": "level",
+					"es-419": "level",
+					"zh-CN": "level",
+					"fr": "level",
+					"it": "level",
+					"de": "level",
+					"pl": "level",
+					"ru": "level",
+					"ja": "level"
+				},
+				"description": "Use this option to select the playback volume level.",
+				"description_localizations": {
+					"en-US": "Use this option to select the playback volume level.",
+					"en-GB": "Use this option to select the playback volume level.",
+					"es-ES": "Usa esta opción para seleccionar el nivel de volumen de reproducción.",
+					"es-419": "Usa esta opción para seleccionar el nivel de volumen de reproducción.",
+					"zh-CN": "使用此选项选择播放音量级别。",
+					"fr": "Utilisez cette option pour sélectionner le niveau de volume de lecture.",
+					"it": "Usa questa opzione per selezionare il livello del volume di riproduzione.",
+					"de": "Verwende diese Option, um die Wiedergabelautstärke auszuwählen.",
+					"pl": "Użyj tej opcji, aby wybrać poziom głośności odtwarzania.",
+					"ru": "Используйте эту опцию, чтобы выбрать уровень громкости воспроизведения.",
+					"ja": "このオプションを使用して再生音量レベルを選択します。"
+				},
+				"required": true,
+				"choices": [
+					{
+						"name": "0%",
+						"name_localizations": {
+							"en-US": "0%",
+							"en-GB": "0%",
+							"es-ES": "0%",
+							"es-419": "0%",
+							"zh-CN": "0%",
+							"fr": "0%",
+							"it": "0%",
+							"de": "0%",
+							"pl": "0%",
+							"ru": "0%",
+							"ja": "0%"
+						},
+						"value": 0
+					},
+					{
+						"name": "25%",
+						"name_localizations": {
+							"en-US": "25%",
+							"en-GB": "25%",
+							"es-ES": "25%",
+							"es-419": "25%",
+							"zh-CN": "25%",
+							"fr": "25%",
+							"it": "25%",
+							"de": "25%",
+							"pl": "25%",
+							"ru": "25%",
+							"ja": "25%"
+						},
+						"value": 25
+					},
+					{
+						"name": "50%",
+						"name_localizations": {
+							"en-US": "50%",
+							"en-GB": "50%",
+							"es-ES": "50%",
+							"es-419": "50%",
+							"zh-CN": "50%",
+							"fr": "50%",
+							"it": "50%",
+							"de": "50%",
+							"pl": "50%",
+							"ru": "50%",
+							"ja": "50%"
+						},
+						"value": 50
+					},
+					{
+						"name": "75%",
+						"name_localizations": {
+							"en-US": "75%",
+							"en-GB": "75%",
+							"es-ES": "75%",
+							"es-419": "75%",
+							"zh-CN": "75%",
+							"fr": "75%",
+							"it": "75%",
+							"de": "75%",
+							"pl": "75%",
+							"ru": "75%",
+							"ja": "75%"
+						},
+						"value": 75
+					},
+					{
+						"name": "100%",
+						"name_localizations": {
+							"en-US": "100%",
+							"en-GB": "100%",
+							"es-ES": "100%",
+							"es-419": "100%",
+							"zh-CN": "100%",
+							"fr": "100%",
+							"it": "100%",
+							"de": "100%",
+							"pl": "100%",
+							"ru": "100%",
+							"ja": "100%"
+						},
+						"value": 100
+					},
+					{
+						"name": "125%",
+						"name_localizations": {
+							"en-US": "125%",
+							"en-GB": "125%",
+							"es-ES": "125%",
+							"es-419": "125%",
+							"zh-CN": "125%",
+							"fr": "125%",
+							"it": "125%",
+							"de": "125%",
+							"pl": "125%",
+							"ru": "125%",
+							"ja": "125%"
+						},
+						"value": 125
+					},
+					{
+						"name": "150%",
+						"name_localizations": {
+							"en-US": "150%",
+							"en-GB": "150%",
+							"es-ES": "150%",
+							"es-419": "150%",
+							"zh-CN": "150%",
+							"fr": "150%",
+							"it": "150%",
+							"de": "150%",
+							"pl": "150%",
+							"ru": "150%",
+							"ja": "150%"
+						},
+						"value": 150
+					}
+				]
+			}
+		],
+		"contexts": [
+			0
+		]
+	},
+	{
 		"name": "stats",
 		"name_localizations": {
 			"en-US": "stats",

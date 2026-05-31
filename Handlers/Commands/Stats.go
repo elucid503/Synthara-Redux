@@ -136,6 +136,22 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 
 	EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.MemoryUsage", Locale), MemoryValue, true)
 
+	// Field 7: Volume Processing
+
+	var VolumeStepValue string
+
+	if Structs.VolumeProcessingEnabled(Guild.Features.Volume) {
+
+		VolumeStepValue = Localizations.Get("Commands.Stats.VolumeStep.Enabled", Locale)
+
+	} else {
+
+		VolumeStepValue = Localizations.Get("Commands.Stats.VolumeStep.Disabled", Locale)
+
+	}
+
+	EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.VolumeStep", Locale), VolumeStepValue, true)
+
 	Event.CreateMessage(discord.MessageCreate{
 
 		Embeds: []discord.Embed{EmbedBuilder},

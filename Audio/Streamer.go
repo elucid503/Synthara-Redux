@@ -1502,7 +1502,9 @@ func (P *MP4Processor) Close() {
 type MP4Playback struct {
 
 	Streamer *MP4Streamer
-	Stopped  atomic.Bool
+	Volume *VolumeProcessor
+
+	Stopped atomic.Bool
 
 }
 

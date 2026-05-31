@@ -45,9 +45,7 @@ func VideoIDToSong(VideoID string) (Tidal.Song, *youtube.Video, error) {
 
 	}
 
-	// Return the first (best) match
-
-	return Results[0], Video, nil
+	return Utils.GetBestSearchResult(SearchQuery, Results), Video, nil
 
 }
 
@@ -82,7 +80,7 @@ func PlaylistIDToFirstSong(PlaylistID string) (Tidal.Song, *youtube.Playlist, er
 
 	}
 
-	return Results[0], Playlist, nil
+	return Utils.GetBestSearchResult(SearchQuery, Results), Playlist, nil
 }
 
 // PlaylistIDToAllSongs fetches all videos from a YouTube playlist and converts to Tidal.Song array
@@ -120,7 +118,7 @@ func PlaylistIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tidal
 
 		}
 
-		Songs = append(Songs, Results[0])
+		Songs = append(Songs, Utils.GetBestSearchResult(SearchQuery, Results))
 
 	}
 
@@ -163,7 +161,7 @@ func MusicAlbumIDToFirstSong(AlbumID string) (Tidal.Song, *youtube.Playlist, err
 
 	}
 
-	return Results[0], Playlist, nil
+	return Utils.GetBestSearchResult(SearchQuery, Results), Playlist, nil
 
 }
 
@@ -202,12 +200,12 @@ func MusicAlbumIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tid
 
 		}
 
-		Songs = append(Songs, Results[0])
+		Songs = append(Songs, Utils.GetBestSearchResult(SearchQuery, Results))
 
 	}
 
 	return Songs, FailedCount, Playlist, nil
-	
+
 }
 
 // MusicArtistIDToSongs fetches songs from YouTube Music artist channel
@@ -261,10 +259,10 @@ func MusicArtistIDToSongs(ArtistID string) ([]Tidal.Song, error) {
 
 			Utils.Logger.Warn("YouTube Fetch", fmt.Sprintf("No Tidal match found for track: %s", Video.Title))
 			continue
-			
+
 		}
 
-		Songs = append(Songs, Results[0])
+		Songs = append(Songs, Utils.GetBestSearchResult(SearchQuery, Results))
 
 	}
 

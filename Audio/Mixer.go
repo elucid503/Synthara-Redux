@@ -32,15 +32,18 @@ type MixerProvider struct {
 	cuePos int
 
 	ttsFrames [][]int16
-	ttsPos    int
+	ttsPos int
 
 	overlayActive atomic.Bool
 	ttsActive atomic.Bool
 	captureDuckActive atomic.Bool
-	captureDuckEpoch  atomic.Uint64
+
+	captureDuckEpoch atomic.Uint64
 
 	dec *gopus.Decoder
 	enc *gopus.Encoder
+
+	volume *VolumeProcessor
 
 }
 
@@ -104,6 +107,21 @@ func (M *MixerProvider) SetInner(provider OpusFrameProvider) {
 
 	M.mu.Lock()
 	M.inner = provider
+	M.mu.Unlock()
+
+}
+
+// SetVolumeProcessor attaches live volume scaling for music frames.
+func (M *MixerProvider) SetVolumeProcessor(Processor *VolumeProcessor) {
+
+	if M == nil {
+
+		return
+
+	}
+
+	M.mu.Lock()
+	M.volume = Processor
 	M.mu.Unlock()
 
 }
@@ -276,12 +294,26 @@ func (M *MixerProvider) ProvideOpusFrame() ([]byte, error) {
 
 	Duck := M.captureDuckActive.Load()
 
+	VolumeGain := float32(1)
+
+	if M.volume != nil {
+
+		VolumeGain = M.volume.VolumeGain()
+
+	}
+
 	// Fast path: normal playback, no capture duck, no cue overlay.
 	if !Duck && !Overlay {
 
 		if len(BaseOpus) > 0 {
 
-			return BaseOpus, nil
+			if VolumeGain == 1 || M.volume == nil {
+
+				return BaseOpus, nil
+
+			}
+
+			return M.volume.ProcessOpusFrame(BaseOpus)
 
 		}
 
@@ -320,16 +352,18 @@ func (M *MixerProvider) ProvideOpusFrame() ([]byte, error) {
 
 	}
 
+	MusicGain := DuckGain * VolumeGain
+
 	if Overlay {
 
-		Mixed := mixPCMFrame(BasePCM, CuePCM, DuckGain)
+		Mixed := mixPCMFrame(BasePCM, CuePCM, MusicGain)
 
 		return M.enc.Encode(Mixed, FrameSize, MaxPacketSize)
 
 	}
 
 	// Capture duck only (music playing, no cue this frame).
-	Scaled := mixPCMFrame(BasePCM, nil, DuckGain)
+	Scaled := mixPCMFrame(BasePCM, nil, MusicGain)
 
 	return M.enc.Encode(Scaled, FrameSize, MaxPacketSize)
 

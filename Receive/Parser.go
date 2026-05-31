@@ -17,6 +17,7 @@ const (
 	CommandRepeat = "repeat"
 	CommandReplay = "replay"
 	CommandAutoplay = "autoplay"
+	CommandVolume = "volume"
 
 )
 
@@ -144,7 +145,7 @@ func CommandDispatchesImmediately(Command, Args string) bool {
 	switch Command {
 
 	case CommandPause, CommandResume, CommandNext, CommandLast, CommandLeave,
-		CommandShuffle, CommandRepeat, CommandReplay, CommandAutoplay:
+		CommandShuffle, CommandRepeat, CommandReplay, CommandAutoplay, CommandVolume:
 
 		return true
 
@@ -284,6 +285,10 @@ func normalizeCommand(Token string) string {
 	case "autoplay", "auto", "radio":
 
 		return CommandAutoplay
+
+	case "volume", "vol", "loudness":
+
+		return CommandVolume
 
 	}
 
