@@ -18,6 +18,8 @@ const (
 	CommandReplay = "replay"
 	CommandAutoplay = "autoplay"
 	CommandVolume = "volume"
+	CommandSpeed  = "speed"
+	CommandReverb = "reverb"
 
 )
 
@@ -148,9 +150,9 @@ func CommandDispatchesImmediately(Command, Args string) bool {
 
 		return true
 
-	case CommandVolume:
+	case CommandVolume, CommandSpeed, CommandReverb:
 
-		return strings.TrimSpace(Args) != "" // volume command can be dispatched immediately if it has any argument at all
+		return strings.TrimSpace(Args) != "" // these commands can be dispatched immediately when an argument is present
 
 	default:
 
@@ -292,6 +294,14 @@ func normalizeCommand(Token string) string {
 	case "volume", "vol", "loudness":
 
 		return CommandVolume
+
+	case "speed", "tempo", "rate":
+
+		return CommandSpeed
+
+	case "reverb", "echo", "room":
+
+		return CommandReverb
 
 	}
 

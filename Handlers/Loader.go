@@ -110,6 +110,8 @@ func registerVoiceCommands() {
 	Receive.Register(Receive.CommandReplay, Voice.Replay)
 	Receive.Register(Receive.CommandAutoplay, Voice.Autoplay)
 	Receive.Register(Receive.CommandVolume, Voice.Volume)
+	Receive.Register(Receive.CommandSpeed, Voice.Speed)
+	Receive.Register(Receive.CommandReverb, Voice.Reverb)
 
 	Receive.SetFeedbackCueHandler(func(GuildID snowflake.ID, Kind Receive.FeedbackCueKind) {
 
@@ -333,6 +335,14 @@ func InitializeHandlers() {
 
 				Commands.Volume(Event)
 
+			case "speed":
+
+				Commands.Speed(Event)
+
+			case "reverb":
+
+				Commands.Reverb(Event)
+
 			case "lyrics":
 
 				Commands.Lyrics(Event)
@@ -397,6 +407,18 @@ func InitializeHandlers() {
 
 				Commands.Forget(Event)
 
+			case "save":
+
+				Commands.Save(Event)
+
+			case "load":
+
+				Commands.Load(Event)
+
+			case "manage":
+
+				Commands.Manage(Event)
+
 			}
 
 			go CheckAndDisplayNotification(Event, Event.User().ID)
@@ -455,6 +477,10 @@ func InitializeHandlers() {
 			case "delete":
 
 				Autocomplete.DeleteAutocomplete(Event)
+
+			case "load", "manage":
+
+				Autocomplete.SavedQueueAutocomplete(Event)
 
 			}
 

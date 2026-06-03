@@ -12,22 +12,29 @@ import (
 	"layeh.com/gopus"
 )
 
-// OpusFrameProvider supplies 20ms Opus frames (which is same contract as disgo voice.OpusFrameProvider).
-type OpusFrameProvider interface {
+// PCMFrameProvider supplies raw 20ms stereo PCM (FrameSize*Channels int16 values).
+type PCMFrameProvider interface {
 
-	ProvideOpusFrame() ([]byte, error)
+	ProvidePCMFrame() ([]int16, error)
 	Close()
 
 }
 
-// MixerProvider is the persistent outbound audio source for a guild voice connection.
+// MixerProvider is the single Opus encode point for guild voice: speed, effects, volume, duck, overlays.
 type MixerProvider struct {
 
 	mu sync.Mutex
 
-	inner OpusFrameProvider
+	source PCMFrameProvider
+	effects *EffectsProcessor
+	volume *VolumeProcessor
+
+	residual []float32
+	pos float64
+	srcEOF bool
 
 	cueMu sync.Mutex
+
 	cueFrames [][]int16
 	cuePos int
 
@@ -36,100 +43,94 @@ type MixerProvider struct {
 
 	overlayActive atomic.Bool
 	ttsActive atomic.Bool
-	captureDuckActive atomic.Bool
 
+	captureDuckActive atomic.Bool
 	captureDuckEpoch atomic.Uint64
 
-	dec *gopus.Decoder
-	enc *gopus.Encoder
+	encoder *gopus.Encoder
 
-	volume *VolumeProcessor
+	work []float32
+	pcmOut []int16
 
 }
 
-// NewMixerProvider builds a mixer with preloaded wake/end cue PCM.
 func NewMixerProvider() (*MixerProvider, error) {
 
 	loadVoiceCues()
 
-	if cueLoadErr != nil {
+	encoder, err := gopus.NewEncoder(SampleRate, Channels, gopus.Audio)
 
-		return nil, cueLoadErr
+	if err != nil {
 
-	}
-
-	Dec, Err := gopus.NewDecoder(SampleRate, Channels)
-
-	if Err != nil {
-
-		return nil, Err
+		return nil, err
 
 	}
 
-	Enc, Err := gopus.NewEncoder(SampleRate, Channels, gopus.Audio)
-
-	if Err != nil {
-
-		return nil, Err
-
-	}
-
-	Enc.SetBitrate(128000)
+	encoder.SetBitrate(OpusBitrate)
 
 	return &MixerProvider{
 
-		dec: Dec,
-		enc: Enc,
+		encoder: encoder,
+
+		work: make([]float32, FrameSize*Channels),
+		pcmOut: make([]int16, FrameSize*Channels),
+
 
 	}, nil
 
 }
 
-// SetInner swaps the music source without recreating Discord's audio sender.
-func (M *MixerProvider) SetInner(provider OpusFrameProvider) {
+func (mixer *MixerProvider) SetSource(provider PCMFrameProvider) {
 
-	if M == nil {
-
-		return
-
-	}
-
-	if Dec, Err := gopus.NewDecoder(SampleRate, Channels); Err == nil {
-
-		M.mu.Lock()
-		M.inner = provider
-		M.dec = Dec
-		M.mu.Unlock()
+	if mixer == nil {
 
 		return
 
 	}
 
-	M.mu.Lock()
-	M.inner = provider
-	M.mu.Unlock()
+	mixer.mu.Lock()
+
+	mixer.source = provider
+	mixer.residual = mixer.residual[:0]
+
+	mixer.pos = 0
+	mixer.srcEOF = false
+
+	mixer.mu.Unlock()
 
 }
 
-// SetVolumeProcessor attaches live volume scaling for music frames.
-func (M *MixerProvider) SetVolumeProcessor(Processor *VolumeProcessor) {
+func (mixer *MixerProvider) SetEffects(processor *EffectsProcessor) {
 
-	if M == nil {
+	if mixer == nil {
 
 		return
 
 	}
 
-	M.mu.Lock()
-	M.volume = Processor
-	M.mu.Unlock()
+	mixer.mu.Lock()
+	mixer.effects = processor
+	mixer.mu.Unlock()
 
 }
 
-// SetCaptureDuck enables or disables music ducking for the full voice-command capture window.
-func (M *MixerProvider) SetCaptureDuck(active bool) {
+func (mixer *MixerProvider) SetVolumeProcessor(processor *VolumeProcessor) {
 
-	if M == nil {
+	if mixer == nil {
+
+		return
+
+	}
+
+	mixer.mu.Lock()
+	mixer.volume = processor
+	mixer.mu.Unlock()
+
+}
+
+func (mixer *MixerProvider) SetCaptureDuck(active bool) {
+
+	if mixer == nil {
 
 		return
 
@@ -137,21 +138,20 @@ func (M *MixerProvider) SetCaptureDuck(active bool) {
 
 	if active {
 
-		M.captureDuckEpoch.Add(1)
-		M.captureDuckActive.Store(true)
+		mixer.captureDuckEpoch.Add(1)
+		mixer.captureDuckActive.Store(true)
 
 		return
 
 	}
 
-	M.captureDuckActive.Store(false)
+	mixer.captureDuckActive.Store(false)
 
 }
 
-// EndCaptureDuckAfter keeps ducking until the end cue finishes, then restores full volume.
-func (M *MixerProvider) EndCaptureDuckAfter(delay time.Duration) {
+func (mixer *MixerProvider) EndCaptureDuckAfter(delay time.Duration) {
 
-	if M == nil {
+	if mixer == nil {
 
 		return
 
@@ -159,293 +159,346 @@ func (M *MixerProvider) EndCaptureDuckAfter(delay time.Duration) {
 
 	if delay <= 0 {
 
-		M.captureDuckActive.Store(false)
-
+		mixer.captureDuckActive.Store(false)
 		return
 
 	}
 
-	Epoch := M.captureDuckEpoch.Load()
+	epoch := mixer.captureDuckEpoch.Load()
 
-	go func(Mixer *MixerProvider, E uint64, D time.Duration) {
+	go func(target *MixerProvider, expected uint64, wait time.Duration) {
 
-		time.Sleep(D)
+		time.Sleep(wait)
 
-		if Mixer.captureDuckEpoch.Load() != E {
+		if target.captureDuckEpoch.Load() != expected {
 
 			return
 
 		}
 
-		Mixer.captureDuckActive.Store(false)
+		target.captureDuckActive.Store(false)
 
-	}(M, Epoch, delay)
+	}(mixer, epoch, delay)
 
 }
 
-// PlayTTSOverlay queues TTS PCM frames for playback after any active cue overlay finishes.
-func (M *MixerProvider) PlayTTSOverlay(frames [][]int16) {
+func (mixer *MixerProvider) PlayTTSOverlay(frames [][]int16) {
 
-	if M == nil || len(frames) == 0 {
+	if mixer == nil || len(frames) == 0 {
 
 		return
 
 	}
 
-	TTSDuration := time.Duration(len(frames)) * 20 * time.Millisecond
+	ttsDuration := time.Duration(len(frames)) * 20 * time.Millisecond
 
-	M.SetCaptureDuck(true)
-	M.EndCaptureDuckAfter(TTSDuration + 100*time.Millisecond)
+	mixer.SetCaptureDuck(true)
+	mixer.EndCaptureDuckAfter(ttsDuration + 100*time.Millisecond)
 
-	M.cueMu.Lock()
-	M.ttsFrames = frames
-	M.ttsPos = 0
-	M.cueMu.Unlock()
+	mixer.cueMu.Lock()
 
-	M.ttsActive.Store(true)
+	mixer.ttsFrames = frames
+	mixer.ttsPos = 0
+
+	mixer.cueMu.Unlock()
+
+	mixer.ttsActive.Store(true)
 
 }
 
-// PlayCue starts (or replaces) a wake/end overlay; safe to call from any goroutine.
-func (M *MixerProvider) PlayCue(kind CueKind) {
+func (mixer *MixerProvider) PlayCue(kind CueKind) {
 
-	if M == nil {
+	if mixer == nil {
+		return
+	}
+
+	frames := cueFrames(kind)
+
+	if len(frames) == 0 {
 
 		return
 
 	}
 
-	Frames := cueFrames(kind)
+	mixer.cueMu.Lock()
+	mixer.cueFrames = frames
+	mixer.cuePos = 0
+	mixer.cueMu.Unlock()
 
-	if len(Frames) == 0 {
-
-		return
-
-	}
-
-	M.cueMu.Lock()
-	M.cueFrames = Frames
-	M.cuePos = 0
-	M.cueMu.Unlock()
-
-	M.overlayActive.Store(true)
+	mixer.overlayActive.Store(true)
 
 }
 
-func (M *MixerProvider) ProvideOpusFrame() ([]byte, error) {
+func (mixer *MixerProvider) ProvideOpusFrame() ([]byte, error) {
 
-	if M == nil {
+	if mixer == nil {
 
 		return nil, nil
 
 	}
 
-	M.mu.Lock()
-	Inner := M.inner
-	Dec := M.dec
-	M.mu.Unlock()
+	mixer.mu.Lock()
+	defer mixer.mu.Unlock()
 
-	var BaseOpus []byte
-	var BaseErr error
+	speed := 1.0
 
-	if Inner != nil {
+	if mixer.effects != nil {
+		speed = mixer.effects.SpeedRatio()
+	}
 
-		BaseOpus, BaseErr = Inner.ProvideOpusFrame()
+	mixer.refillLocked(speed)
+	hasMusic := mixer.readMusicFrameLocked(speed)
 
-		if BaseErr != nil && BaseErr != io.EOF {
+	overlayPCM, hasOverlay := mixer.nextOverlayFrame()
 
-			return nil, BaseErr
+	if !hasMusic && !hasOverlay {
 
-		}
+		return nil, nil
 
 	}
 
-	M.cueMu.Lock()
+	if !hasMusic {
 
-	var CuePCM []int16
+		clearFloats(mixer.work)
 
-	if M.overlayActive.Load() && M.cuePos < len(M.cueFrames) {
+	} else {
 
-		CuePCM = M.cueFrames[M.cuePos]
-		M.cuePos++
+		if mixer.effects != nil {
 
-		if M.cuePos >= len(M.cueFrames) {
-
-			M.overlayActive.Store(false)
+			mixer.effects.ApplyReverb(mixer.work)
 
 		}
 
-	} else if M.ttsActive.Load() && M.ttsPos < len(M.ttsFrames) {
+		gain := float32(1)
 
-		CuePCM = M.ttsFrames[M.ttsPos]
-		M.ttsPos++
+		if mixer.volume != nil {
 
-		if M.ttsPos >= len(M.ttsFrames) {
-
-			M.ttsActive.Store(false)
+			gain = mixer.volume.VolumeGain()
 
 		}
 
-	}
+		if mixer.captureDuckActive.Load() {
 
-	M.cueMu.Unlock()
+			gain *= playbackDuckGain
 
-	Overlay := CuePCM != nil
+		}
 
-	Duck := M.captureDuckActive.Load()
+		if gain != 1 {
 
-	VolumeGain := float32(1)
+			for i := range mixer.work {
 
-	if M.volume != nil {
-
-		VolumeGain = M.volume.VolumeGain()
-
-	}
-
-	// Fast path: normal playback, no capture duck, no cue overlay.
-	if !Duck && !Overlay {
-
-		if len(BaseOpus) > 0 {
-
-			if VolumeGain == 1 || M.volume == nil {
-
-				return BaseOpus, nil
+				mixer.work[i] *= gain
 
 			}
 
-			return M.volume.ProcessOpusFrame(BaseOpus)
+		}
+
+	}
+
+	if hasOverlay {
+
+		// Mix overlay on top of music. No ducking or effects applied to overlay.
+
+		limit := FrameSize * Channels
+
+		if len(overlayPCM) < limit {
+
+			limit = len(overlayPCM)
 
 		}
 
-		return nil, nil
+		for i := 0; i < limit; i++ {
 
-	}
-
-	// Cue-only (no music).
-	if Overlay && len(BaseOpus) == 0 {
-
-		Mixed := mixPCMFrame(silencePCMFrame(), CuePCM, 1)
-
-		return M.enc.Encode(Mixed, FrameSize, MaxPacketSize)
-
-	}
-
-	BasePCM := silencePCMFrame()
-
-	if len(BaseOpus) > 0 && Dec != nil {
-
-		Decoded, Err := Dec.Decode(BaseOpus, FrameSize, false)
-
-		if Err == nil && len(Decoded) >= FrameSize*Channels {
-
-			BasePCM = Decoded[:FrameSize*Channels]
+			mixer.work[i] += float32(overlayPCM[i]) / 32768.
 
 		}
 
 	}
 
-	DuckGain := float32(1)
+	floatToPCM(mixer.work, mixer.pcmOut) // Clips to [-1,1] and converts to int16
 
-	if Duck {
-
-		DuckGain = playbackDuckGain
-
-	}
-
-	MusicGain := DuckGain * VolumeGain
-
-	if Overlay {
-
-		Mixed := mixPCMFrame(BasePCM, CuePCM, MusicGain)
-
-		return M.enc.Encode(Mixed, FrameSize, MaxPacketSize)
-
-	}
-
-	// Capture duck only (music playing, no cue this frame).
-	Scaled := mixPCMFrame(BasePCM, nil, MusicGain)
-
-	return M.enc.Encode(Scaled, FrameSize, MaxPacketSize)
+	return mixer.encoder.Encode(mixer.pcmOut, FrameSize, MaxPacketSize) // back to Opus
 
 }
 
-func (M *MixerProvider) Close() {
+func (mixer *MixerProvider) refillLocked(speed float64) {
 
-	if M == nil {
+	if mixer.source == nil {
 
 		return
 
 	}
 
-	M.overlayActive.Store(false)
-	M.ttsActive.Store(false)
-	M.captureDuckActive.Store(false)
+	need := int(mixer.pos+float64(FrameSize-1)*speed) + 2
 
-	M.cueMu.Lock()
-	M.cueFrames = nil
-	M.cuePos = 0
-	M.ttsFrames = nil
-	M.ttsPos = 0
-	M.cueMu.Unlock()
+	for len(mixer.residual)/Channels < need {
 
-	M.mu.Lock()
-	Inner := M.inner
-	M.inner = nil
-	M.mu.Unlock()
+		frame, err := mixer.source.ProvidePCMFrame()
 
-	if Inner != nil {
+		if err == io.EOF {
 
-		Inner.Close()
+			mixer.srcEOF = true
+			return
+
+		}
+
+		if err != nil || frame == nil {
+
+			return
+
+		}
+
+		for _, sample := range frame {
+
+			mixer.residual = append(mixer.residual, float32(sample)/32768.0)
+
+		}
 
 	}
 
 }
 
-func silencePCMFrame() []int16 {
+func (mixer *MixerProvider) readMusicFrameLocked(speed float64) bool {
 
-	return make([]int16, FrameSize*Channels)
+	inFrames := len(mixer.residual) / Channels
+	need := int(mixer.pos+float64(FrameSize-1)*speed) + 2
 
-}
+	if inFrames < need && !mixer.srcEOF {
+		return false
+	}
 
-func mixPCMFrame(base, cue []int16, duck float32) []int16 {
+	if inFrames < 2 {
+		return false
+	}
 
-	N := FrameSize * Channels
-	Out := make([]int16, N)
+	for outFrame := 0; outFrame < FrameSize; outFrame++ {
 
-	for I := 0; I < N; I++ {
+		inIdx := int(mixer.pos)
 
-		B := float32(0)
+		if inIdx+1 >= inFrames {
 
-		if I < len(base) {
+			for k := outFrame * Channels; k < FrameSize*Channels; k++ {
 
-			B = float32(base[I]) * duck
+				mixer.work[k] = 0
 
-		}
+			}
 
-		C := float32(0)
-
-		if I < len(cue) {
-
-			C = float32(cue[I])
-
-		}
-
-		V := B + C
-
-		if V > 32767 {
-
-			V = 32767
-
-		} else if V < -32768 {
-
-			V = -32768
+			mixer.pos += float64(FrameSize-outFrame) * speed
+			break
 
 		}
 
-		Out[I] = int16(V)
+		frac := float32(mixer.pos - float64(inIdx))
+
+		base0 := inIdx * Channels
+		base1 := base0 + Channels
+
+		for ch := 0; ch < Channels; ch++ {
+
+			s1 := mixer.residual[base0+ch]
+			s2 := mixer.residual[base1+ch]
+
+			mixer.work[outFrame*Channels+ch] = s1 + (s2-s1)*frac
+
+		}
+
+		mixer.pos += speed
 
 	}
 
-	return Out
+	consumed := int(mixer.pos)
+
+	if consumed > inFrames {
+
+		consumed = inFrames
+
+	}
+
+	if consumed > 0 {
+
+		mixer.residual = append(mixer.residual[:0], mixer.residual[consumed*Channels:]...)
+		mixer.pos -= float64(consumed)
+
+	}
+
+	return true
+
+}
+
+func (mixer *MixerProvider) nextOverlayFrame() ([]int16, bool) {
+
+	mixer.cueMu.Lock()
+	defer mixer.cueMu.Unlock()
+
+	if mixer.overlayActive.Load() && mixer.cuePos < len(mixer.cueFrames) {
+
+		frame := mixer.cueFrames[mixer.cuePos]
+		mixer.cuePos++
+
+		if mixer.cuePos >= len(mixer.cueFrames) {
+
+			mixer.overlayActive.Store(false)
+
+		}
+
+		return frame, true
+
+	}
+
+	if mixer.ttsActive.Load() && mixer.ttsPos < len(mixer.ttsFrames) {
+
+		frame := mixer.ttsFrames[mixer.ttsPos]
+		mixer.ttsPos++
+
+		if mixer.ttsPos >= len(mixer.ttsFrames) {
+
+			mixer.ttsActive.Store(false)
+
+		}
+
+		return frame, true
+
+	}
+
+	return nil, false
+
+}
+
+func (mixer *MixerProvider) Close() {
+
+	if mixer == nil {
+
+		return
+
+	}
+
+	mixer.overlayActive.Store(false)
+	mixer.ttsActive.Store(false)
+	mixer.captureDuckActive.Store(false)
+
+	mixer.cueMu.Lock()
+
+	mixer.cueFrames = nil
+	mixer.cuePos = 0
+
+	mixer.ttsFrames = nil
+	mixer.ttsPos = 0
+
+	mixer.cueMu.Unlock()
+
+	mixer.mu.Lock()
+
+	source := mixer.source
+
+	mixer.source = nil
+	mixer.residual = nil
+
+	mixer.mu.Unlock()
+
+	if source != nil {
+
+		source.Close()
+
+	}
 
 }

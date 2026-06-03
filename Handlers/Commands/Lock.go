@@ -22,9 +22,9 @@ func Lock(Event *events.ApplicationCommandInteractionCreate) {
 
 			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
-				Title:       Localizations.Get("Commands.Lock.Error.Title", Locale),
+				Title:       Localizations.Get("Embeds.Errors.NoActiveSession.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
-				Description: Localizations.Get("Commands.Lock.Error.Description", Locale),
+				Description: Localizations.Get("Embeds.Errors.NoActiveSession.Description", Locale),
 				Color:       Utils.ERROR,
 
 			})},

@@ -224,6 +224,12 @@ func QueueUpdatedHandler(Queue *Queue) {
 
 	NextSong := Queue.Upcoming[0]
 
+	if NextSong.IsDirectMedia() {
+
+		return
+
+	}
+
 	// Pre-cache streaming URL for next song
 
 	_, ErrorGettingStream := Tidal.GetStreamURL(NextSong.TidalID)
@@ -365,7 +371,7 @@ func (Q *Queue) FinishQueue(Notify bool) bool {
 
 	if Guild.VoiceMixer != nil {
 
-		Guild.VoiceMixer.SetInner(nil)
+		Guild.VoiceMixer.SetSource(nil)
 
 	} else if Guild.VoiceConnection != nil {
 

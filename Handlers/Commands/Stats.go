@@ -23,9 +23,9 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 
 			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
-				Title:       Localizations.Get("Commands.Lock.Error.Title", Locale),
-				Description: Localizations.Get("Commands.Lock.Error.Description", Locale),
-				Color:       Utils.ERROR,
+				Title: Localizations.Get("Embeds.Errors.NoActiveSession.Title", Locale),
+				Description: Localizations.Get("Embeds.Errors.NoActiveSession.Description", Locale),
+				Color: Utils.ERROR,
 
 			})},
 
@@ -36,7 +36,7 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 		return
 
 	}
-	
+
 	EmbedBuilder := discord.NewEmbedBuilder()
 	EmbedBuilder.SetTitle(Localizations.Get("Commands.Stats.Title", Locale))
 	EmbedBuilder.SetColor(Utils.PRIMARY)
@@ -77,7 +77,7 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 		if BytesStreamed > 1024*1024 {
 
 			ProgressValue = fmt.Sprintf("%.2f MB", float64(BytesStreamed)/(1024*1024))
-			
+
 		} else {
 
 			ProgressValue = fmt.Sprintf("%.2f KB", float64(BytesStreamed)/1024)
@@ -119,8 +119,8 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 
 	if Guild.Queue.PlaybackSession != nil && Guild.Queue.PlaybackSession.Streamer != nil {
 
-		BufferSize := len(Guild.Queue.PlaybackSession.Streamer.OpusFrameChan)
-		BufferCapacity := cap(Guild.Queue.PlaybackSession.Streamer.OpusFrameChan)
+		BufferSize := len(Guild.Queue.PlaybackSession.Streamer.PCMFrameChan)
+		BufferCapacity := cap(Guild.Queue.PlaybackSession.Streamer.PCMFrameChan)
 
 		BufferValue := fmt.Sprintf("%d / %d", BufferSize, BufferCapacity)
 
@@ -151,6 +151,20 @@ func Stats(Event *events.ApplicationCommandInteractionCreate) {
 	}
 
 	EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.VolumeStep", Locale), VolumeStepValue, true)
+
+	var EffectsStepValue string
+
+	if Structs.EffectsProcessingEnabled(Guild.Features.SpeedMilli, Guild.Features.Reverb) {
+
+		EffectsStepValue = Localizations.Get("Commands.Stats.EffectsStep.Enabled", Locale)
+
+	} else {
+
+		EffectsStepValue = Localizations.Get("Commands.Stats.EffectsStep.Disabled", Locale)
+
+	}
+
+	EmbedBuilder.AddField(Localizations.Get("Commands.Stats.Fields.EffectsStep", Locale), EffectsStepValue, true)
 
 	Event.CreateMessage(discord.MessageCreate{
 

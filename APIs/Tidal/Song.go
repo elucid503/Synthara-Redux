@@ -31,7 +31,7 @@ type Song struct {
 
 	Unavailable bool `json:"unavailable,omitempty"`
 
-	Internal SongInternal `json:"-"`
+	Internal SongInternal `json:"-" bson:"-"`
 
 }
 
@@ -61,6 +61,8 @@ type SongInternal struct {
 	Requestor string `json:"requestor"`
 
 	Suggested bool `json:"suggested"`
+
+	DirectURL string `json:"direct_url,omitempty" bson:"-"`
 
 	Playlist PlaylistMeta `json:"playlist"`
 
@@ -265,39 +267,53 @@ func (S *Song) Embed(State QueueInfo) discord.Embed {
 	Page := fmt.Sprintf("%s/Queues/%s", os.Getenv("DOMAIN"), State.GuildID.String())
 	Embed.SetURL(Page)
 
-	Embed.SetThumbnail(S.Cover)
+	if S.Cover != "" {
+		Embed.SetThumbnail(S.Cover)
+	}
 
-	Description := Localizations.GetFormat("Embeds.NowPlaying.DescriptionOnAlbum", Locale, S.Album)
+	var description string
+
+	if S.IsDirectMedia() {
+
+		description = Localizations.Get("Embeds.NowPlaying.DescriptionFromDirectURL", Locale)
+
+	} else {
+
+		description = Localizations.GetFormat("Embeds.NowPlaying.DescriptionOnAlbum", Locale, S.Album)
+
+	}
 
 	if (S.Internal.Playlist.Index >= 0) && (S.Internal.Playlist.Total > 0) {
 
-		Description += "\n" + Localizations.GetFormat("Embeds.NowPlaying.DescriptionInPlaylist", Locale, S.Internal.Playlist.Index + 1, S.Internal.Playlist.Total, S.Internal.Playlist.Name)
+		description += "\n" + Localizations.GetFormat("Embeds.NowPlaying.DescriptionInPlaylist", Locale, S.Internal.Playlist.Index+1, S.Internal.Playlist.Total, S.Internal.Playlist.Name)
 
 	}
 
 	if S.Internal.Suggested {
 
-		Description += "\n" + Localizations.Get("Embeds.NowPlaying.SuggestedSong", Locale)
+		description += "\n" + Localizations.Get("Embeds.NowPlaying.SuggestedSong", Locale)
 
 	}
 
-	Embed.SetDescription(Description)
+	Embed.SetDescription(description)
 
 	Embed.AddField(Localizations.Get("Embeds.NowPlaying.FieldArtists", Locale), ArtistNames, true)
 	Embed.AddField(Localizations.Get("Embeds.NowPlaying.FieldDuration", Locale), Localizations.GetFormat("Embeds.NowPlaying.DurationFormat", Locale, S.Duration.Formatted), true)
 	Embed.AddField(AddedState, S.Internal.Requestor, true)
 
-	// Color
+	if S.Cover != "" {
 
-	DominantColor, ColorFetchError := Utils.GetDominantColorHex(S.Cover)
+		DominantColor, ColorFetchError := Utils.GetDominantColorHex(S.Cover)
 
-	if ColorFetchError != nil {
+		if ColorFetchError != nil {
 
-		Utils.Logger.Warn("Embed", fmt.Sprintf("Failed to get dominant color for song embed: %s", ColorFetchError.Error()))
+			Utils.Logger.Warn("Embed", fmt.Sprintf("Failed to get dominant color for song embed: %s", ColorFetchError.Error()))
+
+		}
+
+		Embed.SetColor(DominantColor)
 
 	}
-
-	Embed.SetColor(DominantColor)
 
 	return Embed
 

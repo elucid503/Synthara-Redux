@@ -2,6 +2,8 @@ package APIs
 
 import (
 	"errors"
+	"net/url"
+	"path"
 	"regexp"
 	"strings"
 )
@@ -45,6 +47,8 @@ const (
 	URITypeFavorites = "Favorites"
 	URITypeSuggestions = "Suggestions"
 
+	URITypeDirectMedia = "DirectMedia"
+
 )
 
 const (
@@ -72,28 +76,9 @@ func ParseURI(Input string) (string, string, error) {
 
 	}
 
-	Parts := make([]string, 0)
+	Parts := strings.SplitN(Input[15:], ":", 2)
 
-	CurrentPart := ""
-
-	for i := 15; i < len(Input); i++ {
-
-		if Input[i] == ':' {
-
-			Parts = append(Parts, CurrentPart)
-			CurrentPart = ""
-
-		} else {
-
-			CurrentPart += string(Input[i])
-
-		}
-
-	}
-
-	Parts = append(Parts, CurrentPart)
-
-	if len(Parts) != 2 {
+	if len(Parts) != 2 || Parts[0] == "" || Parts[1] == "" {
 
 		return "", "", errors.New("invalid Synthara-Redux URI format")
 
@@ -267,6 +252,37 @@ func Route(Input string) (string, error) {
 
 	}
 
+	if IsDirectMediaURL(URL) {
+
+		return "Synthara-Redux:" + URITypeDirectMedia + ":" + URL, nil
+
+	}
+
 	return "", errors.New("unsupported URL format")
+
+}
+
+// IsDirectMediaURL reports whether the URL points at a supported direct audio file.
+func IsDirectMediaURL(Raw string) bool {
+
+	Parsed, Err := url.Parse(strings.TrimSpace(Raw))
+
+	if Err != nil {
+
+		return false
+
+	}
+
+	switch strings.ToLower(path.Ext(Parsed.Path)) {
+
+	case ".mp3", ".mp4", ".m4a", ".wav":
+
+		return true
+
+	default:
+
+		return false
+
+	}
 
 }

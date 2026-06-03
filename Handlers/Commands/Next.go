@@ -25,9 +25,9 @@ func Next(Event *events.ApplicationCommandInteractionCreate) {
 
 			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
-				Title:       Localizations.Get("Commands.Next.Error.NoSession.Title", Locale),
+				Title:       Localizations.Get("Embeds.Errors.NoActiveSession.Title", Locale),
 				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
-				Description: Localizations.Get("Commands.Next.Error.NoSession.Description", Locale),
+				Description: Localizations.Get("Embeds.Errors.NoActiveSession.Description", Locale),
 				Color:       Utils.ERROR,
 
 			})},

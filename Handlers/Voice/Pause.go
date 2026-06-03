@@ -21,7 +21,7 @@ func Pause(GuildID, UserID snowflake.ID, _ string) {
 
 	if Guild.Queue.State != Structs.StatePlaying {
 
-		notifyLocalized(Guild, "Commands.Pause.Error.Title", "Commands.Pause.Error.Description", "Embeds.Categories.Error", Utils.ERROR)
+		notifyLocalized(Guild, "Embeds.Errors.NoActiveSession.Title", "Embeds.Errors.NoActiveSession.Description", "Embeds.Categories.Error", Utils.ERROR)
 		voiceRespond(GuildID, "Playback is already paused.")
 
 		return

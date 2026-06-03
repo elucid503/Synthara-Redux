@@ -78,7 +78,9 @@ type Features struct {
 	Shuffle  bool `json:"shuffle"`
 	Autoplay bool `json:"autoplay"`
 	Locked   bool `json:"locked"`
-	Volume   int  `json:"volume"`
+	Volume     int `json:"volume"`
+	SpeedMilli int `json:"speed_milli"`
+	Reverb     int `json:"reverb"`
 
 }
 
@@ -132,7 +134,9 @@ func NewGuild(ID snowflake.ID, Locale discord.Locale) *Guild {
 			Shuffle:  false,
 			Autoplay: false,
 			Locked:   false,
-			Volume:   DefaultVolume,
+			Volume:     DefaultVolume,
+			SpeedMilli: DefaultSpeedMilli,
+			Reverb:     DefaultReverb,
 		},
 
 		VoiceConnection: nil,
@@ -244,20 +248,22 @@ func (G *Guild) Connect(VoiceChannelID snowflake.ID, TextChannelID snowflake.ID)
 
 	G.VoiceConnection = VoiceConnection
 
+	// The mixer is the single Opus encode point for the connection and is always the frame provider,
+	// whether or not voice commands are active (cues/TTS simply go unused without them).
+	Mixer, ErrMixer := Audio.NewMixerProvider()
+
+	if ErrMixer != nil {
+
+		Utils.Logger.Warn("Guild", fmt.Sprintf("Audio mixer unavailable for guild %s: %s", G.ID, ErrMixer.Error()))
+
+	} else {
+
+		G.VoiceMixer = Mixer
+		VoiceConnection.SetOpusFrameProvider(Mixer)
+
+	}
+
 	if VoiceCommandsActive {
-
-		Mixer, ErrMixer := Audio.NewMixerProvider()
-
-		if ErrMixer != nil {
-
-			Utils.Logger.Warn("Guild", fmt.Sprintf("Voice cue mixer unavailable for guild %s: %s", G.ID, ErrMixer.Error()))
-
-		} else {
-
-			G.VoiceMixer = Mixer
-			VoiceConnection.SetOpusFrameProvider(Mixer)
-
-		}
 
 		G.VoiceReceiver = Receive.AttachReceiver(G.ID, VoiceConnection)
 
@@ -1271,6 +1277,19 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 		}()
 
+	case APIs.URITypeDirectMedia:
+
+		Adapted, AdaptErr := Tidal.SongFromDirectURL(ID)
+
+		if AdaptErr != nil {
+
+			return nil, -1, AdaptErr
+
+		}
+
+		SongFound = Adapted
+		PosAdded = G.Queue.Add(SongFound, Requestor)
+
 	case APIs.URITypeAMPlaylist:
 
 		FirstSong, AppleMusicPlaylist, FirstSongError := Apple.AppleMusicPlaylistToFirstSong(ID)
@@ -1396,8 +1415,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 	}()
 
-	// Get stream URL from Tidal
-	StreamURL, ErrorFetchingStream := Tidal.GetStreamURL(Song.TidalID)
+	StreamURL, ErrorFetchingStream := Song.ResolveStreamURL()
 
 	if ErrorFetchingStream != nil {
 
@@ -1465,7 +1483,7 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 			if G.VoiceMixer != nil {
 
-				G.VoiceMixer.SetInner(nil)
+				G.VoiceMixer.SetSource(nil)
 
 			} else {
 
@@ -1534,7 +1552,16 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 	VolumeProcessor.SetVolume(G.Features.Volume)
 	Playback.Volume = VolumeProcessor
 
-	InnerProvider := &Audio.MP4OpusProvider{
+	EffectsProcessor := Audio.NewEffectsProcessor()
+
+	G.Features.SpeedMilli = ClampSpeedMilli(G.Features.SpeedMilli)
+	G.Features.Reverb = ClampReverb(G.Features.Reverb)
+
+	EffectsProcessor.SetSpeedMilli(G.Features.SpeedMilli)
+	EffectsProcessor.SetReverbPercent(G.Features.Reverb)
+	Playback.Effects = EffectsProcessor
+
+	SourceProvider := &Audio.MP4PCMProvider{
 
 		Streamer: Playback.Streamer,
 	}
@@ -1546,20 +1573,27 @@ func (G *Guild) Play(Song *Tidal.Song) error {
 
 	}
 
-	if G.VoiceMixer != nil {
+	// The mixer is the single encode point and the connection's only frame provider. It is normally
+	// created when the connection opens; ensure one exists here for plain (non-voice-command) playback.
+	if G.VoiceMixer == nil {
 
-		G.VoiceMixer.SetVolumeProcessor(VolumeProcessor)
-		G.VoiceMixer.SetInner(InnerProvider)
+		Mixer, ErrMixer := Audio.NewMixerProvider()
 
-	} else {
+		if ErrMixer != nil {
 
-		G.VoiceConnection.SetOpusFrameProvider(&Audio.VolumeOpusProvider{
+			Playback.Stop()
+			return fmt.Errorf("failed to create audio mixer: %w", ErrMixer)
 
-			Inner:  InnerProvider,
-			Volume: VolumeProcessor,
-		})
+		}
+
+		G.VoiceMixer = Mixer
+		G.VoiceConnection.SetOpusFrameProvider(Mixer)
 
 	}
+
+	G.VoiceMixer.SetEffects(EffectsProcessor)
+	G.VoiceMixer.SetVolumeProcessor(VolumeProcessor)
+	G.VoiceMixer.SetSource(SourceProvider)
 
 	if G.VoiceConnection == nil {
 

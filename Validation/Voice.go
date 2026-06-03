@@ -13,13 +13,12 @@ import (
 func GuildSessionError(Locale string) discord.Embed {
 
 	return discord.Embed{
-		
-		Title:       Localizations.Get("Commands.Pause.Error.Title", Locale),
 
-		Author:      &discord.EmbedAuthor{Name: Localizations.Get("Embeds.Categories.Error", Locale)},
-		Description: Localizations.Get("Commands.Pause.Error.Description", Locale),
-		
-		Color:       Utils.ERROR,
+		Title: Localizations.Get("Embeds.Errors.NoActiveSession.Title", Locale),
+		Author: &discord.EmbedAuthor{Name: Localizations.Get("Embeds.Categories.Error", Locale)},
+		Description: Localizations.Get("Embeds.Errors.NoActiveSession.Description", Locale),
+
+		Color: Utils.ERROR,
 
 	}
 
@@ -37,11 +36,12 @@ func VoiceStateError(GuildID snowflake.ID, UserID snowflake.ID, Locale string) *
 		if RestError != nil || RestVoiceState == nil || RestVoiceState.ChannelID == nil {
 
 			return &discord.Embed{
-				
-				Title:       Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Title", Locale),
-				Author:      &discord.EmbedAuthor{Name: Localizations.Get("Embeds.Categories.Error", Locale)},
+
+				Title: Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Title", Locale),
+				Author: &discord.EmbedAuthor{Name: Localizations.Get("Embeds.Categories.Error", Locale)},
 				Description: Localizations.Get("Commands.Play.Error.NotInVoiceChannel.Description", Locale),
-				Color:       Utils.ERROR,
+
+				Color: Utils.ERROR,
 
 			}
 
@@ -57,11 +57,12 @@ func VoiceStateError(GuildID snowflake.ID, UserID snowflake.ID, Locale string) *
 func PlaybackError(Locale string) discord.Embed {
 
 	return discord.Embed{
-		
-		Title:       Localizations.Get("Commands.Lyrics.Error.NoSong.Title", Locale),
-		Author:      &discord.EmbedAuthor{Name: Localizations.Get("Embeds.Categories.Error", Locale)},
-		Description: Localizations.Get("Commands.Lyrics.Error.NoSong.Description", Locale),
-		Color:       Utils.ERROR,
+
+		Title: Localizations.Get("Embeds.Errors.NoActiveSession.Title", Locale),
+		Author: &discord.EmbedAuthor{Name: Localizations.Get("Embeds.Categories.Error", Locale)},
+		Description: Localizations.Get("Embeds.Errors.NoActiveSession.Description", Locale),
+
+		Color: Utils.ERROR,
 
 	}
 

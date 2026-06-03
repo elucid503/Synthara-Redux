@@ -1,4 +1,5 @@
 import { Song, LyricsResponse, Operation, WebIdentifier } from '../Types';
+import { fetchBinimumLyrics } from './Lyrics';
 
 const Secure = import.meta.env.VITE_SECURE === 'true';
 const Host = import.meta.env.VITE_SERVER_HOST;
@@ -102,11 +103,11 @@ export const FetchLyrics = async (Song: Song): Promise<{ data: LyricsResponse | 
     const CleanedTitle = Song.title.replace(/\s*\(.*?\)/g, '').trim();
     const OriginalTitle = Song.title;
 
-    const Result = await LyricsFetcher(CleanedTitle, Song.artists[0]);
+    const Result = await LyricsFetcher(CleanedTitle, Song.artists[0] ?? '', Song);
 
     if (Result.error && CleanedTitle != OriginalTitle) {
 
-        return await LyricsFetcher(OriginalTitle, Song.artists[0]);
+        return await LyricsFetcher(OriginalTitle, Song.artists[0] ?? '', Song);
 
     }
 
@@ -115,7 +116,7 @@ export const FetchLyrics = async (Song: Song): Promise<{ data: LyricsResponse | 
 };
 
 // Helper function to fetch lyrics with specific title/artist/album strings
-const LyricsFetcher = async (Title: string, Artist: string): Promise<{ data: LyricsResponse | null, error: boolean }> => {
+const LyricsFetcher = async (Title: string, Artist: string, Song: Song): Promise<{ data: LyricsResponse | null, error: boolean }> => {
 
     try {
 
@@ -135,15 +136,37 @@ const LyricsFetcher = async (Title: string, Artist: string): Promise<{ data: Lyr
             const Data: LyricsResponse = await Response.json();
             return { data: Data, error: false };
 
-        } else {
+        }
 
-            return { data: null, error: true };
+        const Fallback = await fetchBinimumLyrics(Title, Artist, Song.album, Song.duration.seconds);
+
+        if (Fallback) {
+
+            return { data: Fallback, error: false };
 
         }
+
+        return { data: null, error: true };
 
     } catch (Error) {
 
         console.error('Error fetching lyrics:', Error);
+
+        try {
+
+            const Fallback = await fetchBinimumLyrics(Title, Artist, Song.album, Song.duration.seconds);
+
+            if (Fallback) {
+
+                return { data: Fallback, error: false };
+
+            }
+
+        } catch {
+
+            // Binimum fallback failed
+
+        }
 
         return { data: null, error: true };
 

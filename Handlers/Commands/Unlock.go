@@ -22,10 +22,10 @@ func Unlock(Event *events.ApplicationCommandInteractionCreate) {
 
 			Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
-				Title:       Localizations.Get("Commands.Unlock.Error.Title", Locale),
-				Author:      Localizations.Get("Embeds.Categories.Error", Locale),
-				Description: Localizations.Get("Commands.Unlock.Error.Description", Locale),
-				Color:       Utils.ERROR,
+				Title: Localizations.Get("Embeds.Errors.NoActiveSession.Title", Locale),
+				Author: Localizations.Get("Embeds.Categories.Error", Locale),
+				Description: Localizations.Get("Embeds.Errors.NoActiveSession.Description", Locale),
+				Color: Utils.ERROR,
 
 			})},
 
@@ -43,9 +43,9 @@ func Unlock(Event *events.ApplicationCommandInteractionCreate) {
 
 		Embeds: []discord.Embed{Utils.CreateEmbed(Utils.EmbedOptions{
 
-			Title:       Localizations.Get("Commands.Unlock.Success.Title", Locale),
-			Author:      Localizations.Get("Embeds.Categories.Notifications", Locale),
-				Description: Localizations.Get("Commands.Unlock.Success.Description", Locale),
+			Title: Localizations.Get("Commands.Unlock.Success.Title", Locale),
+			Author: Localizations.Get("Embeds.Categories.Notifications", Locale),
+			Description: Localizations.Get("Commands.Unlock.Success.Description", Locale),
 
 		})},
 

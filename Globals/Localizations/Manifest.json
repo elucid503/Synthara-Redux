@@ -31,16 +31,16 @@
 		"About": {
 			"Voice": {
 				"Content": {
-					"en-US": "# Voice Commands\nControl Synthara with your voice.\n\n## Getting Started\nUse `/connect` or `/play` so Synthara joins your channel. Stay in the **same voice channel**, then say **Synthara** and your command (English works best). Example: `Synthara, play never gonna give you up`\n\n## Commands\n**play** *[song/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[position]* (`0` = most recent)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (say **repeat** alone to cycle)\n**autoplay** *[on/off]*\n**volume** *[low/high/level]*\n**leave** / **disconnect**\n\n## Tips\n- Most audio stays on the server and never leaves it. Speech is sent for transcription only after you say **Synthara**.\n- You must be in voice with the bot; confirmations post in the notification channel.\n- Opt out with `/settings`. **Rejoin voice** after changing it.\n- `/connect` joins voice without starting music.",
-					"en-GB": "# Voice Commands\nControl Synthara with your voice.\n\n## Getting Started\nUse `/connect` or `/play` so Synthara joins your channel. Stay in the **same voice channel**, then say **Synthara** and your command (English works best). Example: `Synthara, play never gonna give you up`\n\n## Commands\n**play** *[song/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[position]* (`0` = most recent)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (say **repeat** alone to cycle)\n**autoplay** *[on/off]*\n**volume** *[low/high/level]*\n**leave** / **disconnect**\n\n## Tips\n- Most audio stays on the server and never leaves it. Speech is sent for transcription only after you say **Synthara**.\n- You must be in voice with the bot; confirmations post in the notification channel.\n- Opt out with `/settings`. **Rejoin voice** after changing it.\n- `/connect` joins voice without starting music.",
-					"es-ES": "# Comandos de Voz\nControla Synthara sin manos en un canal de voz con el bot.\n\n## Primeros Pasos\nUsa `/connect` o `/play` para que Synthara se una a tu canal. Permanece en el **mismo canal de voz**, di **Synthara** y tu comando (el inglés funciona mejor). Ejemplo: `Synthara, play never gonna give you up`\n\n## Comandos\n**play** *[canción/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[posición]* (`0` = la más reciente)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (di solo **repeat** para alternar)\n**autoplay** *[on/off]*\n**volume** *[bajo/alto/nivel]*\n**leave** / **disconnect**\n\n## Consejos\n- La mayor parte del audio permanece en el servidor y no sale de él; el habla solo se envía a transcripción después de decir **Synthara**.\n- Debes estar en voz con el bot; las confirmaciones van al canal de notificaciones.\n- Exclúyete con `/settings`. **Vuelve a unirte a voz** tras cambiarlo.\n- `/connect` une a voz sin iniciar música.",
-					"es-419": "# Comandos de Voz\nControla Synthara sin manos en un canal de voz con el bot.\n\n## Primeros Pasos\nUsa `/connect` o `/play` para que Synthara se una a tu canal. Permanece en el **mismo canal de voz**, di **Synthara** y tu comando (el inglés funciona mejor). Ejemplo: `Synthara, play never gonna give you up`\n\n## Comandos\n**play** *[canción/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[posición]* (`0` = la más reciente)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (di solo **repeat** para alternar)\n**autoplay** *[on/off]*\n**volume** *[bajo/alto/nivel]*\n**leave** / **disconnect**\n\n## Consejos\n- La mayor parte del audio permanece en el servidor y no sale de él; el habla solo se envía a transcripción después de decir **Synthara**.\n- Debes estar en voz con el bot; las confirmaciones van al canal de notificaciones.\n- Exclúyete con `/settings`. **Vuelve a unirte a voz** tras cambiarlo.\n- `/connect` une a voz sin iniciar música.",
-					"zh-CN": "# 语音命令\n在与机器人同一语音频道中免提控制 Synthara。\n\n## 入门\n使用 `/connect` 或 `/play` 让 Synthara 加入你的频道。请留在**同一语音频道**，说出 **Synthara** 和命令（英语效果最佳）。示例：`Synthara, play never gonna give you up`\n\n## 命令\n**play** *[歌曲/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[位置]*（`0` = 最近一首）\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]*（单独说 **repeat** 可切换）\n**autoplay** *[on/off]*\n**volume** *[低/高/数值]*\n**leave** / **disconnect**\n\n## 提示\n- 大多数音频留在服务器上，不会离开；只有在你说出 **Synthara** 后才会发送语音进行转录。\n- 你必须与机器人在语音中；确认消息会发布在通知频道。\n- 使用 `/settings` 可退出。更改后请**重新加入语音**。\n- `/connect` 可在不开始播放的情况下加入语音。",
-					"fr": "# Commandes Vocales\nContrôlez Synthara mains libres dans un canal vocal avec le bot.\n\n## Pour Commencer\nUtilisez `/connect` ou `/play` pour que Synthara rejoigne votre canal. Restez dans le **même canal vocal**, dites **Synthara** puis votre commande (l'anglais fonctionne le mieux). Exemple : `Synthara, play never gonna give you up`\n\n## Commandes\n**play** *[titre/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[position]* (`0` = le plus récent)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (dites **repeat** seul pour alterner)\n**autoplay** *[on/off]*\n**volume** *[bas/haut/niveau]*\n**leave** / **disconnect**\n\n## Conseils\n- La plupart de l'audio reste sur le serveur et ne le quitte pas—la parole n'est envoyée pour transcription qu'après **Synthara**.\n- Vous devez être en vocal avec le bot ; les confirmations vont au canal de notifications.\n- Désactivez avec `/settings`. **Rejoignez le vocal** après modification.\n- `/connect` rejoint le vocal sans lancer la musique.",
-					"it": "# Comandi Vocali\nControlla Synthara a mani libere in un canale vocale con il bot.\n\n## Per Iniziare\nUsa `/connect` o `/play` così Synthara entra nel tuo canale. Resta nello **stesso canale vocale**, di' **Synthara** e il comando (l'inglese funziona meglio). Esempio: `Synthara, play never gonna give you up`\n\n## Comandi\n**play** *[brano/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[posizione]* (`0` = il più recente)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (di' solo **repeat** per alternare)\n**autoplay** *[on/off]*\n**volume** *[basso/alto/livello]*\n**leave** / **disconnect**\n\n## Suggerimenti\n- La maggior parte dell'audio resta sul server e non esce—il parlato viene inviato per la trascrizione solo dopo **Synthara**.\n- Devi essere in vocale con il bot; le conferme vanno al canale notifiche.\n- Escludi con `/settings`. **Rientra in vocale** dopo la modifica.\n- `/connect` entra in vocale senza avviare musica.",
-					"de": "# Sprachbefehle\nSteuere Synthara freihändig in einem Sprachkanal mit dem Bot.\n\n## Erste Schritte\nVerwende `/connect` oder `/play`, damit Synthara deinem Kanal beitritt. Bleibe im **selben Sprachkanal**, sage **Synthara** und deinen Befehl (Englisch funktioniert am besten). Beispiel: `Synthara, play never gonna give you up`\n\n## Befehle\n**play** *[Song/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[Position]* (`0` = zuletzt gespielt)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (nur **repeat** sagen zum Wechseln)\n**autoplay** *[on/off]*\n**volume** *[niedrig/hoch/stufe]*\n**leave** / **disconnect**\n\n## Tipps\n- Die meiste Audio bleibt auf dem Server—Sprache wird erst nach **Synthara** zur Transkription gesendet.\n- Du musst mit dem Bot im Sprachkanal sein; Bestätigungen erscheinen im Benachrichtigungskanal.\n- Opt-out über `/settings`. **Sprachkanal erneut beitreten** nach der Änderung.\n- `/connect` tritt dem Sprachkanal bei, ohne Musik zu starten.",
-					"pl": "# Polecenia Głosowe\nSteruj Syntharą bez użycia rąk na kanale głosowym z botem.\n\n## Na Start\nUżyj `/connect` lub `/play`, aby Synthara dołączyła do kanału. Zostań na **tym samym kanale głosowym**, powiedz **Synthara** i polecenie (najlepiej angielski). Przykład: `Synthara, play never gonna give you up`\n\n## Polecenia\n**play** *[utwór/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[pozycja]* (`0` = najnowszy)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (powiedz samo **repeat**, aby przełączać)\n**autoplay** *[on/off]*\n**volume** *[nisko/wysoko/poziom]*\n**leave** / **disconnect**\n\n## Wskazówki\n- Większość audio pozostaje na serwerze i go nie opuszcza—mowa jest wysyłana do transkrypcji dopiero po **Synthara**.\n- Musisz być na głosowym z botem; potwierdzenia trafiają na kanał powiadomień.\n- Zrezygnuj przez `/settings`. **Dołącz ponownie do głosu** po zmianie.\n- `/connect` dołącza do głosu bez startu muzyki.",
-					"ru": "# Голосовые Команды\nУправляйте Synthara без рук в голосовом канале с ботом.\n\n## Начало Работы\nИспользуйте `/connect` или `/play`, чтобы Synthara подключилась к каналу. Оставайтесь в **том же голосовом канале**, произнесите **Synthara** и команду (лучше всего английский). Пример: `Synthara, play never gonna give you up`\n\n## Команды\n**play** *[песня/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[позиция]* (`0` = самый недавний)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (скажите только **repeat** для переключения)\n**autoplay** *[on/off]*\n**volume** *[низко/высоко/уровень]*\n**leave** / **disconnect**\n\n## Советы\n- Большая часть аудио остаётся на сервере и не покидает его—речь отправляется на транскрипцию только после **Synthara**.\n- Вы должны быть в голосе с ботом; подтверждения публикуются в канале уведомлений.\n- Отказ через `/settings`. **Переподключитесь к голосу** после изменения.\n- `/connect` подключает к голосу без начала музыки.",
+					"en-US": "# Voice Commands\nControl Synthara with your voice.\n\n## Getting Started\nUse `/connect` or `/play` so Synthara joins your channel. Stay in the **same voice channel**, then say **Synthara** and your command (English works best). Example: `Synthara, play never gonna give you up`\n\n## Commands\n**play** *[song/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[position]* (`0` = most recent)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (say **repeat** alone to cycle)\n**autoplay** *[on/off]*\n**volume** *[low/high/level]*\n**speed** *[faster/slower/level]*\n**reverb** *[more/less/level]*\n**leave** / **disconnect**\n\n## Tips\n- Most audio stays on the server and never leaves it. Speech is sent for transcription only after you say **Synthara**.\n- You must be in voice with the bot; confirmations post in the notification channel.\n- Opt out with `/settings`. **Rejoin voice** after changing it.\n- `/connect` joins voice without starting music.",
+					"en-GB": "# Voice Commands\nControl Synthara with your voice.\n\n## Getting Started\nUse `/connect` or `/play` so Synthara joins your channel. Stay in the **same voice channel**, then say **Synthara** and your command (English works best). Example: `Synthara, play never gonna give you up`\n\n## Commands\n**play** *[song/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[position]* (`0` = most recent)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (say **repeat** alone to cycle)\n**autoplay** *[on/off]*\n**volume** *[low/high/level]*\n**speed** *[faster/slower/level]*\n**reverb** *[more/less/level]*\n**leave** / **disconnect**\n\n## Tips\n- Most audio stays on the server and never leaves it. Speech is sent for transcription only after you say **Synthara**.\n- You must be in voice with the bot; confirmations post in the notification channel.\n- Opt out with `/settings`. **Rejoin voice** after changing it.\n- `/connect` joins voice without starting music.",
+					"es-ES": "# Comandos de Voz\nControla Synthara sin manos en un canal de voz con el bot.\n\n## Primeros Pasos\nUsa `/connect` o `/play` para que Synthara se una a tu canal. Permanece en el **mismo canal de voz**, di **Synthara** y tu comando (el inglés funciona mejor). Ejemplo: `Synthara, play never gonna give you up`\n\n## Comandos\n**play** *[canción/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[posición]* (`0` = la más reciente)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (di solo **repeat** para alternar)\n**autoplay** *[on/off]*\n**volume** *[bajo/alto/nivel]*\n**speed** *[más rápido/más lento/nivel]*\n**reverb** *[más/menos/nivel]*\n**leave** / **disconnect**\n\n## Consejos\n- La mayor parte del audio permanece en el servidor y no sale de él; el habla solo se envía a transcripción después de decir **Synthara**.\n- Debes estar en voz con el bot; las confirmaciones van al canal de notificaciones.\n- Exclúyete con `/settings`. **Vuelve a unirte a voz** tras cambiarlo.\n- `/connect` une a voz sin iniciar música.",
+					"es-419": "# Comandos de Voz\nControla Synthara sin manos en un canal de voz con el bot.\n\n## Primeros Pasos\nUsa `/connect` o `/play` para que Synthara se una a tu canal. Permanece en el **mismo canal de voz**, di **Synthara** y tu comando (el inglés funciona mejor). Ejemplo: `Synthara, play never gonna give you up`\n\n## Comandos\n**play** *[canción/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[posición]* (`0` = la más reciente)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (di solo **repeat** para alternar)\n**autoplay** *[on/off]*\n**volume** *[bajo/alto/nivel]*\n**speed** *[más rápido/más lento/nivel]*\n**reverb** *[más/menos/nivel]*\n**leave** / **disconnect**\n\n## Consejos\n- La mayor parte del audio permanece en el servidor y no sale de él; el habla solo se envía a transcripción después de decir **Synthara**.\n- Debes estar en voz con el bot; las confirmaciones van al canal de notificaciones.\n- Exclúyete con `/settings`. **Vuelve a unirte a voz** tras cambiarlo.\n- `/connect` une a voz sin iniciar música.",
+					"zh-CN": "# 语音命令\n在与机器人同一语音频道中免提控制 Synthara。\n\n## 入门\n使用 `/connect` 或 `/play` 让 Synthara 加入你的频道。请留在**同一语音频道**，说出 **Synthara** 和命令（英语效果最佳）。示例：`Synthara, play never gonna give you up`\n\n## 命令\n**play** *[歌曲/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[位置]*（`0` = 最近一首）\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]*（单独说 **repeat** 可切换）\n**autoplay** *[on/off]*\n**volume** *[低/高/数值]*\n**speed** *[更快/更慢/倍速]*\n**reverb** *[更多/更少/级别]*\n**leave** / **disconnect**\n\n## 提示\n- 大多数音频留在服务器上，不会离开；只有在你说出 **Synthara** 后才会发送语音进行转录。\n- 你必须与机器人在语音中；确认消息会发布在通知频道。\n- 使用 `/settings` 可退出。更改后请**重新加入语音**。\n- `/connect` 可在不开始播放的情况下加入语音。",
+					"fr": "# Commandes Vocales\nContrôlez Synthara mains libres dans un canal vocal avec le bot.\n\n## Pour Commencer\nUtilisez `/connect` ou `/play` pour que Synthara rejoigne votre canal. Restez dans le **même canal vocal**, dites **Synthara** puis votre commande (l'anglais fonctionne le mieux). Exemple : `Synthara, play never gonna give you up`\n\n## Commandes\n**play** *[titre/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[position]* (`0` = le plus récent)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (dites **repeat** seul pour alterner)\n**autoplay** *[on/off]*\n**volume** *[bas/haut/niveau]*\n**speed** *[plus vite/plus lent/niveau]*\n**reverb** *[plus/moins/niveau]*\n**leave** / **disconnect**\n\n## Conseils\n- La plupart de l'audio reste sur le serveur et ne le quitte pas—la parole n'est envoyée pour transcription qu'après **Synthara**.\n- Vous devez être en vocal avec le bot ; les confirmations vont au canal de notifications.\n- Désactivez avec `/settings`. **Rejoignez le vocal** après modification.\n- `/connect` rejoint le vocal sans lancer la musique.",
+					"it": "# Comandi Vocali\nControlla Synthara a mani libere in un canale vocale con il bot.\n\n## Per Iniziare\nUsa `/connect` o `/play` così Synthara entra nel tuo canale. Resta nello **stesso canale vocale**, di' **Synthara** e il comando (l'inglese funziona meglio). Esempio: `Synthara, play never gonna give you up`\n\n## Comandi\n**play** *[brano/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[posizione]* (`0` = il più recente)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (di' solo **repeat** per alternare)\n**autoplay** *[on/off]*\n**volume** *[basso/alto/livello]*\n**speed** *[più veloce/più lento/livello]*\n**reverb** *[più/meno/livello]*\n**leave** / **disconnect**\n\n## Suggerimenti\n- La maggior parte dell'audio resta sul server e non esce—il parlato viene inviato per la trascrizione solo dopo **Synthara**.\n- Devi essere in vocale con il bot; le conferme vanno al canale notifiche.\n- Escludi con `/settings`. **Rientra in vocale** dopo la modifica.\n- `/connect` entra in vocale senza avviare musica.",
+					"de": "# Sprachbefehle\nSteuere Synthara freihändig in einem Sprachkanal mit dem Bot.\n\n## Erste Schritte\nVerwende `/connect` oder `/play`, damit Synthara deinem Kanal beitritt. Bleibe im **selben Sprachkanal**, sage **Synthara** und deinen Befehl (Englisch funktioniert am besten). Beispiel: `Synthara, play never gonna give you up`\n\n## Befehle\n**play** *[Song/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[Position]* (`0` = zuletzt gespielt)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (nur **repeat** sagen zum Wechseln)\n**autoplay** *[on/off]*\n**volume** *[niedrig/hoch/stufe]*\n**speed** *[schneller/langsamer/stufe]*\n**reverb** *[mehr/weniger/stufe]*\n**leave** / **disconnect**\n\n## Tipps\n- Die meiste Audio bleibt auf dem Server—Sprache wird erst nach **Synthara** zur Transkription gesendet.\n- Du musst mit dem Bot im Sprachkanal sein; Bestätigungen erscheinen im Benachrichtigungskanal.\n- Opt-out über `/settings`. **Sprachkanal erneut beitreten** nach der Änderung.\n- `/connect` tritt dem Sprachkanal bei, ohne Musik zu starten.",
+					"pl": "# Polecenia Głosowe\nSteruj Syntharą bez użycia rąk na kanale głosowym z botem.\n\n## Na Start\nUżyj `/connect` lub `/play`, aby Synthara dołączyła do kanału. Zostań na **tym samym kanale głosowym**, powiedz **Synthara** i polecenie (najlepiej angielski). Przykład: `Synthara, play never gonna give you up`\n\n## Polecenia\n**play** *[utwór/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[pozycja]* (`0` = najnowszy)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (powiedz samo **repeat**, aby przełączać)\n**autoplay** *[on/off]*\n**volume** *[nisko/wysoko/poziom]*\n**speed** *[szybciej/wolniej/poziom]*\n**reverb** *[więcej/mniej/poziom]*\n**leave** / **disconnect**\n\n## Wskazówki\n- Większość audio pozostaje na serwerze i go nie opuszcza—mowa jest wysyłana do transkrypcji dopiero po **Synthara**.\n- Musisz być na głosowym z botem; potwierdzenia trafiają na kanał powiadomień.\n- Zrezygnuj przez `/settings`. **Dołącz ponownie do głosu** po zmianie.\n- `/connect` dołącza do głosu bez startu muzyki.",
+					"ru": "# Голосовые Команды\nУправляйте Synthara без рук в голосовом канале с ботом.\n\n## Начало Работы\nИспользуйте `/connect` или `/play`, чтобы Synthara подключилась к каналу. Оставайтесь в **том же голосовом канале**, произнесите **Synthara** и команду (лучше всего английский). Пример: `Synthara, play never gonna give you up`\n\n## Команды\n**play** *[песня/URL]*\n**pause**\n**resume** / **continue**\n**next** / **skip**\n**last** / **previous** / **back**\n**replay** *[позиция]* (`0` = самый недавний)\n**shuffle** *[on/off]*\n**repeat** *[off/one/all]* (скажите только **repeat** для переключения)\n**autoplay** *[on/off]*\n**volume** *[низко/высоко/уровень]*\n**speed** *[быстрее/медленнее/уровень]*\n**reverb** *[больше/меньше/уровень]*\n**leave** / **disconnect**\n\n## Советы\n- Большая часть аудио остаётся на сервере и не покидает его—речь отправляется на транскрипцию только после **Synthara**.\n- Вы должны быть в голосе с ботом; подтверждения публикуются в канале уведомлений.\n- Отказ через `/settings`. **Переподключитесь к голосу** после изменения.\n- `/connect` подключает к голосу без начала музыки.",
 					"ja": "# 音声コマンド\nボットと同じボイスチャンネルで Synthara をハンズフリー操作できます。\n\n## はじめに\n`/connect` または `/play` で Synthara をチャンネルに参加させます。ボットと**同じボイスチャンネル**に留まり、**Synthara** の後にコマンドを話します（英語が最も安定）。例: `Synthara, play never gonna give you up`\n\n## コマンド\n**再生:** **play** *[曲/URL]* · **pause** · **resume**/**continue** · **next**/**skip** · **last**/**previous**/**back** · **replay** *[位置]*（`0` = 直近）\n**キューとモード:** **shuffle** *[on/off]* · **repeat** *[off/one/all]*（**repeat** のみで切替） · **autoplay** *[on/off]*\n**セッション:** **leave**/**disconnect**\n\n## ヒント\n- ほとんどの音声処理はサーバー内で完結し、外部に出ません—**Synthara** と言った後だけ文字起こしのために送信されます。\n- ボットと同じボイスにいる必要があります。確認は通知チャンネルに投稿されます。\n- `/settings` → **音声コマンドのオプトアウト** で除外できます（デフォルトはオフ）。変更後は**ボイスに再参加**してください。\n- `/connect` は音楽を始めずにボイスに参加します。"
 				}
 			},
@@ -220,34 +220,7 @@
 					"ja": "Web操作が無効になりました。/unlock を使用して再度有効にします。"
 				}
 			},
-			"Error": {
-				"Title": {
-					"en-US": "No Active Session",
-					"en-GB": "No Active Session",
-					"es-ES": "No Hay Sesión Activa",
-					"es-419": "No Hay Sesión Activa",
-					"zh-CN": "没有活动会话",
-					"fr": "Aucune Session Active",
-					"it": "Nessuna Sessione Attiva",
-					"de": "Keine Aktive Sitzung",
-					"pl": "Brak Aktywnej Sesji",
-					"ru": "Нет Активного Сеанса",
-					"ja": "アクティブなセッションがありません"
-				},
-				"Description": {
-					"en-US": "There is no active playback session.",
-					"en-GB": "There is no active playback session.",
-					"es-ES": "No hay una sesión de reproducción activa.",
-					"es-419": "No hay una sesión de reproducción activa.",
-					"zh-CN": "没有活动的播放会话。",
-					"fr": "Il n'y a pas de session de lecture active.",
-					"it": "Non c'è alcuna sessione di riproduzione attiva.",
-					"de": "Es gibt keine aktive Wiedergabesitzung.",
-					"pl": "Nie ma aktywnej sesji odtwarzania.",
-					"ru": "Нет активного сеанса воспроизведения.",
-					"ja": "アクティブな再生セッションがありません。"
-				}
-			}
+			"Error": {}
 		},
 		"Unlock": {
 			"Success": {
@@ -278,34 +251,7 @@
 					"ja": "Web操作が有効になりました。"
 				}
 			},
-			"Error": {
-				"Title": {
-					"en-US": "No Active Session",
-					"en-GB": "No Active Session",
-					"es-ES": "No Hay Sesión Activa",
-					"es-419": "No Hay Sesión Activa",
-					"zh-CN": "没有活动会话",
-					"fr": "Aucune Session Active",
-					"it": "Nessuna Sessione Attiva",
-					"de": "Keine Aktive Sitzung",
-					"pl": "Brak Aktywnej Sesji",
-					"ru": "Нет Активного Сеанса",
-					"ja": "アクティブなセッションがありません"
-				},
-				"Description": {
-					"en-US": "There is no active playback session.",
-					"en-GB": "There is no active playback session.",
-					"es-ES": "No hay una sesión de reproducción activa.",
-					"es-419": "No hay una sesión de reproducción activa.",
-					"zh-CN": "没有活动的播放会话。",
-					"fr": "Il n'y a pas de session de lecture active.",
-					"it": "Non c'è alcuna sessione di riproduzione attiva.",
-					"de": "Es gibt keine aktive Wiedergabesitzung.",
-					"pl": "Nie ma aktywnej sesji odtwarzania.",
-					"ru": "Нет активного сеанса воспроизведения.",
-					"ja": "アクティブな再生セッションがありません。"
-				}
-			}
+			"Error": {}
 		},
 		"AutoPlay": {
 			"Title": {
@@ -430,32 +376,6 @@
 					"ru": "Переданные Данные",
 					"ja": "送信データ"
 				},
-				"Codec": {
-					"en-US": "Audio Codec",
-					"en-GB": "Audio Codec",
-					"es-ES": "Códec de Audio",
-					"es-419": "Códec de Audio",
-					"zh-CN": "音频编解码器",
-					"fr": "Codec Audio",
-					"it": "Codec Audio",
-					"de": "Audio-Codec",
-					"pl": "Kodek Audio",
-					"ru": "Аудио Кодек",
-					"ja": "オーディオコーデック"
-				},
-				"Queue": {
-					"en-US": "Queue",
-					"en-GB": "Queue",
-					"es-ES": "Cola",
-					"es-419": "Cola",
-					"zh-CN": "队列",
-					"fr": "File d'attente",
-					"it": "Coda",
-					"de": "Warteschlange",
-					"pl": "Kolejka",
-					"ru": "Очередь",
-					"ja": "キュー"
-				},
 				"ActiveGoroutines": {
 					"en-US": "Goroutines",
 					"en-GB": "Goroutines",
@@ -508,19 +428,6 @@
 					"ru": "Использование Памяти",
 					"ja": "メモリ使用量"
 				},
-				"Duration": {
-					"en-US": "Playback Time",
-					"en-GB": "Playback Time",
-					"es-ES": "Tiempo de Reproducción",
-					"es-419": "Tiempo de Reproducción",
-					"zh-CN": "播放时间",
-					"fr": "Durée de Lecture",
-					"it": "Tempo di Riproduzione",
-					"de": "Wiedergabezeit",
-					"pl": "Czas Odtwarzania",
-					"ru": "Время Воспроизведения",
-					"ja": "再生時間"
-				},
 				"VolumeStep": {
 					"en-US": "Volume Processing",
 					"en-GB": "Volume Processing",
@@ -533,22 +440,22 @@
 					"pl": "Przetwarzanie Głośności",
 					"ru": "Обработка Громкости",
 					"ja": "音量処理"
+				},
+				"EffectsStep": {
+					"en-US": "Effects Processing",
+					"en-GB": "Effects Processing",
+					"es-ES": "Procesamiento de Efectos",
+					"es-419": "Procesamiento de Efectos",
+					"zh-CN": "效果处理",
+					"fr": "Traitement des Effets",
+					"it": "Elaborazione Effetti",
+					"de": "Effekt-Verarbeitung",
+					"pl": "Przetwarzanie Efektów",
+					"ru": "Обработка Эффектов",
+					"ja": "エフェクト処理"
 				}
 			},
 			"Progress": {
-				"Format": {
-					"en-US": "%d / %d segments (%d%%)",
-					"en-GB": "%d / %d segments (%d%%)",
-					"es-ES": "%d / %d segmentos (%d%%)",
-					"es-419": "%d / %d segmentos (%d%%)",
-					"zh-CN": "%d / %d 段 (%d%%)",
-					"fr": "%d / %d segments (%d%%)",
-					"it": "%d / %d segmenti (%d%%)",
-					"de": "%d / %d Segmente (%d%%)",
-					"pl": "%d / %d segmentów (%d%%)",
-					"ru": "%d / %d сегментов (%d%%)",
-					"ja": "%d / %d セグメント (%d%%)"
-				},
 				"NoData": {
 					"en-US": "No data available",
 					"en-GB": "No data available",
@@ -563,103 +470,9 @@
 					"ja": "データがありません"
 				}
 			},
-			"Codec": {
-				"Format": {
-					"en-US": "%s\n%s • %s",
-					"en-GB": "%s\n%s • %s",
-					"es-ES": "%s\n%s • %s",
-					"es-419": "%s\n%s • %s",
-					"zh-CN": "%s\n%s • %s",
-					"fr": "%s\n%s • %s",
-					"it": "%s\n%s • %s",
-					"de": "%s\n%s • %s",
-					"pl": "%s\n%s • %s",
-					"ru": "%s\n%s • %s",
-					"ja": "%s\n%s • %s"
-				}
-			},
-			"Queue": {
-				"Singular": {
-					"en-US": "%d Song upcoming",
-					"en-GB": "%d Song upcoming",
-					"es-ES": "%d canción próxima",
-					"es-419": "%d canción próxima",
-					"zh-CN": "%d 首即将播放",
-					"fr": "%d chanson à venir",
-					"it": "%d canzone in arrivo",
-					"de": "%d Lied bevorstehend",
-					"pl": "%d utwór nadchodzący",
-					"ru": "%d песня предстоящая",
-					"ja": "%d 曲が次に再生されます"
-				},
-				"Plural": {
-					"en-US": "%d songs upcoming",
-					"en-GB": "%d songs upcoming",
-					"es-ES": "%d canciones próximas",
-					"es-419": "%d canciones próximas",
-					"zh-CN": "%d 首即将播放",
-					"fr": "%d chansons à venir",
-					"it": "%d canzoni in arrivo",
-					"de": "%d Lieder bevorstehend",
-					"pl": "%d utworów nadchodzących",
-					"ru": "%d песен предстоящих",
-					"ja": "%d 曲が次に再生されます"
-				},
-				"PreviousSingular": {
-					"en-US": "%d Song in history",
-					"en-GB": "%d Song in history",
-					"es-ES": "%d canción en historial",
-					"es-419": "%d canción en historial",
-					"zh-CN": "%d 首历史记录",
-					"fr": "%d chanson dans l'historique",
-					"it": "%d canzone nello storico",
-					"de": "%d Lied im Verlauf",
-					"pl": "%d utwór w historii",
-					"ru": "%d песня в истории",
-					"ja": "%d 曲が履歴にあります"
-				},
-				"PreviousPlural": {
-					"en-US": "%d songs in history",
-					"en-GB": "%d songs in history",
-					"es-ES": "%d canciones en historial",
-					"es-419": "%d canciones en historial",
-					"zh-CN": "%d 首历史记录",
-					"fr": "%d chansons dans l'historique",
-					"it": "%d canzoni nello storico",
-					"de": "%d Lieder im Verlauf",
-					"pl": "%d utworów w historii",
-					"ru": "%d песен в истории",
-					"ja": "%d 曲が履歴にあります"
-				}
-			},
-			"Duration": {
-				"Format": {
-					"en-US": "%d:%02d elapsed",
-					"en-GB": "%d:%02d elapsed",
-					"es-ES": "%d:%02d transcurrido",
-					"es-419": "%d:%02d transcurrido",
-					"zh-CN": "已过 %d:%02d",
-					"fr": "%d:%02d écoulé",
-					"it": "%d:%02d trascorso",
-					"de": "%d:%02d vergangen",
-					"pl": "%d:%02d upłynęło",
-					"ru": "%d:%02d прошло",
-					"ja": "%d:%02d 経過"
-				},
-				"NoData": {
-					"en-US": "No data available",
-					"en-GB": "No data available",
-					"es-ES": "No hay datos disponibles",
-					"es-419": "No hay datos disponibles",
-					"zh-CN": "无可用数据",
-					"fr": "Aucune donnée disponible",
-					"it": "Nessun dato disponibile",
-					"de": "Keine Daten verfügbar",
-					"pl": "Brak dostępnych danych",
-					"ru": "Нет доступных данных",
-					"ja": "データがありません"
-				}
-			},
+			"Codec": {},
+			"Queue": {},
+			"Duration": {},
 			"VolumeStep": {
 				"Enabled": {
 					"en-US": "Enabled",
@@ -686,6 +499,34 @@
 					"pl": "Wyłączony",
 					"ru": "Отключено",
 					"ja": "無効"
+				}
+			},
+			"EffectsStep": {
+				"Enabled": {
+					"en-US": "Enabled",
+					"en-GB": "Enabled",
+					"es-ES": "Enabled",
+					"es-419": "Enabled",
+					"zh-CN": "Enabled",
+					"fr": "Enabled",
+					"it": "Enabled",
+					"de": "Enabled",
+					"pl": "Enabled",
+					"ru": "Enabled",
+					"ja": "Enabled"
+				},
+				"Disabled": {
+					"en-US": "Disabled",
+					"en-GB": "Disabled",
+					"es-ES": "Disabled",
+					"es-419": "Disabled",
+					"zh-CN": "Disabled",
+					"fr": "Disabled",
+					"it": "Disabled",
+					"de": "Disabled",
+					"pl": "Disabled",
+					"ru": "Disabled",
+					"ja": "Disabled"
 				}
 			}
 		},
@@ -744,6 +585,444 @@
 					"pl": "Wystąpił błąd podczas czyszczenia historii wyszukiwania.",
 					"ru": "Произошла ошибка при очистке истории поиска.",
 					"ja": "検索履歴のクリア中にエラーが発生しました。"
+				}
+			}
+		},
+		"Save": {
+			"Success": {
+				"Title": {
+					"en-US": "Queue Saved",
+					"en-GB": "Queue Saved",
+					"es-ES": "Cola Guardada",
+					"es-419": "Cola Guardada",
+					"zh-CN": "队列已保存",
+					"fr": "File Enregistrée",
+					"it": "Coda Salvata",
+					"de": "Warteschlange Gespeichert",
+					"pl": "Kolejka Zapisana",
+					"ru": "Очередь Сохранена",
+					"ja": "キューを保存しました"
+				},
+				"Description": {
+					"en-US": "Saved **%s** with %d %s for later use.",
+					"en-GB": "Saved **%s** with %d %s for later use.",
+					"es-ES": "Se guardó **%s** con %d %s para uso posterior.",
+					"es-419": "Se guardó **%s** con %d %s para uso posterior.",
+					"zh-CN": "已保存 **%s**，包含 %d %s，供以后使用。",
+					"fr": "**%s** enregistrée avec %d %s pour une utilisation ultérieure.",
+					"it": "Salvata **%s** con %d %s per un uso successivo.",
+					"de": "**%s** mit %d %s für die spätere Nutzung gespeichert.",
+					"pl": "Zapisano **%s** z %d %s do późniejszego użycia.",
+					"ru": "Сохранена **%s** с %d %s для последующего использования.",
+					"ja": "**%s** を %d %s で保存しました。"
+				}
+			},
+			"Error": {
+				"EmptyQueue": {
+					"Title": {
+						"en-US": "Nothing to Save",
+						"en-GB": "Nothing to Save",
+						"es-ES": "Nada Que Guardar",
+						"es-419": "Nada Que Guardar",
+						"zh-CN": "没有可保存的内容",
+						"fr": "Rien à Enregistrer",
+						"it": "Niente da Salvare",
+						"de": "Nichts zu Speichern",
+						"pl": "Brak Do Zapisania",
+						"ru": "Нечего Сохранять",
+						"ja": "保存するものがありません"
+					},
+					"Description": {
+						"en-US": "The current Queue is empty. Add Songs before saving.",
+						"en-GB": "The current Queue is empty. Add Songs before saving.",
+						"es-ES": "La cola actual está vacía. Añade canciones antes de guardar.",
+						"es-419": "La cola actual está vacía. Añade canciones antes de guardar.",
+						"zh-CN": "当前队列为空。请先添加歌曲再保存。",
+						"fr": "La file actuelle est vide. Ajoutez des chansons avant d'enregistrer.",
+						"it": "La coda corrente è vuota. Aggiungi canzoni prima di salvare.",
+						"de": "Die aktuelle Warteschlange ist leer. Füge Lieder hinzu, bevor du speicherst.",
+						"pl": "Bieżąca kolejka jest pusta. Dodaj utwory przed zapisaniem.",
+						"ru": "Текущая очередь пуста. Добавьте песни перед сохранением.",
+						"ja": "現在のキューは空です。保存する前に曲を追加してください。"
+					}
+				},
+				"InvalidName": {
+					"Title": {
+						"en-US": "Invalid Name",
+						"en-GB": "Invalid Name",
+						"es-ES": "Nombre No Válido",
+						"es-419": "Nombre No Válido",
+						"zh-CN": "名称无效",
+						"fr": "Nom Invalide",
+						"it": "Nome Non Valido",
+						"de": "Ungültiger Name",
+						"pl": "Nieprawidłowa Nazwa",
+						"ru": "Недопустимое Имя",
+						"ja": "無効な名前"
+					},
+					"Description": {
+						"en-US": "Provide a non-empty name for this saved Queue.",
+						"en-GB": "Provide a non-empty name for this saved Queue.",
+						"es-ES": "Proporciona un nombre no vacío para esta cola guardada.",
+						"es-419": "Proporciona un nombre no vacío para esta cola guardada.",
+						"zh-CN": "请为此已保存队列提供非空名称。",
+						"fr": "Indiquez un nom non vide pour cette file enregistrée.",
+						"it": "Fornisci un nome non vuoto per questa coda salvata.",
+						"de": "Gib einen nicht leeren Namen für diese gespeicherte Warteschlange an.",
+						"pl": "Podaj niepustą nazwę dla tej zapisanej kolejki.",
+						"ru": "Укажите непустое имя для этой сохранённой очереди.",
+						"ja": "この保存キューには空でない名前を指定してください。"
+					}
+				},
+				"NameTooLong": {
+					"Title": {
+						"en-US": "Name Too Long",
+						"en-GB": "Name Too Long",
+						"es-ES": "Nombre Demasiado Largo",
+						"es-419": "Nombre Demasiado Largo",
+						"zh-CN": "名称过长",
+						"fr": "Nom Trop Long",
+						"it": "Nome Troppo Lungo",
+						"de": "Name Zu Lang",
+						"pl": "Nazwa Za Długa",
+						"ru": "Имя Слишком Длинное",
+						"ja": "名前が長すぎます"
+					},
+					"Description": {
+						"en-US": "Saved Queue names must be %d characters or fewer.",
+						"en-GB": "Saved Queue names must be %d characters or fewer.",
+						"es-ES": "Los nombres de cola guardada deben tener %d caracteres o menos.",
+						"es-419": "Los nombres de cola guardada deben tener %d caracteres o menos.",
+						"zh-CN": "已保存队列的名称不得超过 %d 个字符。",
+						"fr": "Les noms de file enregistrée doivent contenir au maximum %d caractères.",
+						"it": "I nomi delle code salvate devono avere al massimo %d caratteri.",
+						"de": "Namen gespeicherter Warteschlangen dürfen höchstens %d Zeichen lang sein.",
+						"pl": "Nazwy zapisanych kolejek mogą mieć maksymalnie %d znaków.",
+						"ru": "Имена сохранённых очередей должны быть не длиннее %d символов.",
+						"ja": "保存キュー名は %d 文字以内にしてください。"
+					}
+				},
+				"LimitReached": {
+					"Title": {
+						"en-US": "Saved Queue Limit Reached",
+						"en-GB": "Saved Queue Limit Reached",
+						"es-ES": "Límite de Colas Guardadas Alcanzado",
+						"es-419": "Límite de Colas Guardadas Alcanzado",
+						"zh-CN": "已达已保存队列上限",
+						"fr": "Limite de Files Enregistrées Atteinte",
+						"it": "Limite Code Salvate Raggiunto",
+						"de": "Limit Gespeicherter Warteschlangen Erreicht",
+						"pl": "Osiągnięto Limit Zapisanych Kolejek",
+						"ru": "Достигнут Лимит Сохранённых Очередей",
+						"ja": "保存キューの上限に達しました"
+					},
+					"Description": {
+						"en-US": "This server can save up to %d Queues. Delete one with /manage before saving a new name.",
+						"en-GB": "This server can save up to %d Queues. Delete one with /manage before saving a new name.",
+						"es-ES": "Este servidor puede guardar hasta %d colas. Elimina una con /manage antes de guardar un nombre nuevo.",
+						"es-419": "Este servidor puede guardar hasta %d colas. Elimina una con /manage antes de guardar un nombre nuevo.",
+						"zh-CN": "此服务器最多可保存 %d 个队列。保存新名称前请用 /manage 删除一个。",
+						"fr": "Ce serveur peut enregistrer jusqu'à %d files. Supprimez-en une avec /manage avant un nouveau nom.",
+						"it": "Questo server può salvare fino a %d code. Eliminane una con /manage prima di un nuovo nome.",
+						"de": "Dieser Server kann bis zu %d Warteschlangen speichern. Lösche eine mit /manage vor einem neuen Namen.",
+						"pl": "Ten serwer może zapisać do %d kolejek. Usuń jedną przez /manage przed nową nazwą.",
+						"ru": "На этом сервере можно сохранить до %d очередей. Удалите одну через /manage перед новым именем.",
+						"ja": "このサーバーは最大 %d 件のキューを保存できます。新しい名前の前に /manage で削除してください。"
+					}
+				},
+				"Persist": {
+					"Title": {
+						"en-US": "Could Not Save Queue",
+						"en-GB": "Could Not Save Queue",
+						"es-ES": "No Se Pudo Guardar la Cola",
+						"es-419": "No Se Pudo Guardar la Cola",
+						"zh-CN": "无法保存队列",
+						"fr": "Impossible d'Enregistrer la File",
+						"it": "Impossibile Salvare la Coda",
+						"de": "Warteschlange Konnte Nicht Gespeichert Werden",
+						"pl": "Nie Udało Się Zapisać Kolejki",
+						"ru": "Не Удалось Сохранить Очередь",
+						"ja": "キューを保存できませんでした"
+					},
+					"Description": {
+						"en-US": "The saved Queue could not be written right now. Please try again later.",
+						"en-GB": "The saved Queue could not be written right now. Please try again later.",
+						"es-ES": "No se pudo guardar la cola en este momento. Inténtalo de nuevo más tarde.",
+						"es-419": "No se pudo guardar la cola en este momento. Inténtalo de nuevo más tarde.",
+						"zh-CN": "目前无法写入已保存的队列。请稍后再试。",
+						"fr": "La file enregistrée n'a pas pu être écrite pour le moment. Réessayez plus tard.",
+						"it": "La coda salvata non può essere scritta ora. Riprova più tardi.",
+						"de": "Die gespeicherte Warteschlange konnte gerade nicht geschrieben werden. Bitte später erneut versuchen.",
+						"pl": "Nie udało się teraz zapisać kolejki. Spróbuj ponownie później.",
+						"ru": "Сейчас не удалось записать сохранённую очередь. Повторите попытку позже.",
+						"ja": "保存キューを書き込めませんでした。しばらくしてからもう一度お試しください。"
+					}
+				}
+			}
+		},
+		"Load": {
+			"Success": {
+				"Title": {
+					"en-US": "Queue Loaded",
+					"en-GB": "Queue Loaded",
+					"es-ES": "Cola Cargada",
+					"es-419": "Cola Cargada",
+					"zh-CN": "队列已加载",
+					"fr": "File Chargée",
+					"it": "Coda Caricata",
+					"de": "Warteschlange Geladen",
+					"pl": "Kolejka Wczytana",
+					"ru": "Очередь Загружена",
+					"ja": "キューを読み込みました"
+				},
+				"Description": {
+					"en-US": "Loaded **%s** (%d %s) and replaced the current Queue.",
+					"en-GB": "Loaded **%s** (%d %s) and replaced the current Queue.",
+					"es-ES": "Se cargó **%s** (%d %s) y se reemplazó la cola actual.",
+					"es-419": "Se cargó **%s** (%d %s) y se reemplazó la cola actual.",
+					"zh-CN": "已加载 **%s**（%d %s）并替换了当前队列。",
+					"fr": "**%s** chargée (%d %s) ; la file actuelle a été remplacée.",
+					"it": "Caricata **%s** (%d %s) e sostituita la coda corrente.",
+					"de": "**%s** (%d %s) geladen und die aktuelle Warteschlange ersetzt.",
+					"pl": "Wczytano **%s** (%d %s) i zastąpiono bieżącą kolejkę.",
+					"ru": "Загружена **%s** (%d %s); текущая очередь заменена.",
+					"ja": "**%s**（%d %s）を読み込み、現在のキューを置き換えました。"
+				}
+			},
+			"Error": {
+				"NotFound": {
+					"Title": {
+						"en-US": "Saved Queue Not Found",
+						"en-GB": "Saved Queue Not Found",
+						"es-ES": "Cola Guardada No Encontrada",
+						"es-419": "Cola Guardada No Encontrada",
+						"zh-CN": "未找到已保存的队列",
+						"fr": "File Enregistrée Introuvable",
+						"it": "Coda Salvata Non Trovata",
+						"de": "Gespeicherte Warteschlange Nicht Gefunden",
+						"pl": "Nie Znaleziono Zapisanej Kolejki",
+						"ru": "Сохранённая Очередь Не Найдена",
+						"ja": "保存キューが見つかりません"
+					},
+					"Description": {
+						"en-US": "No saved Queue matches that name on this server.",
+						"en-GB": "No saved Queue matches that name on this server.",
+						"es-ES": "Ninguna cola guardada coincide con ese nombre en este servidor.",
+						"es-419": "Ninguna cola guardada coincide con ese nombre en este servidor.",
+						"zh-CN": "此服务器上没有与该名称匹配的已保存队列。",
+						"fr": "Aucune file enregistrée ne correspond à ce nom sur ce serveur.",
+						"it": "Nessuna coda salvata corrisponde a quel nome su questo server.",
+						"de": "Keine gespeicherte Warteschlange mit diesem Namen auf diesem Server.",
+						"pl": "Na tym serwerze nie ma zapisanej kolejki o tej nazwie.",
+						"ru": "На этом сервере нет сохранённой очереди с таким именем.",
+						"ja": "このサーバーにその名前の保存キューはありません。"
+					}
+				},
+				"Persist": {
+					"Title": {
+						"en-US": "Could Not Load Queue",
+						"en-GB": "Could Not Load Queue",
+						"es-ES": "No Se Pudo Cargar la Cola",
+						"es-419": "No Se Pudo Cargar la Cola",
+						"zh-CN": "无法加载队列",
+						"fr": "Impossible de Charger la File",
+						"it": "Impossibile Caricare la Coda",
+						"de": "Warteschlange Konnte Nicht Geladen Werden",
+						"pl": "Nie Udało Się Wczytać Kolejki",
+						"ru": "Не Удалось Загрузить Очередь",
+						"ja": "キューを読み込めませんでした"
+					},
+					"Description": {
+						"en-US": "The saved Queue could not be read right now. Please try again later.",
+						"en-GB": "The saved Queue could not be read right now. Please try again later.",
+						"es-ES": "No se pudo leer la cola guardada en este momento. Inténtalo de nuevo más tarde.",
+						"es-419": "No se pudo leer la cola guardada en este momento. Inténtalo de nuevo más tarde.",
+						"zh-CN": "目前无法读取已保存的队列。请稍后再试。",
+						"fr": "La file enregistrée n'a pas pu être lue pour le moment. Réessayez plus tard.",
+						"it": "La coda salvata non può essere letta ora. Riprova più tardi.",
+						"de": "Die gespeicherte Warteschlange konnte gerade nicht gelesen werden. Bitte später erneut versuchen.",
+						"pl": "Nie udało się teraz odczytać zapisanej kolejki. Spróbuj ponownie później.",
+						"ru": "Сейчас не удалось прочитать сохранённую очередь. Повторите попытку позже.",
+						"ja": "保存キューを読み込めませんでした。しばらくしてからもう一度お試しください。"
+					}
+				}
+			}
+		},
+		"Manage": {
+			"Delete": {
+				"Success": {
+					"Title": {
+						"en-US": "Saved Queue Deleted",
+						"en-GB": "Saved Queue Deleted",
+						"es-ES": "Cola Guardada Eliminada",
+						"es-419": "Cola Guardada Eliminada",
+						"zh-CN": "已删除保存的队列",
+						"fr": "File Enregistrée Supprimée",
+						"it": "Coda Salvata Eliminata",
+						"de": "Gespeicherte Warteschlange Gelöscht",
+						"pl": "Zapisana Kolejka Usunięta",
+						"ru": "Сохранённая Очередь Удалена",
+						"ja": "保存キューを削除しました"
+					},
+					"Description": {
+						"en-US": "Deleted the saved Queue **%s**.",
+						"en-GB": "Deleted the saved Queue **%s**.",
+						"es-ES": "Se eliminó la cola guardada **%s**.",
+						"es-419": "Se eliminó la cola guardada **%s**.",
+						"zh-CN": "已删除已保存的队列 **%s**。",
+						"fr": "La file enregistrée **%s** a été supprimée.",
+						"it": "Eliminata la coda salvata **%s**.",
+						"de": "Die gespeicherte Warteschlange **%s** wurde gelöscht.",
+						"pl": "Usunięto zapisaną kolejkę **%s**.",
+						"ru": "Удалена сохранённая очередь **%s**.",
+						"ja": "保存キュー **%s** を削除しました。"
+					}
+				}
+			},
+			"Overwrite": {
+				"Success": {
+					"Title": {
+						"en-US": "Saved Queue Overwritten",
+						"en-GB": "Saved Queue Overwritten",
+						"es-ES": "Cola Guardada Sobrescrita",
+						"es-419": "Cola Guardada Sobrescrita",
+						"zh-CN": "已覆盖保存的队列",
+						"fr": "File Enregistrée Remplacée",
+						"it": "Coda Salvata Sovrascritta",
+						"de": "Gespeicherte Warteschlange Überschrieben",
+						"pl": "Zapisana Kolejka Nadpisana",
+						"ru": "Сохранённая Очередь Перезаписана",
+						"ja": "保存キューを上書きしました"
+					},
+					"Description": {
+						"en-US": "Replaced saved Queue **%s** with the current Queue (%d %s).",
+						"en-GB": "Replaced saved Queue **%s** with the current Queue (%d %s).",
+						"es-ES": "Se reemplazó la cola guardada **%s** con la cola actual (%d %s).",
+						"es-419": "Se reemplazó la cola guardada **%s** con la cola actual (%d %s).",
+						"zh-CN": "已将已保存的队列 **%s** 替换为当前队列（%d %s）。",
+						"fr": "La file enregistrée **%s** a été remplacée par la file actuelle (%d %s).",
+						"it": "Sostituita la coda salvata **%s** con quella corrente (%d %s).",
+						"de": "Gespeicherte Warteschlange **%s** durch die aktuelle ersetzt (%d %s).",
+						"pl": "Zastąpiono zapisaną kolejkę **%s** bieżącą (%d %s).",
+						"ru": "Сохранённая очередь **%s** заменена текущей (%d %s).",
+						"ja": "保存キュー **%s** を現在のキュー（%d %s）で上書きしました。"
+					}
+				},
+				"Error": {
+					"EmptyQueue": {
+						"Title": {
+							"en-US": "Nothing to Overwrite With",
+							"en-GB": "Nothing to Overwrite With",
+							"es-ES": "Nada Con Qué Sobrescribir",
+							"es-419": "Nada Con Qué Sobrescribir",
+							"zh-CN": "没有可用来覆盖的内容",
+							"fr": "Rien pour Remplacer",
+							"it": "Niente da Usare per Sovrascrivere",
+							"de": "Nichts zum Überschreiben",
+							"pl": "Brak Do Nadpisania",
+							"ru": "Нечем Перезаписать",
+							"ja": "上書きする内容がありません"
+						},
+						"Description": {
+							"en-US": "The current Queue is empty. Add Songs before overwriting a saved Queue.",
+							"en-GB": "The current Queue is empty. Add Songs before overwriting a saved Queue.",
+							"es-ES": "La cola actual está vacía. Añade canciones antes de sobrescribir una cola guardada.",
+							"es-419": "La cola actual está vacía. Añade canciones antes de sobrescribir una cola guardada.",
+							"zh-CN": "当前队列为空。请先添加歌曲再覆盖已保存的队列。",
+							"fr": "La file actuelle est vide. Ajoutez des chansons avant de remplacer une file enregistrée.",
+							"it": "La coda corrente è vuota. Aggiungi canzoni prima di sovrascrivere una coda salvata.",
+							"de": "Die aktuelle Warteschlange ist leer. Füge Lieder hinzu, bevor du eine gespeicherte überschreibst.",
+							"pl": "Bieżąca kolejka jest pusta. Dodaj utwory przed nadpisaniem zapisanej kolejki.",
+							"ru": "Текущая очередь пуста. Добавьте песни перед перезаписью сохранённой очереди.",
+							"ja": "現在のキューは空です。保存キューを上書きする前に曲を追加してください。"
+						}
+					}
+				}
+			},
+			"Error": {
+				"NotFound": {
+					"Title": {
+						"en-US": "Saved Queue Not Found",
+						"en-GB": "Saved Queue Not Found",
+						"es-ES": "Cola Guardada No Encontrada",
+						"es-419": "Cola Guardada No Encontrada",
+						"zh-CN": "未找到已保存的队列",
+						"fr": "File Enregistrée Introuvable",
+						"it": "Coda Salvata Non Trovata",
+						"de": "Gespeicherte Warteschlange Nicht Gefunden",
+						"pl": "Nie Znaleziono Zapisanej Kolejki",
+						"ru": "Сохранённая Очередь Не Найдена",
+						"ja": "保存キューが見つかりません"
+					},
+					"Description": {
+						"en-US": "No saved Queue matches that name on this server.",
+						"en-GB": "No saved Queue matches that name on this server.",
+						"es-ES": "Ninguna cola guardada coincide con ese nombre en este servidor.",
+						"es-419": "Ninguna cola guardada coincide con ese nombre en este servidor.",
+						"zh-CN": "此服务器上没有与该名称匹配的已保存队列。",
+						"fr": "Aucune file enregistrée ne correspond à ce nom sur ce serveur.",
+						"it": "Nessuna coda salvata corrisponde a quel nome su questo server.",
+						"de": "Keine gespeicherte Warteschlange mit diesem Namen auf diesem Server.",
+						"pl": "Na tym serwerze nie ma zapisanej kolejki o tej nazwie.",
+						"ru": "На этом сервере нет сохранённой очереди с таким именем.",
+						"ja": "このサーバーにその名前の保存キューはありません。"
+					}
+				},
+				"UnknownAction": {
+					"Title": {
+						"en-US": "Unknown Action",
+						"en-GB": "Unknown Action",
+						"es-ES": "Acción Desconocida",
+						"es-419": "Acción Desconocida",
+						"zh-CN": "未知操作",
+						"fr": "Action Inconnue",
+						"it": "Azione Sconosciuta",
+						"de": "Unbekannte Aktion",
+						"pl": "Nieznana Akcja",
+						"ru": "Неизвестное Действие",
+						"ja": "不明な操作"
+					},
+					"Description": {
+						"en-US": "Choose delete or overwrite for this saved Queue.",
+						"en-GB": "Choose delete or overwrite for this saved Queue.",
+						"es-ES": "Elige eliminar o sobrescribir para esta cola guardada.",
+						"es-419": "Elige eliminar o sobrescribir para esta cola guardada.",
+						"zh-CN": "请为此已保存队列选择删除或覆盖。",
+						"fr": "Choisissez supprimer ou remplacer pour cette file enregistrée.",
+						"it": "Scegli elimina o sovrascrivi per questa coda salvata.",
+						"de": "Wähle löschen oder überschreiben für diese gespeicherte Warteschlange.",
+						"pl": "Wybierz usuń lub nadpisz dla tej zapisanej kolejki.",
+						"ru": "Выберите удалить или перезаписать для этой сохранённой очереди.",
+						"ja": "この保存キューでは削除または上書きを選択してください。"
+					}
+				},
+				"Persist": {
+					"Title": {
+						"en-US": "Could Not Update Saved Queue",
+						"en-GB": "Could Not Update Saved Queue",
+						"es-ES": "No Se Pudo Actualizar la Cola Guardada",
+						"es-419": "No Se Pudo Actualizar la Cola Guardada",
+						"zh-CN": "无法更新已保存的队列",
+						"fr": "Impossible de Mettre à Jour la File Enregistrée",
+						"it": "Impossibile Aggiornare la Coda Salvata",
+						"de": "Gespeicherte Warteschlange Konnte Nicht Aktualisiert Werden",
+						"pl": "Nie Udało Się Zaktualizować Zapisanej Kolejki",
+						"ru": "Не Удалось Обновить Сохранённую Очередь",
+						"ja": "保存キューを更新できませんでした"
+					},
+					"Description": {
+						"en-US": "The saved Queue could not be updated right now. Please try again later.",
+						"en-GB": "The saved Queue could not be updated right now. Please try again later.",
+						"es-ES": "No se pudo actualizar la cola guardada en este momento. Inténtalo de nuevo más tarde.",
+						"es-419": "No se pudo actualizar la cola guardada en este momento. Inténtalo de nuevo más tarde.",
+						"zh-CN": "目前无法更新已保存的队列。请稍后再试。",
+						"fr": "La file enregistrée n'a pas pu être mise à jour pour le moment. Réessayez plus tard.",
+						"it": "La coda salvata non può essere aggiornata ora. Riprova più tardi.",
+						"de": "Die gespeicherte Warteschlange konnte gerade nicht aktualisiert werden. Bitte später erneut versuchen.",
+						"pl": "Nie udało się teraz zaktualizować zapisanej kolejki. Spróbuj ponownie później.",
+						"ru": "Сейчас не удалось обновить сохранённую очередь. Повторите попытку позже.",
+						"ja": "保存キューを更新できませんでした。しばらくしてからもう一度お試しください。"
+					}
 				}
 			}
 		},
@@ -961,34 +1240,7 @@
 				"ru": "Текущая воспроизводимая песня была приостановлена.",
 				"ja": "現在再生中の曲が一時停止されました。"
 			},
-			"Error": {
-				"Title": {
-					"en-US": "No Active Session",
-					"en-GB": "No Active Session",
-					"es-ES": "No Hay Sesión Activa",
-					"es-419": "No Hay Sesión Activa",
-					"zh-CN": "没有活动会话",
-					"fr": "Aucune Session Active",
-					"it": "Nessuna Sessione Attiva",
-					"de": "Keine Aktive Sitzung",
-					"pl": "Brak Aktywnej Sesji",
-					"ru": "Нет Активного Сеанса",
-					"ja": "アクティブなセッションがありません"
-				},
-				"Description": {
-					"en-US": "There is no active playback session to pause.",
-					"en-GB": "There is no active playback session to pause.",
-					"es-ES": "No hay una sesión de reproducción activa para pausar.",
-					"es-419": "No hay una sesión de reproducción activa para pausar.",
-					"zh-CN": "没有要暂停的活动播放会话。",
-					"fr": "Il n'y a pas de session de lecture active à mettre en pause.",
-					"it": "Non c'è alcuna sessione di riproduzione attiva da mettere in pausa.",
-					"de": "Es gibt keine aktive Wiedergabesitzung zum Pausieren.",
-					"pl": "Nie ma aktywnej sesji odtwarzania do wstrzymania.",
-					"ru": "Нет активного сеанса воспроизведения для приостановки.",
-					"ja": "一時停止するアクティブな再生セッションがありません。"
-				}
-			}
+			"Error": {}
 		},
 		"Resume": {
 			"Title": {
@@ -1017,34 +1269,7 @@
 				"ru": "Приостановленная песня была возобновлена.",
 				"ja": "一時停止された曲が再開されました。"
 			},
-			"Error": {
-				"Title": {
-					"en-US": "No Active Session",
-					"en-GB": "No Active Session",
-					"es-ES": "No Hay Sesión Activa",
-					"es-419": "No Hay Sesión Activa",
-					"zh-CN": "没有活动会话",
-					"fr": "Aucune Session Active",
-					"it": "Nessuna Sessione Attiva",
-					"de": "Keine Aktive Sitzung",
-					"pl": "Brak Aktywnej Sesji",
-					"ru": "Нет Активного Сеанса",
-					"ja": "アクティブなセッションがありません"
-				},
-				"Description": {
-					"en-US": "There is no active playback session to resume.",
-					"en-GB": "There is no active playback session to resume.",
-					"es-ES": "No hay una sesión de reproducción activa para reanudar.",
-					"es-419": "No hay una sesión de reproducción activa para reanudar.",
-					"zh-CN": "没有要恢复的活动播放会话。",
-					"fr": "Il n'y a pas de session de lecture active à reprendre.",
-					"it": "Non c'è alcuna sessione di riproduzione attiva da riprendere.",
-					"de": "Es gibt keine aktive Wiedergabesitzung zum Fortsetzen.",
-					"pl": "Nie ma aktywnej sesji odtwarzania do wznowienia.",
-					"ru": "Нет активного сеанса воспроизведения для возобновления.",
-					"ja": "再開するアクティブな再生セッションがありません。"
-				}
-			}
+			"Error": {}
 		},
 		"Next": {
 			"Title": {
@@ -1074,34 +1299,7 @@
 				"ja": "再生中：%s"
 			},
 			"Error": {
-				"NoSession": {
-					"Title": {
-						"en-US": "No Active Session",
-						"en-GB": "No Active Session",
-						"es-ES": "No Hay Sesión Activa",
-						"es-419": "No Hay Sesión Activa",
-						"zh-CN": "没有活动会话",
-						"fr": "Aucune Session Active",
-						"it": "Nessuna Sessione Attiva",
-						"de": "Keine Aktive Sitzung",
-						"pl": "Brak Aktywnej Sesji",
-						"ru": "Нет Активного Сеанса",
-						"ja": "アクティブなセッションがありません"
-					},
-					"Description": {
-						"en-US": "There is no active playback session.",
-						"en-GB": "There is no active playback session.",
-						"es-ES": "No hay una sesión de reproducción activa.",
-						"es-419": "No hay una sesión de reproducción activa.",
-						"zh-CN": "没有活动的播放会话。",
-						"fr": "Il n'y a pas de session de lecture active.",
-						"it": "Non c'è alcuna sessione di riproduzione attiva.",
-						"de": "Es gibt keine aktive Wiedergabesitzung.",
-						"pl": "Nie ma aktywnej sesji odtwarzania.",
-						"ru": "Нет активного сеанса воспроизведения.",
-						"ja": "アクティブな再生セッションがありません。"
-					}
-				},
+				"NoSession": {},
 				"NoNextSong": {
 					"Title": {
 						"en-US": "No Next Song",
@@ -1242,34 +1440,7 @@
 				"ja": "再生中：%s"
 			},
 			"Error": {
-				"NoSession": {
-					"Title": {
-						"en-US": "No Active Session",
-						"en-GB": "No Active Session",
-						"es-ES": "No Hay Sesión Activa",
-						"es-419": "No Hay Sesión Activa",
-						"zh-CN": "没有活动会话",
-						"fr": "Aucune Session Active",
-						"it": "Nessuna Sessione Attiva",
-						"de": "Keine Aktive Sitzung",
-						"pl": "Brak Aktywnej Sesji",
-						"ru": "Нет Активного Сеанса",
-						"ja": "アクティブなセッションがありません"
-					},
-					"Description": {
-						"en-US": "There is no active playback session.",
-						"en-GB": "There is no active playback session.",
-						"es-ES": "No hay una sesión de reproducción activa.",
-						"es-419": "No hay una sesión de reproducción activa.",
-						"zh-CN": "没有活动的播放会话。",
-						"fr": "Il n'y a pas de session de lecture active.",
-						"it": "Non c'è alcuna sessione di riproduzione attiva.",
-						"de": "Es gibt keine aktive Wiedergabesitzung.",
-						"pl": "Nie ma aktywnej sesji odtwarzania.",
-						"ru": "Нет активного сеанса воспроизведения.",
-						"ja": "アクティブな再生セッションがありません。"
-					}
-				},
+				"NoSession": {},
 				"InvalidPosition": {
 					"Title": {
 						"en-US": "Invalid Position",
@@ -1328,34 +1499,7 @@
 				"ja": "履歴から再生中：%s"
 			},
 			"Error": {
-				"NoSession": {
-					"Title": {
-						"en-US": "No Active Session",
-						"en-GB": "No Active Session",
-						"es-ES": "No Hay Sesión Activa",
-						"es-419": "No Hay Sesión Activa",
-						"zh-CN": "没有活动会话",
-						"fr": "Aucune Session Active",
-						"it": "Nessuna Sessione Attiva",
-						"de": "Keine Aktive Sitzung",
-						"pl": "Brak Aktywnej Sesji",
-						"ru": "Нет Активного Сеанса",
-						"ja": "アクティブなセッションがありません"
-					},
-					"Description": {
-						"en-US": "There is no active playback session.",
-						"en-GB": "There is no active playback session.",
-						"es-ES": "No hay una sesión de reproducción activa.",
-						"es-419": "No hay una sesión de reproducción activa.",
-						"zh-CN": "没有活动的播放会话。",
-						"fr": "Il n'y a pas de session de lecture active.",
-						"it": "Non c'è alcuna sessione di riproduzione attiva.",
-						"de": "Es gibt keine aktive Wiedergabesitzung.",
-						"pl": "Nie ma aktywnej sesji odtwarzania.",
-						"ru": "Нет активного сеанса воспроизведения.",
-						"ja": "アクティブな再生セッションがありません。"
-					}
-				},
+				"NoSession": {},
 				"InvalidPosition": {
 					"Title": {
 						"en-US": "Invalid Position",
@@ -2328,19 +2472,6 @@
 				}
 			},
 			"Details": {
-				"Title": {
-					"en-US": "%s",
-					"en-GB": "%s",
-					"es-ES": "%s",
-					"es-419": "%s",
-					"zh-CN": "%s",
-					"fr": "%s",
-					"it": "%s",
-					"de": "%s",
-					"pl": "%s",
-					"ru": "%s",
-					"ja": "%s"
-				},
 				"InvalidGuildID": {
 					"Title": {
 						"en-US": "Invalid Guild ID",
@@ -2697,6 +2828,62 @@
 				"ru": "Громкость воспроизведения теперь установлена на %d%%.",
 				"ja": "再生音量が %d%% に設定されました。"
 			}
+		},
+		"Speed": {
+			"Title": {
+				"en-US": "Speed Updated",
+				"en-GB": "Speed Updated",
+				"es-ES": "Speed Updated",
+				"es-419": "Speed Updated",
+				"zh-CN": "Speed Updated",
+				"fr": "Speed Updated",
+				"it": "Speed Updated",
+				"de": "Speed Updated",
+				"pl": "Speed Updated",
+				"ru": "Speed Updated",
+				"ja": "Speed Updated"
+			},
+			"Description": {
+				"en-US": "Playback speed is now set to %s.",
+				"en-GB": "Playback speed is now set to %s.",
+				"es-ES": "La velocidad de reproducción ahora está en %s.",
+				"es-419": "La velocidad de reproducción ahora está en %s.",
+				"zh-CN": "播放速度现已设置为 %s。",
+				"fr": "La vitesse de lecture est maintenant réglée sur %s.",
+				"it": "La velocità di riproduzione è ora impostata su %s.",
+				"de": "Die Wiedergabegeschwindigkeit ist jetzt auf %s eingestellt.",
+				"pl": "Prędkość odtwarzania została ustawiona na %s.",
+				"ru": "Скорость воспроизведения теперь установлена на %s.",
+				"ja": "再生速度が %s に設定されました。"
+			}
+		},
+		"Reverb": {
+			"Title": {
+				"en-US": "Reverb Updated",
+				"en-GB": "Reverb Updated",
+				"es-ES": "Reverb Updated",
+				"es-419": "Reverb Updated",
+				"zh-CN": "Reverb Updated",
+				"fr": "Reverb Updated",
+				"it": "Reverb Updated",
+				"de": "Reverb Updated",
+				"pl": "Reverb Updated",
+				"ru": "Reverb Updated",
+				"ja": "Reverb Updated"
+			},
+			"Description": {
+				"en-US": "Playback reverb is now set to %d%%.",
+				"en-GB": "Playback reverb is now set to %d%%.",
+				"es-ES": "La reverberación de reproducción ahora está en %d%%.",
+				"es-419": "La reverberación de reproducción ahora está en %d%%.",
+				"zh-CN": "播放混响现已设置为 %d%%。",
+				"fr": "La réverbération de lecture est maintenant réglée sur %d%%.",
+				"it": "Il riverbero di riproduzione è ora impostato su %d%%.",
+				"de": "Der Wiedergabe-Hall ist jetzt auf %d%% eingestellt.",
+				"pl": "Pogłos odtwarzania został ustawiony na %d%%.",
+				"ru": "Реверберация воспроизведения теперь установлена на %d%%.",
+				"ja": "再生リバーブが %d%% に設定されました。"
+			}
 		}
 	},
 	"Buttons": {
@@ -2738,19 +2925,6 @@
 			"pl": "Wznów",
 			"ru": "Возобновить",
 			"ja": "再開"
-		},
-		"Pause": {
-			"en-US": "Pause",
-			"en-GB": "Pause",
-			"es-ES": "Pausar",
-			"es-419": "Pausar",
-			"zh-CN": "暂停",
-			"fr": "Pause",
-			"it": "Pausa",
-			"de": "Pausieren",
-			"pl": "Wstrzymaj",
-			"ru": "Пауза",
-			"ja": "一時停止"
 		},
 		"AutoPlay": {
 			"en-US": "AutoPlay",
@@ -2871,6 +3045,36 @@
 				"pl": "Sukces",
 				"ru": "Успех",
 				"ja": "成功"
+			}
+		},
+		"Errors": {
+			"NoActiveSession": {
+				"Title": {
+					"en-US": "No Active Session",
+					"en-GB": "No Active Session",
+					"es-ES": "No Hay Sesión Activa",
+					"es-419": "No Hay Sesión Activa",
+					"zh-CN": "没有活动会话",
+					"fr": "Aucune Session Active",
+					"it": "Nessuna Sessione Attiva",
+					"de": "Keine Aktive Sitzung",
+					"pl": "Brak Aktywnej Sesji",
+					"ru": "Нет Активного Сеанса",
+					"ja": "アクティブなセッションがありません"
+				},
+				"Description": {
+					"en-US": "Please use `/play` or request a song via Voice first.",
+					"en-GB": "Please use `/play` or request a song via Voice first.",
+					"es-ES": "Usa `/play` o solicita una canción por Voz primero.",
+					"es-419": "Usa `/play` o solicita una canción por Voz primero.",
+					"zh-CN": "请先使用 `/play` 或通过语音请求歌曲。",
+					"fr": "Utilisez `/play` ou demandez une chanson via la Voix d'abord.",
+					"it": "Usa `/play` o richiedi un brano tramite Voce prima.",
+					"de": "Verwende `/play` oder fordere zuerst ein Lied per Sprache an.",
+					"pl": "Użyj `/play` lub najpierw poproś o utwór przez Głos.",
+					"ru": "Используйте `/play` или сначала запросите песню через Голос.",
+					"ja": "まず `/play` を使うか、音声で曲をリクエストしてください。"
+				}
 			}
 		},
 		"Notifications": {
@@ -3055,34 +3259,7 @@
 					"ja": "この曲はストリーミングできません。スキップされます。"
 				}
 			},
-			"AddedToQueue": {
-				"Title": {
-					"en-US": "Added %s To Queue",
-					"en-GB": "Added %s To Queue",
-					"es-ES": "Se Agregó %s A La Cola",
-					"es-419": "Se Agregó %s A La Cola",
-					"zh-CN": "已将 %s 添加到队列",
-					"fr": "%s Ajouté À La File D'attente",
-					"it": "%s Aggiunto Alla Coda",
-					"de": "%s Zur Warteschlange Hinzugefügt",
-					"pl": "Dodano %s Do Kolejki",
-					"ru": "%s Добавлено В Очередь",
-					"ja": "%s をキューに追加しました"
-				},
-				"Description": {
-					"en-US": "Added %d %s to the Queue.",
-					"en-GB": "Added %d %s to the Queue.",
-					"es-ES": "Se agregaron %d %s a la cola.",
-					"es-419": "Se agregaron %d %s a la cola.",
-					"zh-CN": "已将 %d %s添加到队列。",
-					"fr": "%d %s ajoutées à la file d'attente.",
-					"it": "%d %s aggiunte alla coda.",
-					"de": "%d %s zur Warteschlange hinzugefügt.",
-					"pl": "Dodano %d %s do kolejki.",
-					"ru": "%d %s добавлено в очередь.",
-					"ja": "%d %sをキューに追加しました。"
-				}
-			},
+			"AddedToQueue": {},
 			"AddedAdditionalSongs": {
 				"Title": {
 					"en-US": "Added Additional Songs",
@@ -3247,6 +3424,19 @@
 				"ru": "На **%s**",
 				"ja": "アルバム **%s**"
 			},
+			"DescriptionFromDirectURL": {
+				"en-US": "From a **Direct URL**",
+				"en-GB": "From a **Direct URL**",
+				"es-ES": "Desde una **URL directa**",
+				"es-419": "Desde una **URL directa**",
+				"zh-CN": "来自**直接链接**",
+				"fr": "Depuis une **URL directe**",
+				"it": "Da un **URL diretto**",
+				"de": "Von einer **direkten URL**",
+				"pl": "Z **bezpośredniego URL**",
+				"ru": "Из **прямой ссылки**",
+				"ja": "**直接URL**から"
+			},
 			"DescriptionInPlaylist": {
 				"en-US": "Song %d Of %d In **%s**",
 				"en-GB": "Song %d Of %d In **%s**",
@@ -3298,19 +3488,6 @@
 				"pl": "%s Min",
 				"ru": "%s Мин",
 				"ja": "%s 分"
-			},
-			"AddedViaVoice": {
-				"en-US": "Added via Voice",
-				"en-GB": "Added via Voice",
-				"es-ES": "Añadido por voz",
-				"es-419": "Añadido por voz",
-				"zh-CN": "通过语音添加",
-				"fr": "Ajouté par la voix",
-				"it": "Aggiunto tramite voce",
-				"de": "Per Sprache hinzugefügt",
-				"pl": "Dodano głosem",
-				"ru": "Добавлено голосом",
-				"ja": "音声で追加"
 			},
 			"AddedByMemberViaVoice": {
 				"en-US": "Requested by %s via Voice",
@@ -3610,19 +3787,6 @@
 	},
 	"Autocomplete": {
 		"Play": {
-			"InputTooShort": {
-				"en-US": "Input must be at least 3 characters long.",
-				"en-GB": "Input must be at least 3 characters long.",
-				"es-ES": "La entrada debe tener al menos 3 caracteres.",
-				"es-419": "La entrada debe tener al menos 3 caracteres.",
-				"zh-CN": "输入必须至少3个字符。",
-				"fr": "L'entrée doit contenir au moins 3 caractères.",
-				"it": "L'input deve essere di almeno 3 caratteri.",
-				"de": "Eingabe muss mindestens 3 Zeichen lang sein.",
-				"pl": "Dane muszą mieć co najmniej 3 znaki.",
-				"ru": "Введите не менее 3 символов.",
-				"ja": "入力は3文字以上である必要があります。"
-			},
 			"NoSuggestions": {
 				"en-US": "No suggestions found.",
 				"en-GB": "No suggestions found.",
@@ -3825,6 +3989,21 @@
 				"pl": "Brak aktywnych serwerów.",
 				"ru": "Нет активных серверов.",
 				"ja": "アクティブなサーバーがありません。"
+			}
+		},
+		"SavedQueue": {
+			"None": {
+				"en-US": "No saved Queues.",
+				"en-GB": "No saved Queues.",
+				"es-ES": "No hay colas guardadas.",
+				"es-419": "No hay colas guardadas.",
+				"zh-CN": "没有已保存的队列。",
+				"fr": "Aucune file enregistrée.",
+				"it": "Nessuna coda salvata.",
+				"de": "Keine gespeicherten Warteschlangen.",
+				"pl": "Brak zapisanych kolejek.",
+				"ru": "Нет сохранённых очередей.",
+				"ja": "保存されたキューはありません。"
 			}
 		},
 		"Delete": {
@@ -4189,133 +4368,6 @@
 			}
 		}
 	},
-	"Artist": {
-		"InvalidID": {
-			"Title": {
-				"en-US": "Invalid Artist ID",
-				"en-GB": "Invalid Artist ID",
-				"es-ES": "ID de Artista Inválido",
-				"es-419": "ID de Artista Inválido",
-				"zh-CN": "无效的艺术家 ID",
-				"fr": "ID d'Artiste Invalide",
-				"it": "ID Artista Non Valido",
-				"de": "Ungültige Künstler-ID",
-				"pl": "Nieprawidłowy ID Artysty",
-				"ru": "Недействительный ID Исполнителя",
-				"ja": "無効なアーティストID"
-			},
-			"Description": {
-				"en-US": "The artist ID provided is invalid.",
-				"en-GB": "The artist ID provided is invalid.",
-				"es-ES": "El ID del artista proporcionado no es válido.",
-				"es-419": "El ID del artista proporcionado no es válido.",
-				"zh-CN": "提供的艺术家 ID 无效。",
-				"fr": "L'ID d'artiste fourni n'est pas valide.",
-				"it": "L'ID artista fornito non è valido.",
-				"de": "Die angegebene Künstler-ID ist ungültig.",
-				"pl": "Podany ID artysty jest nieprawidłowy.",
-				"ru": "Предоставленный ID исполнителя недействителен.",
-				"ja": "提供されたアーティストIDは無効です。"
-			}
-		},
-		"FetchError": {
-			"Title": {
-				"en-US": "Artist Fetch Failed",
-				"en-GB": "Artist Fetch Failed",
-				"es-ES": "Error al Obtener el Artista",
-				"es-419": "Error al Obtener el Artista",
-				"zh-CN": "获取艺术家失败",
-				"fr": "Échec de la Récupération de l'Artiste",
-				"it": "Recupero Artista Fallito",
-				"de": "Künstler-Abruf Fehlgeschlagen",
-				"pl": "Nie Udało Się Pobrać Artysty",
-				"ru": "Не Удалось Получить Исполнителя",
-				"ja": "アーティストの取得に失敗しました"
-			},
-			"Description": {
-				"en-US": "Unable to fetch artist songs. Please try again later.",
-				"en-GB": "Unable to fetch artist songs. Please try again later.",
-				"es-ES": "No se pudieron obtener las canciones del artista. Inténtalo de nuevo más tarde.",
-				"es-419": "No se pudieron obtener las canciones del artista. Inténtalo de nuevo más tarde.",
-				"zh-CN": "无法获取艺术家歌曲。请稍后再试。",
-				"fr": "Impossible de récupérer les chansons de l'artiste. Veuillez réessayer plus tard.",
-				"it": "Impossibile recuperare le canzoni dell'artista. Riprova più tardi.",
-				"de": "Künstler-Songs konnten nicht abgerufen werden. Bitte versuchen Sie es später erneut.",
-				"pl": "Nie można pobrać utworów artysty. Spróbuj ponownie później.",
-				"ru": "Не удалось получить песни исполнителя. Попробуйте позже.",
-				"ja": "アーティストの曲を取得できませんでした。後でもう一度お試しください。"
-			}
-		},
-		"Enqueued": {
-			"Title": {
-				"en-US": "Artist Enqueued",
-				"en-GB": "Artist Enqueued",
-				"es-ES": "Artista Añadido a la Cola",
-				"es-419": "Artista Añadido a la Cola",
-				"zh-CN": "艺术家已加入队列",
-				"fr": "Artiste Ajouté à la File",
-				"it": "Artista Accodato",
-				"de": "Künstler Eingereiht",
-				"pl": "Artysta Dodany do Kolejki",
-				"ru": "Исполнитель Добавлен в Очередь",
-				"ja": "アーティストがキューに追加されました"
-			},
-			"Description": {
-				"en-US": "Added %d songs to the queue.",
-				"en-GB": "Added %d songs to the queue.",
-				"es-ES": "Se añadieron %d canciones a la cola.",
-				"es-419": "Se añadieron %d canciones a la cola.",
-				"zh-CN": "已将 %d 首歌曲添加到队列。",
-				"fr": "%d chansons ajoutées à la file d'attente.",
-				"it": "Aggiunte %d canzoni alla coda.",
-				"de": "%d Lieder zur Warteschlange hinzugefügt.",
-				"pl": "Dodano %d utworów do kolejki.",
-				"ru": "Добавлено %d песен в очередь.",
-				"ja": "キューに %d 曲追加しました。"
-			},
-			"DescriptionAfterCurrent": {
-				"en-US": "Added %d songs after %s.",
-				"en-GB": "Added %d songs after %s.",
-				"es-ES": "Se añadieron %d canciones después de %s.",
-				"es-419": "Se añadieron %d canciones después de %s.",
-				"zh-CN": "已在 %s 之后添加 %d 首歌曲。",
-				"fr": "%d chansons ajoutées après %s.",
-				"it": "%d canzoni aggiunte dopo %s.",
-				"de": "%d Lieder nach %s hinzugefügt.",
-				"pl": "Dodano %d utworów po %s.",
-				"ru": "Добавлено %d песен после %s.",
-				"ja": "%s の後に %d 曲を追加しました。"
-			}
-		},
-		"Playing": {
-			"Title": {
-				"en-US": "Playing Artist",
-				"en-GB": "Playing Artist",
-				"es-ES": "Reproduciendo Artista",
-				"es-419": "Reproduciendo Artista",
-				"zh-CN": "正在播放艺术家",
-				"fr": "Lecture de l'Artiste",
-				"it": "Riproduzione Artista",
-				"de": "Künstler Wird Abgespielt",
-				"pl": "Odtwarzanie Artysty",
-				"ru": "Воспроизведение Исполнителя",
-				"ja": "アーティスト再生中"
-			},
-			"Description": {
-				"en-US": "Now playing %d songs from this artist.",
-				"en-GB": "Now playing %d songs from this artist.",
-				"es-ES": "Ahora reproduciendo %d canciones de este artista.",
-				"es-419": "Ahora reproduciendo %d canciones de este artista.",
-				"zh-CN": "正在播放此艺术家的 %d 首歌曲。",
-				"fr": "Lecture de %d chansons de cet artiste.",
-				"it": "In riproduzione %d canzoni da questo artista.",
-				"de": "%d Lieder von diesem Künstler werden abgespielt.",
-				"pl": "Odtwarzanie %d utworów tego artysty.",
-				"ru": "Воспроизводится %d песен от этого исполнителя.",
-				"ja": "このアーティストから %d 曲を再生中。"
-			}
-		}
-	},
 	"Common": {
 		"Song": {
 			"en-US": "Song",
@@ -4459,6 +4511,11 @@
 			"pl": "3 godziny",
 			"ru": "3 часа",
 			"ja": "3時間"
+		}
+	},
+	"About": {
+		"Guides": {
+			"Voice": {}
 		}
 	}
 }

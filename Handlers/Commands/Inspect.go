@@ -404,8 +404,8 @@ func ShowGuildDetails(Event *events.ApplicationCommandInteractionCreate, Locale 
 
 	if Guild.Queue.PlaybackSession != nil && Guild.Queue.PlaybackSession.Streamer != nil {
 
-		BufferSize := len(Guild.Queue.PlaybackSession.Streamer.OpusFrameChan)
-		BufferCapacity := cap(Guild.Queue.PlaybackSession.Streamer.OpusFrameChan)
+		BufferSize := len(Guild.Queue.PlaybackSession.Streamer.PCMFrameChan)
+		BufferCapacity := cap(Guild.Queue.PlaybackSession.Streamer.PCMFrameChan)
 
 		BufferValue := fmt.Sprintf("%d / %d", BufferSize, BufferCapacity)
 

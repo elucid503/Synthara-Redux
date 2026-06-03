@@ -1027,6 +1027,277 @@
 		]
 	},
 	{
+		"name": "save",
+		"name_localizations": {
+			"en-US": "save",
+			"en-GB": "save",
+			"es-ES": "guardar",
+			"es-419": "guardar",
+			"zh-CN": "保存",
+			"fr": "enregistrer",
+			"it": "salva",
+			"de": "speichern",
+			"pl": "zapisz",
+			"ru": "сохранить",
+			"ja": "保存"
+		},
+		"description": "Use this command to save the current Queue under a name for later use.",
+		"description_localizations": {
+			"en-US": "Use this command to save the current Queue under a name for later use.",
+			"en-GB": "Use this command to save the current Queue under a name for later use.",
+			"es-ES": "Usa este comando para guardar la cola actual con un nombre.",
+			"es-419": "Usa este comando para guardar la cola actual con un nombre.",
+			"zh-CN": "使用此命令将当前队列保存为名称，供以后使用。",
+			"fr": "Utilisez cette commande pour enregistrer la file actuelle sous un nom.",
+			"it": "Usa questo comando per salvare la coda corrente con un nome.",
+			"de": "Verwende diesen Befehl, um die aktuelle Warteschlange unter einem Namen zu speichern.",
+			"pl": "Użyj tej komendy, aby zapisać bieżącą kolejkę pod nazwą.",
+			"ru": "Используйте эту команду, чтобы сохранить текущую очередь под именем.",
+			"ja": "このコマンドを使用して、現在のキューを名前で保存します。"
+		},
+		"options": [
+			{
+				"type": 3,
+				"name": "name",
+				"name_localizations": {
+					"en-US": "name",
+					"en-GB": "name",
+					"es-ES": "nombre",
+					"es-419": "nombre",
+					"zh-CN": "名称",
+					"fr": "nom",
+					"it": "nome",
+					"de": "name",
+					"pl": "nazwa",
+					"ru": "имя",
+					"ja": "名前"
+				},
+				"description": "Use this option to specify the name for this saved Queue.",
+				"description_localizations": {
+					"en-US": "Use this option to specify the name for this saved Queue.",
+					"en-GB": "Use this option to specify the name for this saved Queue.",
+					"es-ES": "Usa esta opción para especificar el nombre de la cola guardada.",
+					"es-419": "Usa esta opción para especificar el nombre de la cola guardada.",
+					"zh-CN": "使用此选项指定此已保存队列的名称。",
+					"fr": "Utilisez cette option pour spécifier le nom de cette file enregistrée.",
+					"it": "Usa questa opzione per specificare il nome di questa coda salvata.",
+					"de": "Verwende diese Option, um den Namen dieser gespeicherten Warteschlange anzugeben.",
+					"pl": "Użyj tej opcji, aby określić nazwę tej zapisanej kolejki.",
+					"ru": "Используйте эту опцию, чтобы указать имя этой сохранённой очереди.",
+					"ja": "このオプションを使用して、保存するキューの名前を指定します。"
+				},
+				"required": true
+			}
+		],
+		"contexts": [
+			0
+		]
+	},
+	{
+		"name": "load",
+		"name_localizations": {
+			"en-US": "load",
+			"en-GB": "load",
+			"es-ES": "cargar",
+			"es-419": "cargar",
+			"zh-CN": "加载",
+			"fr": "charger",
+			"it": "carica",
+			"de": "laden",
+			"pl": "wczytaj",
+			"ru": "загрузить",
+			"ja": "読み込み"
+		},
+		"description": "Use this command to load a saved Queue, replacing the current Queue.",
+		"description_localizations": {
+			"en-US": "Use this command to load a saved Queue, replacing the current Queue.",
+			"en-GB": "Use this command to load a saved Queue, replacing the current Queue.",
+			"es-ES": "Usa este comando para cargar una cola guardada, reemplazando la cola actual.",
+			"es-419": "Usa este comando para cargar una cola guardada, reemplazando la cola actual.",
+			"zh-CN": "使用此命令加载已保存的队列，替换当前队列。",
+			"fr": "Utilisez cette commande pour charger une file enregistrée, en remplaçant la file actuelle.",
+			"it": "Usa questo comando per caricare una coda salvata, sostituendo la coda corrente.",
+			"de": "Verwende diesen Befehl, um den Wiederholungsmodus für die Wiedergabe festzulegen.",
+			"pl": "Użyj tej komendy, aby wczytać zapisaną kolejkę, zastępując bieżącą kolejkę.",
+			"ru": "Используйте эту команду, чтобы загрузить сохранённую очередь, заменив текущую очередь.",
+			"ja": "このコマンドを使用して、保存されたキューを読み込み、現在のキューを置き換えます。"
+		},
+		"options": [
+			{
+				"type": 3,
+				"name": "name",
+				"name_localizations": {
+					"en-US": "name",
+					"en-GB": "name",
+					"es-ES": "nombre",
+					"es-419": "nombre",
+					"zh-CN": "名称",
+					"fr": "nom",
+					"it": "nome",
+					"de": "name",
+					"pl": "nazwa",
+					"ru": "имя",
+					"ja": "名前"
+				},
+				"description": "Use this option to choose which saved Queue to load.",
+				"description_localizations": {
+					"en-US": "Use this option to choose which saved Queue to load.",
+					"en-GB": "Use this option to choose which saved Queue to load.",
+					"es-ES": "Usa esta opción para elegir qué cola guardada cargar.",
+					"es-419": "Usa esta opción para elegir qué cola guardada cargar.",
+					"zh-CN": "使用此选项选择要加载的已保存队列。",
+					"fr": "Utilisez cette option pour choisir quelle file enregistrée charger.",
+					"it": "Usa questa opzione per scegliere quale coda salvata caricare.",
+					"de": "Verwende diese Option, um auszuwählen, welche gespeicherte Warteschlange geladen wird.",
+					"pl": "Użyj tej opcji, aby wybrać zapisaną kolejkę do wczytania.",
+					"ru": "Используйте эту опцию, чтобы выбрать, какую сохранённую очередь загрузить.",
+					"ja": "このオプションを使用して、読み込む保存済みキューを選択します。"
+				},
+				"required": true,
+				"autocomplete": true
+			}
+		],
+		"contexts": [
+			0
+		]
+	},
+	{
+		"name": "manage",
+		"name_localizations": {
+			"en-US": "manage",
+			"en-GB": "manage",
+			"es-ES": "gestionar",
+			"es-419": "gestionar",
+			"zh-CN": "管理",
+			"fr": "gérer",
+			"it": "gestisci",
+			"de": "verwalten",
+			"pl": "zarządzaj",
+			"ru": "управлять",
+			"ja": "管理"
+		},
+		"description": "Use this command to delete or overwrite a saved Queue.",
+		"description_localizations": {
+			"en-US": "Use this command to delete or overwrite a saved Queue.",
+			"en-GB": "Use this command to delete or overwrite a saved Queue.",
+			"es-ES": "Usa este comando para eliminar o sobrescribir una cola guardada.",
+			"es-419": "Usa este comando para eliminar o sobrescribir una cola guardada.",
+			"zh-CN": "使用此命令删除或覆盖已保存的队列。",
+			"fr": "Utilisez cette commande pour supprimer ou remplacer une file enregistrée.",
+			"it": "Usa questo comando per eliminare o sovrascrivere una coda salvata.",
+			"de": "Verwende diesen Befehl, um eine gespeicherte Warteschlange zu löschen oder zu überschreiben.",
+			"pl": "Użyj tej komendy, aby usunąć lub nadpisać zapisaną kolejkę.",
+			"ru": "Используйте эту команду, чтобы удалить или перезаписать сохранённую очередь.",
+			"ja": "このコマンドを使用して、保存したキューを削除または上書きします。"
+		},
+		"options": [
+			{
+				"type": 3,
+				"name": "name",
+				"name_localizations": {
+					"en-US": "name",
+					"en-GB": "name",
+					"es-ES": "nombre",
+					"es-419": "nombre",
+					"zh-CN": "名称",
+					"fr": "nom",
+					"it": "nome",
+					"de": "name",
+					"pl": "nazwa",
+					"ru": "имя",
+					"ja": "名前"
+				},
+				"description": "Use this option to choose which saved Queue to manage.",
+				"description_localizations": {
+					"en-US": "Use this option to choose which saved Queue to manage.",
+					"en-GB": "Use this option to choose which saved Queue to manage.",
+					"es-ES": "Usa esta opción para elegir qué cola guardada gestionar.",
+					"es-419": "Usa esta opción para elegir qué cola guardada gestionar.",
+					"zh-CN": "使用此选项选择要管理的已保存队列。",
+					"fr": "Utilisez cette option pour choisir quelle file enregistrée gérer.",
+					"it": "Usa questa opzione per scegliere quale coda salvata gestire.",
+					"de": "Verwende diese Option, um auszuwählen, welche gespeicherte Warteschlange verwaltet wird.",
+					"pl": "Użyj tej opcji, aby wybrać zapisaną kolejkę do zarządzania.",
+					"ru": "Используйте эту опцию, чтобы выбрать, какой сохранённой очередью управлять.",
+					"ja": "このオプションを使用して、管理する保存済みキューを選択します。"
+				},
+				"required": true,
+				"autocomplete": true
+			},
+			{
+				"type": 3,
+				"name": "action",
+				"name_localizations": {
+					"en-US": "action",
+					"en-GB": "action",
+					"es-ES": "acción",
+					"es-419": "acción",
+					"zh-CN": "操作",
+					"fr": "action",
+					"it": "azione",
+					"de": "aktion",
+					"pl": "akcja",
+					"ru": "действие",
+					"ja": "操作"
+				},
+				"description": "Use this option to delete the saved Queue or overwrite it with the current Queue.",
+				"description_localizations": {
+					"en-US": "Use this option to delete the saved Queue or overwrite it with the current Queue.",
+					"en-GB": "Use this option to delete the saved Queue or overwrite it with the current Queue.",
+					"es-ES": "Usa esta opción para eliminar la cola guardada o sobrescribirla con la actual.",
+					"es-419": "Usa esta opción para eliminar la cola guardada o sobrescribirla con la actual.",
+					"zh-CN": "使用此选项删除已保存的队列，或用当前队列覆盖它。",
+					"fr": "Utilisez cette option pour supprimer la file enregistrée ou la remplacer par la file actuelle.",
+					"it": "Usa questa opzione per eliminare la coda salvata o sovrascriverla con quella corrente.",
+					"de": "Lösche die gespeicherte Warteschlange oder überschreibe sie mit der aktuellen.",
+					"pl": "Użyj tej opcji, aby usunąć zapisaną kolejkę lub nadpisać ją bieżącą.",
+					"ru": "Используйте эту опцию, чтобы удалить сохранённую очередь или перезаписать её текущей.",
+					"ja": "このオプションを使用して、保存したキューを削除するか、現在のキューで上書きします。"
+				},
+				"required": true,
+				"choices": [
+					{
+						"name": "Delete",
+						"name_localizations": {
+							"en-US": "Delete",
+							"en-GB": "Delete",
+							"es-ES": "Eliminar",
+							"es-419": "Eliminar",
+							"zh-CN": "删除",
+							"fr": "Supprimer",
+							"it": "Elimina",
+							"de": "Löschen",
+							"pl": "Usuń",
+							"ru": "Удалить",
+							"ja": "削除"
+						},
+						"value": "delete"
+					},
+					{
+						"name": "Overwrite",
+						"name_localizations": {
+							"en-US": "Overwrite",
+							"en-GB": "Overwrite",
+							"es-ES": "Sobrescribir",
+							"es-419": "Sobrescribir",
+							"zh-CN": "覆盖",
+							"fr": "Remplacer",
+							"it": "Sovrascrivi",
+							"de": "Überschreiben",
+							"pl": "Nadpisz",
+							"ru": "Перезаписать",
+							"ja": "上書き"
+						},
+						"value": "overwrite"
+					}
+				]
+			}
+		],
+		"contexts": [
+			0
+		]
+	},
+	{
 		"name": "forget",
 		"name_localizations": {
 			"en-US": "forget",
@@ -1305,6 +1576,365 @@
 							"ja": "150%"
 						},
 						"value": 150
+					}
+				]
+			}
+		],
+		"contexts": [
+			0
+		]
+	},
+	{
+		"name": "speed",
+		"name_localizations": {
+			"en-US": "speed",
+			"en-GB": "speed",
+			"es-ES": "speed",
+			"es-419": "speed",
+			"zh-CN": "speed",
+			"fr": "speed",
+			"it": "speed",
+			"de": "speed",
+			"pl": "speed",
+			"ru": "speed",
+			"ja": "speed"
+		},
+		"description": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+		"description_localizations": {
+			"en-US": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+			"en-GB": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+			"es-ES": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+			"es-419": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+			"zh-CN": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+			"fr": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+			"it": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+			"de": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+			"pl": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+			"ru": "Use this command to change playback speed. Pitch shifts naturally with speed.",
+			"ja": "Use this command to change playback speed. Pitch shifts naturally with speed."
+		},
+		"options": [
+			{
+				"type": 4,
+				"name": "value",
+				"name_localizations": {
+					"en-US": "value",
+					"en-GB": "value",
+					"es-ES": "value",
+					"es-419": "value",
+					"zh-CN": "value",
+					"fr": "value",
+					"it": "value",
+					"de": "value",
+					"pl": "value",
+					"ru": "value",
+					"ja": "value"
+				},
+				"description": "Use this option to select the playback speed multiplier.",
+				"description_localizations": {
+					"en-US": "Use this option to select the playback speed multiplier.",
+					"en-GB": "Use this option to select the playback speed multiplier.",
+					"es-ES": "Use this option to select the playback speed multiplier.",
+					"es-419": "Use this option to select the playback speed multiplier.",
+					"zh-CN": "Use this option to select the playback speed multiplier.",
+					"fr": "Use this option to select the playback speed multiplier.",
+					"it": "Use this option to select the playback speed multiplier.",
+					"de": "Use this option to select the playback speed multiplier.",
+					"pl": "Use this option to select the playback speed multiplier.",
+					"ru": "Use this option to select the playback speed multiplier.",
+					"ja": "Use this option to select the playback speed multiplier."
+				},
+				"required": true,
+				"choices": [
+					{
+						"name": "0.85x",
+						"name_localizations": {
+							"en-US": "0.85x",
+							"en-GB": "0.85x",
+							"es-ES": "0.85x",
+							"es-419": "0.85x",
+							"zh-CN": "0.85x",
+							"fr": "0.85x",
+							"it": "0.85x",
+							"de": "0.85x",
+							"pl": "0.85x",
+							"ru": "0.85x",
+							"ja": "0.85x"
+						},
+						"value": 850
+					},
+					{
+						"name": "0.90x",
+						"name_localizations": {
+							"en-US": "0.90x",
+							"en-GB": "0.90x",
+							"es-ES": "0.90x",
+							"es-419": "0.90x",
+							"zh-CN": "0.90x",
+							"fr": "0.90x",
+							"it": "0.90x",
+							"de": "0.90x",
+							"pl": "0.90x",
+							"ru": "0.90x",
+							"ja": "0.90x"
+						},
+						"value": 900
+					},
+					{
+						"name": "0.95x",
+						"name_localizations": {
+							"en-US": "0.95x",
+							"en-GB": "0.95x",
+							"es-ES": "0.95x",
+							"es-419": "0.95x",
+							"zh-CN": "0.95x",
+							"fr": "0.95x",
+							"it": "0.95x",
+							"de": "0.95x",
+							"pl": "0.95x",
+							"ru": "0.95x",
+							"ja": "0.95x"
+						},
+						"value": 950
+					},
+					{
+						"name": "1.00x",
+						"name_localizations": {
+							"en-US": "1.00x",
+							"en-GB": "1.00x",
+							"es-ES": "1.00x",
+							"es-419": "1.00x",
+							"zh-CN": "1.00x",
+							"fr": "1.00x",
+							"it": "1.00x",
+							"de": "1.00x",
+							"pl": "1.00x",
+							"ru": "1.00x",
+							"ja": "1.00x"
+						},
+						"value": 1000
+					},
+					{
+						"name": "1.05x",
+						"name_localizations": {
+							"en-US": "1.05x",
+							"en-GB": "1.05x",
+							"es-ES": "1.05x",
+							"es-419": "1.05x",
+							"zh-CN": "1.05x",
+							"fr": "1.05x",
+							"it": "1.05x",
+							"de": "1.05x",
+							"pl": "1.05x",
+							"ru": "1.05x",
+							"ja": "1.05x"
+						},
+						"value": 1050
+					},
+					{
+						"name": "1.10x",
+						"name_localizations": {
+							"en-US": "1.10x",
+							"en-GB": "1.10x",
+							"es-ES": "1.10x",
+							"es-419": "1.10x",
+							"zh-CN": "1.10x",
+							"fr": "1.10x",
+							"it": "1.10x",
+							"de": "1.10x",
+							"pl": "1.10x",
+							"ru": "1.10x",
+							"ja": "1.10x"
+						},
+						"value": 1100
+					},
+					{
+						"name": "1.15x",
+						"name_localizations": {
+							"en-US": "1.15x",
+							"en-GB": "1.15x",
+							"es-ES": "1.15x",
+							"es-419": "1.15x",
+							"zh-CN": "1.15x",
+							"fr": "1.15x",
+							"it": "1.15x",
+							"de": "1.15x",
+							"pl": "1.15x",
+							"ru": "1.15x",
+							"ja": "1.15x"
+						},
+						"value": 1150
+					}
+				]
+			}
+		],
+		"contexts": [
+			0
+		]
+	},
+	{
+		"name": "reverb",
+		"name_localizations": {
+			"en-US": "reverb",
+			"en-GB": "reverb",
+			"es-ES": "reverb",
+			"es-419": "reverb",
+			"zh-CN": "reverb",
+			"fr": "reverb",
+			"it": "reverb",
+			"de": "reverb",
+			"pl": "reverb",
+			"ru": "reverb",
+			"ja": "reverb"
+		},
+		"description": "Use this command to change playback reverb amount.",
+		"description_localizations": {
+			"en-US": "Use this command to change playback reverb amount.",
+			"en-GB": "Use this command to change playback reverb amount.",
+			"es-ES": "Use this command to change playback reverb amount.",
+			"es-419": "Use this command to change playback reverb amount.",
+			"zh-CN": "Use this command to change playback reverb amount.",
+			"fr": "Use this command to change playback reverb amount.",
+			"it": "Use this command to change playback reverb amount.",
+			"de": "Use this command to change playback reverb amount.",
+			"pl": "Use this command to change playback reverb amount.",
+			"ru": "Use this command to change playback reverb amount.",
+			"ja": "Use this command to change playback reverb amount."
+		},
+		"options": [
+			{
+				"type": 4,
+				"name": "value",
+				"name_localizations": {
+					"en-US": "value",
+					"en-GB": "value",
+					"es-ES": "value",
+					"es-419": "value",
+					"zh-CN": "value",
+					"fr": "value",
+					"it": "value",
+					"de": "value",
+					"pl": "value",
+					"ru": "value",
+					"ja": "value"
+				},
+				"description": "Use this option to select the reverb percentage.",
+				"description_localizations": {
+					"en-US": "Use this option to select the reverb percentage.",
+					"en-GB": "Use this option to select the reverb percentage.",
+					"es-ES": "Use this option to select the reverb percentage.",
+					"es-419": "Use this option to select the reverb percentage.",
+					"zh-CN": "Use this option to select the reverb percentage.",
+					"fr": "Use this option to select the reverb percentage.",
+					"it": "Use this option to select the reverb percentage.",
+					"de": "Use this option to select the reverb percentage.",
+					"pl": "Use this option to select the reverb percentage.",
+					"ru": "Use this option to select the reverb percentage.",
+					"ja": "Use this option to select the reverb percentage."
+				},
+				"required": true,
+				"choices": [
+					{
+						"name": "0%",
+						"name_localizations": {
+							"en-US": "0%",
+							"en-GB": "0%",
+							"es-ES": "0%",
+							"es-419": "0%",
+							"zh-CN": "0%",
+							"fr": "0%",
+							"it": "0%",
+							"de": "0%",
+							"pl": "0%",
+							"ru": "0%",
+							"ja": "0%"
+						},
+						"value": 0
+					},
+					{
+						"name": "15%",
+						"name_localizations": {
+							"en-US": "15%",
+							"en-GB": "15%",
+							"es-ES": "15%",
+							"es-419": "15%",
+							"zh-CN": "15%",
+							"fr": "15%",
+							"it": "15%",
+							"de": "15%",
+							"pl": "15%",
+							"ru": "15%",
+							"ja": "15%"
+						},
+						"value": 15
+					},
+					{
+						"name": "30%",
+						"name_localizations": {
+							"en-US": "30%",
+							"en-GB": "30%",
+							"es-ES": "30%",
+							"es-419": "30%",
+							"zh-CN": "30%",
+							"fr": "30%",
+							"it": "30%",
+							"de": "30%",
+							"pl": "30%",
+							"ru": "30%",
+							"ja": "30%"
+						},
+						"value": 30
+					},
+					{
+						"name": "45%",
+						"name_localizations": {
+							"en-US": "45%",
+							"en-GB": "45%",
+							"es-ES": "45%",
+							"es-419": "45%",
+							"zh-CN": "45%",
+							"fr": "45%",
+							"it": "45%",
+							"de": "45%",
+							"pl": "45%",
+							"ru": "45%",
+							"ja": "45%"
+						},
+						"value": 45
+					},
+					{
+						"name": "60%",
+						"name_localizations": {
+							"en-US": "60%",
+							"en-GB": "60%",
+							"es-ES": "60%",
+							"es-419": "60%",
+							"zh-CN": "60%",
+							"fr": "60%",
+							"it": "60%",
+							"de": "60%",
+							"pl": "60%",
+							"ru": "60%",
+							"ja": "60%"
+						},
+						"value": 60
+					},
+					{
+						"name": "75%",
+						"name_localizations": {
+							"en-US": "75%",
+							"en-GB": "75%",
+							"es-ES": "75%",
+							"es-419": "75%",
+							"zh-CN": "75%",
+							"fr": "75%",
+							"it": "75%",
+							"de": "75%",
+							"pl": "75%",
+							"ru": "75%",
+							"ja": "75%"
+						},
+						"value": 75
 					}
 				]
 			}
