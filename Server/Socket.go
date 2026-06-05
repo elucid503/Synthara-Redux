@@ -7,7 +7,6 @@ import (
 	"Synthara-Redux/Utils"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
@@ -17,7 +16,6 @@ import (
 
 type WebIdentifier struct {
 	Name string
-	Icon string
 }
 
 const (
@@ -110,6 +108,11 @@ func HandleWSConnections(Context *gin.Context) {
 
 			"State":    Guild.Queue.State,
 			"Progress": Progress,
+
+			"OAuthEnabled":   OAuthEnabled(),
+			"Authenticated":  WebAuthenticated(Context.Request),
+			"ControlsLocked": WebControlsLocked(Guild.Features.Locked, Context.Request),
+			"GuildLocked":    Guild.Features.Locked,
 		},
 	}
 
@@ -129,7 +132,7 @@ func HandleWSConnections(Context *gin.Context) {
 
 		}
 
-		HandleWSMessage(Guild, Message)
+		HandleWSMessage(Guild, Context.Request, Message)
 
 	}
 
@@ -141,7 +144,7 @@ func HandleWSConnections(Context *gin.Context) {
 
 }
 
-func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
+func HandleWSMessage(Guild *Structs.Guild, Request *http.Request, Message map[string]interface{}) {
 
 	Operation, Ok := Message["Operation"].(string)
 
@@ -149,14 +152,13 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 		return
 	}
 
-	Identifier := ParseWebIdentifier(Message)
+	Identifier := WebIdentifier{Name: WebUserForControls(Request)}
 
-	// Check if guild is locked
-	if Guild.Features.Locked {
+	if WebControlsLocked(Guild.Features.Locked, Request) {
 
 		Guild.Queue.SendToWebsockets("ERROR", map[string]interface{}{
 
-			"Message": "Web controls are locked. Use /unlock to re-enable.",
+			"Message": WebControlsLockMessage(Guild.Features.Locked, Request),
 		})
 
 		return
@@ -300,47 +302,6 @@ func HandleWSMessage(Guild *Structs.Guild, Message map[string]interface{}) {
 		}
 
 	}
-
-}
-
-func ParseWebIdentifier(Message map[string]interface{}) WebIdentifier {
-
-	Identifier := WebIdentifier{Name: "Web User"}
-	RawIdentifier, Ok := Message["Identifier"].(map[string]interface{})
-
-	if !Ok {
-
-		return Identifier
-
-	}
-
-	if Name, Ok := RawIdentifier["Name"].(string); Ok {
-
-		Name = strings.TrimSpace(Name)
-
-		if Name != "" {
-
-			Runes := []rune(Name)
-
-			if len(Runes) > 40 {
-
-				Name = string(Runes[:40])
-
-			}
-
-			Identifier.Name = Name
-
-		}
-
-	}
-
-	if Icon, Ok := RawIdentifier["Icon"].(string); Ok {
-
-		Identifier.Icon = strings.TrimSpace(Icon)
-
-	}
-
-	return Identifier
 
 }
 

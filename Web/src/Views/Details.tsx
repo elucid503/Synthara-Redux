@@ -16,26 +16,23 @@ function Details({ CurrentSong }: DetailsProps) {
 
     return (
 
-        <>
-            
-            {/* Cover Art */}
+        <div className="flex min-h-0 flex-1 flex-col">
 
-            <div className="relative aspect-square w-full max-w-md mx-auto mb-8 rounded-lg overflow-hidden shadow-2xl">
+            <div className="relative mx-auto mb-5 aspect-square w-full max-w-[min(58vh,30rem)] overflow-hidden rounded-xl shadow-2xl shadow-black/40">
 
-                <img src={NormalizeCoverURL(CurrentSong.cover)} alt={CurrentSong.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                <img src={NormalizeCoverURL(CurrentSong.cover)} alt={CurrentSong.title} referrerPolicy="no-referrer" className="h-full w-full object-cover" />
 
             </div>
 
-            {/* Song Info */}
+            <div className="min-w-0 text-center">
 
-            <div className="text-center">
-
-                <h1 className="text-3xl font-bold mb-2 truncate">{CurrentSong.title}</h1>
-                <p className="text-xl text-zinc-400 truncate"> {CurrentSong.artists.join(', ')} </p>
+                <h1 className="truncate text-3xl mt-3 font-bold">{CurrentSong.title}</h1>
+                <p className="mt-2 truncate text-lg text-zinc-400">{CurrentSong.artists.join(', ')}</p>
+                {CurrentSong.album && <p className="mb-1 truncate text-sm text-zinc-500">{CurrentSong.album}</p>}
 
             </div>
 
-        </>
+        </div>
 
     );
 

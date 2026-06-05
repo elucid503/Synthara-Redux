@@ -8,12 +8,16 @@ import (
 
 func InitializeRoutes() {
 
-	Globals.WebServer.GET("/Queues/:ID", HandleQueuePage)
+	Globals.WebServer.GET("/Queues/:ID", RateLimitMiddleware(RateLimitPage), HandleQueuePage)
 
-	Globals.WebServer.GET("/API/Queue", HandleWSConnections)
+	Globals.WebServer.GET("/API/Queue", RateLimitMiddleware(RateLimitWSConnect), HandleWSConnections)
 
-	Globals.WebServer.GET("/API/Search", HandleSearch)
-	Globals.WebServer.GET("/API/Suggestions", HandleSuggestions)
+	Globals.WebServer.GET("/API/Suggestions", RateLimitMiddleware(RateLimitSuggestions), HandleSuggestions)
+
+	Globals.WebServer.GET("/API/Auth/Login", RateLimitMiddleware(RateLimitAuthLogin), HandleAuthLogin)
+	Globals.WebServer.GET("/API/Auth/Callback", RateLimitMiddleware(RateLimitAuthCallback), HandleAuthCallback)
+	Globals.WebServer.GET("/API/Auth/Me", RateLimitMiddleware(RateLimitAuthMe), HandleAuthMe)
+	Globals.WebServer.POST("/API/Auth/Logout", RateLimitMiddleware(RateLimitAuthMe), HandleAuthLogout)
 
 }
 

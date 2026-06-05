@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
+
+import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent, type DragStartEvent, } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy, } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+import { MoreHorizontal, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
 
 import { Song } from '../Types';
 
@@ -15,184 +20,255 @@ interface QueueProps {
 
     OnMove: (FromIndex: number, ToIndex: number) => void;
 
+    ControlsLocked?: boolean;
+
 }
 
-function Queue({ Current, PreviousSongs, UpcomingSongs, ActiveContextMenu, SetActiveContextMenu, OnMove }: QueueProps) {
+const UpcomingID = (Index: number) => `upcoming-${Index}`;
 
-    const [ShowPrevious, SetShowPrevious] = useState(false);
-    const [DraggedIndex, SetDraggedIndex] = useState<number | null>(null);
-    const [DragOverIndex, SetDragOverIndex] = useState<number | null>(null);
+const NormalizeCoverURL = (URL: string): string => {
 
-    const NormalizeCoverURL = (URL: string): string => {
+    return URL.replace(/=w\d+-h\d+(-l\d+)?(-rj)?/g, '=w512-h512-l90-rj');
 
-        return URL.replace(/=w\d+-h\d+(-l\d+)?(-rj)?/g, '=w512-h512-l90-rj');
+};
 
-    };
+interface SongRowProps {
 
-    const RenderSong = (Song: Song, Mode: 'Big' | 'Normal' | 'Muted', Index: number = 0, Key?: string) => {
+    Song: Song;
+    Index?: number;
 
-        const IsBig = Mode == 'Big';
-        const IsPrevious = Mode == 'Muted';
-        const ContextType = IsPrevious ? 'Previous' : 'Upcoming';
+    ShowIndex?: boolean;
+    ShowMenu?: boolean;
 
-        const IsDragging = !IsPrevious && DraggedIndex == Index;
-        const IsDragOver = !IsPrevious && DragOverIndex == Index;
+    OnMenuClick?: (E: React.MouseEvent<HTMLButtonElement>) => void;
 
-        const HandleDragStart = (E: React.DragEvent) => {
+}
 
-            if (IsPrevious) return;
+function SongRow({ Song, Index, ShowIndex = false, ShowMenu = false, OnMenuClick }: SongRowProps) {
 
-            SetDraggedIndex(Index);
-            E.dataTransfer.effectAllowed = 'move';
+    return (
 
-        };
+        <>
 
-        const HandleDragOver = (E: React.DragEvent) => {
+            {ShowIndex && Index != null && (
 
-            if (IsPrevious || DraggedIndex == null) return;
+                <div className="w-5 shrink-0 text-center text-sm font-medium text-zinc-500">{Index + 1}</div>
 
-            E.preventDefault();
-            E.dataTransfer.dropEffect = 'move';
+            )}
 
-            if (DraggedIndex != Index) {
+            <img src={NormalizeCoverURL(Song.cover)} referrerPolicy="no-referrer" className="h-11 w-11 shrink-0 rounded-lg object-cover" />
 
-                SetDragOverIndex(Index);
+            <div className="min-w-0 flex-1">
 
-            }
+                <div className="truncate text-sm font-medium">{Song.title}</div>
+                <div className="truncate text-xs text-zinc-400">{Song.artists.join(', ')}</div>
 
-        };
+            </div>
 
-        const HandleDragLeave = () => {
+            {Song.unavailable && (
 
-            if (IsPrevious) return;
+                <span className="shrink-0 rounded bg-red-400/10 px-1.5 py-0.5 text-xs font-semibold text-red-400">Unavailable</span>
 
-            SetDragOverIndex(null);
+            )}
 
-        };
+            <div className="w-fit shrink-0 text-right text-xs font-semibold text-zinc-500">{Song.duration.formatted}</div>
 
-        const HandleDrop = (E: React.DragEvent) => {
+            {ShowMenu && OnMenuClick && (
 
-            if (IsPrevious) return;
-
-            E.preventDefault();
-
-            if (DraggedIndex != null && DraggedIndex != Index) {
-
-                OnMove(DraggedIndex, Index);
-
-            }
-
-            SetDraggedIndex(null);
-            SetDragOverIndex(null);
-
-        };
-
-        const HandleDragEnd = () => {
-
-            SetDraggedIndex(null);
-            SetDragOverIndex(null);
-
-        };
-
-        if (IsBig) {
-
-            return (
-
-                <div key={Key} className="flex items-center gap-4 p-4 rounded-xl bg-white/10">
-
-                    <img src={NormalizeCoverURL(Song.cover)} referrerPolicy='no-referrer' className="w-16 h-16 rounded-lg object-cover shadow-lg" />
-
-                    <div className="flex-1 min-w-0">
-
-                        <div className="text-lg font-bold truncate">{Song.title}</div>
-                        <div className="text-zinc-400 truncate">{Song.artists.join(', ')}</div>
-
-                    </div>
-
-                    <div className="text-zinc-400 mr-2 font-semibold">{Song.duration.formatted}</div>
-
-                </div>
-
-            );
-
-        }
-
-        return (
-
-          <div key={Key} className={`flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group relative ${IsPrevious ? 'opacity-60' : ''} ${!IsPrevious ? 'cursor-move' : '' } ${IsDragging ? 'opacity-30' : ''} ${IsDragOver ? 'border-t-2 rounded-tl-none rounded-tr-none border-white' : ''}`}
-
-            draggable={!IsPrevious}
-
-            onDragStart={HandleDragStart}
-            onDragEnd={HandleDragEnd}
-
-            onDragOver={HandleDragOver}
-            onDragLeave={HandleDragLeave}
-            onDrop={HandleDrop}
-
-            onContextMenu={(E) => {
-
-                  E.preventDefault();
-                  E.stopPropagation();
-
-                  SetActiveContextMenu(ActiveContextMenu?.index === Index && ActiveContextMenu?.type === ContextType ? null : { type: ContextType, index: Index, x: E.clientX, y: E.clientY });
-
-            }}
-
-            >
-
-                {!IsPrevious && (<div className="p-1 text-center text-zinc-500 font-medium text-sm">{Index + 1}</div>)}
-
-                <img src={NormalizeCoverURL(Song.cover)} referrerPolicy='no-referrer' className="w-10 h-10 rounded object-cover" />
-
-                <div className="flex-1 min-w-0 -ml-1">
-
-                    <div className="font-medium truncate text-sm">{Song.title}</div>
-                    <div className="text-xs text-zinc-400 truncate">{Song.artists.join(', ')}</div>
-
-                </div>
-
-                {Song.unavailable && (
-
-                    <span className="text-xs font-semibold text-red-400 bg-red-400/10 px-1.5 py-0.5 rounded shrink-0">Unavailable</span>
-
-                )}
-
-                <div className="text-xs font-semibold text-zinc-500 w-fit text-right">{Song.duration.formatted}</div>
-
-                <button onClick={(E) => {
-
-                    E.stopPropagation();
-                    const Rect = E.currentTarget.getBoundingClientRect();
-
-                    SetActiveContextMenu(ActiveContextMenu?.index === Index && ActiveContextMenu?.type === ContextType ? null : { type: ContextType, index: Index, x: Rect.right, y: Rect.bottom });
-
-                }} className="mr-2 text-zinc-400 hover:text-white transition-colors context-menu-trigger" >
+                <button type="button" onClick={OnMenuClick} className="context-menu-trigger mr-1 shrink-0 text-zinc-400 transition-colors hover:text-white" onPointerDown={(E) => E.stopPropagation()}>
 
                     <MoreHorizontal size={16} />
 
                 </button>
 
-            </div>
+            )}
 
-        );
+        </>
+
+    );
+
+}
+
+interface SortableUpcomingRowProps {
+
+    Song: Song;
+    Index: number;
+    ControlsLocked: boolean;
+
+    ActiveContextMenu: QueueProps['ActiveContextMenu'];
+    SetActiveContextMenu: QueueProps['SetActiveContextMenu'];
+
+}
+
+function SortableUpcomingRow({ Song, Index, ControlsLocked, ActiveContextMenu, SetActiveContextMenu }: SortableUpcomingRowProps) {
+
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging, } = useSortable({
+
+        id: UpcomingID(Index),
+        disabled: ControlsLocked,
+
+    });
+
+    const Style = {
+
+        transform: CSS.Transform.toString(transform),
+        transition,
 
     };
 
     return (
 
-        <div className="w-full h-fit max-w-3xl mx-auto">
+        <div className={`group relative flex items-center gap-2 rounded-lg bg-white/5 p-3 transition-shadow sm:gap-3 ${isDragging ? 'z-10 opacity-40 shadow-lg shadow-black/20' : 'hover:bg-white/10'}`}
 
-            {/* Previous Songs Toggle */}
+            ref={setNodeRef}
+            style={Style}
+
+            onContextMenu={(E) => {
+
+                if (ControlsLocked) return;
+
+                E.preventDefault();
+                E.stopPropagation();
+
+                SetActiveContextMenu(
+
+                    ActiveContextMenu?.index === Index && ActiveContextMenu?.type === 'Upcoming'
+                        ? null
+                        : { type: 'Upcoming', index: Index, x: E.clientX, y: E.clientY },
+
+                );
+
+            }}
+        >
+
+            {!ControlsLocked && (
+
+                <button className="touch-none shrink-0 cursor-grab text-zinc-500 transition-colors hover:text-white active:cursor-grabbing"
+
+                    type="button"
+                    aria-label={`Reorder ${Song.title}`}
+
+                    {...attributes}
+                    {...listeners}
+
+                >
+
+                    <GripVertical size={16} />
+
+                </button>
+
+            )}
+
+            <SongRow Song={Song} Index={Index} ShowIndex ShowMenu={!ControlsLocked}
+
+                OnMenuClick={(E) => {
+
+                    E.stopPropagation();
+                    const Rect = E.currentTarget.getBoundingClientRect();
+
+                    SetActiveContextMenu(ActiveContextMenu?.index === Index && ActiveContextMenu?.type === 'Upcoming' ? null : { type: 'Upcoming', index: Index, x: Rect.right, y: Rect.bottom });
+
+                }}
+            />
+
+        </div>
+
+    );
+
+}
+
+function Queue({ Current, PreviousSongs, UpcomingSongs, ActiveContextMenu, SetActiveContextMenu, OnMove, ControlsLocked = false }: QueueProps) {
+
+    const [ShowPrevious, SetShowPrevious] = useState(false);
+    const [ActiveDragIndex, SetActiveDragIndex] = useState<number | null>(null);
+
+    const Sensors = useSensors(
+
+        useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+
+    );
+
+    const UpcomingIDs = UpcomingSongs.map((_, Index) => UpcomingID(Index));
+
+    const HandleDragStart = (Event: DragStartEvent) => {
+
+        const Index = UpcomingIDs.indexOf(String(Event.active.id));
+
+        SetActiveDragIndex(Index >= 0 ? Index : null);
+
+    };
+
+    const HandleDragEnd = (Event: DragEndEvent) => {
+
+        SetActiveDragIndex(null);
+
+        const { active, over } = Event;
+
+        if (!over || active.id === over.id) return;
+
+        const FromIndex = UpcomingIDs.indexOf(String(active.id));
+        const ToIndex = UpcomingIDs.indexOf(String(over.id));
+
+        if (FromIndex < 0 || ToIndex < 0 || FromIndex === ToIndex) return;
+
+        OnMove(FromIndex, ToIndex);
+
+    };
+
+    const HandleDragCancel = () => {
+
+        SetActiveDragIndex(null);
+
+    };
+
+    const RenderPreviousSong = (Song: Song, Index: number) => (
+
+        <div key={`prev-${Index}`} className="group relative flex items-center gap-3 rounded-lg bg-white/5 p-3 opacity-60 sm:gap-4"
+
+            onContextMenu={(E) => {
+
+                if (ControlsLocked) return;
+
+                E.preventDefault();
+                E.stopPropagation();
+
+                SetActiveContextMenu(ActiveContextMenu?.index === Index && ActiveContextMenu?.type === 'Previous' ? null : { type: 'Previous', index: Index, x: E.clientX, y: E.clientY });
+
+            }}
+        >
+
+            <SongRow Song={Song} ShowMenu={!ControlsLocked}
+
+                OnMenuClick={(E) => {
+
+                    E.stopPropagation();
+                    const Rect = E.currentTarget.getBoundingClientRect();
+
+                    SetActiveContextMenu(ActiveContextMenu?.index === Index && ActiveContextMenu?.type === 'Previous' ? null : { type: 'Previous', index: Index, x: Rect.right, y: Rect.bottom });
+
+                }}
+
+            />
+
+        </div>
+
+    );
+
+    const ActiveDragSong = ActiveDragIndex != null ? UpcomingSongs[ActiveDragIndex] : null;
+
+    return (
+
+        <div className="mx-auto h-fit w-full max-w-4xl">
 
             {PreviousSongs.length > 0 && (
 
                 <div className="mb-6">
 
-                    <button onClick={() => SetShowPrevious(!ShowPrevious)} className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-wider hover:text-white transition-colors">
+                    <button onClick={() => SetShowPrevious(!ShowPrevious)} className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-500 transition-colors hover:text-white">
 
                         Previous
-                        {ShowPrevious ? <ChevronUp className='mb-0.5' size={16} /> : <ChevronDown className='mb-0.5' size={16} />}
+                        {ShowPrevious ? <ChevronUp className="mb-0.5" size={16} /> : <ChevronDown className="mb-0.5" size={16} />}
 
                     </button>
 
@@ -200,7 +276,7 @@ function Queue({ Current, PreviousSongs, UpcomingSongs, ActiveContextMenu, SetAc
 
                         <div className="mt-4 space-y-2">
 
-                            {PreviousSongs.map((Song, Index) => RenderSong(Song, 'Muted', Index, `prev-${Index}`))}
+                            {PreviousSongs.map(RenderPreviousSong)}
 
                         </div>
 
@@ -210,28 +286,77 @@ function Queue({ Current, PreviousSongs, UpcomingSongs, ActiveContextMenu, SetAc
 
             )}
 
-            {/* Current Song */}
-
             <div className="mb-8">
 
-                <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4">Now Playing</h2>
-                {Current && RenderSong(Current, 'Big')}
+                <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-zinc-500">Now Playing</h2>
+
+                {Current && (
+
+                    <div className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.08] p-4 shadow-lg shadow-black/10">
+
+                        <img src={NormalizeCoverURL(Current.cover)} referrerPolicy="no-referrer" className="h-16 w-16 rounded-lg object-cover shadow-lg" />
+
+                        <div className="min-w-0 flex-1">
+
+                            <div className="truncate text-lg font-bold">{Current.title}</div>
+                            <div className="truncate text-zinc-400">{Current.artists.join(', ')}</div>
+
+                        </div>
+
+                        <div className="mr-2 font-semibold text-zinc-400">{Current.duration.formatted}</div>
+
+                    </div>
+
+                )}
 
             </div>
-
-            {/* Upcoming Songs */}
 
             {UpcomingSongs.length > 0 && (
 
                 <div>
 
-                    <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4">Next Up</h2>
+                    <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-zinc-500">Next Up</h2>
 
-                    <div className="space-y-2">
+                    <DndContext sensors={Sensors} collisionDetection={closestCenter} onDragStart={HandleDragStart} onDragEnd={HandleDragEnd} onDragCancel={HandleDragCancel} >
 
-                        {UpcomingSongs.map((Song, Index) => RenderSong(Song, 'Normal', Index, `next-${Index}`))}
+                        <SortableContext items={UpcomingIDs} strategy={verticalListSortingStrategy}>
 
-                    </div>
+                            <div className="space-y-2">
+
+                                {UpcomingSongs.map((Song, Index) => (
+
+                                    <SortableUpcomingRow key={UpcomingID(Index)} Song={Song} Index={Index}
+
+                                        ControlsLocked={ControlsLocked}
+
+                                        ActiveContextMenu={ActiveContextMenu}
+                                        SetActiveContextMenu={SetActiveContextMenu}
+
+                                    />
+
+                                ))}
+
+                            </div>
+
+                        </SortableContext>
+
+                        <DragOverlay dropAnimation={{ duration: 180, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1)' }}>
+
+                            {ActiveDragSong && ActiveDragIndex != null ? (
+
+                                <div className="flex items-center gap-2 rounded-lg border border-white/20 bg-zinc-900/95 p-3 shadow-2xl shadow-black/50 sm:gap-3">
+
+                                    <GripVertical size={16} className="shrink-0 text-white" />
+
+                                    <SongRow Song={ActiveDragSong} Index={ActiveDragIndex} ShowIndex />
+
+                                </div>
+
+                            ) : null}
+
+                        </DragOverlay>
+
+                    </DndContext>
 
                 </div>
 

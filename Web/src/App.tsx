@@ -1,15 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Trash2, CornerDownRight, RefreshCw } from 'lucide-react';
 
-import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse, SearchResult, WebIdentifier } from './Types';
-import { NormalizeCoverURL, FormatTime, SendOperation, FetchLyrics, FormatURL, FormatWS, GetStoredIdentifier, SaveIdentifier } from './Utils/Misc';
+import { Song, PlayerState, WSEvents, WSMessage, Operation, LyricsResponse, InitialStateData, AuthState } from './Types';
+import { NormalizeCoverURL, FormatTime, SendOperation, FetchLyrics, FormatWS, FetchAPI } from './Utils/Misc';
 
 import DetailsView from './Views/Details';
 import LyricsView from './Views/Lyrics';
 import QueueView from './Views/Queue';
 import SearchBar from './Components/Search';
-import SearchResultsView from './Views/Search';
-import Identify from './Components/Identify';
 
 function App() {
 
@@ -26,8 +24,9 @@ function App() {
 
     const [Toast, SetToast] = useState<string | null>(null);
     const ToastTimeoutRef = useRef<any>(null);
-    const [Identifier, SetIdentifier] = useState<WebIdentifier | null>(() => GetStoredIdentifier());
-    const [ShowIdentifyModal, SetShowIdentifyModal] = useState(() => !GetStoredIdentifier());
+    const [Auth, SetAuth] = useState<AuthState>({ OAuthEnabled: false, Authenticated: false });
+    const [ControlsLocked, SetControlsLocked] = useState(false);
+    const [GuildLocked, SetGuildLocked] = useState(false);
 
     // Close context menu on click outside or scroll
 
@@ -76,7 +75,28 @@ function App() {
 
     const GuildID = window.location.href.split('/').pop()?.split('?')[0] ?? '';
 
-    const [ActiveView, SetActiveView] = useState<'Details' | 'Queue' | 'Lyrics' | 'Search'>(() => {
+    useEffect(() => {
+
+        FetchAPI('/API/Auth/Me')
+            .then((Res) => Res.json())
+            .then((Data: AuthState & { Username?: string }) => {
+
+                SetAuth({
+
+                    OAuthEnabled: !!Data.OAuthEnabled,
+                    Authenticated: !!Data.Authenticated,
+                    Username: Data.Username,
+
+                });
+
+                SetControlsLocked(!Data.OAuthEnabled || !Data.Authenticated);
+
+            })
+            .catch(() => {});
+
+    }, []);
+
+    const [ActiveView, SetActiveView] = useState<'Details' | 'Queue' | 'Lyrics'>(() => {
 
         const Params = new URLSearchParams(window.location.search);
         const View = Params.get('View');
@@ -88,12 +108,10 @@ function App() {
 
     });
 
-    const [SearchResults, SetSearchResults] = useState<SearchResult[]>([]);
-
     const [BackgroundImage, SetBackgroundImage] = useState<string>('');
 
     const CurrentSongIdRef = useRef<number | null>(null);
-    const ActiveViewRef = useRef<'Details' | 'Queue' | 'Lyrics' | 'Search'>(ActiveView);
+    const ActiveViewRef = useRef<'Details' | 'Queue' | 'Lyrics'>(ActiveView);
     const UpcomingSongsLengthRef = useRef<number>(0);
 
     const [Lyrics, SetLyrics] = useState<LyricsResponse | null>(null);
@@ -159,13 +177,30 @@ function App() {
 
                     case WSEvents.Event_Initial:
 
-                        SetCurrentSong(Message.Data.Current);
-                        SetPreviousSongs(Message.Data.Previous || []);
-                        SetUpcomingSongs(Message.Data.Upcoming || []);
-                        SetPlayerStateValue(Message.Data.State);
+                        const Initial = Message.Data as InitialStateData;
 
-                        const InitialProgress = Message.Data.Progress;
+                        SetCurrentSong(Initial.Current);
+                        SetPreviousSongs(Initial.Previous || []);
+                        SetUpcomingSongs(Initial.Upcoming || []);
+                        SetPlayerStateValue(Initial.State);
+
+                        const InitialProgress = Initial.Progress;
                         SetCurrentTime(Math.max(0, (InitialProgress - CurrentTimeBuffer)));
+
+                        if (Initial.OAuthEnabled != null) {
+
+                            SetAuth((Prev) => ({
+
+                                OAuthEnabled: !!Initial.OAuthEnabled,
+                                Authenticated: !!Initial.Authenticated,
+                                Username: Initial.Authenticated ? (Prev.Username || undefined) : undefined,
+
+                            }));
+
+                        }
+
+                        SetGuildLocked(!!Initial.GuildLocked);
+                        SetControlsLocked(!!Initial.ControlsLocked);
 
                     break;
 
@@ -212,7 +247,12 @@ function App() {
                     case WSEvents.Event_Error:
 
                         const ErrorData = Message.Data as { Message: string };
-                        ShowToast(ErrorData.Message);
+
+                        if (ErrorData.Message) {
+
+                            ShowToast(ErrorData.Message);
+
+                        }
 
                     break;
 
@@ -328,15 +368,20 @@ function App() {
 
     }, [ActiveView, CurrentSong]);
 
+    const ShowLockBanner = !Auth.OAuthEnabled || GuildLocked;
+    const LockBannerMessage = !Auth.OAuthEnabled
+        ? 'Discord OAuth is not configured. Web controls are unavailable.'
+        : 'Web controls are locked. Use /unlock in Discord to re-enable.';
+
     const HandlePlayPause = () => {
 
         if (PlayerStateValue == PlayerState.Playing) {
 
-            SendOperation(Socket, Operation.Pause);
+            SendOperation(Socket, Operation.Pause, {}, ControlsLocked);
 
         } else if (PlayerStateValue == PlayerState.Paused) {
 
-            SendOperation(Socket, Operation.Resume);
+            SendOperation(Socket, Operation.Resume, {}, ControlsLocked);
 
         }
 
@@ -344,81 +389,49 @@ function App() {
 
     const HandlePrevious = () => {
 
-        SendOperation(Socket, Operation.Last);
+        SendOperation(Socket, Operation.Last, {}, ControlsLocked);
 
     };
 
     const HandleNext = () => {
 
-        SendOperation(Socket, Operation.Next);
+        SendOperation(Socket, Operation.Next, {}, ControlsLocked);
 
     };
 
     const HandleJump = (Index: number) => {
 
-        SendOperation(Socket, Operation.Jump, { Index: Index + 1 });
+        SendOperation(Socket, Operation.Jump, { Index: Index + 1 }, ControlsLocked);
         SetActiveContextMenu(null);
 
     };
 
     const HandleRemove = (Index: number) => {
 
-        SendOperation(Socket, Operation.Remove, { Index });
+        SendOperation(Socket, Operation.Remove, { Index }, ControlsLocked);
         SetActiveContextMenu(null);
 
     };
 
     const HandleMove = (FromIndex: number, ToIndex: number) => {
 
-        SendOperation(Socket, Operation.Move, { FromIndex, ToIndex });
+        SendOperation(Socket, Operation.Move, { FromIndex, ToIndex }, ControlsLocked);
 
     };
 
     const HandleReplay = (Index: number) => {
 
-        SendOperation(Socket, Operation.Replay, { Index });
+        SendOperation(Socket, Operation.Replay, { Index }, ControlsLocked);
         SetActiveContextMenu(null);
 
     };
 
     const HandleEnqueue = (TidalID: number) => {
 
-        SendOperation(Socket, Operation.Enqueue, { TidalID });
-        SetSearchResults([]);
+        SendOperation(Socket, Operation.Enqueue, { TidalID }, ControlsLocked);
         SetActiveView('Queue');
 
     };
-
-    const HandleSearch = async (Query: string) => {
-
-        try {
-
-            const Res = await fetch(FormatURL(`/API/Search?ID=${GuildID}&q=${encodeURIComponent(Query)}`));
-            SetSearchResults(Res.ok ? await Res.json() : []);
-
-        } catch {
-
-            SetSearchResults([]);
-
-        }
-
-        SetActiveView('Search');
-
-    };
-
-    const HandleIdentifySubmit = (NewIdentifier: WebIdentifier) => {
-
-        SaveIdentifier(NewIdentifier);
-        SetIdentifier(NewIdentifier);
-        SetShowIdentifyModal(false);
-
-    };
-
-    const IdentifyModal = ShowIdentifyModal ? (
-
-        <Identify InitialValue={Identifier} Required={!Identifier} OnClose={() => SetShowIdentifyModal(false)} OnSubmit={HandleIdentifySubmit} />
-
-    ) : null;
 
     if (QueueEnded) {
 
@@ -427,7 +440,6 @@ function App() {
             <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
 
                 <div className="text-zinc-500 text-lg">This Queue has Ended</div>
-                {IdentifyModal}
 
             </div>
 
@@ -442,7 +454,6 @@ function App() {
             <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
 
                 <div className="text-zinc-500 text-lg">{HasEverConnected ? 'No Songs are currently playing.' : 'No Queue Found'}</div>
-                {IdentifyModal}
 
             </div>
 
@@ -489,19 +500,7 @@ function App() {
 
                         <div className="min-h-[200px] max-h-[500px] overflow-y-auto">
 
-                            <QueueView key={CurrentSong ? CurrentSong.tidal_id.toString() : 'none'} Current={CurrentSong} PreviousSongs={PreviousSongs} UpcomingSongs={UpcomingSongs} ActiveContextMenu={ActiveContextMenu} SetActiveContextMenu={SetActiveContextMenu} OnMove={HandleMove} />
-
-                        </div>
-
-                    )}
-
-                    {/* Search Results View */}
-
-                    {ActiveView == 'Search' && (
-
-                        <div className="min-h-[200px] max-h-[500px] overflow-y-auto">
-
-                            <SearchResultsView Results={SearchResults} OnEnqueue={HandleEnqueue} />
+                            <QueueView key={CurrentSong ? CurrentSong.tidal_id.toString() : 'none'} Current={CurrentSong} PreviousSongs={PreviousSongs} UpcomingSongs={UpcomingSongs} ActiveContextMenu={ActiveContextMenu} SetActiveContextMenu={SetActiveContextMenu} OnMove={HandleMove} ControlsLocked={ControlsLocked} />
 
                         </div>
 
@@ -532,19 +531,29 @@ function App() {
 
                 </div>
 
+                {ShowLockBanner && (
+
+                    <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-sm text-amber-100">
+
+                        {LockBannerMessage}
+
+                    </div>
+
+                )}
+
                 {/* Controls */}
 
-                <div className="flex items-center justify-center gap-8 mb-12">
+                <div className={`mb-12 flex items-center justify-center gap-8 ${ControlsLocked ? 'pointer-events-none opacity-40' : ''}`}>
 
-                    <button onClick={HandlePrevious} className="text-white hover:text-zinc-400 transition-colors" aria-label="Previous" >
+                    <button onClick={HandlePrevious} disabled={ControlsLocked} className="text-white transition-colors hover:text-zinc-400 disabled:cursor-not-allowed" aria-label="Previous" >
                         <SkipBack size={40} fill="currentColor"/>
                     </button>
 
-                    <button onClick={HandlePlayPause} className="w-20 h-20 rounded-full bg-white text-zinc-950 hover:bg-zinc-200 transition-colors flex items-center justify-center" aria-label={PlayerStateValue === PlayerState.Playing ? 'Pause' : 'Play'} >
+                    <button onClick={HandlePlayPause} disabled={ControlsLocked} className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-zinc-950 transition-colors hover:bg-zinc-200 disabled:cursor-not-allowed" aria-label={PlayerStateValue === PlayerState.Playing ? 'Pause' : 'Play'} >
                         {PlayerStateValue == PlayerState.Playing ? (<Pause size={32} fill="currentColor" /> ) : (<Play size={32} fill="currentColor" className="ml-1" /> )}
                     </button>
 
-                    <button onClick={HandleNext} className="text-white hover:text-zinc-400 transition-colors" aria-label="Next" >
+                    <button onClick={HandleNext} disabled={ControlsLocked} className="text-white transition-colors hover:text-zinc-400 disabled:cursor-not-allowed" aria-label="Next" >
                         <SkipForward size={40} fill="currentColor"/>
                     </button>
 
@@ -576,13 +585,13 @@ function App() {
 
                 <div className="max-w-2xl mx-auto">
 
-                    <SearchBar GuildID={GuildID} OnSearch={HandleSearch} OnEnqueue={HandleEnqueue} OnEditIdentify={() => SetShowIdentifyModal(true)} Identifier={Identifier} />
+                    <SearchBar GuildID={GuildID} OnEnqueue={HandleEnqueue} Auth={Auth} ControlsLocked={ControlsLocked} />
 
                 </div>
 
             </div>
 
-            {ActiveContextMenu && (() => {
+            {ActiveContextMenu && !ControlsLocked && (() => {
 
                 const IsPrevious = ActiveContextMenu.type == 'Previous';
 
@@ -628,6 +637,7 @@ function App() {
                 );
 
             })()}
+
             {Toast && (
 
                 <div className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-white text-zinc-950 rounded-lg shadow-lg z-50 animate-fade-in">
@@ -637,7 +647,7 @@ function App() {
                 </div>
 
             )}
-            {IdentifyModal}
+
         </div>
 
     );

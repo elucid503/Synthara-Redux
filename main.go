@@ -18,10 +18,15 @@ import (
 )
 
 func main() {
+
 	defer func() {
+
 		if r := recover(); r != nil {
+
 			Utils.Logger.Error("Main", fmt.Sprintf("Panic in main goroutine: %v", r))
+
 		}
+
 	}()
 
 	godotenv.Load(".env")
@@ -83,17 +88,34 @@ func main() {
 
 	Utils.Logger.Info("Discord", "Connected to Discord!")
 
+	if AuthErr := Server.InitAuth(); AuthErr != nil {
+
+		Utils.Logger.Error("Web", fmt.Sprintf("Failed to initialize Discord OAuth: %s", AuthErr.Error()))
+		os.Exit(1)
+
+	}
+
+	if Server.OAuthEnabled() {
+
+		Utils.Logger.Info("Web", "Discord OAuth enabled for web controls.")
+
+	} else {
+
+		Utils.Logger.Warn("Web", "Discord OAuth not configured (set DISCORD_CLIENT_SECRET); web controls are disabled.")
+
+	}
+
 	if (os.Getenv("REFRESH_COMMANDS") == "true") {
 
 		Handlers.InitializeCommands()
 
 	}
-	
+
 	Handlers.InitializeHandlers()
 
 	Globals.InitWebServer()
 	Server.InitializeRoutes()
-	
+
 	go Globals.WebServer.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 
 	Utils.Logger.Info("Web Server", fmt.Sprintf("Web server running on port %s", os.Getenv("PORT")))
@@ -107,7 +129,7 @@ func main() {
 	// Spotify Initialization
 
 	Spotify.Initialize(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
-	
+
 	Utils.Logger.Info("API", "Spotify client initialized.")
 
 	// Apple Music Initialization
@@ -119,9 +141,9 @@ func main() {
 	// YT Initialization
 
 	YouTube.Init()
-	
+
 	Utils.Logger.Info("API", "YouTube client initialized.")
-	
+
 	// Done with setup; now we wait for events
 
 	Utils.Hang()

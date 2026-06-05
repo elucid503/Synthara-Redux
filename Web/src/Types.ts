@@ -58,22 +58,6 @@ export enum Operation {
 
 }
 
-export interface WebIdentifier {
-
-    Name: string;
-    Icon: string;
-
-}
-
-export interface SearchResult {
-
-    tidal_id: number;
-
-    title: string;
-    subtitle: string;
-
-}
-
 export interface SuggestionItem {
 
     type: 'Track' | 'Text';
@@ -91,6 +75,30 @@ export interface WSMessage<T> {
 
     Event: WSEvents;
     Data: T;
+
+}
+
+export interface InitialStateData {
+
+    Current: Song | null;
+    Previous: Song[];
+    Upcoming: Song[];
+
+    State: PlayerState;
+    Progress: number;
+
+    OAuthEnabled?: boolean;
+    Authenticated?: boolean;
+    ControlsLocked?: boolean;
+    GuildLocked?: boolean;
+
+}
+
+export interface AuthState {
+
+    OAuthEnabled: boolean;
+    Authenticated: boolean;
+    Username?: string;
 
 }
 

@@ -10,15 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type SearchResult struct {
-
-	TidalID  int64  `json:"tidal_id"`
-
-	Title    string `json:"title"`
-	Subtitle string `json:"subtitle"`
-
-}
-
 type SuggestionItem struct {
 
 	Type     string `json:"type"`               // "Track" or "Text"
@@ -67,9 +58,9 @@ func resolveQuery(Context *gin.Context) (*Structs.Guild, string, bool) {
 
 }
 
-func HandleSearch(Context *gin.Context) {
+func HandleSuggestions(Context *gin.Context) {
 
-	_, Query, Ok := resolveQuery(Context)
+	Guild, Query, Ok := resolveQuery(Context)
 
 	if !Ok {
 
@@ -77,38 +68,9 @@ func HandleSearch(Context *gin.Context) {
 
 	}
 
-	Results := []SearchResult{}
+	if WebControlsLocked(Guild.Features.Locked, Context.Request) {
 
-	for _, S := range Tidal.GetSearchSuggestions(Query) {
-
-		if S.Metadata.Type != "Song" {
-
-			continue
-
-		}
-
-		ID, Err := strconv.ParseInt(S.Metadata.ID, 10, 64)
-
-		if Err != nil {
-
-			continue
-
-		}
-
-		Results = append(Results, SearchResult{TidalID: ID, Title: S.Metadata.Title, Subtitle: S.Metadata.Subtitle})
-
-	}
-
-	Context.JSON(http.StatusOK, Results)
-
-}
-
-func HandleSuggestions(Context *gin.Context) {
-
-	_, Query, Ok := resolveQuery(Context)
-
-	if !Ok {
-
+		Context.JSON(webControlsLockStatus(Guild.Features.Locked, Context.Request), gin.H{"Error": WebControlsLockMessage(Guild.Features.Locked, Context.Request)})
 		return
 
 	}

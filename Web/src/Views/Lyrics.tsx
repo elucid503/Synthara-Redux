@@ -39,9 +39,9 @@ function Lyrics({ Lyrics, LyricsError, CurrentTime }: LyricsProps) {
 
         return (
 
-            <div className="min-h-[200px] flex items-center justify-center">
+            <div className="flex min-h-[200px] items-center justify-center">
 
-                <div className="text-zinc-500">No Lyrics available.</div>
+                <div className="text-zinc-500">No lyrics available.</div>
 
             </div>
 
@@ -55,7 +55,7 @@ function Lyrics({ Lyrics, LyricsError, CurrentTime }: LyricsProps) {
 
             return (
 
-                <div className="min-h-[200px] flex flex-col items-center justify-center animate-pulse">
+                <div className="flex min-h-[200px] flex-col items-center justify-center animate-pulse">
                     
                     <Music size={64} className="text-zinc-500" />
                 
@@ -67,9 +67,9 @@ function Lyrics({ Lyrics, LyricsError, CurrentTime }: LyricsProps) {
 
         return (
 
-            <div className="min-h-[200px] flex items-center justify-center">
+            <div className="flex min-h-[200px] items-center justify-center">
 
-                <div className="text-zinc-500 animate-pulse">Loading Lyrics...</div>
+                <div className="animate-pulse text-zinc-500">Loading lyrics...</div>
 
             </div>
 
@@ -89,7 +89,7 @@ function Lyrics({ Lyrics, LyricsError, CurrentTime }: LyricsProps) {
 
         return (
 
-            <div className="min-h-[200px] flex flex-col items-center justify-center animate-pulse">
+            <div className="flex min-h-[200px] flex-col items-center justify-center animate-pulse">
                 
                 <Music size={64} className="text-zinc-500" />
             
@@ -103,7 +103,7 @@ function Lyrics({ Lyrics, LyricsError, CurrentTime }: LyricsProps) {
 
     return (
 
-        <div key={CurrentLineIndex} className="lyric-line-active text-center max-w-4xl mx-auto px-4">
+        <div key={CurrentLineIndex} className="lyric-line-active mx-auto max-w-4xl px-4 text-center">
             
             <div className="text-4xl font-semibold tracking-wide">
                 
@@ -133,7 +133,7 @@ function Lyrics({ Lyrics, LyricsError, CurrentTime }: LyricsProps) {
 
                             return Words.map((Word, WordIndex) => (
 
-                                <span key={WordIndex} className="whitespace-nowrap inline-block">
+                                <span key={WordIndex} className="inline-block whitespace-nowrap">
                                     
                                     {Word.map((Syllable, SyllableIndex) => {
 
@@ -141,7 +141,7 @@ function Lyrics({ Lyrics, LyricsError, CurrentTime }: LyricsProps) {
 
                                         return (
 
-                                            <span key={SyllableIndex} className={`transition-colors ease-linear ${IsActive ? 'text-white' : 'text-zinc-600'}`} style={{ transitionDuration: `${IsActive && Syllable.duration > 200 ? Syllable.duration : 200}ms` }} >
+                                            <span key={SyllableIndex} className={`transition-colors ease-linear ${IsActive ? 'text-white' : 'text-zinc-600'}`} style={{ transitionDuration: `${IsActive && Syllable.duration > 200 ? Syllable.duration : 200}ms` }}>
                                                 
                                                 {Syllable.text}
 
