@@ -2,7 +2,6 @@ package Spotify
 
 import (
 	"Synthara-Redux/APIs/Tidal"
-	"Synthara-Redux/Utils"
 	"fmt"
 	"slices"
 	"sync"
@@ -30,7 +29,7 @@ func SpotifyIDToSong(SpotifyID string) (Tidal.Song, *Track, error) {
 
 	}
 
-	return Utils.GetBestSearchResult(SearchQuery, TidalResults), SpotifyTrack, nil
+	return TidalResults[0], SpotifyTrack, nil
 
 }
 

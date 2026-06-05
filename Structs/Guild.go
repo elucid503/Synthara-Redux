@@ -655,8 +655,7 @@ func (G *Guild) HandleURI(URI string, Requestor string) (*Tidal.Song, int, error
 
 		}
 
-		Best := Utils.GetBestSearchResult(ID, SearchResults)
-		SongFound = &Best
+		SongFound = &SearchResults[0]
 
 		PosAdded = G.Queue.Add(SongFound, Requestor)
 

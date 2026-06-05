@@ -45,7 +45,7 @@ func VideoIDToSong(VideoID string) (Tidal.Song, *youtube.Video, error) {
 
 	}
 
-	return Utils.GetBestSearchResult(SearchQuery, Results), Video, nil
+	return Results[0], Video, nil
 
 }
 
@@ -80,7 +80,7 @@ func PlaylistIDToFirstSong(PlaylistID string) (Tidal.Song, *youtube.Playlist, er
 
 	}
 
-	return Utils.GetBestSearchResult(SearchQuery, Results), Playlist, nil
+	return Results[0], Playlist, nil
 }
 
 // PlaylistIDToAllSongs fetches all videos from a YouTube playlist and converts to Tidal.Song array
@@ -118,7 +118,7 @@ func PlaylistIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tidal
 
 		}
 
-		Songs = append(Songs, Utils.GetBestSearchResult(SearchQuery, Results))
+		Songs = append(Songs, Results[0])
 
 	}
 
@@ -161,7 +161,7 @@ func MusicAlbumIDToFirstSong(AlbumID string) (Tidal.Song, *youtube.Playlist, err
 
 	}
 
-	return Utils.GetBestSearchResult(SearchQuery, Results), Playlist, nil
+	return Results[0], Playlist, nil
 
 }
 
@@ -200,7 +200,7 @@ func MusicAlbumIDToAllSongs(Playlist *youtube.Playlist, IgnoreFirst bool) ([]Tid
 
 		}
 
-		Songs = append(Songs, Utils.GetBestSearchResult(SearchQuery, Results))
+		Songs = append(Songs, Results[0])
 
 	}
 
@@ -262,7 +262,7 @@ func MusicArtistIDToSongs(ArtistID string) ([]Tidal.Song, error) {
 
 		}
 
-		Songs = append(Songs, Utils.GetBestSearchResult(SearchQuery, Results))
+		Songs = append(Songs, Results[0])
 
 	}
 
